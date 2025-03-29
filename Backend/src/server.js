@@ -16,7 +16,10 @@ connectDatabase()
 
 // Routes Imports
 import userRouter from "./routes/user.routes.js";
+import resourceRouter from "./routes/resource.routes.js";
 
 
 // Routes Declarations
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/resource", resourceRouter);
+

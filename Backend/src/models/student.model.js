@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import mongoose,{ Schema } from "mongoose";
 
 const studentSchema = new Schema({
     user: {
@@ -104,3 +104,5 @@ const studentSchema = new Schema({
     ],
     
 });
+
+export const Student = mongoose.model("Student", studentSchema);
