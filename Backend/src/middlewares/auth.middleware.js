@@ -32,3 +32,24 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     }
 });
 
+export const verifyTeacher = asyncHandler(async (req, _, next) => {
+    if (req.user.role !== "teacher") {
+        throw new ApiError(403, "Forbidden: You do not have permission to access this resource.");
+    }
+    next();
+});
+
+export const verifyCoordinator = asyncHandler(async (req, _, next) => {
+    if (req.user.role !== "coordinator") {
+        throw new ApiError(403, "Forbidden: You do not have permission to access this resource.");
+    }
+    next();
+});
+
+export const verifySuperAdmin = asyncHandler(async (req, _, next) => {
+    if (req.user.role !== "super admin") {
+        throw new ApiError(403, "Forbidden: You do not have permission to access this resource.");
+    }
+    next();
+});
+
