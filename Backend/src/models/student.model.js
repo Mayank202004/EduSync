@@ -1,7 +1,7 @@
 import mongoose,{ Schema } from "mongoose";
 
 const studentSchema = new Schema({
-    user: {
+    userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
         required: true,
@@ -18,11 +18,9 @@ const studentSchema = new Schema({
         {
             relation:{
                 type:String,
-                required: true
             },
             contact:{
                 type:String,
-                required: true
             }
         }
     ],
@@ -50,47 +48,37 @@ const studentSchema = new Schema({
     parentsInfo:{
         fatherName:{
             type: String,
-            required: true
         },
         fatherOccupation:{
             type: String,
-            required: true
         },
         fatherIncome:{
             type: Number,
-            required: true
         },
         motherName:{
             type: String,
-            required: true
         },
         motherOccupation:{
             type: String,
-            required: true
         },
         motherIncome:{
             type: Number,
-            required: true
         },
     },
     siblingInfo:[
         {
             name:{
                 type: String,
-                required: true
             },
             age:{
                 type: Number,
-                required: true
             },
             relation:{
                 type: String,
                 enum: ["Brother", "Sister"],
-                required: true
             },
             isInSameSchool:{
                 type: Boolean,
-                required: true
             },
             class:{
                 type: String,
