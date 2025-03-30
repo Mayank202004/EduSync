@@ -167,17 +167,17 @@ export const addResource = asyncHandler(async (req, res) => {
     try {
         const { className, subjectName, termNumber, chapterName } = req.body;
 
-        // ✅ Validate required fields
+        // Validate required fields
         if ([className, subjectName, termNumber, chapterName].some(field => !field?.trim())) {
             throw new ApiError(400, "All fields are required.");
         }
 
-        // ✅ Check if files exist
+        // Check if files exist
         if (!req.files || req.files.length === 0) {
             throw new ApiError(400, "At least one file is required.");
         }
 
-        // ✅ Upload each file to Cloudinary
+        // Upload each file to Cloudinary
         const uploadedFiles = await Promise.all(
             req.files.map(async (file) => {
                 const cloudinaryResponse = await uploadOnCloudinary(file.path);
@@ -188,7 +188,6 @@ export const addResource = asyncHandler(async (req, res) => {
             })
         );
 
-        // ✅ Find and Update the Resource in One Query
         const updatedClass = await SchoolResource.findOneAndUpdate(
             { 
                 class: className, 
@@ -203,9 +202,9 @@ export const addResource = asyncHandler(async (req, res) => {
             },
             {
                 arrayFilters: [
-                    { "subject.subjectName": subjectName },  // ✅ FIXED: Changed from `name` to `subjectName`
-                    { "term.termNumber": termNumber },       // ✅ Ensure correct field name
-                    { "chapter.chapterName": chapterName }   // ✅ Ensure correct field name
+                    { "subject.subjectName": subjectName },  
+                    { "term.termNumber": termNumber },      
+                    { "chapter.chapterName": chapterName }  
                 ],
                 new: true
             }
