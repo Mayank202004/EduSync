@@ -3,6 +3,7 @@ import { ApiResponse } from '../utils/apiResponse.js';
 import { ApiError}  from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { Student } from '../models/student.model.js';
+import { uploadOnCloudinary } from '../utils/cloudinary.js';
 
 /**
  * @desc Add a new class
@@ -162,31 +163,63 @@ export const addChapter = asyncHandler(async (req, res) => {
 
 
 // Add a resource to a chapter
-export const addResource = async (req, res, next) => {
+export const addResource = asyncHandler(async (req, res) => {
     try {
-        const { classNumber, subjectName, termNumber, chapterTitle } = req.params;
-        const { type, url, description } = req.body;
+        const { className, subjectName, termNumber, chapterName } = req.body;
 
-        const schoolClass = await SchoolResource.findOne({ classNumber });
-        if (!schoolClass) return next(new ApiError('Class not found', 404));
+        // ✅ Validate required fields
+        if ([className, subjectName, termNumber, chapterName].some(field => !field?.trim())) {
+            throw new ApiError(400, "All fields are required.");
+        }
 
-        const subject = schoolClass.subjects.find(sub => sub.name === subjectName);
-        if (!subject) return next(new ApiError('Subject not found', 404));
+        // ✅ Check if files exist
+        if (!req.files || req.files.length === 0) {
+            throw new ApiError(400, "At least one file is required.");
+        }
 
-        const term = subject.terms.find(term => term.termNumber == termNumber);
-        if (!term) return next(new ApiError('Term not found', 404));
+        // ✅ Upload each file to Cloudinary
+        const uploadedFiles = await Promise.all(
+            req.files.map(async (file) => {
+                const cloudinaryResponse = await uploadOnCloudinary(file.path);
+                if (!cloudinaryResponse) {
+                    throw new ApiError(500, "Error while uploading file.");
+                }
+                return { type: cloudinaryResponse.resource_type, url: cloudinaryResponse.secure_url };
+            })
+        );
 
-        const chapter = term.chapters.find(chap => chap.title === chapterTitle);
-        if (!chapter) return next(new ApiError('Chapter not found', 404));
+        // ✅ Find and Update the Resource in One Query
+        const updatedClass = await SchoolResource.findOneAndUpdate(
+            { 
+                class: className, 
+                "subjects.subjectName": subjectName,  
+                "subjects.terms.termNumber": termNumber,  
+                "subjects.terms.chapters.chapterName": chapterName  
+            },
+            {
+                $push: { 
+                    "subjects.$[subject].terms.$[term].chapters.$[chapter].resources": { $each: uploadedFiles }
+                }
+            },
+            {
+                arrayFilters: [
+                    { "subject.subjectName": subjectName },  // ✅ FIXED: Changed from `name` to `subjectName`
+                    { "term.termNumber": termNumber },       // ✅ Ensure correct field name
+                    { "chapter.chapterName": chapterName }   // ✅ Ensure correct field name
+                ],
+                new: true
+            }
+        );
 
-        chapter.resources.push({ type, url, description });
-        await schoolClass.save();
+        if (!updatedClass) {
+            throw new ApiError(404, "Class, subject, term, or chapter not found.");
+        }
 
-        res.json(new ApiResponse(true, 'Resource added successfully', schoolClass, 200));
+        res.status(200).json(new ApiResponse(true, "Resources added successfully", uploadedFiles, 200));
     } catch (error) {
-        next(new ApiError(error.message, 400));
+        throw new ApiError(400,error.message)
     }
-};
+});
 
 // Delete a class
 export const deleteClass = async (req, res, next) => {
@@ -204,22 +237,30 @@ export const deleteClass = async (req, res, next) => {
     }
 };
 
+/**
+ * @desc Get Students Resources (based on his class)
+ * @route /resource/me
+ * @access Private (user)
+ */
 export const getMyResources = asyncHandler(async (req, res) => {
     try{
         if(req.user.role !== 'student'){
             throw new ApiError(403, "Forbidden: You do not have permission to access this resource.");
         }
         const userId = req.user._id;
-        const className = Student.findById(userId).class;
-        if (!className) {
+
+        const student = await Student.findOne({ userId: userId });
+        if (!student || !student.class) {
             throw new ApiError(404, "Class not found for this user.");
         }
 
-        const resource = SchoolResource.findOne({ class: className });
+        const className = student.class;
+
+        const resource = await SchoolResource.findOne({ class: className });
         if (!resource) {
             throw new ApiError(404, "Resource not found for this class.");
         }
-        res.status(200).json(new ApiResponse(200, resource, "Resources fetched successfully"));
+        res.status(200).json(new ApiResponse(200, resource.subjects, "Resources fetched successfully"));
     }catch (error) {
         throw new ApiError(500, error.message);
     }
