@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { validateRegisterInput, validateUpdateUserInput} from "../validators/user.validator.js";
 import jwt from "jsonwebtoken";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { Student } from "../models/student.model.js"; 
 
 /**
  * @desc   Generate access and refresh tokens
@@ -66,8 +67,6 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!["super admin", "student","teacher"].includes(userRole)) {
         throw new ApiError(400, "Role must be either admin or student");
     }
-    let verified=false;
-    if(userRole == "student") verified=true;
 
     // Create new user
     const user = await User.create({
@@ -76,7 +75,7 @@ const registerUser = asyncHandler(async (req, res) => {
         username,
         password,
         role: userRole,
-        verified
+        verified:false
     });
 
     const createdUser = await User.findById(user._id).select(
@@ -85,6 +84,16 @@ const registerUser = asyncHandler(async (req, res) => {
 
     if (!createdUser) {
         throw new ApiError(500, "Error creating user");
+    }
+
+    // Make an entry in student schema 
+    if (userRole === "student") {
+        const student = await Student.create({
+            userId: user._id, 
+        });
+        if(!student){
+            throw new ApiError(500,"Error Creating Student");
+        }
     }
 
     return res
@@ -115,6 +124,10 @@ const loginUser = asyncHandler(async (req, res) => {
 
     if (!user) {
         throw new ApiError(404, "Invalid Credentials");
+    }
+
+    if(!user.verified){
+        throw new ApiError(403,"You are not verified. Contact super admin");
     }
 
     const isPasswordValid = await user.verifyPassword(password);
