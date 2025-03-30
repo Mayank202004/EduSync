@@ -6,5 +6,6 @@ const router = Router()
 
 // Secure Routes
 router.route("/class-details").post(verifyJWT,verifySuperAdmin,StudentController.addClassDetails);
+router.route("/parent-details").post(verifyJWT,StudentController.addParentInfo);
 
 export default router;
