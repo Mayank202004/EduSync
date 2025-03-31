@@ -16,10 +16,13 @@ const studentSchema = new Schema({
     },
     parentContact:[
         {
+            name:{
+                type:String
+            },
             relation:{
                 type:String,
             },
-            contact:{
+            phone:{
                 type:String,
             }
         }

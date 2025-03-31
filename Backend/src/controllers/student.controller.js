@@ -80,6 +80,7 @@ export const addParentInfo = asyncHandler(async (req, res) => {
  * @access Private (Student)
  */
 export const addSiblingInfo = asyncHandler(async (req, res) => {
+    console.log(req.body);
     const { name, age, relation, isInSameSchool, class: siblingClass, div } = req.body;
 
     if (
@@ -141,7 +142,11 @@ export const addSiblingInfo = asyncHandler(async (req, res) => {
  * @access Private (sports teacher)
  */
 export const addPhysicalInfo = asyncHandler(async (req, res) => {
-    const { height, weight } = req.body;
+    const { studId,height, weight } = req.body;
+
+    if(!studId?.trim()){
+        throw new ApiError(400,"Student Id is required");
+    }
 
     if (height == null && weight == null) {
         throw new ApiError(400, "At least one of height or weight must be provided");
@@ -151,8 +156,8 @@ export const addPhysicalInfo = asyncHandler(async (req, res) => {
     if (height != null) updateData.height = height;
     if (weight != null) updateData.weight = weight;
 
-    const student = await Student.findOneAndUpdate(
-        { userId: req.user._id },
+    const student = await Student.findByIdAndUpdate(
+        studId,
         { $set: updateData },
         { new: true, runValidators: true }
     );
@@ -164,20 +169,22 @@ export const addPhysicalInfo = asyncHandler(async (req, res) => {
     res.status(200).json({ message: "Physical information updated successfully", student });
 });
 
+// Add other details
 export const addStudentDetails = asyncHandler(async (req, res) => {
     const { address, dob, bloodGroup } = req.body;
 
-    // Validate required fields
-    if (!address?.trim() || !dob || !bloodGroup) {
-        throw new ApiError(400, "All fields (address, dob, bloodGroup) are required");
+    if (!address?.trim() && !dob && !bloodGroup) {
+        throw new ApiError(400, "At least one field (address, dob, or bloodGroup) is required");
     }
 
-    // Validate blood group
-    if (!["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].includes(bloodGroup)) {
+    if (bloodGroup && !["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].includes(bloodGroup)) {
         throw new ApiError(400, "Invalid blood group");
     }
 
-    const updateData = { address, dob, bloodGroup };
+    const updateData = {};
+    if (address?.trim()) updateData.address = address;
+    if (dob) updateData.dob = dob;
+    if (bloodGroup) updateData.bloodGroup = bloodGroup;
 
     const student = await Student.findOneAndUpdate(
         { userId: req.user._id },
@@ -189,9 +196,11 @@ export const addStudentDetails = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Student not found");
     }
 
-    res.status(200).json({ message: "Student details added successfully", student });
+    res.status(200).json({ message: "Student details updated successfully", student });
 });
 
+
+// Add Alergies
 export const addAllergy = asyncHandler(async (req, res) => {
     const { allergy } = req.body;
 
@@ -201,7 +210,7 @@ export const addAllergy = asyncHandler(async (req, res) => {
 
     const student = await Student.findOneAndUpdate(
         { userId: req.user._id },
-        { $push: { allergies: allergy } }, // Pushes the new allergy into the array
+        { $push: { allergies: allergy } }, 
         { new: true, runValidators: true }
     );
 
@@ -209,27 +218,27 @@ export const addAllergy = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Student not found");
     }
 
-    res.status(200).json({ message: "Allergy added successfully", student });
+    res.status(200).json(new ApiResponse(200,student,"Allergy added successfully"));
 });
 
+// Add Parents Contact
 export const addParentContact = asyncHandler(async (req, res) => {
-    const { name, phone } = req.body;
+    const { name,relation, phone } = req.body;
 
-    if (!name?.trim() || !phone?.trim()) {
-        throw new ApiError(400, "Both name and phone are required");
+    if (!name?.trim() || !phone?.trim() || !relation.trim()) {
+        throw new ApiError(400, "name, relation and phone are required");
     }
 
     const student = await Student.findOneAndUpdate(
         { userId: req.user._id },
-        { $push: { parentContact: { name, phone } } }, // Pushes the new contact into the array
+        { $push: { parentContact: { name,relation, phone } } }, 
         { new: true, runValidators: true }
     );
 
     if (!student) {
         throw new ApiError(404, "Student not found");
     }
-
-    res.status(200).json({ message: "Parent contact added successfully", student });
+    res.status(200).json(new ApiResponse(200,student,"Parent contact added successfully"));
 });
 
 
