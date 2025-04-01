@@ -3,6 +3,7 @@ import { ApiResponse } from '../utils/apiResponse.js';
 import { ApiError}  from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { Student } from '../models/student.model.js';
+import { Teacher } from '../models/teacher.model.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 
 /**
@@ -261,6 +262,75 @@ export const getMyResources = asyncHandler(async (req, res) => {
         }
         res.status(200).json(new ApiResponse(200, resource.subjects, "Resources fetched successfully"));
     }catch (error) {
+        throw new ApiError(500, error.message);
+    }
+});
+
+
+export const getTeacherResources = asyncHandler(async (req, res) => {
+    try {
+        // Get teacher's userId from the request
+        const userId = req.user._id;
+
+        // Find the teacher based on the userId
+        const teacher = await Teacher.findOne({ userId: userId });
+        if (!teacher) {
+            throw new ApiError(404, "Teacher not found.");
+        }
+
+        // Check if the teacher has subjects assigned
+        if (!teacher.subjects || teacher.subjects.length === 0) {
+            return res.status(200).json(new ApiResponse(200, [], "No subjects assigned to this teacher."));
+        }
+
+        // Prepare the result to filter the class and return only those subjects
+        const teacherResources = [];
+
+        // Iterate over the teacher's subjects
+        for (const subject of teacher.subjects) {
+            for (const cls of subject.classes) {
+                // Find the class in SchoolResource
+                const resource = await SchoolResource.findOne({ class: cls.class });
+
+                let subjectData = {
+                    subjectName: subject.name,
+                    terms: []
+                };
+
+                // If resource exists, get the subject details
+                if (resource && resource.subjects) {
+                    const foundSubject = resource.subjects.find(resSub => resSub.subjectName === subject.name);
+
+                    if (foundSubject) {
+                        subjectData.terms = Array.isArray(foundSubject.terms) 
+                            ? foundSubject.terms.map(term => ({
+                                termNumber: term.termNumber,
+                                chapters: term.chapters || []
+                            }))
+                            : [];
+                    }
+                }
+
+                // Check if class is already in the result
+                let classIndex = teacherResources.findIndex(item => item.class === cls.class);
+
+                if (classIndex === -1) {
+                    // If class doesn't exist, create a new entry
+                    teacherResources.push({
+                        class: cls.class,
+                        subjects: [subjectData]
+                    });
+                } else {
+                    // If class exists, add the subject to that class
+                    teacherResources[classIndex].subjects.push(subjectData);
+                }
+            }
+        }
+
+        // Return the resources with class, subjects, and their respective terms and chapters
+        return res.status(200).json(new ApiResponse(200, teacherResources, "Teacher resources fetched successfully"));
+    } catch (error) {
+        // Handle any errors
         throw new ApiError(500, error.message);
     }
 });
