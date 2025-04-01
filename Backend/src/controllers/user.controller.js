@@ -6,6 +6,7 @@ import { validateRegisterInput, validateUpdateUserInput} from "../validators/use
 import jwt from "jsonwebtoken";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Student } from "../models/student.model.js"; 
+import { Teacher } from "../models/teacher.model.js";
 
 /**
  * @desc   Generate access and refresh tokens
@@ -93,6 +94,14 @@ const registerUser = asyncHandler(async (req, res) => {
         });
         if(!student){
             throw new ApiError(500,"Error Creating Student");
+        }
+    }
+    else if(userRole ==="teacher"){
+        const teacher = await Teacher.create({
+            userId: user._id
+        });
+        if(!teacher){
+            throw new ApiError(500,"Error Creating Teacher");
         }
     }
 

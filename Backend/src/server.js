@@ -18,10 +18,12 @@ connectDatabase()
 import userRouter from "./routes/user.routes.js";
 import resourceRouter from "./routes/resource.routes.js";
 import studentRouter from "./routes/student.routes.js";
+import teacherRouter from "./routes/teacher.routes.js";
 
 
 // Routes Declarations
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/resource", resourceRouter);
 app.use("/api/v1/student",studentRouter);
+app.use("/api/v1/teacher",teacherRouter);
 
