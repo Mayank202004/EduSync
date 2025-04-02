@@ -269,7 +269,6 @@ export const getMyResources = asyncHandler(async (req, res) => {
 
 export const getTeacherResources = asyncHandler(async (req, res) => {
     try {
-        // Get teacher's userId from the request
         const userId = req.user._id;
 
         // Find the teacher based on the userId
@@ -327,10 +326,8 @@ export const getTeacherResources = asyncHandler(async (req, res) => {
             }
         }
 
-        // Return the resources with class, subjects, and their respective terms and chapters
         return res.status(200).json(new ApiResponse(200, teacherResources, "Teacher resources fetched successfully"));
     } catch (error) {
-        // Handle any errors
         throw new ApiError(500, error.message);
     }
 });
