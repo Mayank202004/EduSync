@@ -128,3 +128,67 @@ export const getAttendance = asyncHandler(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200,attendance,"Attendence fetched Succesfully"));
 });
+
+
+
+export const getMyAttendance = asyncHandler(async (req, res) => {
+    const student = await Student.findOne({ userId: req.user._id }).select("_id");
+    if (!student) {
+        throw new ApiError(404, "Student not found");
+    }
+
+    const month = parseInt(req.body.month); // 1-12
+    const year = parseInt(req.body.year) || new Date().getFullYear();
+
+    let dateFilter = {};
+
+    if (!isNaN(month) && month >= 1 && month <= 12) {
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+        dateFilter.date = { $gte: startDate, $lte: endDate };
+    }
+
+    const attendanceRecords = await ClassAttendance.find({
+        "attendance.studentId": student._id,
+        ...dateFilter,
+    });
+
+    if (!attendanceRecords.length) {
+        throw new ApiError(404, "No attendance records found");
+    }
+
+    let present = 0;
+    let absent = 0;
+    let leave = 0;
+
+    const formattedAttendance = attendanceRecords.map((record) => {
+        const studentAttendance = record.attendance.find((a) =>
+            a.studentId.equals(student._id)
+        );
+
+        const status = studentAttendance?.status || "Absent";
+
+        // Count attendance types
+        if (status === "Present") present++;
+        else if (status === "Leave" || status === "Permitted") leave++;
+        else absent++;
+
+        return {
+            date: record.date,
+            status: status,
+        };
+    });
+
+    res.status(200).json(
+        new ApiResponse(200, {
+            attendance: formattedAttendance,
+            summary: {
+                present,
+                absent,
+                leave,
+            },
+        }, "Attendance fetched successfully")
+    );
+});
+
+
