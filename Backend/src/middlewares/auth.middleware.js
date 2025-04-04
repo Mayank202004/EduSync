@@ -1,5 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
+import { Teacher } from "../models/teacher.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
 
@@ -40,11 +41,22 @@ export const verifyStudent = asyncHandler(async(req,_,next) =>{
 });
 
 export const verifyTeacher = asyncHandler(async (req, _, next) => {
-    if (req.user.role !== "teacher") {
+    const user = req.user;
+
+    if (!user || user.role !== "teacher") {
         throw new ApiError(403, "Forbidden: You do not have permission to access this resource.");
     }
+
+    const teacher = await Teacher.findOne({userId:user._id}).select("-phone -address -userId -classCoordinator");
+
+    if (!teacher) {
+        throw new ApiError(404, "No teacher found");
+    }
+
+    req.teacher = teacher;
     next();
 });
+
 
 export const verifyCoordinator = asyncHandler(async (req, _, next) => {
     if (req.user.role !== "coordinator") {
