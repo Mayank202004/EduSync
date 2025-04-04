@@ -3,6 +3,7 @@ import { Student } from "../models/student.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import ExcelJS from "exceljs";
 
 /**
  * @desc Mark attendence of a class
@@ -43,11 +44,19 @@ export const markAttendance = asyncHandler(async (req, res) => {
         if (!date?.trim()) {
             throw new ApiError(400, "Date is required");
         }
+  
+        // Parse and normalize date to avoid time-based errors
+        const parsedDate = new Date(date);
+        parsedDate.setHours(0, 0, 0, 0);
+        
+        
+        
+        
 
         const markedBy = req.teacher._id;
 
         // Check for duplicate attendance
-        const alreadyExists = await ClassAttendance.findOne({ date, class: className, div });
+        const alreadyExists = await ClassAttendance.findOne({ date: parsedDate, class: className, div });
         if (alreadyExists) {
             return res.status(400).json({ message: "Attendance already marked for this class on this date." });
         }
@@ -77,7 +86,7 @@ export const markAttendance = asyncHandler(async (req, res) => {
 
         // Save attendance
         const saved = await ClassAttendance.create({
-            date,
+            date: parsedDate,
             class: className,
             div,
             markedBy,
@@ -99,7 +108,7 @@ export const markAttendance = asyncHandler(async (req, res) => {
  * @route POST /api/attendance/daily
  * @access Private (User)
  */
-export const getAttendance = asyncHandler(async (req, res) => {
+export const getDailyAttendance = asyncHandler(async (req, res) => {
     const { date, class: className, div } = req.body;
 
      if (!date || !className || !div) {
@@ -192,3 +201,227 @@ export const getMyAttendance = asyncHandler(async (req, res) => {
 });
 
 
+export const getAttendance = asyncHandler(async (req, res) => {
+    const { month, year, class: className, div } = req.body;
+
+    if (!className || !div) {
+        throw new ApiError(400, "Class and div are required");
+    }
+
+    const filter = { class: className, div };
+
+    if (!isNaN(parseInt(month)) && month >= 1 && month <= 12) {
+        const selectedYear = parseInt(year) || new Date().getFullYear();
+        const startDate = new Date(selectedYear, month - 1, 1);
+        const endDate = new Date(selectedYear, month, 0, 23, 59, 59, 999);
+        filter.date = { $gte: startDate, $lte: endDate };
+    }
+
+    const attendanceRecords = await ClassAttendance.find(filter).populate({
+        path: "attendance.studentId",
+        select: "userId",
+        populate: {
+            path: "userId",
+            select: "fullName"
+        }
+    }).select("-__v -createdAt -updatedAt -class -div");
+
+    if (!attendanceRecords.length) {
+        throw new ApiError(404, "No attendance records found");
+    }
+
+    const formatted = attendanceRecords.map((record) => {
+        const students = record.attendance.map((entry) => ({
+            name: entry.studentId?.userId?.fullName || "Unknown",
+            status: entry.status
+        })).sort((a, b) => a.name.localeCompare(b.name));
+
+        // Convert date to IST string (YYYY-MM-DD)
+        const dateIST = record.date.toLocaleDateString("en-IN", {
+            timeZone: "Asia/Kolkata",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        }).split("/").reverse().join("-"); // DD/MM/YYYY → YYYY-MM-DD
+
+        return {
+            date: dateIST,
+            students
+        };
+    });
+
+    res.status(200).json(
+        new ApiResponse(200, formatted, "Attendance fetched successfully")
+    );
+});
+
+
+
+// Utility to get month start and end in UTC
+function getMonthStartEnd(year, month) {
+    // month: 1-12
+    const start = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
+    const end = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
+    return { start, end };
+}
+
+// Convert UTC date to IST in YYYY-MM-DD format
+function convertToISTDateString(date) {
+    if (!date || isNaN(new Date(date))) return null;
+    const istDate = new Date(date.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+    const yyyy = istDate.getFullYear();
+    const mm = (istDate.getMonth() + 1).toString().padStart(2, "0");
+    const dd = istDate.getDate().toString().padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+}
+
+export const exportAttendanceExcel = asyncHandler(async (req, res) => {
+    const { month, year, class: className, div } = req.body;
+    const targetYear = year || new Date().getFullYear();
+
+    const query = {};
+    if (className) query.class = className;
+    if (div) query.div = div;
+
+    let records = [];
+
+    if (month) {
+        const { start, end } = getMonthStartEnd(targetYear, month);
+        query.date = { $gte: start, $lte: end };
+
+        records = await ClassAttendance.find(query)
+            .sort("date")
+            .populate({ path: "attendance.studentId", populate: { path: "userId", select: "fullName" } });
+    } else {
+        records = await ClassAttendance.find(query)
+            .sort("date")
+            .populate({ path: "attendance.studentId", populate: { path: "userId", select: "fullName" } });
+    }
+
+    if (!records.length) throw new ApiError(404, "No attendance records found");
+
+    const students = await Student.find().populate("userId", "fullName");
+    const studentNames = students.map(s => s.userId.fullName);
+
+    const workbook = new ExcelJS.Workbook();
+    const groupByMonth = {};
+
+    records.forEach(record => {
+        const monthKey = `${record.date.getFullYear()}-${(record.date.getMonth() + 1).toString().padStart(2, "0")}`;
+        if (!groupByMonth[monthKey]) groupByMonth[monthKey] = [];
+        groupByMonth[monthKey].push(record);
+    });
+
+    const monthsToExport = month
+        ? [`${targetYear}-${month.toString().padStart(2, "0")}`]
+        : Object.keys(groupByMonth);
+
+    for (const m of monthsToExport) {
+        const data = groupByMonth[m];
+        const dates = [...new Set(data.map(r => convertToISTDateString(r.date)).filter(Boolean))].sort();
+
+        const attendanceData = {};
+        studentNames.forEach(name => {
+            attendanceData[name] = {};
+            dates.forEach(date => attendanceData[name][date] = "AB");
+        });
+
+        data.forEach(record => {
+            const date = convertToISTDateString(record.date);
+            record.attendance.forEach(entry => {
+                const name = entry.studentId?.userId?.fullName;
+                if (name && date) {
+                    attendanceData[name][date] =
+                        entry.status === "Present" ? "P" :
+                        entry.status === "Permitted Leave" ? "PL" :
+                        "AB";
+                }
+            });
+        });
+
+        const sheetName = month ? `Attendance_${m}` : m;
+        const worksheet = workbook.addWorksheet(sheetName);
+
+        const header = ["Student Name", ...dates, "Total P", "Total AB", "Total PL"];
+        worksheet.addRow(header).font = { bold: true };
+        worksheet.getRow(1).fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'D9E1F2' },
+        };
+
+        Object.entries(attendanceData).forEach(([name, statuses]) => {
+            const values = Object.values(statuses);
+            const totalP = values.filter(v => v === "P").length;
+            const totalAB = values.filter(v => v === "AB").length;
+            const totalPL = values.filter(v => v === "PL").length;
+            worksheet.addRow([name, ...values, totalP, totalAB, totalPL]);
+        });
+
+        // Summary rows (column-wise count of statuses)
+        const summaryP = ["P"], summaryAB = ["AB"], summaryPL = ["PL"];
+        dates.forEach(date => {
+            let p = 0, ab = 0, pl = 0;
+            Object.values(attendanceData).forEach(record => {
+                const status = record[date];
+                if (status === "P") p++;
+                else if (status === "AB") ab++;
+                else if (status === "PL") pl++;
+            });
+            summaryP.push(p); summaryAB.push(ab); summaryPL.push(pl);
+        });
+
+        summaryP.push("", "", "");
+        summaryAB.push("", "", "");
+        summaryPL.push("", "", "");
+
+        const lastRowStart = worksheet.lastRow.number + 1;
+        worksheet.addRow(summaryP);
+        worksheet.addRow(summaryAB);
+        worksheet.addRow(summaryPL);
+
+        // Column styling
+        worksheet.columns.forEach((col, idx) => {
+            col.width = idx === 0 ? 30 : 12;
+            col.alignment = { vertical: 'middle', horizontal: idx === 0 ? 'left' : 'center' };
+        });
+
+        // Highlight total columns per student
+        const totalCols = header.length;
+        const dataRowCount = students.length;
+        ["DFF0D8", "F2DEDE", "FCF8E3"].forEach((color, i) => {
+            worksheet.getColumn(totalCols - 2 + i).eachCell((cell, row) => {
+                if (row > 1 && row <= dataRowCount + 1) {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: color }
+                    };
+                }
+            });
+        });
+
+        // Highlight bottom summary rows for each date column
+        const colors = ["DFF0D8", "F2DEDE", "FCF8E3"]; // Green for P, Red for AB, Yellow for PL
+        for (let i = 0; i < 3; i++) {
+            const row = worksheet.getRow(lastRowStart + i);
+            row.eachCell((cell, colNumber) => {
+                // Skip "Student Name" column and total columns
+                if (colNumber > 1 && colNumber <= header.length - 3) {
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: colors[i] }
+                    };
+                }
+            });
+}
+
+    }
+
+    const filename = `Attendance_${className || 'Class'}_${div || 'Div'}_${month ? `${month}_${targetYear}` : 'All'}.xlsx`;
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+    await workbook.xlsx.write(res);
+    res.end();
+});
