@@ -1,9 +1,9 @@
-import express from 'express';
+import { Router } from 'express';
 import * as ResourceController from '../controllers/resource.controller.js';
 import { verifyJWT,verifySuperAdmin, verifyTeacher } from '../middlewares/auth.middleware.js';
 import { upload } from '../middlewares/multer.middleware.js';
 
-const router = express.Router();
+const router = Router();
 
 router.post('/add-class',verifyJWT,verifySuperAdmin, ResourceController.addClass);
 router.get('/classes', verifyJWT,verifySuperAdmin,ResourceController.getAllClasses);
