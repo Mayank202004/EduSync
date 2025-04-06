@@ -49,9 +49,6 @@ export const markAttendance = asyncHandler(async (req, res) => {
         const parsedDate = new Date(date);
         parsedDate.setHours(0, 0, 0, 0);
         
-        
-        
-        
 
         const markedBy = req.teacher._id;
 
@@ -139,7 +136,11 @@ export const getDailyAttendance = asyncHandler(async (req, res) => {
 });
 
 
-
+/**
+ * @desc Get my attenddance (Student)
+ * @route POST /api/attendance/me
+ * @access Private (Student)
+ */
 export const getMyAttendance = asyncHandler(async (req, res) => {
     const student = await Student.findOne({ userId: req.user._id }).select("_id");
     if (!student) {
@@ -201,6 +202,11 @@ export const getMyAttendance = asyncHandler(async (req, res) => {
 });
 
 
+/**
+ * @desc Find overall or monthly attendance of a class
+ * @route POST /api/attendance
+ * @access Private (Teacher)
+ */
 export const getAttendance = asyncHandler(async (req, res) => {
     const { month, year, class: className, div } = req.body;
 
@@ -257,7 +263,9 @@ export const getAttendance = asyncHandler(async (req, res) => {
 
 
 
-// Utility to get month start and end in UTC
+/** 
+ * @desc Utility to get month start and end in UTC
+ */
 function getMonthStartEnd(year, month) {
     // month: 1-12
     const start = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0));
@@ -265,7 +273,10 @@ function getMonthStartEnd(year, month) {
     return { start, end };
 }
 
-// Convert UTC date to IST in YYYY-MM-DD format
+
+/**
+ * @desc Convert UTC date to IST in YYYY-MM-DD format
+*/
 function convertToISTDateString(date) {
     if (!date || isNaN(new Date(date))) return null;
     const istDate = new Date(date.toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
@@ -275,6 +286,12 @@ function convertToISTDateString(date) {
     return `${yyyy}-${mm}-${dd}`;
 }
 
+
+/**
+ * @desc Export Attendance per month / Overall to excel
+ * @route POST /api/attendance/export
+ * @access Private (Class Teacher/Class Coordinator/Super Admin)
+ */
 export const exportAttendanceExcel = asyncHandler(async (req, res) => {
     const { month, year, class: className, div } = req.body;
     const targetYear = year || new Date().getFullYear();

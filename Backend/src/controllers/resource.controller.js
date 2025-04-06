@@ -267,6 +267,11 @@ export const getMyResources = asyncHandler(async (req, res) => {
 });
 
 
+/**
+ * @desc Get all teacher resources (Based of classes/subjects he/she teaches)
+ * @route GET /api/resource/teacher-resource
+ * @access Private (Teacher)
+ */
 export const getTeacherResources = asyncHandler(async (req, res) => {
     try {
         const userId = req.user._id;
