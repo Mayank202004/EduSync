@@ -162,8 +162,11 @@ export const addChapter = asyncHandler(async (req, res) => {
     }
 });
 
-
-// Add a resource to a chapter
+/**
+ * @desc Add a resource to a chapter
+ * @route POST /api/resource/add-resource
+ * @access Private (Super Admin)
+ */
 export const addResource = asyncHandler(async (req, res) => {
     try {
         const { className, subjectName, termNumber, chapterName } = req.body;
