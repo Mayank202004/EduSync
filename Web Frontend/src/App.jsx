@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useEffect } from 'react'
 import Topbar from './components/Topbar/Topbar'
+import { Outlet } from 'react-router-dom'
 
 const App = () => {
 
@@ -25,10 +26,12 @@ const App = () => {
   }, [theme]);
   
   return (
-    <main className="relative min-h-screen w-screen overflow-x-hidden transition-colors duration-500 bg-white text-black dark:bg-gray-800 dark:text-white">
-      <Topbar theme={theme} setTheme={setTheme} />
-</main>
-
+    <>
+      <Topbar theme={theme} setTheme={setTheme}/>
+      <div className="relative min-h-screen w-screen overflow-x-hidden transition-colors duration-500 bg-white text-black dark:bg-gray-800 dark:text-white">
+        <Outlet />
+      </div>
+    </>
   )
 }
 
