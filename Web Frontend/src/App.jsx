@@ -1,10 +1,11 @@
 import React from 'react'
+import Topbar from './components/Topbar/Topbar'
 
 const App = () => {
   return (
-    <div>
-      <h1 className='text-4xl'>FrontEnd is running!</h1>
-    </div>
+    <main className="relative min-h-screen w-screen overflow-x-hidden">
+      <Topbar/>
+    </main>
   )
 }
 
