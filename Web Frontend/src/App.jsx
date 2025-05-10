@@ -4,13 +4,24 @@ import Topbar from './components/Topbar/Topbar'
 
 const App = () => {
 
-  const [theme,setTheme] = useState('dark')
+  // Get stored theme from local storage
+  const currentTheme = localStorage.getItem('currentTheme')
+  
+  // Set initial theme based on stored value or default to light
+  /**
+   * @desc Hook for current theme
+   */
+  const [theme,setTheme] = useState(currentTheme ?? 'Light')
 
   /**
-   * @desc: THis hook is ued to set the theme to add (toggles class='' and class='dark' to html tag based on theme value above)
-   */
+   * @desc: This hook is invoked when theme chnages
+  */
   useEffect(() => {
+    // Toggle class of html ("" or "dark") based on current theme. (Used for global dark mode inheriting)
     document.documentElement.classList.toggle('dark', theme === 'dark');
+
+    // Store the current theme in local storage
+    localStorage.setItem('currentTheme',theme);
   }, [theme]);
   
   return (
