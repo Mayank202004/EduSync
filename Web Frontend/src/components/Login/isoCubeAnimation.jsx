@@ -25,7 +25,7 @@ const IsoCubeAnimation = () => {
 
   return (
     <div
-      className="w-lvh h-full"
+      className="w-lvw h-full"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
