@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx", // or "react" if you’re using React 17 or below
+    "allowJs": true, // Allows JavaScript files alongside TypeScript
+    "checkJs": false, // Disables checking for JS files
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "esnext",
+    "baseUrl": ".", // Root directory
+    "paths": {
+      "@/*": ["src/*"] // Custom alias (adjust `src` folder if necessary)
+    }
+  },
+  "include": ["src"]
+}

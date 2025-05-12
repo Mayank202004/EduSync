@@ -6,5 +6,10 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(),tailwindcss(),],
   assetsInclude: ['**/*.riv'],
+  resolve: {
+    alias: {
+      '@': '/src', // Alias that matches the tsconfig.json alias
+    },
+  },
   
 })
