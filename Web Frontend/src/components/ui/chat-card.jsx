@@ -105,37 +105,41 @@ const ChatCard = ({
         </button>
       </div>
 
-      <div className="chat-messages p-4 space-y-4 overflow-y-auto max-h-96">
-        {messages.map((message) => (
-          <div key={message.id} className="message flex gap-3 items-start">
-            <img src={message.sender.avatar} alt={message.sender.name} className="w-9 h-9 rounded-full" />
-            <div className="message-content flex flex-col">
-              <div className="message-header flex justify-between text-sm text-gray-400 gap-3">
-                <span className="sender-name text-black dark:text-white">{message.sender.name}</span>
-                <span className="timestamp">{message.timestamp}</span>
-              </div>
-              <p className="message-text text-black dark:text-white">{message.content}</p>
-              {message.reactions && message.reactions.length > 0 && (
-                <div className="reactions flex space-x-2">
-                  {message.reactions.map((reaction) => (
-                    <button
-                      key={reaction.emoji}
-                      onClick={() => handleReaction(message.id, reaction.emoji)}
-                      className="reaction-btn flex items-center space-x-1 text-gray-300"
-                    >
-                      <span>{reaction.emoji}</span>
-                      <span>{reaction.count}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="status-icons flex flex-col items-center">
-              {message.status === "read" && <CheckCheck className="w-5 h-5 text-blue-500" />}
-              {message.status === "delivered" && <Check className="w-5 h-5 text-green-500" />}
-            </div>
+      <div className="chat-messages p-4 space-y-4 overflow-y-auto h-96">
+        {messages.length === 0 ? (
+    <div className="text-center text-gray-400 dark:text-gray-500">No messages yet</div>
+  ) : (
+    messages.map((message) => (
+      <div key={message.id} className="message flex gap-3 items-start">
+        <img
+          src={message.sender.avatar}
+          alt={message.sender.name}
+          className="w-9 h-9 rounded-full"
+        />
+        <div className="message-content flex flex-col">
+          <div className="message-header flex justify-between text-sm text-gray-400 gap-3">
+            <span className="sender-name text-black dark:text-white">{message.sender.name}</span>
+            <span className="timestamp">{message.timestamp}</span>
           </div>
-        ))}
+          <p className="message-text text-black dark:text-white">{message.content}</p>
+          {message.reactions && message.reactions.length > 0 && (
+            <div className="reactions flex space-x-2">
+              {message.reactions.map((reaction) => (
+                <button
+                  key={reaction.emoji}
+                  onClick={() => handleReaction(message.id, reaction.emoji)}
+                  className="reaction-btn flex items-center space-x-1 text-gray-300"
+                >
+                  <span>{reaction.emoji}</span>
+                  <span>{reaction.count}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    ))
+  )}
       </div>
 
       <div className="chat-input flex items-center gap-2 p-4 bg-customLightBg2 dark:bg-gray-900">

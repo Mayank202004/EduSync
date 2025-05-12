@@ -20,7 +20,7 @@ const ExpandableItemChild = ({ title, subtitle, avatar }) => {
   return (
     <div>
       <div
-        className="flex items-center mb-2 space-x-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer"
+        className="flex items-center mb-2 space-x-2 hover:bg-gray-100 dark:hover:bg-gray-600 duration-200 rounded cursor-pointer"
         onClick={handleClick} // Open popup on click
       >
         {/* Avatar circle */}

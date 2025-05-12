@@ -13,9 +13,9 @@ const directMessages = [
 const LeftSidebar = () => {
   return (
     <div className="p-5 text-sm my-5 ml-15 mr-5 bg-white dark:bg-customDarkFg rounded-md overflow-y-auto max-h-screen">
-      <div className='flex items-center justify-around align-middle mb-3 '>
-         <FontAwesomeIcon icon={faMessage} className="dark:text-white text-black text-2xl" />
-        <h2 className="font-semibold text-2xl">Channels</h2>
+      <div className='flex items-center justify-around align-middle mb-3 px-3'>
+         <FontAwesomeIcon icon={faMessage} className="dark:text-white text-black text-1.5xl" />
+        <h2 className="font-semibold text-1.5xl">Channels</h2>
       </div>
 
       <ExpandableItem title="Announcements" defaultExpanded={true}>
@@ -30,7 +30,7 @@ const LeftSidebar = () => {
       <input
         type="text"
         placeholder="Search for people"
-        className="w-full p-1 mb-2 border rounded"
+        className="w-full p-1 mb-2 border rounded placeholder:text-gray-700 dark:placeholder:text-gray-300"
       />
       {directMessages.map((item, index) => (
         <ExpandableItemChild

@@ -11,6 +11,12 @@
     /* fafdf1 */
 }
 
+@layer utilities {
+  .text-1\.5xl {
+    font-size: 1.2rem;
+  }
+}
+
 /* ---break---  */
 
 @theme inline {
