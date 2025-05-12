@@ -1,22 +1,35 @@
 import React from 'react';
+import ExpandableItem from './ExpandableItem';
+import ExpandableItemChild from './ExpandableItemChild';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendar, faMessage } from '@fortawesome/free-regular-svg-icons';
+import CalendarChild from './calendarChild';
+
+const directMessages = [
+  { title: '22 - 2 Apr', subtitle: 'Session - Break'},
+  { title: '1 May', subtitle: 'Holiday 1'},
+  { title: '7 March', subtitle: 'ABC Jayanti'}
+];
 
 const RightSidebar = () => {
   return (
-    <div className="text-sm">
-      <div className="mb-6">
-        <h2 className="font-semibold mb-2">Recent Achievements</h2>
-        <p>Level 0</p>
-        <p>150 Points are needed to move to the next level.</p>
+    <div className="p-5 text-sm my-5 ml-5 mr-15 bg-white dark:bg-customDarkFg rounded-md overflow-y-auto max-h-screen">
+      <div className='flex items-center justify-around align-middle mb-3 '>
+         <FontAwesomeIcon icon={faCalendar} className="dark:text-white text-black text-2xl" />
+        <h2 className="font-semibold text-1.5xl">Upcomming Events</h2>
       </div>
 
-      <div className="mb-6">
-        <h2 className="font-semibold mb-2">Upcoming Events</h2>
-        <ul>
-          <li>22 Mar - 2 Apr: Session Break</li>
-          <li>29 Mar: Open House Std. I to IX</li>
-          <li>30 Mar: Gudi Padwa</li>
-        </ul>
-      </div>
+      
+      {directMessages.map((item, index) => (
+        <CalendarChild
+          key={index}
+          title={item.title}
+          subtitle={item.subtitle}
+          avatarUrl={item.avatarUrl}
+        />
+      ))}
+      <button className='px-5 text-blue-500 hover:text-blue-300 duration-500'>View Calendar</button>
+
     </div>
   );
 };
