@@ -1,3 +1,10 @@
 @import "tailwindcss";
 /* For Dark Mode class  */
 @custom-variant dark (&:where(.dark, .dark *));
+
+@theme{
+    --color-customDarkBg: #121212;
+    --color-customDarkFg: #282828;
+    --color-customLightBg: #f0f0f0;
+    /* fafdf1 */
+}

@@ -6,14 +6,14 @@ const HomeContent = () => {
       <h1 className="text-xl font-bold mb-4">Hello Parent!</h1>
       <p>Checkout how ABC is progressing!</p>
 
-      <div className="my-4 p-4 bg-white rounded shadow">
+      <div className="my-4 p-4 bg-white dark:bg-customDarkFg rounded shadow">
         <p>Select Date Range</p>
         <input type="date" className="mr-2" />
         <input type="date" />
         <p className="mt-2">0 Points Scored</p>
       </div>
 
-      <div className="bg-white p-4 rounded shadow">
+      <div className="bg-white dark:bg-customDarkFg p-4 rounded shadow">
         <h3 className="font-semibold mb-2">Tasks</h3>
         <ul>
           <li>English - 2 points - Pending</li>

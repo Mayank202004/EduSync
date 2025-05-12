@@ -7,11 +7,13 @@ import Home from './components/Home/Home.jsx';
 import Fees from './components/Fees/Fees.jsx';
 import Resources from './components/Resources/Resources.jsx';
 import Calendar from './components/Calendar/Calendar.jsx';
+import Layout from './layout.jsx';
+import Login from './pages/Login.jsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<App/>}>
-      <Route path='' element={<Home/>}/>
+      <Route path='' element={<Layout/>}/>
       <Route path='fees' element={<Fees/>}/>
       <Route path='resources' element={<Resources/>}/>
       <Route path='calendar' element={<Calendar/>}/>

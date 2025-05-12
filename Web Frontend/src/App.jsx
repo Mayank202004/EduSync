@@ -28,7 +28,7 @@ const App = () => {
   return (
     <>
       <Topbar theme={theme} setTheme={setTheme}/>
-      <div className="relative min-h-screen w-screen overflow-x-hidden transition-colors duration-500 bg-white text-black dark:bg-gray-800 dark:text-white">
+      <div className="relative min-h-screen w-screen overflow-x-hidden transition-colors duration-500 bg-customLightBg text-black dark:bg-customDarkBg dark:text-white">
         <Outlet />
       </div>
     </>
