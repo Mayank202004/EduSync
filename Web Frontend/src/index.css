@@ -15,6 +15,14 @@
   .text-1\.5xl {
     font-size: 1.2rem;
   }
+  .dark .fc-col-header{
+    background-color: black;
+  }
+  .fc-event-title.fc-sticky{
+    margin-left: 10px;
+    color:black;
+    font-weight: 500;
+  }
 }
 
 /* ---break---  */
