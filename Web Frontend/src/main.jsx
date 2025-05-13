@@ -5,7 +5,7 @@ import './index.css';
 import App from './App.jsx';
 import Home from './components/Home/Home.jsx';
 import Fees from './components/Fees/Fees.jsx';
-import Resources from './components/Resources/Resources.jsx';
+import Resources from './pages/Resources.jsx';
 import Calendar from './components/Calendar/Calendar.jsx';
 import Layout from './layout.jsx';
 import Login from './pages/Login.jsx';
