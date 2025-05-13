@@ -8,7 +8,7 @@ const ChatCard = ({
   initialMessages = [],
   currentUser = {
     name: "You",
-    avatar: "https://example.com/avatar.png",
+    avatar: "../assets/avatar.png",
   },
   onSendMessage,
   onReaction,
@@ -154,7 +154,7 @@ const ChatCard = ({
             }
           }}
           placeholder="Write a message..."
-          className="flex-grow p-2 rounded-lg bg-white dark:bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
+          className="flex-grow p-2 rounded-lg bg-white dark:bg-gray-700 dark:text-white text-customDarkFg placeholder-gray-400 focus:outline-none"
         />
         <button onClick={handleSendMessage} className="send-btn p-2 rounded-full bg-green-500 hover:bg-green-400">
           <Send className="w-5 h-5 text-white" />
