@@ -6,7 +6,7 @@ const ExpandableItemChild = ({ title, subtitle, avatar }) => {
 
   const CURRENT_USER = {
     name: title,
-    avatar: avatar || "https://placekitten.com/200/200", // Default avatar if none is provided
+    avatar: avatar || "src/assets/avatar.png", // Default avatar if none is provided
   };
 
   const handleClick = () => {

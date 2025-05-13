@@ -1,23 +1,28 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+
 /* For Dark Mode class  */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme{
+  /* Custom Colors */
     --color-customDarkBg: #121212;
     --color-customDarkFg: #282828;
     --color-customLightBg: #f0f0f0;
     --color-customLightBg2: #e3ebff;
-    /* fafdf1 */
 }
 
 @layer utilities {
+  /* Custom text size */
   .text-1\.5xl {
     font-size: 1.2rem;
   }
+  
+  /* For calendar date header  */
   .dark .fc-col-header{
     background-color: black;
   }
+  /* For calendar event dispaly bar */
   .fc-event-title.fc-sticky{
     margin-left: 10px;
     color:black;

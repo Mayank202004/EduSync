@@ -5,9 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMessage } from '@fortawesome/free-regular-svg-icons';
 
 const directMessages = [
-  { title: 'Shilpa', subtitle: 'Super Admin', avatarUrl: '/avatar1.png' },
-  { title: 'Deepti Manish', subtitle: 'Teacher', avatarUrl: '/avatar2.png' },
-  { title: 'Aditya Sunil', subtitle: 'Student', avatarUrl: '/avatar3.png' }
+  { title: 'Shilpa', subtitle: 'Super Admin', avatarUrl: '../avatar.png' },
+  { title: 'Deepti Manish', subtitle: 'Teacher', avatarUrl: '../avatar.png' },
+  { title: 'Aditya Sunil', subtitle: 'Student', avatarUrl: '../avatar.png' }
 ];
 
 const LeftSidebar = () => {
