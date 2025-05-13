@@ -1,9 +1,10 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import toggleLight from '../../assets/day.png';
 import toggleDark from '../../assets/night.png';
+import { faCircleQuestion, faMessage } from '@fortawesome/free-regular-svg-icons';
 
 const Topbar = ({ theme, setTheme }) => {
   const handleToggleTheme = () => {
@@ -48,13 +49,19 @@ const Topbar = ({ theme, setTheme }) => {
         <FontAwesomeIcon icon={faMagnifyingGlass} className="dark:text-black text-white" />
       </div>
 
-      <button onClick={handleToggleTheme} aria-label="Toggle Theme">
-        <img
-          src={theme === 'light' ? toggleDark : toggleLight}
-          alt="Theme Toggle"
-          className="w-8 h-8 ml-4 cursor-pointer"
-        />
-      </button>
+      <div className='flex items-center'>
+        <FontAwesomeIcon icon={faMessage} className="text-black dark:text-white text-2xl" />
+        <FontAwesomeIcon icon={faCircleQuestion} className="text-black dark:text-white text-2xl ml-5" />
+
+        <button onClick={handleToggleTheme} aria-label="Toggle Theme">
+          <img
+            src={theme === 'light' ? toggleDark : toggleLight}
+            alt="Theme Toggle"
+            className="w-8 h-8 ml-4 cursor-pointer select-none"
+            draggable="false"
+            />
+        </button>
+      </div>
     </header>
   );
 };

@@ -8,7 +8,7 @@ function SubjectCard({subject="Subject",topics=0,bgColor="bg-amber-300",imgSrc="
             <p>{topics} Topics</p>
         </div>
         <div className=' ml-5 w-15 h-15'>
-            <img src={imgSrc} alt="" />
+            <img src={imgSrc} alt="" draggable="false"/>
         </div>
     </div>
   )

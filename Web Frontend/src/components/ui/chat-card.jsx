@@ -114,6 +114,7 @@ const ChatCard = ({
         <img
           src={message.sender.avatar}
           alt={message.sender.name}
+          draggable="false"
           className="w-9 h-9 rounded-full"
         />
         <div className="message-content flex flex-col">
