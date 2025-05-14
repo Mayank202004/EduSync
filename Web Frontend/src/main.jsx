@@ -1,30 +1,18 @@
+// src/main.jsx
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import routes from './routes/Routes.jsx';
+import { AuthProvider } from './auth/AuthContext.jsx';
+import { Toaster } from 'react-hot-toast';
 import './index.css';
-import App from './App.jsx';
-import Home from './components/Home/Home.jsx';
-import Fees from './components/Fees/Fees.jsx';
-import Resources from './pages/Resources.jsx';
-import Calendar from './components/Calendar/Calendar.jsx';
-import Layout from './layout.jsx';
-import Login from './pages/Login.jsx';
-import { AuthProvider } from './auth/useAuth';
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path='/' element={<Login/>}>
-      <Route path='' element={<Layout/>}/>
-      <Route path='fees' element={<Fees/>}/>
-      <Route path='resources' element={<Resources/>}/>
-      <Route path='calendar' element={<Calendar/>}/>
-    </Route>
-  )
-)
+const router = createBrowserRouter(routes);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
+      <Toaster />
       <RouterProvider router={router} />
     </AuthProvider>
   </StrictMode>

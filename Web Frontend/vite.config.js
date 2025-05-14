@@ -11,5 +11,10 @@ export default defineConfig({
       '@': '/src', // Alias that matches the tsconfig.json alias
     },
   },
+  server: {
+    proxy: {
+      '/api': 'http://localhost:5000', // Your backend port
+    },
+  },
   
 })
