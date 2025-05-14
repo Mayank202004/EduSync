@@ -1,19 +1,27 @@
 import React from 'react'
 import IsoCubeAnimation from '../components/Login/isoCubeAnimation'
 import LoginCard from '../components/Login/loginCard'
+import SignupCard from '@/components/Login/SignupCard';
+import { useState } from 'react';
+
+
 
 function Login() {
+  // State to toggle between login and signup
+  const [isLogin, setIsLogin] = useState(true);
+
   return (
-    <>
-        <div className='w-full h-screen flex items-start'>
-          <IsoCubeAnimation/>
-          <div className='w-full h-full flex items-center justify-center'>
-            <LoginCard/>
-          </div>
-        </div>
-    </>
-    
-  )
+    <div className='w-full h-screen flex items-start'>
+      <IsoCubeAnimation />
+      <div className='w-full h-full flex items-center ml-15'>
+        {isLogin ? (
+          <LoginCard switchToSignup={() => setIsLogin(false)} />
+        ) : (
+          <SignupCard switchToLogin={() => setIsLogin(true)} />
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default Login

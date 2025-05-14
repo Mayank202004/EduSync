@@ -9,10 +9,11 @@ import Resources from './pages/Resources.jsx';
 import Calendar from './components/Calendar/Calendar.jsx';
 import Layout from './layout.jsx';
 import Login from './pages/Login.jsx';
+import { AuthProvider } from './auth/useAuth';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path='/' element={<App/>}>
+    <Route path='/' element={<Login/>}>
       <Route path='' element={<Layout/>}/>
       <Route path='fees' element={<Fees/>}/>
       <Route path='resources' element={<Resources/>}/>
@@ -23,6 +24,8 @@ const router = createBrowserRouter(
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router}/>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>
 );
