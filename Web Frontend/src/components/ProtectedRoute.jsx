@@ -4,7 +4,7 @@ import { useAuth } from '@/auth/AuthContext'; // Assuming this contains the auth
 
 // This component will wrap the protected routes
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth(); // Assuming `useAuth` provides `isAuthenticated` state
+  const { isAuthenticated } = useAuth(); 
 
   if (!isAuthenticated) {
     // If user is not authenticated, redirect to login

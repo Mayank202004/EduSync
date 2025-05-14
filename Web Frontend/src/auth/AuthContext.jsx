@@ -4,11 +4,12 @@ import axiosInstance from '@/api/axiosInstance';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const BASEURL = import.meta.env.VITE_API_BASE_URL;
   const [isAuthenticated, setIsAuthenticated] = useState(null); // null = loading
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axiosInstance.get('/users/me')
+    axiosInstance.get("/users/me")
       .then(() => setIsAuthenticated(true))
       .catch(() => setIsAuthenticated(false))
       .finally(() => setLoading(false));

@@ -13,7 +13,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': 'http://localhost:5000', // Your backend port
+      '/api': 'http://localhost:3000', // Your backend port
     },
   },
   
