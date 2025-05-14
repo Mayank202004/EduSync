@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-// Axios instance
+const BASEURL = import.meta.env.VITE_API_BASE_URL;
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, 
+  baseURL: BASEURL, 
   withCredentials: true, 
+  timeout: 5000,
 });
-
 
 axiosInstance.interceptors.request.use(
   (config) => {
@@ -18,25 +18,28 @@ axiosInstance.interceptors.request.use(
 
 // Response interceptor to handle token expiry
 axiosInstance.interceptors.response.use(
-  (response) => response,  // If request is successful, return the response
+  (response) => response, // If request is successful, return the response
   async (error) => {
     const originalRequest = error.config;
 
     // If the error is due to token expiry (401 Unauthorized), try refreshing the token
-    if (error.response.status === 401 && !originalRequest._retry) {
+    const isRefreshUrl = originalRequest.url?.includes('/users/refresh-token');
+    if (
+      error.response?.status === 401 && !originalRequest._retry && !isRefreshUrl) {
       originalRequest._retry = true;
 
       try {
-        // Attempt to get a new access token using the refresh token
-        const refreshResponse = await axios.post('/refresh-token', {}, { withCredentials: true });  // Modify endpoint as needed
-        // No need to manually set the new access token, since the backend will automatically set it in cookies
-        
-        // Retry the original request with the new token (no need to manually add the token)
-        return axiosInstance(originalRequest);
+        const refreshResponse = await axiosInstance.post("/users/refresh-token",{},{ withCredentials: true });
+
+        if (refreshResponse.status === 200) {
+          return axiosInstance(originalRequest); // Retry original request
+        } else {
+          console.error("Token refresh failed with status:", refreshResponse.status);
+          //window.location.href = '/login';
+        }
       } catch (refreshError) {
-        // If refresh fails, redirect to login page or show an error message
-        console.error('Token refresh failed', refreshError);
-        window.location.href = '/login';  // Redirect to login page
+        console.error("Token refresh failed:", refreshError);
+        //window.location.href = '/login'; // Hard stop to break retry cycle
       }
     }
 
