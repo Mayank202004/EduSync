@@ -1,7 +1,7 @@
 import React from 'react'
 import { loginApi } from '@/services/authService';
 import { useState } from 'react';
-import { useAuth } from '@/auth/useAuth';
+import { useAuth } from '@/auth/AuthContext';
 import { Link,useNavigate } from 'react-router-dom';
 
 function LoginCard({ switchToSignup}) {
@@ -15,15 +15,23 @@ function LoginCard({ switchToSignup}) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
     try {
-      const data = await loginApi(email, password);
-      login(data); // save to context
-      navigate('/dashboard');
+      const response = await loginApi(email, password);  // Call the login API
+      // Check if response status is not 200, you can modify this check as per your API response
+      if (response.status !== 200) {
+        console.log(` hello : ${response.message}`);  // Log the message if status is not 200
+      }
+      console.log(response.data);  // Log the response data
+      localStorage.setItem('token', response.data.token);  // Save token to localStorage
+      navigate('/');  // Redirect to home page
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      // Handle error and display the message
+      const errorMsg = err.response?.data?.message || 'Login failed';
+      setError(errorMsg);
+      console.log(err.response.data);
     }
   };
+  
   return (
     <div className="min-h-screen w-96 flex items-center justify-center">
       <div className="w-full bg-white rounded-xl p-8">

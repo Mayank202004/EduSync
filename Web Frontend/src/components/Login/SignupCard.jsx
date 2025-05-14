@@ -1,7 +1,7 @@
 import React from 'react'
 import { loginApi } from '@/services/authService';
 import { useState } from 'react';
-import { useAuth } from '@/auth/useAuth';
+import { useAuth } from '@/auth/AuthContext';
 import { Link,useNavigate } from 'react-router-dom';
 
 function SignupCard({switchToLogin}) {
