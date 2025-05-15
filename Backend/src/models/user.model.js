@@ -95,7 +95,7 @@ userSchema.methods.generateAccessToken = function () {
 // Generate refresh token method
 userSchema.methods.generateRefreshToken = function () {
     try {
-        return jwt.sign(
+        const refreshToken = jwt.sign(
             {
                 _id: this._id,
             },
@@ -104,6 +104,7 @@ userSchema.methods.generateRefreshToken = function () {
                 expiresIn: process.env.REFRESH_TOKEN_EXPIRY || "10d", // Default expiry
             }
         );
+        return refreshToken;
     } catch (error) {
         throw new ApiError(500, "Error generating refresh token");
     }

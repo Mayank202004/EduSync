@@ -215,6 +215,7 @@ const refreshAccessToken = asyncHandler(async (req,res) =>{
         const user = await User.findById(decodedToken?._id).select(
             "-password -role -avatar"
         );
+        console.log(`Name : ${user.fullName}`);
 
         if(!user){
             throw new ApiError(401,"Invalid Refresh Token");
@@ -223,7 +224,9 @@ const refreshAccessToken = asyncHandler(async (req,res) =>{
             throw new ApiError(401,"Refresh token is expired or used");
         }
 
-        const {accessToken, newRefreshToken} = await generateAccessAndRefereshTokens(user._id)
+        const {accessToken, RefreshToken} = await generateAccessAndRefereshTokens(user._id)
+        console.log("access :",accessToken);
+        console.log("refresh :",RefreshToken);
         // Update refresh token in database
         user.refreshToken = newRefreshToken;
         await user.save({ validateBeforeSave: false });
@@ -235,7 +238,7 @@ const refreshAccessToken = asyncHandler(async (req,res) =>{
         return res
         .status(200)
         .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", newRefreshToken, options)
+        .cookie("refreshToken", RefreshToken, options)
         .json(
             new ApiResponse(
                 200, 
