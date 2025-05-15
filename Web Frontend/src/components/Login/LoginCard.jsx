@@ -16,23 +16,33 @@ function LoginCard({ switchToSignup}) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    try {
-      const response = await loginApi(email, password);
 
-      if (response.statusCode == 200) {
-        setUser(response.data.user);
-        navigate('/');  // Redirect to home page
-      }else {
-        
-        console.log('Login failed with message:', response.message);
-        setError(response.message || 'Login failed');
+    const loginPromise = loginApi(email, password);
+
+    toast.promise(
+      loginPromise,
+      {
+        loading: 'Logging in...',
+        success: (response) => {
+          return `Welcome, ${response.data.user.username || 'User'}!`;
+        },
+        error: (err) => {
+          return err?.response?.data?.message || 'Login failed';
+        },
       }
-    } catch (err) {
-      toast.error(err.response.data.message || 'Login failed');
-      const errorMsg = err.response?.data?.message || 'Login failed';
-      setError(errorMsg);
-      console.log(err.response.data);
+    );
+    try {
+    const response = await loginPromise;
+
+    if (response.statusCode === 200) {
+      setUser(response.data.user);
+      navigate('/');
+    } else {
+      setError(response.message || 'Login failed');
     }
+  } catch (err) {
+    setError(err?.response?.data?.message || 'Login failed');
+  }
   };
   
   return (
