@@ -16,16 +16,15 @@ function LoginCard({ switchToSignup}) {
     e.preventDefault();
     setError('');
     try {
-      const response = await loginApi(email, password);  // Call the login API
-      // Check if response status is not 200, you can modify this check as per your API response
-      if (response.status !== 200) {
-        console.log(` hello : ${response.message}`);  // Log the message if status is not 200
+      const response = await loginApi(email, password);
+
+      if (response.statusCode == 200) {
+        navigate('/');  // Redirect to home page
+      }else {
+        console.log('Login failed with message:', response.message);
+        setError(response.message || 'Login failed');
       }
-      console.log(response.data);  // Log the response data
-      localStorage.setItem('token', response.data.token);  // Save token to localStorage
-      navigate('/');  // Redirect to home page
     } catch (err) {
-      // Handle error and display the message
       const errorMsg = err.response?.data?.message || 'Login failed';
       setError(errorMsg);
       console.log(err.response.data);
