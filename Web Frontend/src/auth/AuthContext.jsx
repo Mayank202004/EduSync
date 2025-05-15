@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const BASEURL = import.meta.env.VITE_API_BASE_URL;
   const [isAuthenticated, setIsAuthenticated] = useState(null); // null = loading
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     axiosInstance.get("/users/me")
@@ -21,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, logout,user, setUser }}>
       {children}
     </AuthContext.Provider>
   );

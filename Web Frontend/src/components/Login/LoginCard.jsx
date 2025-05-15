@@ -3,12 +3,13 @@ import { loginApi } from '@/services/authService';
 import { useState } from 'react';
 import { useAuth } from '@/auth/AuthContext';
 import { Link,useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function LoginCard({ switchToSignup}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, setUser } = useAuth();
   const navigate = useNavigate();
 
 
@@ -19,12 +20,15 @@ function LoginCard({ switchToSignup}) {
       const response = await loginApi(email, password);
 
       if (response.statusCode == 200) {
+        setUser(response.data.user);
         navigate('/');  // Redirect to home page
       }else {
+        
         console.log('Login failed with message:', response.message);
         setError(response.message || 'Login failed');
       }
     } catch (err) {
+      toast.error(err.response.data.message || 'Login failed');
       const errorMsg = err.response?.data?.message || 'Login failed';
       setError(errorMsg);
       console.log(err.response.data);

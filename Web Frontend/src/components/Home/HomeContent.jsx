@@ -1,10 +1,12 @@
 import React from 'react';
+import { useAuth } from '@/auth/AuthContext';
 
 const HomeContent = () => {
+   const { user } = useAuth();
   return (
     <div>
       <h1 className="text-xl font-bold mb-4">Hello Parent!</h1>
-      <p>Checkout how ABC is progressing!</p>
+      <p>Checkout how {user.fullName} is progressing!</p>
 
       <div className="my-4 p-4 bg-white dark:bg-customDarkFg rounded shadow">
         <p>Select Date Range</p>
