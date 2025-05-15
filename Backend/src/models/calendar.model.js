@@ -24,6 +24,10 @@ const calendarSchema = new Schema({
       default: "",
     },
   },
+  anuallyRepeat:{
+    type: Boolean,
+    default:false,
+  }
 });
 
 export default mongoose.model("CalendarEvent", calendarSchema);
