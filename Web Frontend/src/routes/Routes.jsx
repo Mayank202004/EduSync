@@ -3,7 +3,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Layout from '@/layout';
 import Login from '@/pages/Login';
 import Home from '@/components/Home/Home';
-import Fees from '@/components/Fees/Fees';
+import Fees from '@/pages/Fees';
 import Calendar from '@/components/Calendar/Calendar';
 import Resources from '@/pages/Resources';
 import App from '@/App';

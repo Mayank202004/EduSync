@@ -4,14 +4,12 @@ import LoginCard from '../components/Login/loginCard'
 import SignupCard from '@/components/Login/SignupCard';
 import { useState } from 'react';
 
-
-
 function Login() {
   // State to toggle between login and signup
   const [isLogin, setIsLogin] = useState(true);
 
   return (
-    <div className='w-full h-screen flex items-start'>
+    <div className='w-full h-full flex items-start'>
       <IsoCubeAnimation />
       <div className='w-full h-full flex items-center ml-15'>
         {isLogin ? (

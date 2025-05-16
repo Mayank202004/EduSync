@@ -1,7 +1,6 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import toggleLight from '../../assets/day.png';
 import toggleDark from '../../assets/night.png';
 import { faCircleQuestion, faMessage } from '@fortawesome/free-regular-svg-icons';
@@ -20,10 +19,10 @@ const Topbar = ({ theme, setTheme }) => {
     } hover:text-blue-500 dark:hover:text-blue-300`;
 
   return (
-    <header className={`navbar w-screen flex justify-between items-center bg-white dark:bg-black shadow-md px-4 py-2 duration-500`}>
+    <header className={`navbar w-full flex items-center bg-white dark:bg-black shadow-md px-4 py-3 duration-500`}>
       <h1 className='Logo text-3xl font-bold text-black dark:text-white'>EduSync</h1>
 
-      <nav>
+      <nav className='mx-auto'>
         <ul className='flex gap-8'>
           <li>
             <NavLink to="/" className={navLinkClass}>Home</NavLink>
@@ -40,7 +39,7 @@ const Topbar = ({ theme, setTheme }) => {
         </ul>
       </nav>
 
-      <div className={`search-box flex items-center px-4 py-2 rounded-full bg-black dark:bg-white shadow-md`}>
+      <div className={`search-box flex self-end items-center px-4 py-2 mx-4 rounded-full bg-black dark:bg-white shadow-md`}>
         <input
           type="text"
           placeholder="Search"
