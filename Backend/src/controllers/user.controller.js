@@ -66,7 +66,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // Default role to "user" if not provided
     const userRole = role || "student"; 
     if (!["super admin", "student","teacher"].includes(userRole)) {
-        throw new ApiError(400, "Role must be either admin or student");
+        throw new ApiError(400, "Role must be either admin or student or teacher");
     }
 
     // Create new user
