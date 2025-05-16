@@ -27,7 +27,7 @@ function SignupCard({switchToLogin}) {
       {
         loading: 'Creating Account...',
         success: (response) => {
-          return `Welcome, ${response.data.user.username || 'User'}!`;
+          return `Account Created! Proceed to login.`;
         },
         error: (err) => {
           if(err?.response?.data?.message === 'Validation error'){
@@ -42,8 +42,8 @@ function SignupCard({switchToLogin}) {
     const response = await signupPromise;
 
     if (response.statusCode === 201) {
-      setUser(response.data.user);
-      navigate('/');
+      switchToLogin(); // Swap signupcard to loginCard
+      
     } 
   } catch (err) {
     // Already handled by toast
@@ -52,7 +52,7 @@ function SignupCard({switchToLogin}) {
 
 
   return (
-    <div className="min-h-screen w-96 flex items-center justify-center">
+    <div className="min-h-screen w-100 flex items-center justify-center">
       <div className="w-full bg-white rounded-xl p-8">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">EduSync</h1>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
@@ -61,9 +61,11 @@ function SignupCard({switchToLogin}) {
             type="text"
             placeholder="Full Name"
             value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'
-  }`}
+            onChange={(e) => {
+              setFullName(e.target.value)
+              setErrors(prev => ({ ...prev, fullName: null })); // Clear error on change
+            }}
+            className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           />
           {errors.fullName && (
             <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
@@ -72,7 +74,10 @@ function SignupCard({switchToLogin}) {
             type="text"
             placeholder="Username"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => {
+              setUsername(e.target.value)
+              setErrors(prev => ({ ...prev, username: null })); // Clear error on change
+            }}
             className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           />
           {errors.username && (
@@ -81,12 +86,15 @@ function SignupCard({switchToLogin}) {
 
           <select
             value={role}
-            onChange={(e) => setRole(e.target.value)}
+            onChange={(e) => {
+              setRole(e.target.value)
+              setErrors(prev => ({ ...prev, role: null })); // Clear error on change
+            }}
             className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           >
             <option value="" disabled>Select Role</option>
-            <option value="Student">student</option>
-            <option value="Teacher">teacher</option>
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
           </select>
           {errors.role && (
             <p className="text-red-500 text-sm mt-1">{errors.role}</p>
@@ -96,7 +104,10 @@ function SignupCard({switchToLogin}) {
             type="text"
             placeholder="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setErrors(prev => ({ ...prev, email: null })); // Clear error on change
+            }}
             className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           />
           {errors.email && (
@@ -107,7 +118,10 @@ function SignupCard({switchToLogin}) {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value)
+              setErrors(prev => ({ ...prev, password: null })); // Clear error on change
+            }}
             className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           />
           {errors.password && (

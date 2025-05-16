@@ -8,17 +8,17 @@ import toast from 'react-hot-toast';
 function LoginCard({ switchToSignup}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const { login, setUser } = useAuth();
   const navigate = useNavigate();
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+  
 
     const loginPromise = loginApi(email, password);
 
+    // Toast based on promise state
     toast.promise(
       loginPromise,
       {
@@ -31,22 +31,21 @@ function LoginCard({ switchToSignup}) {
         },
       }
     );
+
     try {
     const response = await loginPromise;
 
     if (response.statusCode === 200) {
       setUser(response.data.user);
       navigate('/');
-    } else {
-      setError(response.message || 'Login failed');
-    }
+    } 
   } catch (err) {
-    setError(err?.response?.data?.message || 'Login failed');
+    // Already handled by toast
   }
   };
   
   return (
-    <div className="min-h-screen w-96 flex items-center justify-center">
+    <div className="min-h-screen w-100 flex items-center justify-center">
       <div className="w-full bg-white rounded-xl p-8">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">EduSync</h1>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
