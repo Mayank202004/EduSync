@@ -225,10 +225,8 @@ const refreshAccessToken = asyncHandler(async (req,res) =>{
         }
 
         const {accessToken, RefreshToken} = await generateAccessAndRefereshTokens(user._id)
-        console.log("access :",accessToken);
-        console.log("refresh :",RefreshToken);
         // Update refresh token in database
-        user.refreshToken = newRefreshToken;
+        user.refreshToken = RefreshToken;
         await user.save({ validateBeforeSave: false });
         
         const options = {
@@ -242,7 +240,7 @@ const refreshAccessToken = asyncHandler(async (req,res) =>{
         .json(
             new ApiResponse(
                 200, 
-                {accessToken, refreshToken: newRefreshToken},
+                {accessToken, refreshToken: RefreshToken},
                 "Access token refreshed"
             )
         )
