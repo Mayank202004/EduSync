@@ -1,21 +1,53 @@
 import React from 'react'
-import { loginApi } from '@/services/authService';
+import { loginApi, signupApi } from '@/services/authService';
 import { useState } from 'react';
 import { useAuth } from '@/auth/AuthContext';
 import { Link,useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function SignupCard({switchToLogin}) {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [role, setRole] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
       e.preventDefault();
-      setError('');
-      // To be implemented 
+      
+      const signupPromise = signupApi(fullName,username, email,password, role);
+
+    // Toast based on promise state
+    toast.promise(
+      signupPromise,
+      {
+        loading: 'Creating Account...',
+        success: (response) => {
+          return `Welcome, ${response.data.user.username || 'User'}!`;
+        },
+        error: (err) => {
+          if(err?.response?.data?.message === 'Validation error'){
+            setErrors(err.response.data.data);
+          }
+          return err?.response?.data?.message || 'Signup failed';
+        },
+      }
+    );
+
+    try {
+    const response = await signupPromise;
+
+    if (response.statusCode === 201) {
+      setUser(response.data.user);
+      navigate('/');
+    } 
+  } catch (err) {
+    // Already handled by toast
+  }
     };
 
 
@@ -27,31 +59,66 @@ function SignupCard({switchToLogin}) {
           
           <input
             type="text"
+            placeholder="Full Name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'
+  }`}
+          />
+          {errors.fullName && (
+            <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+          )}
+          <input
+            type="text"
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           />
+          {errors.username && (
+            <p className="text-red-500 text-sm mt-1">{errors.username}</p>
+          )}
+
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
+          >
+            <option value="" disabled>Select Role</option>
+            <option value="Student">student</option>
+            <option value="Teacher">teacher</option>
+          </select>
+          {errors.role && (
+            <p className="text-red-500 text-sm mt-1">{errors.role}</p>
+          )}
 
           <input
             type="text"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           />
+          {errors.email && (
+            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+          )}
+
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           />
+          {errors.password && (
+            <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+          )}
+
           <button
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md p-3 transition duration-200"
           >
-            Login
+            Sign Up
           </button>
         </form>
 
