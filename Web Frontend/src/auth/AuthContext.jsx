@@ -19,13 +19,17 @@ export const AuthProvider = ({ children }) => {
       .finally(() => setLoading(false));
   }, []);
 
+  const login = (userData) => {
+    setUser(userData);
+    setIsAuthenticated(true);
+  };
   const logout = async () => {
     await axiosInstance.post('/logout');
     setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, logout,user, setUser }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, logout,user, setUser, login }}>
       {children}
     </AuthContext.Provider>
   );

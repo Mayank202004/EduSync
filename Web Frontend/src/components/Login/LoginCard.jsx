@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 function LoginCard({ switchToSignup}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, setUser } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
 
@@ -36,7 +36,9 @@ function LoginCard({ switchToSignup}) {
     const response = await loginPromise;
 
     if (response.statusCode === 200) {
-      setUser(response.data.user);
+      console.log("logging in");
+      login(response.data.user);
+      console.log("logging in after");
       navigate('/');
     } 
   } catch (err) {
