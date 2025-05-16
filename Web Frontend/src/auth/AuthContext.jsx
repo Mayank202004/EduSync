@@ -11,7 +11,10 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     axiosInstance.get("/users/me")
-      .then(() => setIsAuthenticated(true))
+      .then((res) => {
+      setIsAuthenticated(true);
+      setUser(res.data.data);
+    })
       .catch(() => setIsAuthenticated(false))
       .finally(() => setLoading(false));
   }, []);
