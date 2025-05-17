@@ -42,6 +42,7 @@ const feesData = [
 ];
 
 const Fees = () => {
+  const [allFeesData, setAllFeesData] = useState(feesData);
   const [selectedItems, setSelectedItems] = useState([]); //store ids of selected items
 
   function selectFee(id) {
@@ -55,41 +56,72 @@ const Fees = () => {
     );
   }
 
+  const paidFees = allFeesData.filter(element => element.status === 'paid');
+  const unpaidFees = allFeesData.filter(element => element.status === 'unpaid');
+
   return (
     <>
-      <div className="md:flex md:h-screen">
-        <div className="md:w-3/10 md:border-r-1 h-full">
-          <h1 className="font-bold text-3xl mt-4 w-fit mx-auto md:my-10">
+      <div className="md:flex min-h-screen">
+        <div className="md:w-3/10 md:border-r-1 md:min-h-screen">
+          <h1 className="font-bold text-3xl mt-4 w-fit mx-auto md:mt-10 md:mb-2">
             Fees
           </h1>
+          <p className="w-fit mx-auto text-center text-lg text-gray-500">
+            Academic year: 2025-26
+          </p>
         </div>
         <div className="p-4 md:mr-0 w-full">
           <h1 className="text-2xl font-bold m-3">Dues</h1>
+          {unpaidFees.length === 0 ? (
+            <p className="ml-4">You have no dues</p>
+          ) : (
+            <>
+              <ul className="py-2 mx-auto">
+                {unpaidFees.map(
+                  (element, index) =>
+                      <FeeCard
+                        key={index}
+                        feeData={element}
+                        selectedFees={selectedItems}
+                        selectFee={selectFee}
+                        deselectFee={deselectFee}
+                      />
+                    )
+                }
+              </ul>
+              <button
+                type="button"
+                disabled={selectedItems.length === 0}
+                className="cursor-pointer block ml-auto mr-2 p-2 w-fit rounded-sm bg-green-400 text-black hover:not-disabled:bg-green-600 duration-200 disabled:opacity-50"
+              >
+                Proceed to pay
+              </button>
+            </>
+          )}
+          <hr className="mt-4" />
+          <h1 className="text-2xl font-bold m-3">Paid</h1>
+          {paidFees.length === 0 ? 
+          <p className="ml-4">No paid history</p> :
           <ul className="py-2 mx-auto">
-            {feesData.map(
+            {allFeesData.map(
               (element, index) =>
-                element.status === "unpaid" && (
+                element.status === "paid" && (
                   <FeeCard
                     key={index}
                     feeData={element}
                     selectedFees={selectedItems}
                     selectFee={selectFee}
                     deselectFee={deselectFee}
+                    isSelectable={false}
                   />
                 )
             )}
-          </ul>
-          <button
-            type="button"
-            disabled={selectedItems.length === 0}
-            className="cursor-pointer block ml-auto mr-2 p-2 w-fit rounded-sm bg-green-400 text-black hover:not-disabled:bg-green-600 duration-200 disabled:opacity-50"
-          >
-            Proceed to pay
-          </button>
+          </ul>}
         </div>
-        <div className="md:w-1/2 border-l-1 h-full">
-            <PaymentFAQs />
-            <RaiseTicket />
+        <hr className="md:hidden" />
+        <div className="md:w-1/2 border-l-1 my-8 md:min-h-screen">
+          <PaymentFAQs />
+          <RaiseTicket />
         </div>
       </div>
     </>
