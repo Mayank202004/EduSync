@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 const FeeCard = ({ feeData, selectedFees, selectFee, deselectFee }) => {
   const isSelected = selectedFees.includes(feeData.id);
 
@@ -5,9 +7,12 @@ const FeeCard = ({ feeData, selectedFees, selectFee, deselectFee }) => {
     <li className="w-full flex md:px-2 pb-6">
       <button
         type="button"
-        className={`cursor-pointer duration-200 fade-in-translate-full h-fit relative mr-2 p-2 my-auto rounded-full border-black dark:border-white border-1 after:content-[''] after:inset-0 after:scale-[70%] after:rounded-full after:bg-blue-600 after:absolute ${
-          isSelected ? "after:block" : "after:hidden"
-        }`}
+        className={cn(
+          "cursor-pointer duration-200 fade-in-translate-full h-fit relative mr-2 p-2 my-auto rounded-full border-black dark:border-white border-1 after:content-[''] after:inset-0 after:scale-[70%] after:rounded-full after:bg-blue-600 after:absolute after:hidden",
+          {
+            "after:block": isSelected,
+          }
+        )}
         onClick={
           isSelected
             ? () => deselectFee(feeData.id)

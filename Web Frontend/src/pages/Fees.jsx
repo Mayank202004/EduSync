@@ -1,5 +1,7 @@
 import { useState } from "react";
 import FeeCard from "../components/Fees/FeeCard";
+import PaymentFAQs from "@/components/Fees/FAQs";
+import RaiseTicket from "@/components/Fees/RaiseTicket";
 
 const feesData = [
   {
@@ -61,7 +63,8 @@ const Fees = () => {
             Fees
           </h1>
         </div>
-        <div className="p-4 w-full">
+        <div className="p-4 md:mr-0 w-full">
+          <h1 className="text-2xl font-bold m-3">Dues</h1>
           <ul className="py-2 mx-auto">
             {feesData.map(
               (element, index) =>
@@ -85,9 +88,8 @@ const Fees = () => {
           </button>
         </div>
         <div className="md:w-1/2 border-l-1 h-full">
-          <h1 className="font-bold text-3xl w-fit mx-auto my-10 mb-4">
-            Right side
-          </h1>
+            <PaymentFAQs />
+            <RaiseTicket />
         </div>
       </div>
     </>
