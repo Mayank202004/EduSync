@@ -1,6 +1,6 @@
 import connectDatabase from "./config/database.js";
 import { app } from "./app.js";
-
+import { seedDefaultFeeStructures } from "./seed/feeStructure.seed.js";
 
 connectDatabase()
     .then(() => {
@@ -13,6 +13,7 @@ connectDatabase()
         console.error(`Details : ${error}`);
         process.exit(1);
     });
+await seedDefaultFeeStructures();
 
 // Routes Imports
 import userRouter from "./routes/user.routes.js";
@@ -20,6 +21,7 @@ import resourceRouter from "./routes/resource.routes.js";
 import studentRouter from "./routes/student.routes.js";
 import teacherRouter from "./routes/teacher.routes.js";
 import attendenceRouter from "./routes/attendence.routes.js";
+import feeStructureRouter from "./routes/feeStructure.routes.js";
 
 
 // Routes Declarations
@@ -28,6 +30,7 @@ app.use("/api/v1/resource", resourceRouter);
 app.use("/api/v1/student",studentRouter);
 app.use("/api/v1/teacher",teacherRouter);
 app.use("/api/v1/attendence",attendenceRouter);
+app.use("/api/v1/feestructure",feeStructureRouter);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
