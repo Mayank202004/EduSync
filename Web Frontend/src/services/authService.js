@@ -5,25 +5,24 @@ const BASEURL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * 
- * @param {string} email - User's email address 
+ * @param {string} identifier - User's email address or username 
  * @param {string} password - User's password
  * @returns {Promise} - Promise ressolving to the response data
  */
-export const loginApi = async (email, password) => {
-  
-  const response = await axiosInstance.post(`${BASEURL}/users/login`,
-    {
-    username : email,
-    password,
-    },
-    {
-      headers:{
-        'content-type': 'application/json',
-      },
-    },
-    
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+
+export const loginApi = async (identifier, password) => {
+  const body = EMAIL_REGEX.test(identifier)
+    ? { email: identifier, password }      // send as “email”
+    : { username: identifier, password };  // send as “username”
+
+  const { data } = await axiosInstance.post(
+    `${BASEURL}/users/login`,
+    body,
   );
-  return response.data;
+
+  return data;
 };
 
 /**
