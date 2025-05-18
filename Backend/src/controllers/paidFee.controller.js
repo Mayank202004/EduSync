@@ -5,84 +5,83 @@ import { StudentFeeStatus } from '../models/paidFee.model.js';
 import { FeeStructure } from '../models/feeStructure.model.js';
 import mongoose from 'mongoose';
 
+
+/**
+ * @desc Mark fee as paid
+ * @route POST /api/v1/fee/pay
+ * @access Private (Student)
+ */
 const markFeeAsPaid = asyncHandler(async (req, res) => {
-  const { studentId, className, feeType, structureId, transactionId, mode } = req.body;
+  const studentId = req.student._id;
+  const className = req.student.class;
+  const { feeType, structureId, transactionId, mode } = req.body;
 
-  // 🔐 Basic validation
-  if (!studentId || !className || !feeType || !structureId || !mode) {
-    throw new ApiError(400, 'All fields are required');
+  if (!feeType?.trim() || !structureId?.trim() || !transactionId?.trim() || !mode?.trim()) {
+    throw new ApiError(400, "Missing required payment fields");
   }
 
-  // ⛔ Invalid fee type
-  const validTypes = ['Tuition Fee', 'Transport Fee', 'Other Fee'];
-  if (!validTypes.includes(feeType)) {
-    throw new ApiError(400, 'Invalid fee type');
+  if (!studentId?.toString().trim() || !className?.toString().trim()) {
+    throw new ApiError(400, "Student or class not found");
   }
 
-  // 🧾 Check if structure ID is valid
+  // Verify feeType and structureId are valid in FeeStructure
   const feeStructure = await FeeStructure.findOne({ class: className });
-  if (!feeStructure) throw new ApiError(404, 'Fee structure not found');
+  if (!feeStructure) throw new ApiError(404, "Fee structure not found");
 
-  const feeBlock = feeStructure.fee.find(f => f.feeType === feeType);
-  if (!feeBlock) throw new ApiError(404, 'Fee type not found in structure');
+  const feeGroup = feeStructure.fee.find(group => group.feeType === feeType);
+  if (!feeGroup || !feeGroup.structure.some(item => item._id.toString() === structureId.toString())) {
+    throw new ApiError(400, "Invalid structureId or feeType");
+  }
 
-  const structureExists = feeBlock.structure.some(s => s._id.equals(structureId));
-  if (!structureExists) throw new ApiError(404, 'Fee structure ID not found');
-
-  // ✅ Check if student entry exists
-  let studentFee = await StudentFeeStatus.findOne({ student: studentId });
-
-  if (!studentFee) {
-    // 🆕 Create new document
-    studentFee = await StudentFeeStatus.create({
+  // Find or create student's fee status
+  let studentFeeStatus = await StudentFeeStatus.findOne({ student: studentId });
+  if (!studentFeeStatus) {
+    studentFeeStatus = await StudentFeeStatus.create({
       student: studentId,
-      class: className,
-      paidFees: [{
-        feeType,
-        payments: [{
-          structureId,
-          transactionId,
-          mode,
-        }]
-      }]
+      paidFees: [],
+    });
+  }
+
+  const paymentEntry = {
+    structureId: structureId,
+    paidOn: new Date(),
+    transactionId,
+    mode,
+  };
+
+  const groupIndex = studentFeeStatus.paidFees.findIndex(group => group.feeType === feeType);
+
+  if (groupIndex === -1) {
+    // Create new group with payment
+    studentFeeStatus.paidFees.push({
+      feeType,
+      payments: [paymentEntry],
     });
   } else {
-    // ✅ Check if feeType group exists
-    let feeGroup = studentFee.paidFees.find(f => f.feeType === feeType);
+    // Modify using array index — safe and tracked
+    const alreadyPaid = studentFeeStatus.paidFees[groupIndex].payments.some(
+  p => p.structureId.toString() === structureId.toString()
+);
+    if (alreadyPaid) throw new ApiError(409, "Fee is already paid");
 
-    if (!feeGroup) {
-      // ➕ Add new feeType entry
-      studentFee.paidFees.push({
-        feeType,
-        payments: [{
-          structureId,
-          transactionId,
-          mode
-        }]
-      });
-    } else {
-      // 🔁 Check for duplicate payment
-      const alreadyPaid = feeGroup.payments.some(p => p.structureId.equals(structureId));
-      if (alreadyPaid) throw new ApiError(409, 'This fee is already marked as paid');
-
-      // ➕ Add payment to existing group
-      feeGroup.payments.push({
-        structureId,
-        transactionId,
-        mode
-      });
-    }
-
-    await studentFee.save();
+    studentFeeStatus.paidFees[groupIndex].payments.push(paymentEntry);
   }
 
-  return res.status(200).json(new ApiResponse(null, 'Fee marked as paid successfully'));
+  await studentFeeStatus.save();
+
+  return res.status(200).json(new ApiResponse(200, studentFeeStatus, "Fee marked as paid successfully"));
 });
 
+
+/**
+ * @desc Get fee status for a student
+ * @route GET /api/v1/fee/myfees
+ * @access Private (Student)
+ */
 const getStudentFeeStatus = asyncHandler(async (req, res) => {
   const studentId = req.student._id;
   const className = req.student.class;
-  if (!studentId || !className || !studentId.toString().trim() || !className.toString().trim()) {
+  if (!studentId || !className || !studentId?.toString().trim() || !className?.toString().trim()) {
     throw new ApiError(400, "Student or class not found");
   }
 
@@ -170,4 +169,4 @@ const getStudentFeeStatus = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200,{ paid, pending },"Fee status fetched successfully"));
 });
 
-export {getStudentFeeStatus};
+export {getStudentFeeStatus,markFeeAsPaid};

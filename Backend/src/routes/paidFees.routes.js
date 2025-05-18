@@ -6,5 +6,6 @@ const router = Router();
 
 
 router.get('/myfees',verifyJWT,verifyStudent,PaidFeesController.getStudentFeeStatus);
+router.post('/pay',verifyJWT,verifyStudent,PaidFeesController.markFeeAsPaid);
 
 export default router;
