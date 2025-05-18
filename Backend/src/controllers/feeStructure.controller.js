@@ -139,7 +139,7 @@ const getClassFeeStructure = asyncHandler(async(req,res)=>{
     if(!className.trim()){
         throw new ApiError(400,"Class Name is required");
     }
-    const feeStructure = await FeeStructure.findOne({class:className});
+    const feeStructure = await FeeStructure.findOne({class:className}).populate("fee.structure");;
     if(!feeStructure){
         throw new ApiError(404,"Fee structure not found");
     }
@@ -147,7 +147,7 @@ const getClassFeeStructure = asyncHandler(async(req,res)=>{
 })
 
 const getAllFeeStructures = asyncHandler(async(req,res)=>{
-    const feeStructures = await FeeStructure.find();
+    const feeStructures = await FeeStructure.find().populate("fee.structure");
     if(!feeStructures || feeStructures.length==0){
         throw new ApiError(404,"Fee structures not found");
     }

@@ -19,6 +19,7 @@ const studentPaidFeeSchema = new Schema({
           structureId: {
             type: mongoose.Schema.Types.ObjectId, // _id from structure[]
             required: true,
+            ref: 'FeeItem',
           },
           paidOn: {
             type: Date,
@@ -34,5 +35,6 @@ const studentPaidFeeSchema = new Schema({
     }
   ]
 });
+
 
 export const StudentFeeStatus = mongoose.model('StudentFeeStatus', studentPaidFeeSchema);

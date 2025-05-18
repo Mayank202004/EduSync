@@ -22,6 +22,7 @@ import studentRouter from "./routes/student.routes.js";
 import teacherRouter from "./routes/teacher.routes.js";
 import attendenceRouter from "./routes/attendence.routes.js";
 import feeStructureRouter from "./routes/feeStructure.routes.js";
+import paidFeeRouter from "./routes/paidFees.routes.js";
 
 
 // Routes Declarations
@@ -31,6 +32,7 @@ app.use("/api/v1/student",studentRouter);
 app.use("/api/v1/teacher",teacherRouter);
 app.use("/api/v1/attendence",attendenceRouter);
 app.use("/api/v1/feestructure",feeStructureRouter);
+app.use("/api/v1/fee",paidFeeRouter);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

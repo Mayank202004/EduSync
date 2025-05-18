@@ -93,6 +93,10 @@ const studentSchema = new Schema({
             }
         }
     ],
+    schoolTransport:{
+        type: Boolean,
+        default:false
+    }
     
 });
 
