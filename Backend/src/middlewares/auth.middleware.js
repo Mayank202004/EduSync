@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { Teacher } from "../models/teacher.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
+import { Student } from "../models/student.model.js";
 
 /**
  * @desc Verify JWT token
@@ -34,9 +35,19 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
 });
 
 export const verifyStudent = asyncHandler(async(req,_,next) =>{
-    if(req.user.role !== "student"){
-        throw new ApiError(403,"Forbidden: You do not have permission to access this resource.")
+    const user = req.user;
+
+    if (!user || user.role !== "student") {
+        throw new ApiError(403, "Forbidden: You do not have permission to access this resource.");
     }
+
+    const student = await Student.findOne({userId:user._id}).select("-userId -parentContact -address -dob -bloodGroup -allergies -height -weight -parentsInfo -siblingsInfo");
+
+    if (!student) {
+        throw new ApiError(404, "No student found");
+    }
+
+    req.student = student;
     next();
 });
 
