@@ -117,38 +117,50 @@ const getStudentFeeStatus = asyncHandler(async (req, res) => {
   };
 
   // Build the paidMap and paid response
+  let skipTuitionFee = false;
+
   if (studentFeeStatus) {
     for (const group of studentFeeStatus.paidFees) {
       const feeType = group.feeType;
-
+    
       for (const payment of group.payments) {
-        const idStr = payment.structureId?._id?.toString();
+        const structure = payment.structureId;
+        const idStr = structure?._id?.toString();
         if (!idStr) continue;
-
+      
+        // Track paid structure IDs
         paidMap[feeType].add(idStr);
-
+      
+        // Check if Tuition Fee full-year discount is already paid
+        if (feeType === "Tuition Fee" && structure.title === "Full Year Fees with Discount") {
+          skipTuitionFee = true;
+        }
+      
         const paidEntry = {
           structureId: idStr,
-          title: payment.structureId.title,
-          amount: payment.structureId.amount,
+          title: structure.title,
+          amount: structure.amount,
           paidOn: payment.paidOn,
           transactionId: payment.transactionId,
           mode: payment.mode,
         };
-
+      
         if (feeType === "Tuition Fee") paid.academic.push(paidEntry);
         else if (feeType === "Transport Fee") paid.transport.push(paidEntry);
         else paid.other.push(paidEntry);
       }
     }
   }
-
+  
   // Build pending response
   for (const group of feeStructure.fee) {
     const feeType = group.feeType;
-
+  
     for (const item of group.structure) {
       const idStr = item._id?.toString();
+      // Skip all Tuition Fee pending items if full-year is paid
+      if (feeType === "Tuition Fee" && skipTuitionFee) continue;
+    
       if (!paidMap[feeType].has(idStr)) {
         const pendingEntry = {
           _id: item._id,
@@ -158,14 +170,13 @@ const getStudentFeeStatus = asyncHandler(async (req, res) => {
           discount: item.discount,
           compulsory: item.compulsory,
         };
-
+      
         if (feeType === "Tuition Fee") pending.academic.push(pendingEntry);
         else if (feeType === "Transport Fee" && req.student.schoolTransport) pending.transport.push(pendingEntry);
         else pending.other.push(pendingEntry);
       }
     }
   }
-
   return res.status(200).json(new ApiResponse(200,{ paid, pending },"Fee status fetched successfully"));
 });
 
