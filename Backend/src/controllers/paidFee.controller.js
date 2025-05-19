@@ -3,8 +3,7 @@ import { ApiError } from '../utils/apiError.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import { StudentFeeStatus } from '../models/paidFee.model.js';
 import { FeeStructure } from '../models/feeStructure.model.js';
-import mongoose from 'mongoose';
-
+import ejs from 'ejs';
 
 /**
  * @desc Mark fee as paid
@@ -180,4 +179,55 @@ const getStudentFeeStatus = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200,{ paid, pending },"Fee status fetched successfully"));
 });
 
-export {getStudentFeeStatus,markFeeAsPaid};
+
+/**
+ * @desc Render fee receipt
+ * @route GET /api/v1/fee/receipt
+ * @access Private (Student)
+ */
+const renderFeeReceipt = asyncHandler(async (req, res) => {
+  const {date,transactionId,title,amount,mode,feeId,stopName,feeType,receiptNo}=req.body;
+  const templatePath = 'src/templates/fee.template.ejs';
+
+  if(!transactionId || !title || !amount || !mode || !feeId || !feeType || !receiptNo){
+    throw new ApiError(400,"Missing required fields");
+  }
+  if(feeType === "Transport Fee" && !stopName){
+    throw new ApiError(400,"Missing stop name");
+  }
+  if(!date){
+    throw new ApiError(400,"Missing date");
+  }
+
+  const data = {
+    academicYear: process.env.ACADEMIC_YEAR,
+    name: req.user.fullName,
+    standard: req.student.class + "-" + req.student.div,
+    studentId: req.student._id,
+    receiptNo: receiptNo,
+    date: date,
+    stopName: stopName?? "",
+    feeItems: [,
+      { title: feeType, amount: amount }
+    ],
+    totalAmount: amount,
+    paymentMode: mode,
+    title: title,
+    feeId: feeId,
+    transactionId: transactionId,
+    transactionDate: date,
+    feeType: feeType
+  };
+
+  try {
+    const html = await ejs.renderFile(templatePath, data);
+    res.setHeader('Content-Type', 'text/html');
+    res.send(html);
+  } catch (err) {
+    console.error("Error rendering fee receipt:", err);
+    res.status(500).send('Failed to render receipt');
+  }
+});
+
+
+export {getStudentFeeStatus,markFeeAsPaid,renderFeeReceipt};
