@@ -1,63 +1,72 @@
 import { useState } from "react";
-import FeeCard from "../components/Fees/FeeCard";
 import PaymentFAQs from "@/components/Fees/FAQs";
 import RaiseTicket from "@/components/Fees/RaiseTicket";
+import PendingFees from "@/components/Fees/PendingFees";
+import PaidFees from "@/components/Fees/PaidFees";
 
-const feesData = [
-  {
-    id: 1,
-    title: "Tuition Feeee",
-    amount: 20000,
-    dueDate: "2025-06-15",
-    status: "unpaid",
-  },
-  {
-    id: 2,
-    title: "Library Fee",
-    amount: 1500,
-    dueDate: "2025-06-10",
-    status: "unpaid",
-  },
-  {
-    id: 3,
-    title: "Lab Fee",
-    amount: 3000,
-    dueDate: "2025-06-20",
-    status: "paid",
-  },
-  {
-    id: 4,
-    title: "Sports Fee",
-    amount: 1000,
-    dueDate: "2025-06-25",
-    status: "unpaid",
-  },
-  {
-    id: 5,
-    title: "Exam Fee",
-    amount: 2500,
-    dueDate: "2025-07-01",
-    status: "unpaid",
-  },
-];
+const { data: allFeesData } = JSON.parse(`{
+    "statusCode": 200,
+    "data": {
+        "paid": {
+            "academic": [
+                {
+                    "structureId": "68299233501c1a93bc381813",
+                    "title": "Full Year Fees with Discount",
+                    "amount": 40000,
+                    "paidOn": "2025-05-18T17:51:03.505Z",
+                    "transactionId": "abcd1234",
+                    "mode": "Online"
+                }
+            ],
+            "transport": [],
+            "other": [
+                {
+                    "structureId": "68299233501c1a93bc381810",
+                    "title": "Diary",
+                    "amount": 200,
+                    "paidOn": "2025-05-18T16:55:40.526Z",
+                    "transactionId": "abcd1234",
+                    "mode": "Online"
+                }
+            ]
+        },
+        "pending": {
+            "academic": [],
+            "transport": [
+                {
+                    "_id": "68299233501c1a93bc381808",
+                    "title": "Term 1",
+                    "dueDate": "2025-06-01T00:00:00.000Z",
+                    "amount": 12000,
+                    "discount": 0,
+                    "compulsory": false
+                },
+                {
+                    "_id": "68299233501c1a93bc381809",
+                    "title": "Term 2",
+                    "dueDate": "2025-09-01T00:00:00.000Z",
+                    "amount": 13000,
+                    "discount": 0,
+                    "compulsory": false
+                }
+            ],
+            "other": []
+        }
+    },
+    "message": "Fee status fetched successfully",
+    "success": true
+}`);
 
 const Fees = () => {
-  const [allFeesData, setAllFeesData] = useState(feesData);
-  const [selectedItems, setSelectedItems] = useState([]); //store ids of selected items
+  const [feesData, setFeesData] = useState(allFeesData);
 
-  function selectFee(id) {
-    console.log("pressed");
-    setSelectedItems((prevSelectedItems) => [...prevSelectedItems, id]);
-  }
+  const isPending = Object.values(feesData.pending).some(
+    (value) => value.length !== 0
+  );
 
-  function deselectFee(id) {
-    setSelectedItems((prevSelectedItems) =>
-      prevSelectedItems.filter((item) => item !== id)
-    );
-  }
-
-  const paidFees = allFeesData.filter(element => element.status === 'paid');
-  const unpaidFees = allFeesData.filter(element => element.status === 'unpaid');
+  const isPaid = Object.values(feesData.paid).some(
+    (value) => value.length !== 0
+  );
 
   return (
     <>
@@ -71,55 +80,12 @@ const Fees = () => {
           </p>
         </div>
         <div className="p-4 md:mr-0 w-full">
-          <h1 className="text-2xl font-bold m-3">Dues</h1>
-          {unpaidFees.length === 0 ? (
-            <p className="ml-4">You have no dues</p>
-          ) : (
-            <>
-              <ul className="py-2 mx-auto">
-                {unpaidFees.map(
-                  (element, index) =>
-                      <FeeCard
-                        key={index}
-                        feeData={element}
-                        selectedFees={selectedItems}
-                        selectFee={selectFee}
-                        deselectFee={deselectFee}
-                      />
-                    )
-                }
-              </ul>
-              <button
-                type="button"
-                disabled={selectedItems.length === 0}
-                className="cursor-pointer block ml-auto mr-2 p-2 w-fit rounded-sm bg-green-400 text-black hover:not-disabled:bg-green-600 duration-200 disabled:opacity-50"
-              >
-                Proceed to pay
-              </button>
-            </>
-          )}
-          <hr className="mt-4" />
-          <h1 className="text-2xl font-bold m-3">Paid</h1>
-          {paidFees.length === 0 ? 
-          <p className="ml-4">No paid history</p> :
-          <ul className="py-2 mx-auto">
-            {allFeesData.map(
-              (element, index) =>
-                element.status === "paid" && (
-                  <FeeCard
-                    key={index}
-                    feeData={element}
-                    selectedFees={selectedItems}
-                    selectFee={selectFee}
-                    deselectFee={deselectFee}
-                    isSelectable={false}
-                  />
-                )
-            )}
-          </ul>}
+          <PendingFees isPending={isPending} feesData={feesData.pending} />
+          <hr className="mt-6" />
+          <PaidFees isPaid={isPaid} feesData={feesData.paid} />
         </div>
         <hr className="md:hidden" />
-        <div className="md:w-1/2 border-l-1 my-8 md:min-h-screen">
+        <div className="md:w-1/2 border-l-1 md:min-h-screen">
           <PaymentFAQs />
           <RaiseTicket />
         </div>
