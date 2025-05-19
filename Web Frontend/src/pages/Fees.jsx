@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PaymentFAQs from "@/components/Fees/FAQs";
 import RaiseTicket from "@/components/Fees/RaiseTicket";
 import PendingFees from "@/components/Fees/PendingFees";
 import PaidFees from "@/components/Fees/PaidFees";
+import { getUserFees } from "@/services/feeService";
+import FeeCardSkeleton from "@/components/Fees/FeeCardSkeleton";
 
-const { data: allFeesData } = JSON.parse(`{
+const { data: allFeesdata } = JSON.parse(`{
     "statusCode": 200,
     "data": {
         "paid": {
@@ -58,15 +60,33 @@ const { data: allFeesData } = JSON.parse(`{
 }`);
 
 const Fees = () => {
-  const [feesData, setFeesData] = useState(allFeesData);
+  const [feesData, setFeesData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const isPending = Object.values(feesData.pending).some(
-    (value) => value.length !== 0
-  );
+  useEffect(() => {
+    const fetchFees = async () => {
+      try {
+        const response = await getUserFees();
+        setFeesData(response.data);
+      } catch (err) {
+        //handle later
+        setError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchFees();
+  }, []);
 
-  const isPaid = Object.values(feesData.paid).some(
-    (value) => value.length !== 0
-  );
+  let isPending, isPaid;
+  if (!isLoading && feesData.length !== 0) {
+    isPending = Object.values(feesData.pending).some(
+      (value) => value.length !== 0
+    );
+
+    isPaid = Object.values(feesData.paid).some((value) => value.length !== 0);
+  }
 
   return (
     <>
@@ -79,11 +99,19 @@ const Fees = () => {
             Academic year: 2025-26
           </p>
         </div>
-        <div className="p-4 md:mr-0 w-full">
-          <PendingFees isPending={isPending} feesData={feesData.pending} />
-          <hr className="mt-6" />
-          <PaidFees isPaid={isPaid} feesData={feesData.paid} />
-        </div>
+        {isLoading ? (
+          <div className="md:min-w-[60%] py-6 flex-1 w-full">
+            <FeeCardSkeleton />
+            <FeeCardSkeleton />
+            <FeeCardSkeleton />
+          </div>
+        ) : (
+          <div className="p-4 md:mr-0 w-full">
+            <PendingFees isPending={isPending} feesData={feesData.pending} />
+            <hr className="mt-6" />
+            <PaidFees isPaid={isPaid} feesData={feesData.paid} />
+          </div>
+        )}
         <hr className="md:hidden" />
         <div className="md:w-1/2 border-l-1 md:min-h-screen">
           <PaymentFAQs />
