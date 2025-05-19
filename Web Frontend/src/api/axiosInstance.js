@@ -1,4 +1,5 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const BASEURL = import.meta.env.VITE_API_BASE_URL;
 const axiosInstance = axios.create({
@@ -23,6 +24,8 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response, // If request is successful, return the response
   async (error) => {
+    const message = error?.response?.data?.message || error.message || "Something went wrong";
+    toast.error(message); //  show toast for response errors
     const originalRequest = error.config;
 
     // If the error is due to token expiry (401 Unauthorized), try refreshing the token
