@@ -80,7 +80,7 @@ const CalendarPage = () => {
           Academic Calendar - March 2025
         </h2>
         {isLoading ? (
-          LoadingScreen
+          <LoadingScreen/>
         ) : (
           <>
             <CalendarPanel events={events} handleEventClick={(info) => setSelectedEvent(info.event)} />
