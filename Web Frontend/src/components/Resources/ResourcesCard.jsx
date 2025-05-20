@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import SubjectCard from './SubjectCard';
-import { getStudentsResources } from '@/services/resourcesService';
-import { toast } from 'react-hot-toast';
 
-function ResourcesCard() {
-  const [allSubjects, setAllSubjects] = useState([]);
-  const [selectedTerm, setSelectedTerm] = useState('1');
+function ResourcesCard({ allSubjects, selectedTerm, setSelectedTerm, onSubjectClick }) {
   const [resources, setResources] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   const subjectImages = {
     English: 'src/assets/English.png',
@@ -29,22 +24,6 @@ function ResourcesCard() {
   ];
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getStudentsResources();
-        const subjects = response.data || [];
-        setAllSubjects(subjects);
-      } catch (error) {
-        toast.error('Failed to load resources.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
     const filteredResources = allSubjects.map((subject) => {
       const term = subject.terms.find((t) => t.termNumber === selectedTerm);
       return {
@@ -55,8 +34,6 @@ function ResourcesCard() {
 
     setResources(filteredResources);
   }, [selectedTerm, allSubjects]);
-
-  if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className='bg-white dark:bg-customDarkFg p-5 rounded-md'>
@@ -82,21 +59,22 @@ function ResourcesCard() {
       </div>
 
       <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-5'>
-         {resources.length === 0 ? (
-            <div className="col-span-full text-center text-gray-500 dark:text-gray-300 text-lg font-medium">
-              No resources found for the selected term.
-            </div>
-          ) : (
-            resources.map((item, index) => (
+        {resources.length === 0 ? (
+          <div className="col-span-full text-center text-gray-500 dark:text-gray-300 text-lg font-medium">
+            No resources found for the selected term.
+          </div>
+        ) : (
+          resources.map((item, index) => (
+            <div key={item.subjectName} onClick={() => onSubjectClick(item.subjectName)}>
               <SubjectCard
-                key={item.subjectName}
                 subject={item.subjectName}
                 topics={item.topics}
                 bgColor={bgColors[index % bgColors.length]}
                 imgSrc={subjectImages[item.subjectName] || 'src/assets/default.png'}
               />
-            ))
-          )}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
