@@ -36,9 +36,7 @@ function LoginCard({ switchToSignup}) {
     const response = await loginPromise;
 
     if (response.statusCode === 200) {
-      console.log("logging in");
       login(response.data.user);
-      console.log("logging in after");
       navigate('/');
     } 
   } catch (err) {
