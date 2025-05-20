@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 // The following schema represents a class structure for educational resources like ppts,videosetc.
 
 const resourceSchema = new mongoose.Schema({
-    type: { type: String, enum: ['ppt', 'pdf', 'video', 'doc', 'link'], required: true },
+    type: { type: String, enum: ['ppt', 'pdf', 'video', 'doc', 'link','image'], required: true },
     url: { type: String, required: true },
     description: String
 });
