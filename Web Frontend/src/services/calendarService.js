@@ -11,3 +11,8 @@ export const getCalendarEvents = async () =>{
     return response.data;
 }
 
+export const addCalendarEvent = async (eventData) =>{
+    const response = await axiosInstance.post(`${BASEURL}/calendar/add`,eventData);
+    return response.data;
+}
+
