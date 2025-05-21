@@ -1,68 +1,89 @@
-import { NavLink } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import toggleLight from '../../assets/day.png';
-import toggleDark from '../../assets/night.png';
-import { faCircleQuestion, faMessage } from '@fortawesome/free-regular-svg-icons';
+import { useEffect, useState } from "react";
+import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { cn } from "@/lib/utils";
+import NavLinks from "./NavLinks";
+import { SearchBar, Message, Question, ToggleTheme } from "./NavbarButtons";
 
-const Topbar = ({ theme, setTheme }) => {
-  const handleToggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
+const ResponsiveTopBar = ({ theme, setTheme }) => {
+  const [isOpen, setIsOpen] = useState(false);
 
-  /**
-   * @desc Function to determine the class for navigation links
-   */
-  const navLinkClass = ({ isActive }) =>
-    `relative font-medium transition-colors duration-300 ${
-      isActive ? 'text-blue-600 dark:text-blue-400' : 'text-black dark:text-white'
-    } hover:text-blue-500 dark:hover:text-blue-300`;
+  //prevent scrolling when sidebar is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      document.body.style.overscrollBehavior = "none";
+    } else {
+      document.body.style.overflow = "auto";
+      document.body.style.overscrollBehavior = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+      document.body.style.overscrollBehavior = "auto";
+    };
+  }, [isOpen]);
 
   return (
-    <header className={`navbar w-full flex items-center bg-white dark:bg-black shadow-md px-4 py-3 duration-500`}>
-      <h1 className='Logo text-3xl font-bold text-black dark:text-white'>EduSync</h1>
-
-      <nav className='mx-auto'>
-        <ul className='flex gap-8'>
-          <li>
-            <NavLink to="/" className={navLinkClass}>Home</NavLink>
-          </li>
-          <li>
-            <NavLink to="/fees" className={navLinkClass}>Fees</NavLink>
-          </li>
-          <li>
-            <NavLink to="/resources" className={navLinkClass}>Resources</NavLink>
-          </li>
-          <li>
-            <NavLink to="/calendar" className={navLinkClass}>Calendar</NavLink>
-          </li>
-        </ul>
-      </nav>
-
-      <div className={`search-box flex self-end items-center px-4 py-2 mx-4 rounded-full bg-black dark:bg-white shadow-md`}>
-        <input
-          type="text"
-          placeholder="Search"
-          className="outline-none border-0 mr-2 bg-transparent dark:placeholder:text-black placeholder:text-white text-white dark:text-black"
-        />
-        <FontAwesomeIcon icon={faMagnifyingGlass} className="dark:text-black text-white" />
-      </div>
-
-      <div className='flex items-center'>
-        <FontAwesomeIcon icon={faMessage} className="text-black dark:text-white text-2xl" />
-        <FontAwesomeIcon icon={faCircleQuestion} className="text-black dark:text-white text-2xl ml-5" />
-
-        <button onClick={handleToggleTheme} aria-label="Toggle Theme">
-          <img
-            src={theme === 'light' ? toggleDark : toggleLight}
-            alt="Theme Toggle"
-            className="w-8 h-8 ml-4 cursor-pointer select-none"
-            draggable="false"
-            />
+    <>
+      <header className="navbar w-full flex items-center bg-white dark:bg-black shadow-md px-4 py-3 duration-500">
+        <h1 className="Logo text-3xl font-bold text-black dark:text-white">
+          EduSync
+        </h1>
+        <button
+          className="tablet:hidden ml-auto size-fit p-2 rounded-sm hover:bg-gray-300 dark:hover:bg-gray-700 cursor-pointer"
+          onClick={() => setIsOpen((prev) => !prev)}
+        >
+          <FontAwesomeIcon icon={isOpen ? faXmark : faBars} className="fa-xl" />
         </button>
+        <nav className="hidden tablet:flex w-full items-center">
+          <ul className="flex gap-8 w-fit text-lg mx-auto">
+            <NavLinks closeMenuCallback={() => setIsOpen(false)} />
+          </ul>
+
+          <SearchBar />
+          <div className="flex items-center">
+            <Message />
+            <Question />
+            <ToggleTheme theme={theme} setTheme={setTheme} />
+          </div>
+        </nav>
+      </header>
+      <div
+        className={cn(
+          "fixed tablet:hidden inset-0 top-15 z-20 bg-transparent w-full h-full",
+          { "-z-999": !isOpen }
+        )}
+      >
+        <nav className="ml-auto w-full sm:w-max h-full flex">
+          {isOpen && (
+            <div
+              className="absolute inset-0 bg-gray-800 opacity-90 -z-1 duration-300"
+              onClick={() => setIsOpen(false)}
+            ></div>
+          )}
+          <ul
+            className={cn(
+        "flex flex-col gap-8 py-8 items-center sm:items-start sm:px-15 w-full text-xl bg-customLightBg dark:bg-customDarkBg h-full transform transition-transform duration-300",
+        {
+          "translate-x-0": isOpen,
+          "translate-x-full": !isOpen,
+        }
+      )}
+          >
+            <NavLinks closeMenuCallback={() => setIsOpen(false)} />
+            <SearchBar />
+
+            <div className="flex items-center mx-auto">
+              <Message />
+              <Question />
+              <ToggleTheme theme={theme} setTheme={setTheme} />
+            </div>
+          </ul>
+        </nav>
       </div>
-    </header>
+    </>
   );
 };
 
-export default Topbar;
+export default ResponsiveTopBar;
