@@ -19,7 +19,7 @@ function Resources() {
         const response = await getStudentsResources();
         setAllSubjects(response.data || []);
       } catch (error) {
-        toast.error('Failed to load resources.');
+        // Already handled by axios instance
       } finally {
         setIsLoading(false);
       }

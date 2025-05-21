@@ -33,18 +33,29 @@ const CalendarPage = () => {
         const response = await getCalendarEvents();
         const rawEvents = response.data;
 
-        const formattedEvents = rawEvents.map((event) => ({
-          title: event.title,
-          start: event.start.split("T")[0],
-          end: event.end ? event.end.split("T")[0] : event.start.split("T")[0],
-          allDay: true,
-          extendedProps: {
-            description: event.extendedProps.description,
-            eventType: event.eventType,
-          },
-          backgroundColor: getEventColor(event.eventType).bg,
-          borderColor: getEventColor(event.eventType).border,
-        }));
+        const formattedEvents = rawEvents.map((event) => {
+          const startDate = event.start.split("T")[0];
+          let endDate = event.end ? event.end.split("T")[0] : startDate;
+                
+          // If start != end, add 1 day to endDate for FullCalendar display
+          if (startDate !== endDate) {
+            const adjustedEnd = new Date(new Date(endDate).getTime() + 24 * 60 * 60 * 1000);
+            endDate = adjustedEnd.toISOString().split("T")[0];
+          }
+        
+          return {
+            title: event.title,
+            start: startDate,
+            end: endDate,
+            allDay: true,
+            extendedProps: {
+              description: event.extendedProps?.description,
+              eventType: event.eventType,
+            },
+            backgroundColor: getEventColor(event.eventType).bg,
+            borderColor: getEventColor(event.eventType).border,
+          };
+        });
 
         setEvents(formattedEvents);
       } catch {
@@ -83,7 +94,7 @@ const CalendarPage = () => {
           <LoadingScreen/>
         ) : (
           <>
-            <CalendarPanel events={events} handleEventClick={(info) => setSelectedEvent(info.event)} />
+            <CalendarPanel events={events} setEvents={setEvents} handleEventClick={(info) => setSelectedEvent(info.event)} />
             <Legend legend={legend} />
           </>
         )}
