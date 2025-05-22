@@ -48,6 +48,7 @@ function AdminResources() {
       {!selectedClass ? (
         <ClassesCard
           classes={allClasses}
+          setClasses={setAllClasses}
           onClassSelect={(cls) => setSelectedClass(cls)}
           role='super admin'
         />

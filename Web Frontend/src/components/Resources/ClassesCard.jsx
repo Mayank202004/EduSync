@@ -1,5 +1,8 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useState } from 'react';
+import AddClassModal from './AddClassModal';
 
 const bgColors = [
   'bg-pink-100',
@@ -19,11 +22,23 @@ const classImages = {
 };
 
 
-function ClassesCard({ classes, onClassSelect, role='teacher' }) {
+function ClassesCard({ classes,setClasses, onClassSelect, role='teacher' }) {
+  // Hooks
+  const [showModal, setShowModal] = useState(false);
+
+  
+  const handleModalClose = () => {
+    setShowModal(false);
+  };
+
+  const handleClassSubmit = (data) => {
+    setClasses((prev) => [...prev, data]);
+    setShowModal(false);
+  };
 
   // On add class clicked
   const handleAddClass = () =>{
-    return;
+    setShowModal(true);
   }
   return (
     <div className='bg-white dark:bg-customDarkFg p-5 rounded-md w-full max-w-6xl'>
@@ -76,6 +91,10 @@ function ClassesCard({ classes, onClassSelect, role='teacher' }) {
           ))
         )}
       </div>
+      {/* Conditionally render modal (This section is for super admin only)*/}
+      {showModal && (
+        <AddClassModal onClose={handleModalClose} onSubmit={handleClassSubmit} />
+      )}
     </div>
   );
 }
