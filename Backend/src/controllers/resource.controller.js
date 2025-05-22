@@ -218,7 +218,7 @@ export const addResource = asyncHandler(async (req, res) => {
             throw new ApiError(404, "Class, subject, term, or chapter not found.");
         }
 
-        res.status(200).json(new ApiResponse(true, "Resources added successfully", uploadedFiles, 200));
+        res.status(200).json(new ApiResponse(200,updatedClass, "Resources added successfully"));
     } catch (error) {
         throw new ApiError(400,error.message)
     }
