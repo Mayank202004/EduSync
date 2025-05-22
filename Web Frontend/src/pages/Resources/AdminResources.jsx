@@ -19,7 +19,6 @@ function AdminResources() {
     const fetchData = async () => {
       try {
         const response = await getAdminResources();
-        console.log(response.data);
         setAllClasses(response.data || []);
       } catch (error) {
         // Already handled by axios instance
@@ -42,7 +41,7 @@ function AdminResources() {
   };
 
   // To update the subjects of selected class (Used in addSubject) 
-  const updateSubjectsForSelectedClass = (updatedClass) => {
+  const updateClass = (updatedClass) => {
     setAllClasses(prev =>
       prev.map(cls =>
         cls._id === updatedClass._id ? updatedClass : cls
@@ -70,17 +69,20 @@ function AdminResources() {
           selectedTerm={selectedTerm}
           setSelectedTerm={setSelectedTerm}
           allSubjects={selectedClass.subjects || []}
-          setAllSubjects={updateSubjectsForSelectedClass}
+          setAllSubjects={updateClass}
           goBack={handleBackFromClass}
           role="super admin"
           className={selectedClass.class}
         />
       ) : (
         <ChapterCard
+          className={selectedClass.class}
           subjectName={selectedSubject}
           term={selectedTerm}
           allSubjects={selectedClass.subjects || []}
+          setUpdatedClass={updateClass}
           goBack={handleBackFromSubject}
+          role='super admin'
         />
       )}
     </div>

@@ -38,10 +38,24 @@ export const addClass = async (className) => {
  * @desc Create a new Subject
  * @param {String} className - Class name to which the subject will be added 
  * @param {String} subjectName - Name of the subject to be added
- * @returns {Promise<Object>} - Promise resolving to the created subject data
+ * @returns {Promise<Object>} - Promise resolving to the updated class data
  */
 export const addSubject = async (className, subjectName) => {
     const response = await axiosInstance.post(`${BASEURL}/resource/add-subject`, {className,subjectName});
+    return response.data;
+}
+
+/**
+ * @desc Add a new chapter to a subject
+ * @param {String} className - Class name to which the chapter wil be added
+ * @param {String} subjectName - Subject name to which the chapter will be added
+ * @param {String} termNumber - Term number to which the chapter will be added
+ * @param {String} chapterName - Name of the chapter to be added
+ * @returns {Promise<Object>} - Promise resolving to the updated class data
+ */
+export const addChapter = async (className, subjectName, termNumber, chapterName) =>{
+    console.log('Adding chapter');
+    const response = await axiosInstance.post(`${BASEURL}/resource/add-chapter`, {className, subjectName, termNumber, chapterName});
     return response.data;
 }
 

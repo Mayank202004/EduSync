@@ -1,37 +1,77 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, Plus} from 'lucide-react';
+import { addChapter } from '@/services/resourcesService';
+import SingleInputModal from './SingleInputModal';
 
 // Simple icon mapping based on type (replace with PNG <img src> if needed)
 const typeIcons = {
   image: 'src/assets/Image.png',
-  video: '🎥',
-  pdf: '📄',
-  doc: '📃',
-  ppt: '📊',
-  audio: '🎵',
-  default: '📁',
+  video: 'src/assets/Video.png',
+  pdf: 'src/assets/PDF.png',
+  doc: '📃', // To Do:
+  ppt: 'src/assets/PPT.png',
+  audio: 'src/assets/Audio.png',
+  default: '📁', // To DO: Add default asset
 };
 
-function ChapterCard({ subjectName, term, allSubjects, goBack }) {
+function ChapterCard({
+  className,
+  subjectName, 
+  term, 
+  allSubjects, 
+  setUpdatedClass= () => {},
+  goBack, 
+  role='student' 
+}){
+  // Hooks
   const [expandedIndex, setExpandedIndex] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const subject = allSubjects.find((s) => s.subjectName === subjectName);
   const termData = subject?.terms.find((t) => t.termNumber === term);
   const chapters = termData?.chapters || [];
 
+  // Expand chapter to show resources belonging to a specific chapter
   const toggleExpand = (index) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
   };
 
+  
+  const handleModalClose = () => {
+    setShowModal(false);
+  };
+
+  const handleChapterSubmit = (data) => {
+    setUpdatedClass(data); 
+    setShowModal(false);
+  };
+
+  // On add chapter clicked
+  const handleAddChapter = () =>{
+    setShowModal(true);
+    }
+
   return (
     <div className='bg-white dark:bg-customDarkFg p-5 rounded-md w-full max-w-3xl'>
-      <button
-        onClick={goBack}
-        className='mb-4 flex items-center text-blue-600 hover:underline'
-      >
-        <ArrowLeft className='mr-2' size={18} />
-        Back to Subjects
-      </button>
+      <div className='flex items-center justify-between'>
+        <button
+          onClick={goBack}
+          className='mb-4 flex items-center text-blue-600 hover:underline'
+          >
+          <ArrowLeft className='mr-2' size={18} />
+          Back to Subjects
+        </button>
+        {/* Right side: Add Chapter button (only for super admin) */}
+          {role === 'super admin' && (
+            <button
+              onClick={handleAddChapter} 
+              className='px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300 text-sm flex items-center'
+            >
+              <Plus className='mr-2' size={16}/>
+              Add Chapter
+            </button>
+          )}
+      </div>
 
       <h1 className='text-2xl font-bold mb-2'>{subjectName} - Term {term}</h1>
       <p className='text-gray-700 dark:text-gray-300 mb-4'>
@@ -92,6 +132,20 @@ function ChapterCard({ subjectName, term, allSubjects, goBack }) {
           ))}
         </ul>
       )}
+      {/* Conditionally render modal (This section is for super admin only)*/}
+      {showModal && (
+        <SingleInputModal
+            title="Add New Chapter"
+            label="Chapter Name"
+            placeholder=""
+            loadingMessage="Adding chapter..."
+            successMessage="Chapter added successfully!"
+            onClose={() => setShowModal(false)}
+            onAdd={(chapterName) => addChapter(className,subjectName,term,chapterName)}
+            onSubmit={(data) => handleChapterSubmit(data)}
+        />
+      )}
+      
     </div>
   );
 }
