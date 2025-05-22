@@ -26,7 +26,7 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
 
   return (
     <>
-      <header className="navbar w-full flex items-center bg-white dark:bg-black shadow-md px-4 py-3 duration-500">
+      <header className="navbar w-full flex items-center bg-white dark:bg-black shadow-md px-4 py-3 max-h-15 duration-500">
         <h1 className="Logo text-3xl font-bold text-black dark:text-white">
           EduSync
         </h1>
