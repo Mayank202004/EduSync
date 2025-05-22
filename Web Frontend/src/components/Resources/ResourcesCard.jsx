@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import SubjectCard from './SubjectCard';
+import { ArrowLeft,Plus } from 'lucide-react';
 
-function ResourcesCard({ allSubjects, selectedTerm, setSelectedTerm, onSubjectClick }) {
+function ResourcesCard({ allSubjects, selectedTerm, setSelectedTerm, onSubjectClick, goBack=null, role='student' }) {
   const [resources, setResources] = useState([]);
 
   const subjectImages = {
@@ -35,16 +36,40 @@ function ResourcesCard({ allSubjects, selectedTerm, setSelectedTerm, onSubjectCl
     setResources(filteredResources);
   }, [selectedTerm, allSubjects]);
 
+  const handleAddSubject = ()=>{
+    return;
+  }
+
   return (
     <div className='bg-white dark:bg-customDarkFg p-5 rounded-md'>
       <div className='flex items-center justify-between gap-5'>
         <div>
+          {role === 'super admin' && (
+            <button
+              onClick={goBack}
+              className='mb-4 flex items-center text-blue-600 hover:underline'
+            >
+              <ArrowLeft className='mr-2' size={18} />
+              Back to Classes
+            </button>
+          )}
           <h1 className='text-2xl font-bold'>Resources</h1>
           <p className='text-gray-700 dark:text-gray-200'>
             Choose subject to see your study resources
           </p>
         </div>
-        <div>
+        <div className='flex items-center gap-2'>
+          {/* Right side: Add Subject button (only for super admin) */}
+          {role === 'super admin' && (
+            <button
+              onClick={handleAddSubject} 
+              className='px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300 text-sm flex items-center'
+            >
+              <Plus className='mr-2' size={16}/>
+              Add Subject
+            </button>
+          )}
+          {/* Right side: Term selection */}
           <select
             id='term'
             name='term'
