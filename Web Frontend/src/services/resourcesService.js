@@ -59,3 +59,29 @@ export const addChapter = async (className, subjectName, termNumber, chapterName
     return response.data;
 }
 
+/**
+ * @desc Add resource/s to a chapter
+ * @param {String} className 
+ * @param {String} subjectName 
+ * @param {String} termNumber 
+ * @param {String} chapterName 
+ * @param {Files} files 
+ * @returns {Promise<Object>} - Promise resolving to the updated class data
+ */
+export const addResource = async (className, subjectName, termNumber, chapterName, files) => {
+  const formData = new FormData();
+  formData.append('className', className);
+  formData.append('subjectName', subjectName);
+  formData.append('termNumber', termNumber);
+  formData.append('chapterName', chapterName);
+  // Append all files with field name "files"
+  files.forEach(file => formData.append('files', file));
+
+  const response = await axiosInstance.post(`${BASEURL}/resource/add-resource`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    }
+  });
+  return response.data;
+};
+
