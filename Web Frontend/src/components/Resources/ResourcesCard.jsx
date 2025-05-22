@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import SubjectCard from './SubjectCard';
 import { ArrowLeft,Plus } from 'lucide-react';
+import SingleInputModal from './SingleInputModal';
+import { addSubject } from '@/services/resourcesService';
 
-function ResourcesCard({ allSubjects, selectedTerm, setSelectedTerm, onSubjectClick, goBack=null, role='student' }) {
+function ResourcesCard({ 
+  allSubjects,
+  setAllSubjects= () => {},
+  selectedTerm, 
+  setSelectedTerm, 
+  onSubjectClick, 
+  goBack=null, 
+  role='student', 
+  className="" 
+}) {
   const [resources, setResources] = useState([]);
 
   const subjectImages = {
@@ -24,6 +35,9 @@ function ResourcesCard({ allSubjects, selectedTerm, setSelectedTerm, onSubjectCl
     'bg-purple-200',
   ];
 
+  // Hooks
+  const [showModal, setShowModal] = useState(false);
+
   useEffect(() => {
     const filteredResources = allSubjects.map((subject) => {
       const term = subject.terms.find((t) => t.termNumber === selectedTerm);
@@ -36,9 +50,20 @@ function ResourcesCard({ allSubjects, selectedTerm, setSelectedTerm, onSubjectCl
     setResources(filteredResources);
   }, [selectedTerm, allSubjects]);
 
+  // On add subject clicked
   const handleAddSubject = ()=>{
-    return;
+    setShowModal(true);
   }
+
+  const handleModalClose = () => {
+    setShowModal(false);
+  };
+
+  const handleSubjectSubmit = (data) => {
+      setAllSubjects(data);
+      setShowModal(false);
+  };
+
 
   return (
     <div className='bg-white dark:bg-customDarkFg p-5 rounded-md'>
@@ -101,6 +126,19 @@ function ResourcesCard({ allSubjects, selectedTerm, setSelectedTerm, onSubjectCl
           ))
         )}
       </div>
+      {/* Conditionally render modal (This section is for super admin only)*/}
+      {showModal && (
+        <SingleInputModal
+            title="Add New Subject"
+            label="Subject Name"
+            placeholder=""
+            loadingMessage="Adding subject..."
+            successMessage="Subject added successfully!"
+            onClose={() => setShowModal(false)}
+            onAdd={(name) => addSubject(className,name)}
+            onSubmit={(data) => handleSubjectSubmit(data)}
+        />
+      )}
     </div>
   );
 }

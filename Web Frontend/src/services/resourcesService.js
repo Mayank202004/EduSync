@@ -27,10 +27,21 @@ export const getAdminResources = async () =>{
 /**
  * @desc Create a new Class
  * @param {String} className - The name of class to be created
- * @returns {Promise} - Promise resolving to the response
+ * @returns {Promise<Object>} - Promise resolving to the created class data
  */
 export const addClass = async (className) => {
     const response = await axiosInstance.post(`${BASEURL}/resource/add-class`, {className});
+    return response.data;
+}
+
+/**
+ * @desc Create a new Subject
+ * @param {String} className - Class name to which the subject will be added 
+ * @param {String} subjectName - Name of the subject to be added
+ * @returns {Promise<Object>} - Promise resolving to the created subject data
+ */
+export const addSubject = async (className, subjectName) => {
+    const response = await axiosInstance.post(`${BASEURL}/resource/add-subject`, {className,subjectName});
     return response.data;
 }
 

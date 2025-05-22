@@ -6,7 +6,7 @@ const SingleInputModal = ({
   label,
   loadingMessage="Loading...",
   successMessage="Success!",
-  errorMessage="Something went wrong", 
+  errorMessage="", 
   placeholder, 
   onClose, 
   onSubmit, 

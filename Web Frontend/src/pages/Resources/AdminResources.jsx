@@ -41,6 +41,18 @@ function AdminResources() {
     setSelectedSubject(null);
   };
 
+  // To update the subjects of selected class (Used in addSubject) 
+  const updateSubjectsForSelectedClass = (updatedClass) => {
+    setAllClasses(prev =>
+      prev.map(cls =>
+        cls._id === updatedClass._id ? updatedClass : cls
+      )
+    );
+    // Update local state of selected class 
+    setSelectedClass(updatedClass);
+  };
+
+
   if (isLoading) return <LoadingScreen/>;
 
   return (
@@ -58,8 +70,10 @@ function AdminResources() {
           selectedTerm={selectedTerm}
           setSelectedTerm={setSelectedTerm}
           allSubjects={selectedClass.subjects || []}
+          setAllSubjects={updateSubjectsForSelectedClass}
           goBack={handleBackFromClass}
           role="super admin"
+          className={selectedClass.class}
         />
       ) : (
         <ChapterCard
