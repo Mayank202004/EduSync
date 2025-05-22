@@ -5,7 +5,7 @@ import { getStudentsResources } from '@/services/resourcesService';
 import { toast } from 'react-hot-toast';
 import LoadingScreen from '@/components/Loading';
 
-function Resources() {
+function StudentResources() {
   //Hooks
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedTerm, setSelectedTerm] = useState('1');
@@ -50,4 +50,4 @@ function Resources() {
   );
 }
 
-export default Resources;
+export default StudentResources;
