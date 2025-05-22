@@ -1,5 +1,16 @@
 import { cn } from "@/lib/utils";
 
+function dateFormatter(dateStr) {
+  return new Date(dateStr).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  });
+}
+
 const FeeCard = ({
   feeData,
   selectedFees = null,
@@ -37,30 +48,15 @@ const FeeCard = ({
         )}
       >
         <div className="flex justify-between">
-          <h2 className="font-bold text-2xl truncate w-fit">{feeData.title}</h2>
+          <h2 className="font-bold text-xl sm:text-2xl truncate w-fit">
+            {feeData.title}
+          </h2>
           <h1 className="font-bold text-xl mr-2">&#x20B9;{feeData.amount}</h1>
         </div>
         <p className="text-gray-600 dark:text-gray-400">
           {isSelectable
-            ? `Due Date: ${new Date(feeData.dueDate).toLocaleDateString(
-                "en-IN",
-                {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                  hour12: true
-                }
-              )}`
-            : `Paid On: ${new Date(feeData.paidOn).toLocaleDateString("en-IN", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true
-              })}`}
+            ? `Due Date: ${dateFormatter(feeData.dueDate)}`
+            : `Paid On: ${dateFormatter(feeData.paidOn)}`}
         </p>
         <hr className="my-2" />
         <p className="line-clamp-1">Description: Yearly fees</p>

@@ -37,7 +37,7 @@ const PaidFeesCard = ({ feeData }) => {
         >
           <FontAwesomeIcon icon={expanded ? faAngleDown : faAngleRight} />
         </button>
-        <h1 className="font-bold text-2xl ml-2 truncate w-fit">
+        <h1 className="font-bold text-xl sm:text-2xl ml-2 truncate w-fit">
           {feeData.title}
         </h1>
         <Tag className="mx-2" text={feeData.mode} color={COLOR_MAP[feeData.mode]}/>
