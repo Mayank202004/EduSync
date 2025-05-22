@@ -37,7 +37,7 @@ const CalendarPage = () => {
           const startDate = event.start.split("T")[0];
           let endDate = event.end ? event.end.split("T")[0] : startDate;
                 
-          // If start != end, add 1 day to endDate for FullCalendar display
+          // If start != end, add 1 day to endDate for FullCalendar display (Because end date is exclusive)
           if (startDate !== endDate) {
             const adjustedEnd = new Date(new Date(endDate).getTime() + 24 * 60 * 60 * 1000);
             endDate = adjustedEnd.toISOString().split("T")[0];

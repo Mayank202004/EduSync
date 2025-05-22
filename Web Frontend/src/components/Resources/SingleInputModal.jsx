@@ -1,30 +1,39 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { addClass } from "@/services/resourcesService";
 
-const AddClassModal = ({ onClose, onSubmit }) => {
-  const [className, setClassName] = useState("");
+const SingleInputModal = ({ 
+  title, 
+  label,
+  loadingMessage="Loading...",
+  successMessage="Success!",
+  errorMessage="Something went wrong", 
+  placeholder, 
+  onClose, 
+  onSubmit, 
+  onAdd 
+}) => {
+  const [value, setValue] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!className.trim()) {
-      toast.error("Class name cannot be empty");
+    if (!value.trim()) {
+      toast.error(`${label} cannot be empty`);
       return;
     }
 
     try {
       const response = await toast.promise(
-        addClass(className),
+        onAdd(value),
         {
-          loading: "Adding class...",
-          success: "Class added successfully!",
-          error: "",
+          loading: loadingMessage,
+          success: successMessage,
+          error: errorMessage,
         }
       );
-      onSubmit(response.data); // Notify parent
+      onSubmit(response.data);
     } catch (err) {
-     // Handled by axios instance
+      // handled by axios 
     }
   };
 
@@ -34,15 +43,14 @@ const AddClassModal = ({ onClose, onSubmit }) => {
         onSubmit={handleSubmit}
         className="bg-white dark:bg-customDarkFg rounded-xl p-6 w-[90%] max-w-md shadow-lg"
       >
-        <h2 className="text-xl font-bold mb-4">Add New Class</h2>
+        <h2 className="text-xl font-bold mb-4">{title}</h2>
 
         <div className="mb-4">
-          <label className="block mb-1 font-medium">Class Name</label>
+          <label className="block mb-1 font-medium">{label}</label>
           <input
-            name="className"
-            value={className}
-            onChange={(e) => setClassName(e.target.value)}
-            placeholder="e.g., 1, 2, Jr. Kg"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder={placeholder}
             required
             type="text"
             className="w-full border px-3 py-2 rounded"
@@ -69,4 +77,4 @@ const AddClassModal = ({ onClose, onSubmit }) => {
   );
 };
 
-export default AddClassModal;
+export default SingleInputModal;

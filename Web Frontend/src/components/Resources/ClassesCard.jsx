@@ -2,7 +2,8 @@ import React from 'react';
 import { Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
-import AddClassModal from './AddClassModal';
+import SingleInputModal from './SingleInputModal';
+import { addClass } from '@/services/resourcesService';
 
 const bgColors = [
   'bg-pink-100',
@@ -93,7 +94,19 @@ function ClassesCard({ classes,setClasses, onClassSelect, role='teacher' }) {
       </div>
       {/* Conditionally render modal (This section is for super admin only)*/}
       {showModal && (
-        <AddClassModal onClose={handleModalClose} onSubmit={handleClassSubmit} />
+        <SingleInputModal
+            title="Add New Class"
+            label="Class Name"
+            placeholder="e.g., 1, 2, Jr. Kg"
+            loadingMessage="Adding class..."
+            successMessage="Class added successfully!"
+            onClose={() => setShowModal(false)}
+            onAdd={(name) => addClass(name)}
+            onSubmit={(data) => {
+              setClasses((prev) => [...prev, data]);
+              setShowModal(false);
+            }}
+        />
       )}
     </div>
   );
