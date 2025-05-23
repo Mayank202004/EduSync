@@ -324,6 +324,7 @@ export const getTeacherResources = asyncHandler(async (req, res) => {
                 if (classIndex === -1) {
                     // If class doesn't exist, create a new entry
                     teacherResources.push({
+                        _id: cls._id,
                         class: cls.class,
                         subjects: [subjectData]
                     });
