@@ -69,7 +69,7 @@ function ResourcesCard({
     <div className='bg-white dark:bg-customDarkFg p-5 rounded-md'>
       <div className='flex items-center justify-between gap-5'>
         <div>
-          {role === 'super admin' && (
+          {role != 'student' && (
             <button
               onClick={goBack}
               className='mb-4 flex items-center text-blue-600 hover:underline'

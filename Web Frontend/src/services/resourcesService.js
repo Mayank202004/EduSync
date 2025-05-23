@@ -11,9 +11,13 @@ export const getStudentsResources = async () =>{
     return response.data;
 }
 
-// To Do
-export const getTeachersResources = async () =>{
-    return;
+/**
+ * @desc Fetch resources for a student
+ * @returns {Promise<Object>} - Promise resolving to the list of classes their subjects and their resources
+ */
+export const getTeacherResources = async () =>{
+    const response = await axiosInstance.get(`${BASEURL}/resource/teacher`);
+    return response.data;
 }
 
 /**
