@@ -497,3 +497,82 @@ export const getGenderDistribution = asyncHandler(async (req, res) => {
     });
 });
 
+export const getTopAttendees = asyncHandler(async (req, res) => {
+    const { className, div } = req.body;
+
+    if (!className?.trim() || !div?.trim()) {
+        throw new ApiError(400, "Class and division are required");
+    }
+
+    const results = await ClassAttendance.aggregate([
+        {
+            $match: {
+                class: className,
+                div: div
+            }
+        },
+        {
+            $facet: {
+                // Total working days
+                totalDays: [
+                    { $group: { _id: "$date" } },
+                    { $count: "total" }
+                ],
+                // Attendance summary
+                studentAttendance: [
+                    { $unwind: "$attendance" },
+                    {
+                        $match: {
+                            "attendance.status": "Present"
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$attendance.studentId",
+                            daysPresent: { $sum: 1 }
+                        }
+                    },
+                    { $sort: { daysPresent: -1 } },
+                    {
+                        $lookup: {
+                            from: "students",
+                            localField: "_id",
+                            foreignField: "_id",
+                            as: "student"
+                        }
+                    },
+                    { $unwind: "$student" },
+                    {
+                        $lookup: {
+                            from: "users", // Collection for User model
+                            localField: "student.userId",
+                            foreignField: "_id",
+                            as: "user"
+                        }
+                    },
+                    { $unwind: "$user" },
+                    {
+                        $project: {
+                            _id: 0,
+                            studentId: "$_id",
+                            name: "$user.fullName",
+                            daysPresent: 1
+                        }
+                    }
+                ]
+            }
+        }
+    ]);
+
+    const totalWorkingDays = results[0]?.totalDays[0]?.total || 0;
+    const studentAttendance = results[0]?.studentAttendance || [];
+
+    res.status(200).json({
+        success: true,
+        message: "Top attendees fetched successfully",
+        data: {
+            totalWorkingDays,
+            studentAttendance
+        }
+    });
+});
