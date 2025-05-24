@@ -442,3 +442,37 @@ export const exportAttendanceExcel = asyncHandler(async (req, res) => {
     await workbook.xlsx.write(res);
     res.end();
 });
+
+/**
+ * @desc Get list of students in a class
+ * @route POST /api/attendance/students
+ * @access Private (Teacher)
+ */
+export const getStudentList = asyncHandler(async (req, res) => {
+  const { className, div } = req.body;
+
+  if (!className?.trim() || !div?.trim()) {
+    throw new ApiError(400, "Class and division is required");
+  }
+
+  const students = await Student.aggregate([
+    { $match: { class: className, div: div } },
+    {
+      $lookup: {
+        from: 'users',           
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'user'
+      }
+    },
+    { $unwind: '$user' },
+    { $sort: { 'user.fullName': 1 } }, 
+    { $project: { _id: 1, fullName: '$user.fullName' } } 
+  ]);
+
+  if (!students) {
+    throw new ApiError(404, "No students found");
+  }
+
+  res.status(200).json(new ApiResponse(200, students, "Student names fetched successfully"));
+});
