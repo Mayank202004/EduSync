@@ -96,7 +96,7 @@ export const markAttendance = asyncHandler(async (req, res) => {
         });
 
     } catch (error) {
-        return res.status(error.statusCode || 500).json({ message: error.message });
+        throw new ApiError(error.statusCode || 500, error.message || "Something went wrong");
     }
 });
 
@@ -476,3 +476,24 @@ export const getStudentList = asyncHandler(async (req, res) => {
 
   res.status(200).json(new ApiResponse(200, students, "Student names fetched successfully"));
 });
+
+export const getGenderDistribution = asyncHandler(async (req, res) => {
+    const { className, div } = req.body;
+
+    if (!className?.trim() || !div?.trim()) {
+        throw new ApiError(400, "Class and division are required");
+    }
+
+    const distribution = await Student.aggregate([
+        { $match: { class: className, div: div } },
+        { $group: { _id: "$gender", count: { $sum: 1 } } },
+        { $project: { gender: "$_id", count: 1, _id: 0 } }
+    ]);
+
+    res.status(200).json({
+        success: true,
+        message: "Gender distribution fetched successfully",
+        data: distribution
+    });
+});
+

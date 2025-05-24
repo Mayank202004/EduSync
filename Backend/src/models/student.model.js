@@ -48,6 +48,11 @@ const studentSchema = new Schema({
     weight: {
         type: Number,
     },
+    gender: {
+        type: String,
+        enum: ["male","female","other","unspecified"],
+        default:"unspecified"
+    },
     parentsInfo:{
         fatherName:{
             type: String,
