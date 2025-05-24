@@ -6,6 +6,9 @@ import {
 import toggleLight from "../../assets/day.png";
 import toggleDark from "../../assets/night.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAuth } from "@/auth/AuthContext";
+import { capitalizeFirstLetter } from "@/lib/utils";
+import colorFromName from "@/lib/colorFromName";
 
 export const SearchBar = () => {
   return (
@@ -36,7 +39,7 @@ export const Question = () => {
   return (
     <FontAwesomeIcon
       icon={faCircleQuestion}
-      className="text-black dark:text-white text-2xl ml-5"
+      className="text-black dark:text-white text-2xl"
     />
   );
 };
@@ -51,9 +54,31 @@ export const ToggleTheme = ({ theme, setTheme }) => {
       <img
         src={theme === "light" ? toggleDark : toggleLight}
         alt="Theme Toggle"
-        className="w-8 h-8 ml-4 cursor-pointer select-none"
+        className="w-8 h-8 cursor-pointer select-none"
         draggable="false"
       />
+    </button>
+  );
+};
+
+export const Avatar = () => {
+  const { user } = useAuth();
+
+  const initial = capitalizeFirstLetter(user.username.at(0));
+
+  return (
+    <button
+      type="button"
+      className="flex cursor-pointer items-centertext-center size-8 bg-cover rounded-full overflow-hidden hover:ring-1 focus:ring-1 ring-gray-500 dark:ring-white"
+      style={{ backgroundColor: colorFromName(initial) }}
+    >
+      {!user.avatar ? (
+        <h1 className="font-bold text-lg size-fit m-auto text-white">
+          {initial}
+        </h1>
+      ) : (
+        <img src={user.avatar} alt="User Profile Picture" />
+      )}
     </button>
   );
 };

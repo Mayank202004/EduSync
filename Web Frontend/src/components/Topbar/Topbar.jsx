@@ -3,7 +3,13 @@ import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cn } from "@/lib/utils";
 import NavLinks from "./NavLinks";
-import { SearchBar, Message, Question, ToggleTheme } from "./NavbarButtons";
+import {
+  SearchBar,
+  Message,
+  Question,
+  ToggleTheme,
+  Avatar,
+} from "./NavbarButtons";
 
 const ResponsiveTopBar = ({ theme, setTheme }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,22 +36,28 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
         <h1 className="Logo text-3xl font-bold text-black dark:text-white">
           EduSync
         </h1>
-        <button
-          className="tablet:hidden ml-auto size-fit p-2 rounded-sm hover:bg-gray-300 dark:hover:bg-gray-700 cursor-pointer"
-          onClick={() => setIsOpen((prev) => !prev)}
-        >
-          <FontAwesomeIcon icon={isOpen ? faXmark : faBars} className="fa-xl" />
-        </button>
+        <div className="tablet:hidden ml-auto flex items-center gap-2 sm:gap-3">
+          <Avatar />
+          <button
+            className="tablet:hidden size-fit p-2 rounded-sm hover:bg-gray-300 dark:hover:bg-gray-700 cursor-pointer"
+            onClick={() => setIsOpen((prev) => !prev)}
+          >
+            <FontAwesomeIcon
+              icon={isOpen ? faXmark : faBars}
+              className="fa-xl"
+            />
+          </button>
+        </div>
         <nav className="hidden tablet:flex w-full items-center">
           <ul className="flex gap-8 w-fit text-lg mx-auto">
             <NavLinks closeMenuCallback={() => setIsOpen(false)} />
           </ul>
 
           <SearchBar />
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
             <Message />
-            <Question />
             <ToggleTheme theme={theme} setTheme={setTheme} />
+            <Avatar />
           </div>
         </nav>
       </header>
@@ -64,19 +76,18 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
           )}
           <ul
             className={cn(
-        "flex flex-col gap-8 py-8 items-center sm:items-start sm:px-15 w-full text-xl bg-customLightBg dark:bg-customDarkBg h-full transform transition-transform duration-300",
-        {
-          "translate-x-0": isOpen,
-          "translate-x-full": !isOpen,
-        }
-      )}
+              "flex flex-col gap-8 py-8 items-center sm:items-start sm:px-15 w-full text-xl bg-customLightBg dark:bg-customDarkBg h-full transform transition-transform duration-300",
+              {
+                "translate-x-0": isOpen,
+                "translate-x-full": !isOpen,
+              }
+            )}
           >
             <NavLinks closeMenuCallback={() => setIsOpen(false)} />
             <SearchBar />
 
-            <div className="flex items-center mx-auto">
+            <div className="flex items-center mx-auto gap-3">
               <Message />
-              <Question />
               <ToggleTheme theme={theme} setTheme={setTheme} />
             </div>
           </ul>
