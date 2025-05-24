@@ -27,7 +27,7 @@ function LeftSidebar() {
   const attendanceForDate = dummyAttendanceByDate[dateKey];
 
   return (
-      <div className="w-full p-4 bg-white dark:bg-customDarkBg rounded">
+      <div className="w-full p-4 bg-white dark:bg-customDarkBg rounded h-full">
         <div>
           <h2 className="text-xl font-semibold mb-2">Class Selection</h2>
           {isClassTeacher && (
@@ -65,21 +65,6 @@ function LeftSidebar() {
             value={selectedDate}
             className="rounded border"
           />
-          {attendanceForDate && (
-            <div className="mt-4 text-sm space-y-2">
-              <p className="font-semibold">Summary ({dateKey}):</p>
-              <p>Present: {attendanceForDate.present.length}</p>
-              <p>Absent: {attendanceForDate.absent.length}</p>
-              <p className="font-medium">Present Students:</p>
-              <ul className="list-disc list-inside text-green-600">
-                {attendanceForDate.present.map((name, i) => <li key={i}>{name}</li>)}
-              </ul>
-              <p className="font-medium mt-2">Absent Students:</p>
-              <ul className="list-disc list-inside text-red-600">
-                {attendanceForDate.absent.map((name, i) => <li key={i}>{name}</li>)}
-              </ul>
-            </div>
-          )}
         </div>
       </div>
   )

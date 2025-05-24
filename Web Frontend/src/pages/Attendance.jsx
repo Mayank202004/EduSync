@@ -3,7 +3,6 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import AttendanceDashboard from '@/components/Attendance/Dashboard';
 import LeftSidebar from '@/components/Attendance/LeftSidebar';
-import RightSidebar from '@/components/Attendance/RightSidebar';
 
 const dummyStudents = [
   { name: 'Riya Sharma', gender: 'Female' },
