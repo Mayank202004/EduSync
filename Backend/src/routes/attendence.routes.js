@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyJWT,verifyTeacher,verifyStudent } from '../middlewares/auth.middleware.js';
-import { markAttendance, getAttendance,getMyAttendance,getDailyAttendance,exportAttendanceExcel, getStudentList, getGenderDistribution, getTopAttendees} from "../controllers/attendence.controller.js"
+import { markAttendance, getAttendance,getMyAttendance,getDailyAttendance,exportAttendanceExcel, getStudentList, getGenderDistribution, getTopAttendees, fetchWeeklyAbsenteeCount} from "../controllers/attendence.controller.js"
 
 const router = Router();
 
@@ -13,5 +13,6 @@ router.route("/export").get(verifyJWT,exportAttendanceExcel);
 router.post("/students",verifyJWT,verifyTeacher,getStudentList);
 router.get("/gender-distribution",verifyJWT,verifyTeacher,getGenderDistribution);
 router.get("/top-attenders",verifyJWT,verifyTeacher,getTopAttendees);
+router.get("/weekly-absentee",verifyJWT,verifyTeacher,fetchWeeklyAbsenteeCount);
 
 export default router;

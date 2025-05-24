@@ -576,3 +576,78 @@ export const getTopAttendees = asyncHandler(async (req, res) => {
         }
     });
 });
+
+/**
+ * @desc
+ * @route
+ * @access 
+ */
+export const fetchWeeklyAbsenteeCount = asyncHandler(async (req, res) => {
+    const { className, div } = req.body;
+
+    if (!className?.trim() || !div?.trim()) {
+        throw new ApiError(400, "Class and division are required");
+    }
+
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const results = await ClassAttendance.aggregate([
+        {
+            $match: {
+                class: className,
+                div: div,
+                date: { $gte: startOfWeek, $lte: now }
+            }
+        },
+        { $unwind: "$attendance" },
+        {
+            $match: {
+                "attendance.status": "Absent"
+            }
+        },
+        {
+            $group: {
+                _id: { $dayOfWeek: "$date" }, // 1 = Sunday ... 7 = Saturday
+                absent: { $sum: 1 }
+            }
+        }
+    ]);
+
+    const dayMap = {
+        1: "Sun",
+        2: "Mon",
+        3: "Tue",
+        4: "Wed",
+        5: "Thu",
+        6: "Fri",
+        7: "Sat"
+    };
+
+    // Initialize week structure with zero absents
+    const weekData = [
+        { day: "Sun", absent: 0 },
+        { day: "Mon", absent: 0 },
+        { day: "Tue", absent: 0 },
+        { day: "Wed", absent: 0 },
+        { day: "Thu", absent: 0 },
+        { day: "Fri", absent: 0 },
+        { day: "Sat", absent: 0 }
+    ];
+
+    for (const item of results) {
+        const day = dayMap[item._id];
+        const entry = weekData.find(d => d.day === day);
+        if (entry) {
+            entry.absent = item.absent;
+        }
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Weekly absentee count fetched",
+        data: weekData
+    });
+});
