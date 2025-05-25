@@ -54,7 +54,7 @@ function Attendance() {
         {/* Main Content */}
         <div className="flex-1 space-y-6">
           {isViewingOwnClass && (
-            <div className="bg-white p-4 rounded shadow gap-4">
+            <div className="bg-white dark:bg-customDarkFg p-4 rounded shadow gap-4">
               <AttendanceDashboard/>
             </div>
           )}
@@ -67,7 +67,7 @@ function Attendance() {
           </button>
 
           {showAttendanceForm && selectedClass && selectedDiv && (
-            <div className="bg-white p-4 rounded shadow space-y-4">
+            <div className="bg-white dark:bg-customDarkBg p-4 rounded shadow space-y-4">
               <h2 className="text-xl font-semibold">Mark Attendance - {selectedClass}-{selectedDiv}</h2>
               {dummyStudents.map((student, idx) => (
                 <div

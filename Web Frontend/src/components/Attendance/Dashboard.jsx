@@ -59,10 +59,10 @@ function AttendanceDashboard() {
 }
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 p-4 dark:bg-customDarkFg">
       {/* First row: 2 charts */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="bg-white p-4 rounded shadow w-full">
+        <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
           <h2 className="text-lg font-semibold mb-2">Total Attendance Report</h2>
           <LineChart width={500} height={200} data={lineData}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -73,7 +73,7 @@ function AttendanceDashboard() {
           </LineChart>
         </div>
 
-        <div className="bg-white p-4 rounded shadow w-full">
+        <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
           <h2 className="text-lg font-semibold mb-2">Presentee by Division</h2>
           <BarChart width={400} height={200} data={barData}>
             <XAxis dataKey="class" />
@@ -86,7 +86,7 @@ function AttendanceDashboard() {
 
       {/* Second row: 3 charts */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="bg-white p-4 rounded shadow w-full">
+        <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
           <h2 className="text-lg font-semibold mb-2">Students by Gender</h2>
           <PieChart width={300} height={200}>
             <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
@@ -98,7 +98,7 @@ function AttendanceDashboard() {
           </PieChart>
         </div>
 
-        <div className="bg-white p-4 rounded shadow w-full">
+        <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
           <h2 className="text-lg font-semibold mb-2">Top 6 Attendant</h2>
           <ul className="space-y-2">
             {topStudents.map((student, index) => (
@@ -110,7 +110,7 @@ function AttendanceDashboard() {
           </ul>
         </div>
 
-        <div className="bg-white p-4 rounded shadow w-full">
+        <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
           <h2 className="text-lg font-semibold mb-2">Weekly Absent</h2>
           <RadarChart outerRadius={70} width={300} height={250} data={radarData}>
             <PolarGrid />

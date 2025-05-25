@@ -27,7 +27,7 @@ function LeftSidebar() {
   const attendanceForDate = dummyAttendanceByDate[dateKey];
 
   return (
-      <div className="w-full p-4 bg-white dark:bg-customDarkBg rounded h-full">
+      <div className="w-full p-4 bg-white dark:bg-customDarkFg rounded h-full">
         <div>
           <h2 className="text-xl font-semibold mb-2">Class Selection</h2>
           {isClassTeacher && (

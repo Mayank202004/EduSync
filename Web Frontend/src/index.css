@@ -29,6 +29,14 @@
     color:black;
     font-weight: 500;
   }
+  .react-calendar{
+    border-color: theme('colors.gray.200') !important;
+  }
+  .dark .react-calendar{
+    background: theme(--color-customDarkFg) !important;
+    border-color: theme('colors.gray.600') !important;
+
+  }
 }
 
 /* ---break---  */
