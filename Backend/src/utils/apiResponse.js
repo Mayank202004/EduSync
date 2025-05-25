@@ -1,5 +1,8 @@
 /**
  * @class ApiResponse
+ * @desc A class to standardize API responses.
+ * @property {number} statusCode - HTTP status code of the response.
+ * @property {Object} data - The data to be returned in the response.
  * @property {String} message - A message describing the response.
  * @property {boolean} success - Indicated whether the request was successful or
  */
