@@ -11,7 +11,7 @@ router.route("/me").get(verifyJWT,getMyAttendance);
 router.route("/").get(verifyJWT,verifyTeacher,getAttendance);
 router.route("/export").get(verifyJWT,exportAttendanceExcel);
 router.post("/students",verifyJWT,verifyTeacher,getStudentList);
-router.get("/dashboard",verifyJWT,verifyTeacher,getDashboardData)
+router.post("/dashboard",verifyJWT,verifyTeacher,getDashboardData)
 
 
 export default router;

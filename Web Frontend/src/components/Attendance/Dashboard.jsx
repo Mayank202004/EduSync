@@ -5,60 +5,59 @@ import {
   PieChart, Pie, Cell,
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
-
-const lineData = [
-  { date: 'Jan 1', total: 43 },
-  { date: 'Jan 4', total: 45 },
-  { date: 'Jan 7', total: 42 },
-  { date: 'Jan 10', total: 44 },
-  { date: 'Jan 13', total: 44 },
-  { date: 'Jan 16', total: 45 },
-  { date: 'Jan 19', total: 45 },
-  { date: 'Jan 22', total: 46 },
-  { date: 'Jan 25', total: 47 },
-  { date: 'Jan 28', total: 44 },
-];
-
-const barData = [
-  { class: 'I', count: 14 },
-  { class: 'II', count: 16 },
-  { class: 'III', count: 15 },
-  { class: 'IV', count: 17 },
-  { class: 'V', count: 18 },
-  { class: 'VI', count: 16 },
-  { class: 'VII', count: 17 },
-  { class: 'VIII', count: 19 },
-  { class: 'IX', count: 15 },
-  { class: 'X', count: 14 },
-];
-
-const pieData = [
-  { name: 'Male', value: 25 },
-  { name: 'Female', value: 22 },
-];
+import { useState, useEffect } from 'react';
+import { getAttendanceDashboardData } from '@/services/attendenceService';
+import LoadingScreen from '../Loading';
 
 const COLORS = ['#34d399', '#3b82f6'];
 
-const radarData = [
-  { day: 'Sun', absent: 2 },
-  { day: 'Mon', absent: 8 },
-  { day: 'Tue', absent: 6 },
-  { day: 'Wed', absent: 4 },
-  { day: 'Thu', absent: 2 },
-  { day: 'Fri', absent: 1 },
-  { day: 'Sat', absent: 3 },
-];
+function AttendanceDashboard() {
+  // Hooks
+  const [dashboardData, setDashboardData] = useState(null);
 
-const topStudents = [
-  { name: 'Brooklyn Simmons', percentage: '100%', days: 30 },
-  { name: 'Cody Fisher', percentage: '100%', days: 30 },
-  { name: 'Marvin McKinney', percentage: '98.7%', days: 29 },
-  { name: 'Arlene McCoy', percentage: '97%', days: 28 },
-  { name: 'Kristin Watson', percentage: '95.6%', days: 26 },
-  { name: 'Savannah Nguyen', percentage: '94%', days: 25 },
-];
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await getAttendanceDashboardData('1', 'A'); // replace with actual class/div To Do:
+        setDashboardData(response.data);
+      } catch (error) {
+        // Handled By axios interceptor
+      }
+    };
+    fetchDashboardData();
+  }, []);
 
-export default function AttendanceDashboard() {
+  // Set data for charts
+    const lineData = dashboardData?.dailyTotalPresentee || [];
+  const barData = dashboardData?.divisionPresenteePercentage.map((item, index) => ({
+    class: item.div,
+    count: item.percentage,
+  })) || [];
+
+  const pieData = dashboardData?.genderStats.map((g) => ({
+    name: g.gender.charAt(0).toUpperCase() + g.gender.slice(1),
+    value: g.count,
+  })) || [];
+
+  const radarData = dashboardData?.weeklyAbsenteeCount || [];
+
+  const topStudents = dashboardData?.topAttendees?.studentAttendance.map((s) => ({
+    name: s.name,
+    percentage: dashboardData.topAttendees.totalWorkingDays === 0
+      ? '0%'
+      : ((s.daysPresent / dashboardData.topAttendees.totalWorkingDays) * 100).toFixed(1) + '%',
+    days: s.daysPresent,
+  })) || [];
+
+
+  if (!dashboardData) {
+  return (
+    <div className="flex items-center justify-center">
+      <LoadingScreen />
+    </div>
+  );
+}
+
   return (
     <div className="space-y-6 p-4">
       {/* First row: 2 charts */}
@@ -68,14 +67,14 @@ export default function AttendanceDashboard() {
           <LineChart width={500} height={200} data={lineData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
-            <YAxis domain={[38, 48]} />
+            <YAxis domain={[0, 45]} />
             <Tooltip />
             <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} />
           </LineChart>
         </div>
 
         <div className="bg-white p-4 rounded shadow w-full">
-          <h2 className="text-lg font-semibold mb-2">Students by Class</h2>
+          <h2 className="text-lg font-semibold mb-2">Presentee by Division</h2>
           <BarChart width={400} height={200} data={barData}>
             <XAxis dataKey="class" />
             <YAxis />
@@ -125,4 +124,6 @@ export default function AttendanceDashboard() {
     </div>
   );
 }
+
+export default AttendanceDashboard;
 
