@@ -477,12 +477,14 @@ export const getStudentList = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, students, "Student names fetched successfully"));
 });
 
-export const getGenderDistribution = asyncHandler(async (req, res) => {
-    const { className, div } = req.body;
 
-    if (!className?.trim() || !div?.trim()) {
-        throw new ApiError(400, "Class and division are required");
-    }
+/**
+ * @desc Helper function to get gender distribution of a class
+ * @param {String} className - Class name
+ * @param {String} div - Division
+ * @returns {Array} - Array of objects containing gender with their counts
+ */
+const getGenderDistribution = async (className,div) => {
 
     const distribution = await Student.aggregate([
         { $match: { class: className, div: div } },
@@ -490,19 +492,17 @@ export const getGenderDistribution = asyncHandler(async (req, res) => {
         { $project: { gender: "$_id", count: 1, _id: 0 } }
     ]);
 
-    res.status(200).json({
-        success: true,
-        message: "Gender distribution fetched successfully",
-        data: distribution
-    });
-});
+    return distribution;
+};
 
-export const getTopAttendees = asyncHandler(async (req, res) => {
-    const { className, div } = req.body;
 
-    if (!className?.trim() || !div?.trim()) {
-        throw new ApiError(400, "Class and division are required");
-    }
+/**
+ * @desc Helper function to get top attendees of a class
+ * @param {String} className - Class name
+ * @param {String} div - Division
+ * @returns {Object} - Object containing total working days and top student attendance summary
+ */
+const getTopAttendees = async (className,div) => {
 
     const results = await ClassAttendance.aggregate([
         {
@@ -567,28 +567,107 @@ export const getTopAttendees = asyncHandler(async (req, res) => {
     const totalWorkingDays = results[0]?.totalDays[0]?.total || 0;
     const studentAttendance = results[0]?.studentAttendance || [];
 
-    res.status(200).json({
-        success: true,
-        message: "Top attendees fetched successfully",
-        data: {
+    return {
             totalWorkingDays,
             studentAttendance
         }
-    });
-});
+};
+
+
 
 /**
- * @desc
- * @route
- * @access 
+ * @desc Get presentee percentage per division for a class (current month or fallback to previous)
+ * @param {String} className - The class name (e.g., "6", "7", etc.)
+ * @returns {Array} - Array of objects: [{ div: 'A', percentage: 87.5 }, ...]
  */
-export const fetchWeeklyAbsenteeCount = asyncHandler(async (req, res) => {
-    const { className, div } = req.body;
+const getDivisionWisePresenteePercentage = async (className) => {
+    const now = new Date();
 
-    if (!className?.trim() || !div?.trim()) {
-        throw new ApiError(400, "Class and division are required");
+    const getMonthRange = (date) => {
+        const start = new Date(date.getFullYear(), date.getMonth(), 1);
+        const end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+        return { start, end };
+    };
+
+    const { start: startOfMonth, end: endOfMonth } = getMonthRange(now);
+
+    let data = await aggregateDivisionPresentee(className, startOfMonth, endOfMonth);
+
+    // If no attendance in current month, fallback to previous month
+    if (data.length === 0) {
+        const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const { start, end } = getMonthRange(previousMonth);
+        data = await aggregateDivisionPresentee(className, start, end);
     }
 
+    return data;
+};
+
+/**
+ * @desc Helper aggregation function to calculate presentee percentage
+ * @param {String} className - Class Name
+ * @param {Date} startDate - Start date of the range
+ * @param {Date} endDate - End date of the range
+ * @returns {Array} - Array of the objects with division and percentage
+ */
+async function aggregateDivisionPresentee(className, startDate, endDate) {
+    const result = await ClassAttendance.aggregate([
+        {
+            $match: {
+                class: className,
+                date: { $gte: startDate, $lte: endDate }
+            }
+        },
+        { $unwind: "$attendance" },
+        {
+            $group: {
+                _id: {
+                    div: "$div",
+                    studentId: "$attendance.studentId",
+                },
+                totalMarked: { $sum: 1 },
+                presentDays: {
+                    $sum: {
+                        $cond: [{ $eq: ["$attendance.status", "Present"] }, 1, 0]
+                    }
+                }
+            }
+        },
+        {
+            $group: {
+                _id: "$_id.div",
+                totalStudents: { $sum: 1 },
+                totalPresent: { $sum: "$presentDays" },
+                totalDays: { $sum: "$totalMarked" }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                div: "$_id",
+                percentage: {
+                    $cond: [
+                        { $eq: ["$totalDays", 0] },
+                        0,
+                        { $round: [{ $multiply: [{ $divide: ["$totalPresent", "$totalDays"] }, 100] }, 2] }
+                    ]
+                }
+            }
+        },
+        { $sort: { div: 1 } }
+    ]);
+
+    return result;
+}
+
+
+/**
+ * @desc Helper function to get weekly absentee count
+ * @param {String} className - Class name
+ * @param {String} div - Division
+ * @returns {Array} - Array of objects with day and absent count
+ */
+const getWeeklyAbsenteeCount = async (className, div) => {
     const now = new Date();
     const startOfWeek = new Date(now);
     startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
@@ -617,7 +696,6 @@ export const fetchWeeklyAbsenteeCount = asyncHandler(async (req, res) => {
     ]);
 
     const dayMap = {
-        1: "Sun",
         2: "Mon",
         3: "Tue",
         4: "Wed",
@@ -626,9 +704,7 @@ export const fetchWeeklyAbsenteeCount = asyncHandler(async (req, res) => {
         7: "Sat"
     };
 
-    // Initialize week structure with zero absents
     const weekData = [
-        { day: "Sun", absent: 0 },
         { day: "Mon", absent: 0 },
         { day: "Tue", absent: 0 },
         { day: "Wed", absent: 0 },
@@ -638,16 +714,124 @@ export const fetchWeeklyAbsenteeCount = asyncHandler(async (req, res) => {
     ];
 
     for (const item of results) {
+        if (item._id === 1) continue; // Skip Sunday (Holiday)
         const day = dayMap[item._id];
         const entry = weekData.find(d => d.day === day);
         if (entry) {
             entry.absent = item.absent;
         }
     }
+    return weekData;
+};
 
-    res.status(200).json({
-        success: true,
-        message: "Weekly absentee count fetched",
-        data: weekData
+
+const getDailyPresenteeForClassDiv = async (className, div) => {
+  const now = new Date();
+  const getMonthRange = (date) => {
+    const start = new Date(date.getFullYear(), date.getMonth(), 1);
+    const end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+    return { start, end };
+  };
+
+  const { start: startOfMonth, end: endOfMonth } = getMonthRange(now);
+
+  let data = await aggregateDailyPresentee(className, div, startOfMonth, endOfMonth);
+
+  // If no attendance in current month return previous month's data
+  if (data.length === 0) {
+    const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const { start, end } = getMonthRange(previousMonth);
+    data = await aggregateDailyPresentee(className, div, start, end);
+  }
+  return data;
+};
+
+
+const aggregateDailyPresentee = async (className,div,startDate,endDate) => {
+  const result = await ClassAttendance.aggregate([
+    {
+      $match: {
+        class: className,
+        div: div,
+        date: { $gte: startDate, $lte: endDate }
+      }
+    },
+    { $unwind: "$attendance" },
+    {
+      $match: {
+        "attendance.status": "Present"
+      }
+    },
+    {
+      $group: {
+        _id: {
+          date: {
+            $dateToString: { format: "%Y-%m-%d", date: "$date" }
+          }
+        },
+        total: { $sum: 1 }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        date: "$_id.date",
+        total: 1
+      }
+    },
+    { $sort: { date: 1 } }
+  ]);
+
+  // Format: { date: 'Jan 1', total: 43 }
+  const formatted = result.map(item => {
+    const dateObj = new Date(item.date);
+    const formattedDate = dateObj.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric"
     });
+    return { date: formattedDate, total: item.total };
+  });
+
+  return formatted;
+};
+
+
+
+/**
+ * @desc Get all dashboard data for a class
+ * @route GET /api/v1/attendance/dashboard
+ * @access Private (Teacher)
+ */
+export const getDashboardData = asyncHandler(async (req, res) => {
+    const { className, div } = req.body;
+
+    if (!className?.trim() || !div?.trim()) {
+        throw new ApiError(400, "Class and division are required");
+    }
+  
+    const [
+        topAttendees,
+        genderStats,
+        weeklyAbsenteeCount,
+        divisionPresenteePercentage,
+        dailyTotalPresentee
+    ] = await Promise.all([
+        getTopAttendees(className, div),
+        getGenderDistribution(className, div),
+        getWeeklyAbsenteeCount(className, div),
+        getDivisionWisePresenteePercentage(className),
+        getDailyPresenteeForClassDiv(className,div)
+    ]);
+
+    res.status(200).json(new ApiResponse(
+        200,
+        {
+            topAttendees,
+            genderStats,
+            weeklyAbsenteeCount,
+            divisionPresenteePercentage,
+            dailyTotalPresentee
+        },
+        "Dashboard data fetched successfully"
+    ));
 });
