@@ -80,7 +80,7 @@ export const Avatar = () => {
           <button type="button" className="absolute top-4 right-4 hover:bg-gray-300 dark:hover:bg-gray-700 size-8 rounded-full cursor-pointer" onClick={() => setIsOpen(false)}>
             <FontAwesomeIcon icon={faXmark} className="fa-lg"/>
           </button>
-          <div className="place-items-center">
+          <div className="flex flex-col place-items-center">
             <AvatarIcon size={"medium"} withHover={false} user={user}/>
             <h1 className="font-bold text-xl mt-2">{user.fullName}</h1>
             <Link className="space-x-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline">
