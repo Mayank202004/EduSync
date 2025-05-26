@@ -4,6 +4,11 @@
 /* For Dark Mode class  */
 @custom-variant dark (&:where(.dark, .dark *));
 
+html, body, #root{
+  height: 100%;
+  width: 100%;
+}
+
 @theme{
   --breakpoint-tablet: 900px;
   /* Custom Colors */

@@ -46,7 +46,7 @@ function Attendance() {
   const attendanceForDate = dummyAttendanceByDate[dateKey];
 
   return (
-    <div className="flex w-full min-h-screen bg-transparent">
+    <div className="flex w-full h-full bg-transparent">
       <div className="w-[20%] dark:border-gray-700 pl-4 pr-1 py-4">
         <LeftSidebar />
       </div>

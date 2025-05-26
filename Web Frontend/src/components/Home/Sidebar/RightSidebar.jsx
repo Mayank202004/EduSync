@@ -12,7 +12,7 @@ const directMessages = [
 
 const RightSidebar = () => {
   return (
-    <div className="max-w-[85%] p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto max-h-screen">
+    <div className="max-w-[85%] p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto">
       <div className="flex items-center justify-around align-middle mb-3 ">
         <FontAwesomeIcon
           icon={faCalendar}
