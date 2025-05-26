@@ -1,26 +1,27 @@
-
-import axiosInstance from '@/api/axiosInstance';
-
-const BASEURL = import.meta.env.VITE_API_BASE_URL;
+import axiosInstance from "@/api/axiosInstance";
 
 /**
- * 
- * @param {string} identifier - User's email address or username 
+ * @desc Function to log user out
+ * @returns nothing. Just clears tokens from cookies
+ */
+export const logoutApi = async () => {
+  return axiosInstance.post("/users/logout");
+};
+
+/**
+ *
+ * @param {string} identifier - User's email address or username
  * @param {string} password - User's password
  * @returns {Promise} - Promise ressolving to the response data
  */
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
-
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const loginApi = async (identifier, password) => {
   const body = EMAIL_REGEX.test(identifier)
-    ? { email: identifier, password }      // send as “email”
-    : { username: identifier, password };  // send as “username”
+    ? { email: identifier, password } // send as “email”
+    : { username: identifier, password }; // send as “username”
 
-  const { data } = await axiosInstance.post(
-    `${BASEURL}/users/login`,
-    body,
-  );
+  const { data } = await axiosInstance.post("/users/login", body);
 
   return data;
 };
@@ -33,15 +34,15 @@ export const loginApi = async (identifier, password) => {
  * @param {string} password - User's password
  * @param {string} role - Users role
  * @returns {Promise} - Promise resolving to the repsosne data
- * 
+ *
  */
-export const signupApi = async (fullName, username, email, password, role) =>{
-  const response = await axiosInstance.post(`/users/register`,{
+export const signupApi = async (fullName, username, email, password, role) => {
+  const response = await axiosInstance.post(`/users/register`, {
     fullName,
     username,
     email,
     password,
-    role
+    role,
   });
   return response.data;
-}
+};

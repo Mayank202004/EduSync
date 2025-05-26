@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import axiosInstance from '@/api/axiosInstance';
+import { logoutApi } from '@/services/authService';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const BASEURL = import.meta.env.VITE_API_BASE_URL;
   const [isAuthenticated, setIsAuthenticated] = useState(null); // null = loading
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(true);
   };
   const logout = async () => {
-    await axiosInstance.post('/logout');
+    await logoutApi();
     setIsAuthenticated(false);
   };
 
