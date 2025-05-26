@@ -122,7 +122,7 @@ export const Avatar = () => {
           <button
             type="button"
             onClick={logoutUser}
-            className="flex gap-2 mx-auto py-1 px-2 w-fit rounded-sm items-center justify-center cursor-pointer text-red-400 dark:text-red-400  hover:bg-gray-300/50 hover:dark:bg-gray-700/50"
+            className="flex gap-2 mx-auto py-1 px-2 w-fit rounded-sm items-center justify-center cursor-pointer text-red-400 dark:text-red-400 hover:bg-gray-300/50 hover:dark:bg-gray-700/50"
           >
             <FontAwesomeIcon icon={faRightFromBracket} />
             <span>Logout</span>
