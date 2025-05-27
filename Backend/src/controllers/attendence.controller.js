@@ -746,7 +746,14 @@ const getDailyPresenteeForClassDiv = async (className, div) => {
   return data;
 };
 
-
+/**
+ * @desc Helper function to aggregate daily presentee count
+ * @param {String} className - Class name
+ * @param {String} div - Division
+ * @param {Date} startDate - Start date of the range
+ * @param {Date} endDate - End date of the range
+ * @returns {Array} - Array of objects with date and total presentee count
+ */
 const aggregateDailyPresentee = async (className,div,startDate,endDate) => {
   const result = await ClassAttendance.aggregate([
     {

@@ -8,24 +8,14 @@ import {
 import { useState, useEffect } from 'react';
 import { getAttendanceDashboardData } from '@/services/attendenceService';
 import LoadingScreen from '../Loading';
+import AttendanceDashboardSkeleton from './DashboardSkeleton';
 
 const COLORS = ['#34d399', '#3b82f6'];
 
-function AttendanceDashboard() {
+function AttendanceDashboard({dashboardData, setDashboardData}) {
   // Hooks
-  const [dashboardData, setDashboardData] = useState(null);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const response = await getAttendanceDashboardData('1', 'A'); // replace with actual class/div To Do:
-        setDashboardData(response.data);
-      } catch (error) {
-        // Handled By axios interceptor
-      }
-    };
-    fetchDashboardData();
-  }, []);
+  
 
   // Set data for charts
     const lineData = dashboardData?.dailyTotalPresentee || [];
@@ -53,7 +43,7 @@ function AttendanceDashboard() {
   if (!dashboardData) {
   return (
     <div className="flex items-center justify-center">
-      <LoadingScreen />
+      <AttendanceDashboardSkeleton />
     </div>
   );
 }
