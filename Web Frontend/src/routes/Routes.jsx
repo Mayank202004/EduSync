@@ -7,6 +7,7 @@ import Fees from '@/pages/Fees';
 import CalendarPage from '@/pages/Calendar';
 import Resources from '@/pages/Resources';
 import App from '@/App';
+import UserProfile from '@/pages/UserProfile';
 
 const routes = createRoutesFromElements(
   <>
@@ -18,6 +19,7 @@ const routes = createRoutesFromElements(
       <Route path="/fees" element={<Fees />} />
       <Route path="/calendar" element={<CalendarPage />} />
       <Route path="/resources" element={<Resources />} />
+      <Route path="/user/edit" element={<UserProfile />}></Route>
     </Route>
   </>
 );

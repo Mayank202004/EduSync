@@ -13,8 +13,8 @@ const sizeMap = {
     text: "text-3xl",
   },
   large: {
-    container: "size-22",
-    text: "text-5xl",
+    container: "size-35",
+    text: "text-6xl",
   },
 };
 

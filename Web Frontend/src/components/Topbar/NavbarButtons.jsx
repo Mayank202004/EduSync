@@ -12,6 +12,8 @@ import { useAuth } from "@/auth/AuthContext";
 import toggleLight from "../../assets/day.png";
 import toggleDark from "../../assets/night.png";
 import AvatarIcon from "./AvatarIcon";
+import toast from "react-hot-toast";
+import { cn } from "@/lib/utils";
 
 export const SearchBar = () => {
   return (
@@ -88,47 +90,58 @@ export const Avatar = () => {
   }, []);
 
   const logoutUser = async () => {
+    toast.promise(logout, {
+      loading: "Logging out...",
+      success: "Logged Out",
+      error: "Failed",
+    });
     await logout();
     navigate("/", { replace: true });
   };
 
   const editProfile = () => {
     setIsOpen(false);
-    navigate("user/edit")
-  }
+    navigate("user/edit");
+  };
 
   return (
     <div ref={containerRef}>
       <AvatarIcon user={user} callback={() => setIsOpen((prev) => !prev)} />
-      {isOpen && (
-        <div className="absolute right-2 mt-4 w-max bg-customLightBg dark:bg-customDarkBg py-5 px-10 rounded-sm ring-1 ring-gray-500 z-10 flex flex-col gap-3">
+      <div
+        className={cn(
+          "absolute right-2 mt-4 w-max bg-customLightBg dark:bg-customDarkBg py-5 px-10 rounded-sm ring-1 ring-gray-500 z-10 flex flex-col gap-3 transition-tranform duration-100 origin-top-right",
+          isOpen ? "scale-100" : "scale-0"
+        )}
+      >
+        <button
+          type="button"
+          className="absolute top-4 right-4 hover:bg-gray-300 dark:hover:bg-gray-700 size-8 rounded-full cursor-pointer"
+          onClick={() => setIsOpen(false)}
+        >
+          <FontAwesomeIcon icon={faXmark} className="fa-lg" />
+        </button>
+        <div className="flex flex-col place-items-center">
+          <AvatarIcon size={"medium"} withHover={false} user={user} />
+          <h1 className="font-bold text-xl mt-2">{user.fullName}</h1>
           <button
             type="button"
-            className="absolute top-4 right-4 hover:bg-gray-300 dark:hover:bg-gray-700 size-8 rounded-full cursor-pointer"
-            onClick={() => setIsOpen(false)}
+            className="cursor-pointer space-x-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+            onClick={editProfile}
           >
-            <FontAwesomeIcon icon={faXmark} className="fa-lg" />
-          </button>
-          <div className="flex flex-col place-items-center">
-            <AvatarIcon size={"medium"} withHover={false} user={user} />
-            <h1 className="font-bold text-xl mt-2">{user.fullName}</h1>
-            <button type="button" className="cursor-pointer space-x-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline"
-              onClick={editProfile}>
-              <FontAwesomeIcon icon={faPenToSquare} />
-              <span>Edit Profile</span>
-            </button>
-          </div>
-          <hr />
-          <button
-            type="button"
-            onClick={logoutUser}
-            className="flex gap-2 mx-auto py-1 px-2 w-fit rounded-sm items-center justify-center cursor-pointer text-red-400 dark:text-red-400 hover:bg-gray-300/50 hover:dark:bg-gray-700/50"
-          >
-            <FontAwesomeIcon icon={faRightFromBracket} />
-            <span>Logout</span>
+            <FontAwesomeIcon icon={faPenToSquare} />
+            <span>Edit Profile</span>
           </button>
         </div>
-      )}
+        <hr />
+        <button
+          type="button"
+          onClick={logoutUser}
+          className="flex gap-2 mx-auto py-1 px-2 w-fit rounded-sm items-center justify-center cursor-pointer text-red-400 dark:text-red-400 hover:bg-gray-300/50 hover:dark:bg-gray-700/50"
+        >
+          <FontAwesomeIcon icon={faRightFromBracket} />
+          <span>Logout</span>
+        </button>
+      </div>
     </div>
   );
 };
