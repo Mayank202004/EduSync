@@ -12,7 +12,7 @@ const directMessages = [
 
 const LeftSidebar = () => {
   return (
-    <div className="max-w-17/20 p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto max-h-screen">
+    <div className="max-w-17/20 p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto">
       <div className="flex items-center justify-center gap-2 align-middle mb-3 px-3">
         <FontAwesomeIcon
           icon={faMessage}

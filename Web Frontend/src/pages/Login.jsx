@@ -9,7 +9,7 @@ function Login() {
   const [isLogin, setIsLogin] = useState(true);
 
   return (
-    <div className='w-full h-screen flex items-start'>
+    <div className='flex w-full h-full'>
       <IsoCubeAnimation />
       <div className='w-full h-full flex items-center ml-15'>
         {isLogin ? (

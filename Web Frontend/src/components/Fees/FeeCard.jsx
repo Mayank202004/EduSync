@@ -10,7 +10,7 @@ const FeeCard = ({
   const isSelected = selectedFees?.includes(feeData._id);
 
   return (
-    <li className="w-full flex md:px-2 pb-6">
+    <li className="w-full shrink-0 flex md:px-2 pb-6">
       {isSelectable && (
         <button
           type="button"

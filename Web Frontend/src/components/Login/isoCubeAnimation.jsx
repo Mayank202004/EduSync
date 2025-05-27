@@ -1,5 +1,4 @@
 import { useRive, useStateMachineInput } from "@rive-app/react-canvas";
-import { useEffect } from "react";
 import animationFile from "../../assets/isoCube.riv";
 
 const IsoCubeAnimation = () => {
@@ -25,7 +24,7 @@ const IsoCubeAnimation = () => {
 
   return (
     <div
-      className="w-lvw h-full"
+      className="w-lvw h-full overflow-y-hidden"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
