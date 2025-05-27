@@ -49,7 +49,7 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
           </button>
         </div>
         <nav className="hidden tablet:flex w-full items-center">
-          <ul className="flex gap-8 w-fit text-lg mx-auto">
+          <ul className="flex gap-8 w-fit text-lg mx-auto font-bold">
             <NavLinks closeMenuCallback={() => setIsOpen(false)} />
           </ul>
 
@@ -76,7 +76,7 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
           )}
           <ul
             className={cn(
-              "flex flex-col gap-8 py-8 items-center sm:items-start sm:px-15 w-full text-xl bg-customLightBg dark:bg-customDarkBg h-full transform transition-transform duration-300",
+              "flex flex-col gap-8 py-8 items-center sm:items-start sm:px-15 w-full text-xl font-bold bg-customLightBg dark:bg-customDarkBg h-full transform transition-transform duration-300",
               {
                 "translate-x-0": isOpen,
                 "translate-x-full": !isOpen,

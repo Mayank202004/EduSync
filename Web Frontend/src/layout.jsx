@@ -6,7 +6,7 @@ import HomeContent from './components/Home/HomeContent';
 
 const Layout = () => {
   return (
-    <div className="flex w-full min-h-screen bg-transparent">
+    <div className="flex grow w-full min-h-full bg-transparent">
       <div className="w-[20%] border-r border-gray-200 dark:border-gray-700">
         <LeftSidebar />
       </div>

@@ -1,6 +1,6 @@
 const FeeCardSkeleton = () => {
   return (
-    <div className="w-full flex-1 md:px-2 pb-6 animate-pulse">
+    <div className="min-w-full md:px-2 pb-6 animate-pulse">
       <div className="w-[95%] mx-auto p-3 border-1 bg-white dark:bg-customDarkFg border-gray-300 dark:border-gray-700 rounded-lg">
         <div className="flex justify-between mb-2">
           <div className="h-6 w-1/3 bg-gray-300 dark:bg-gray-700 rounded"></div>

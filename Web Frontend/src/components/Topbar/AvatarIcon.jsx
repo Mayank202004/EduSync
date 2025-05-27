@@ -18,12 +18,13 @@ const sizeMap = {
   },
 };
 
-const AvatarIcon = ({ size = "small", withHover = true, user }) => {
+const AvatarIcon = ({ size = "small", withHover = true, callback=null, user }) => {
   const initial = capitalizeFirstLetter(user.fullName.at(0) || "");
   const { container, text } = sizeMap[size] || sizeMap.small;
 
   return (
     <div
+      onClick={callback}
       className={cn(
         "flex items-center justify-center text-center rounded-full overflow-hidden bg-cover ring-gray-500 dark:ring-white",
         container,

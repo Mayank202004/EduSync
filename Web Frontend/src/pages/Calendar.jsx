@@ -84,7 +84,7 @@ const CalendarPage = () => {
   ];
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 p-4">
+    <div className="flex grow flex-col md:flex-row gap-4 p-4">
       {/* Calendar View */}
       <div className="flex-1 bg-white dark:bg-customDarkFg shadow dark:shadow-md rounded-lg p-4">
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
@@ -101,7 +101,7 @@ const CalendarPage = () => {
       </div>
 
       {/* Right Sidebar */}
-      <div className="w-full md:w-80 bg-white dark:bg-customDarkFg border-l rounded-lg p-4 flex flex-col h-screen">
+      <div className="w-full md:w-80 bg-white dark:bg-customDarkFg border-l rounded-lg p-4 flex flex-col h-full">
         <EventDetails event={selectedEvent} formatDate={formatDate} />
         <UpcomingEvents events={events} isLoading={isLoading} formatDate={formatDate} />
       </div>
