@@ -3,6 +3,9 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import AttendanceDashboard from '@/components/Attendance/Dashboard';
 import LeftSidebar from '@/components/Attendance/LeftSidebar';
+import DaysSummary from '@/components/Attendance/DaysSummary';
+import { useEffect } from 'react';
+import { getAttendanceDashboardData } from '@/services/attendenceService';
 
 const dummyStudents = [
   { name: 'Riya Sharma', gender: 'Female' },
@@ -38,24 +41,53 @@ function Attendance() {
   const [selectedClass, setSelectedClass] = useState(myClass);
   const [selectedDiv, setSelectedDiv] = useState(myDiv);
   const [showAttendanceForm, setShowAttendanceForm] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [dashboardData, setDashboardData] = useState(null);
 
   const isViewingOwnClass = isClassTeacher && selectedClass === myClass && selectedDiv === myDiv;
 
-  const dateKey = selectedDate.toISOString().split('T')[0];
-  const attendanceForDate = dummyAttendanceByDate[dateKey];
+  useEffect(() => {
+    if (!isClassTeacher) {
+      return;
+    }
+    const fetchDashboardData = async () => {
+      try {
+        const response = await getAttendanceDashboardData('1', 'A');
+        setDashboardData(response.data);
+        console.log(response.data);
+      } catch (error) {
+        // handled by axios interceptor
+      }
+    };
+    fetchDashboardData();
+    console.log(dashboardData)
+  }, []);
+
+  // const dateKey = selectedDate.toISOString().split('T')[0];
+  // const attendanceForDate = dummyAttendanceByDate[dateKey];
 
   return (
     <div className="flex w-full h-full bg-transparent">
       <div className="w-[20%] dark:border-gray-700 pl-4 pr-1 py-4">
-        <LeftSidebar />
+        <LeftSidebar 
+          onDateClicked={(date)=> setSelectedDate(date)}
+        />
       </div>
       <div className="w-[80%] p-4 overflow-y-auto">
         {/* Main Content */}
         <div className="flex-1 space-y-6">
           {isViewingOwnClass && (
             <div className="bg-white dark:bg-customDarkFg p-4 rounded shadow gap-4">
-              <AttendanceDashboard/>
+              {selectedDate ? (
+                <DaysSummary
+                  goBack={() => setSelectedDate(null)}
+                />
+              ) : (
+              <AttendanceDashboard
+                dashboardData={dashboardData}
+                setDashboardData={setDashboardData}
+              />
+              )}
             </div>
           )}
 

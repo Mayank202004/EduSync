@@ -15,16 +15,15 @@ const dummyAttendanceByDate = {
   }
 };
 
-function LeftSidebar() {
+function LeftSidebar({ onDateClicked = () => {} }) {
 
   const [isClassTeacher] = useState(true);
   const [selectedClass, setSelectedClass] = useState(myClass);
   const [selectedDiv, setSelectedDiv] = useState(myDiv);
   const [showAttendanceForm, setShowAttendanceForm] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());  
   const isViewingOwnClass = isClassTeacher && selectedClass === myClass && selectedDiv === myDiv;  
-  const dateKey = selectedDate.toISOString().split('T')[0];
-  const attendanceForDate = dummyAttendanceByDate[dateKey];
+  // const dateKey = selectedDate.toISOString().split('T')[0];
+  // const attendanceForDate = dummyAttendanceByDate[dateKey];
 
   return (
       <div className="w-full p-4 bg-white dark:bg-customDarkFg rounded h-full">
@@ -61,8 +60,8 @@ function LeftSidebar() {
         <div>
           <h2 className="text-xl font-semibold mt-6 mb-2">Attendance by Date</h2>
           <Calendar
-            onChange={setSelectedDate}
-            value={selectedDate}
+            onChange={(date) => onDateClicked(date)}
+            value={new Date()}
             className="rounded border"
           />
         </div>
