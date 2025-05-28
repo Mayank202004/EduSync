@@ -106,7 +106,7 @@ export const markAttendance = asyncHandler(async (req, res) => {
  * @access Private (User)
  */
 export const getDailyAttendance = asyncHandler(async (req, res) => {
-    const { date, class: className, div } = req.body;
+    const { date, className, div } = req.body;
 
      if (!date || !className || !div) {
         throw new ApiError(400, "Date, class, and div are required");
@@ -133,19 +133,22 @@ export const getDailyAttendance = asyncHandler(async (req, res) => {
     });
 
     // Count totals
+  let totalCount = 0;
   let presentCount = 0;
   let absentCount = 0;
   let leaveCount = 0;
 
   attendance.attendance.forEach(entry => {
+    totalCount++;
     if (entry.status === "Present") presentCount++;
     else if (entry.status === "Absent") absentCount++;
     else if (entry.status === "Permitted Leave") leaveCount++;
   });
 
   res.status(200).json(new ApiResponse(200, {
-    attendance,
+    attendance: attendance.attendance,
     totals: {
+      total: totalCount,
       present: presentCount,
       absent: absentCount,
       pl: leaveCount
