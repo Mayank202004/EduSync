@@ -13,3 +13,15 @@ export const getAttendanceDashboardData = async (className,div) => {
     const response = await axiosInstance.post(`${BASEURL}/attendence/dashboard`,{className,div});
     return response.data;
 }
+
+/**
+ * @desc Function to fetch attendance summary for a specific date
+ * @param {String} className - Class name  
+ * @param {String} div - Division
+ * @param {Date} date - Date to fetch attendance
+ * @returns 
+ */
+export const getAttendanceByDate = async (className,div,date) =>{
+    const response = await axiosInstance.post(`${BASEURL}/attendence/daily`,{date,className,div});
+    return response.data;
+}
