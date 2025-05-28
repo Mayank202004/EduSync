@@ -6,7 +6,7 @@ const UpcomingEvents = ({ events, formatDate, isLoading }) => {
     .slice(0, 10);
 
   return (
-    <div className="flex-1 overflow-auto pr-2">
+    <div className="flex-1 overflow-auto pr-2 max-h-[75vh]">
       <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200 mb-2">Upcoming Events</h3>
       {isLoading ? (
         <p className="text-sm text-gray-600 dark:text-gray-300">Loading upcoming events...</p>

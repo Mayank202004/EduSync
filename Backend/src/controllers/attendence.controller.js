@@ -120,7 +120,7 @@ export const getDailyAttendance = asyncHandler(async (req, res) => {
             path: "userId", // populate from Student → User
             select: "fullName" // only get fullName
         }
-    });
+    }).select("-_id -date -class -div");
 
     if (!attendance) {
         throw new ApiError(404, "Attendance not found");
@@ -132,7 +132,25 @@ export const getDailyAttendance = asyncHandler(async (req, res) => {
         return nameA.localeCompare(nameB);
     });
 
-    res.status(200).json(new ApiResponse(200,attendance,"Attendence fetched Succesfully"));
+    // Count totals
+  let presentCount = 0;
+  let absentCount = 0;
+  let leaveCount = 0;
+
+  attendance.attendance.forEach(entry => {
+    if (entry.status === "Present") presentCount++;
+    else if (entry.status === "Absent") absentCount++;
+    else if (entry.status === "Permitted Leave") leaveCount++;
+  });
+
+  res.status(200).json(new ApiResponse(200, {
+    attendance,
+    totals: {
+      present: presentCount,
+      absent: absentCount,
+      pl: leaveCount
+    }}
+    ,"Attendence fetched Succesfully"));
 });
 
 
