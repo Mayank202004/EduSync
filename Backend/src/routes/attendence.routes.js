@@ -6,7 +6,7 @@ const router = Router();
 
 // Protected Routes
 router.route("/mark").post(verifyJWT,verifyTeacher,markAttendance);
-router.route("/daily").get(verifyJWT,getDailyAttendance);
+router.route("/daily").post(verifyJWT,getDailyAttendance);
 router.route("/me").get(verifyJWT,getMyAttendance);
 router.route("/").get(verifyJWT,verifyTeacher,getAttendance);
 router.route("/export").get(verifyJWT,exportAttendanceExcel);

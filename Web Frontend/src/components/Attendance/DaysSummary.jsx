@@ -1,7 +1,32 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { useState, useEffect} from 'react';
+import { getAttendanceByDate } from '@/services/attendenceService';
+import { useAuth } from '@/auth/AuthContext';
+import DaySummarySkeleton from './DaySummarySkeleton';
 
-function DaysSummary({goBack = ()=>{}}) {
+function DaysSummary({className,div,date,goBack = ()=>{}}) {
+  const [isLoading,setisLoading]=useState(false);
+  const [attendance,setAttendance]=useState(null)
+  const [total,setTotal]=useState(null);
+
+  // Hooks
+    useEffect(() => {
+      const fetchAttendanceByDate = async () => {
+        try {
+          setisLoading(true);
+          const response = await getAttendanceByDate(className,div,date);
+          setAttendance(response?.data?.attendance);
+          setTotal(response?.data?.totals);
+        } catch (error) {
+          // handled by axios interceptor
+        } finally {
+          setisLoading(false);
+        }
+      };
+      fetchAttendanceByDate();
+    }, [date]);
+
   const students = [
     { name: 'Alice Johnson', status: 'Present' },
     { name: 'Bob Smith', status: 'Absent' },
@@ -14,6 +39,8 @@ function DaysSummary({goBack = ()=>{}}) {
   const leaveIcon = 'src/assets/attendance/permit.png';
 
 
+  if(isLoading)
+    return <DaySummarySkeleton/>
   return (
     <div className="p-6 bg-white dark:bg-customDarkFg text-gray-900 dark:text-white min-h-screen">
       <button
@@ -31,7 +58,7 @@ function DaysSummary({goBack = ()=>{}}) {
           <img src={totalIcon} alt="Total Students" className="w-10 h-10" />
           <div>
             <h2 className="text-sm font-medium">Total Students</h2>
-            <p className="text-2xl font-bold">40</p>
+            <p className="text-2xl font-bold">{total?.total}</p>
           </div>
         </div>
 
@@ -39,7 +66,7 @@ function DaysSummary({goBack = ()=>{}}) {
           <img src={presentIcon} alt="Present Students" className="w-10 h-10" />
           <div>
             <h2 className="text-sm font-medium">Present</h2>
-            <p className="text-2xl font-bold">32</p>
+            <p className="text-2xl font-bold">{total?.present}</p>
           </div>
         </div>
 
@@ -47,7 +74,7 @@ function DaysSummary({goBack = ()=>{}}) {
           <img src={absentIcon} alt="Absent Students" className="w-10 h-10" />
           <div>
             <h2 className="text-sm font-medium">Absent</h2>
-            <p className="text-2xl font-bold">6</p>
+            <p className="text-2xl font-bold">{total?.absent}</p>
           </div>
         </div>
 
@@ -55,7 +82,7 @@ function DaysSummary({goBack = ()=>{}}) {
           <img src={leaveIcon} alt="Permitted Leave" className="w-10 h-10" />
           <div>
             <h2 className="text-sm font-medium">Permitted Leave</h2>
-            <p className="text-2xl font-bold">2</p>
+            <p className="text-2xl font-bold">{total?.pl}</p>
           </div>
         </div>
       </div>

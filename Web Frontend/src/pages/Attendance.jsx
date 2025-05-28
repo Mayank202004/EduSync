@@ -52,15 +52,13 @@ function Attendance() {
     }
     const fetchDashboardData = async () => {
       try {
-        const response = await getAttendanceDashboardData('1', 'A');
+        const response = await getAttendanceDashboardData('1', 'A'); // To do : currently static need to use teachers data
         setDashboardData(response.data);
-        console.log(response.data);
       } catch (error) {
         // handled by axios interceptor
       }
     };
     fetchDashboardData();
-    console.log(dashboardData)
   }, []);
 
   // const dateKey = selectedDate.toISOString().split('T')[0];
@@ -81,6 +79,9 @@ function Attendance() {
               {selectedDate ? (
                 <DaysSummary
                   goBack={() => setSelectedDate(null)}
+                  className="1"
+                  div="A"
+                  date={selectedDate}
                 />
               ) : (
               <AttendanceDashboard
