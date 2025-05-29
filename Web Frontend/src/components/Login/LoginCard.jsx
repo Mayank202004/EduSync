@@ -48,7 +48,7 @@ function LoginCard({ switchToSignup}) {
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <input
             type="text"
-            placeholder="Email"
+            placeholder="Username or Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"

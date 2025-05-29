@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { getStudentList } from '@/services/attendenceService';
+import { getStudentList, markAttendance } from '@/services/attendenceService';
 import { ArrowLeft } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 function MarkAttendance({ className, div, goBack = () => {} }) {
   const [students, setStudents] = useState([]);
   const [absentStudents, setAbsentStudents] = useState([]);
   const [plStudents, setPlStudents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [date, setDate] = useState(new Date());
 
   useEffect(() => {
     const fetchStudentList = async () => {
@@ -37,10 +39,21 @@ function MarkAttendance({ className, div, goBack = () => {} }) {
     setAbsentStudents((prev) => prev.filter((x) => x !== id));
   };
 
-  const handleSubmit = () => {
-    console.log('Absent IDs:', absentStudents);
-    console.log('Permitted Leave IDs:', plStudents);
+  const handleSubmit = async () => {
+    try {
+      await toast.promise(
+        markAttendance(absentStudents, plStudents, date),
+        {
+          loading: "Marking Attendance...",
+          success: "Attendance marked successfully",
+          error: "",
+        }
+      );
+    } catch (err) {
+      // Handled by axios instance
+    }
   };
+
 
   // Skeleton loading view for table
   const renderSkeletonRow = (index) => (

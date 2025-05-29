@@ -51,7 +51,10 @@ function Attendance() {
     <div className="flex w-full h-full bg-transparent">
       <div className="w-[20%] dark:border-gray-700 pl-4 pr-1 py-4">
         <LeftSidebar 
-          onDateClicked={(date)=> setSelectedDate(date)}
+          onDateClicked={(date)=> {
+            setIsMarkingAttendance(false);
+            setSelectedDate(date);
+          }}
           markAttendance={(className,div) => handleMarkAttendance(className,div)}
         />
       </div>
