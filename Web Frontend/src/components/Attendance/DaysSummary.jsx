@@ -6,39 +6,42 @@ import { useAuth } from '@/auth/AuthContext';
 import DaySummarySkeleton from './DaySummarySkeleton';
 
 function DaysSummary({className,div,date,goBack = ()=>{}}) {
-  const [isLoading,setisLoading]=useState(false);
-  const [attendance,setAttendance]=useState(null)
-  const [total,setTotal]=useState(null);
-
   // Hooks
-    useEffect(() => {
-      const fetchAttendanceByDate = async () => {
-        try {
-          setisLoading(true);
-          const response = await getAttendanceByDate(className,div,date);
-          setAttendance(response?.data?.attendance);
-          setTotal(response?.data?.totals);
-        } catch (error) {
-          // handled by axios interceptor
-        } finally {
-          setisLoading(false);
-        }
-      };
-      fetchAttendanceByDate();
-    }, [date]);
+  const [isLoading,setisLoading]=useState(false);
+  const [attendance,setAttendance]=useState(null); // For student list
+  const [selectedFilter, setSelectedFilter] = useState(null); // For displaying present only , absent only etc on clck on summary boxes
+  const [total,setTotal]=useState(null); // For setting the summary boxes data
 
-  const students = [
-    { name: 'Alice Johnson', status: 'Present' },
-    { name: 'Bob Smith', status: 'Absent' },
-    { name: 'Charlie Doe', status: 'Permitted Leave' },
-    { name: 'Daisy Carter', status: 'Present' },
-  ];
+  // On init and when date change
+  useEffect(() => {
+    const fetchAttendanceByDate = async () => {
+      try {
+        setisLoading(true);
+        const response = await getAttendanceByDate(className,div,date);
+        setAttendance(response?.data?.attendance);
+        setTotal(response?.data?.totals);
+      } catch (error) {
+        goBack();
+        // handled by axios interceptor
+      } finally {
+        setisLoading(false);
+      }
+    };
+    fetchAttendanceByDate();
+  }, [date]);
+    
+  const filteredAttendance = selectedFilter
+    ? attendance?.filter((s) => s.status === selectedFilter)
+    : attendance;
+
+  // Icons
   const totalIcon = 'src/assets/attendance/students.png';
   const presentIcon = 'src/assets/attendance/present.png';
   const absentIcon = 'src/assets/attendance/absent.png';
   const leaveIcon = 'src/assets/attendance/permit.png';
 
 
+  // UI
   if(isLoading)
     return <DaySummarySkeleton/>
   return (
@@ -54,7 +57,7 @@ function DaysSummary({className,div,date,goBack = ()=>{}}) {
 
       {/* Summary Boxes */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-blue-100 dark:bg-blue-900 rounded-2xl p-4 shadow flex items-center gap-4">
+        <div className="bg-blue-100 dark:bg-blue-900 rounded-2xl p-4 shadow flex items-center gap-4" onClick={() => setSelectedFilter(null)}>
           <img src={totalIcon} alt="Total Students" className="w-10 h-10" />
           <div>
             <h2 className="text-sm font-medium">Total Students</h2>
@@ -62,7 +65,7 @@ function DaysSummary({className,div,date,goBack = ()=>{}}) {
           </div>
         </div>
 
-        <div className="bg-green-100 dark:bg-green-900 rounded-2xl p-4 shadow flex items-center gap-4">
+        <div className="bg-green-100 dark:bg-green-900 rounded-2xl p-4 shadow flex items-center gap-4" onClick={() => setSelectedFilter('Present')}>
           <img src={presentIcon} alt="Present Students" className="w-10 h-10" />
           <div>
             <h2 className="text-sm font-medium">Present</h2>
@@ -70,7 +73,7 @@ function DaysSummary({className,div,date,goBack = ()=>{}}) {
           </div>
         </div>
 
-        <div className="bg-red-100 dark:bg-red-900 rounded-2xl p-4 shadow flex items-center gap-4">
+        <div className="bg-red-100 dark:bg-red-900 rounded-2xl p-4 shadow flex items-center gap-4" onClick={() => setSelectedFilter('Absent')}>
           <img src={absentIcon} alt="Absent Students" className="w-10 h-10" />
           <div>
             <h2 className="text-sm font-medium">Absent</h2>
@@ -78,7 +81,7 @@ function DaysSummary({className,div,date,goBack = ()=>{}}) {
           </div>
         </div>
 
-        <div className="bg-yellow-100 dark:bg-yellow-900 rounded-2xl p-4 shadow flex items-center gap-4">
+        <div className="bg-yellow-100 dark:bg-yellow-900 rounded-2xl p-4 shadow flex items-center gap-4" onClick={() => setSelectedFilter('Permitted Leave')}>
           <img src={leaveIcon} alt="Permitted Leave" className="w-10 h-10" />
           <div>
             <h2 className="text-sm font-medium">Permitted Leave</h2>
@@ -92,7 +95,7 @@ function DaysSummary({className,div,date,goBack = ()=>{}}) {
       <div className="bg-gray-50 dark:bg-customDarkFg border dark:border-gray-500 rounded-xl p-4">
         <h3 className="text-lg font-semibold mb-3">Students</h3>
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-          {attendance.map((student, index) => (
+          {filteredAttendance?.map((student, index) => (
             <li key={index} className="flex justify-between py-2">
               <span>{student.studentId?.userId?.fullName}</span>
               <span
