@@ -92,9 +92,9 @@ function DaysSummary({className,div,date,goBack = ()=>{}}) {
       <div className="bg-gray-50 dark:bg-customDarkFg border dark:border-gray-500 rounded-xl p-4">
         <h3 className="text-lg font-semibold mb-3">Students</h3>
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-          {students.map((student, index) => (
+          {attendance.map((student, index) => (
             <li key={index} className="flex justify-between py-2">
-              <span>{student.name}</span>
+              <span>{student.studentId?.userId?.fullName}</span>
               <span
                 className={`px-3 py-1 rounded-full text-sm font-medium ${
                   student.status === 'Present'

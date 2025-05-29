@@ -26,9 +26,6 @@ function LoginCard({ switchToSignup}) {
         success: (response) => {
           return `Welcome, ${response.data.user.username || 'User'}!`;
         },
-        error: (err) => {
-          return err?.response?.data?.message || 'Login failed';
-        },
       }
     );
 
