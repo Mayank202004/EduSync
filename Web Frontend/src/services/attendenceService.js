@@ -19,9 +19,20 @@ export const getAttendanceDashboardData = async (className,div) => {
  * @param {String} className - Class name  
  * @param {String} div - Division
  * @param {Date} date - Date to fetch attendance
- * @returns 
+ * @returns {Promise<Object>} - Promis resolving to attendance summary of given date
  */
 export const getAttendanceByDate = async (className,div,date) =>{
     const response = await axiosInstance.post(`${BASEURL}/attendence/daily`,{date,className,div});
+    return response.data;
+}
+
+/**
+ * @desc Function to fetch students list for given className and div
+ * @param {String} className - Class name for which list to fetch
+ * @param {String} div - Division for which student list to fetch
+ * @returns {Promise<Object>} - Promise resolving to the list of students
+ */
+export const getStudentList = async (className, div) => {
+    const response = await axiosInstance.post(`${BASEURL}/attendence/students`,{className,div});
     return response.data;
 }

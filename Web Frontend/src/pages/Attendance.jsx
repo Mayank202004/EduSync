@@ -6,32 +6,7 @@ import LeftSidebar from '@/components/Attendance/LeftSidebar';
 import DaysSummary from '@/components/Attendance/DaysSummary';
 import { useEffect } from 'react';
 import { getAttendanceDashboardData } from '@/services/attendenceService';
-
-const dummyStudents = [
-  { name: 'Riya Sharma', gender: 'Female' },
-  { name: 'Amit Verma', gender: 'Male' },
-  { name: 'Sana Khan', gender: 'Female' },
-  { name: 'Rahul Singh', gender: 'Male' }
-];
-
-const dummyStats = {
-  total: 4,
-  present: 3,
-  absent: 1,
-  boysPresent: 1,
-  girlsPresent: 2
-};
-
-const dummyAttendanceByDate = {
-  '2025-05-22': {
-    present: ['Riya Sharma', 'Amit Verma', 'Sana Khan'],
-    absent: ['Rahul Singh']
-  },
-  '2025-05-23': {
-    present: ['Riya Sharma', 'Rahul Singh'],
-    absent: ['Amit Verma', 'Sana Khan']
-  }
-};
+import MarkAttendance from '@/components/Attendance/MarkAttendance';
 
 const myClass = '1';
 const myDiv = 'A';
@@ -43,8 +18,9 @@ function Attendance() {
   const [showAttendanceForm, setShowAttendanceForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
+  const [isMarkingAttendance, setIsMarkingAttendance] = useState(false);
 
-  const isViewingOwnClass = isClassTeacher && selectedClass === myClass && selectedDiv === myDiv;
+  const isViewingOwnClass = isClassTeacher;
 
   useEffect(() => {
     if (!isClassTeacher) {
@@ -61,6 +37,13 @@ function Attendance() {
     fetchDashboardData();
   }, []);
 
+  const handleMarkAttendance = (className, div) => {
+    setSelectedClass(className);
+    setSelectedDiv(div);
+    setIsMarkingAttendance(true);
+  };
+
+
   // const dateKey = selectedDate.toISOString().split('T')[0];
   // const attendanceForDate = dummyAttendanceByDate[dateKey];
 
@@ -69,12 +52,23 @@ function Attendance() {
       <div className="w-[20%] dark:border-gray-700 pl-4 pr-1 py-4">
         <LeftSidebar 
           onDateClicked={(date)=> setSelectedDate(date)}
+          markAttendance={(className,div) => handleMarkAttendance(className,div)}
         />
       </div>
       <div className="w-[80%] p-4 overflow-y-auto">
         {/* Main Content */}
         <div className="flex-1 space-y-6">
-          {isViewingOwnClass && (
+          {isMarkingAttendance ? (
+            <MarkAttendance
+              goBack={()=> 
+                {
+                  setIsMarkingAttendance(false);
+                  setSelectedDate(null);
+                }}
+              className={selectedClass}
+              div={selectedDiv}
+            />
+          ) : isViewingOwnClass && (
             <div className="bg-white dark:bg-customDarkFg p-4 rounded shadow gap-4">
               {selectedDate ? (
                 <DaysSummary
@@ -84,36 +78,11 @@ function Attendance() {
                   date={selectedDate}
                 />
               ) : (
-              <AttendanceDashboard
-                dashboardData={dashboardData}
-                setDashboardData={setDashboardData}
-              />
+                <AttendanceDashboard
+                  dashboardData={dashboardData}
+                  setDashboardData={setDashboardData}
+                />
               )}
-            </div>
-          )}
-
-          <button
-            onClick={() => setShowAttendanceForm(!showAttendanceForm)}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            {showAttendanceForm ? 'Hide' : 'Add'} Attendance
-          </button>
-
-          {showAttendanceForm && selectedClass && selectedDiv && (
-            <div className="bg-white dark:bg-customDarkBg p-4 rounded shadow space-y-4">
-              <h2 className="text-xl font-semibold">Mark Attendance - {selectedClass}-{selectedDiv}</h2>
-              {dummyStudents.map((student, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between border-b pb-2 last:border-none"
-                >
-                  <span>{student.name} ({student.gender})</span>
-                  <input type="checkbox" className="w-5 h-5" />
-                </div>
-              ))}
-              <button className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                Submit Attendance
-              </button>
             </div>
           )}
         </div>
