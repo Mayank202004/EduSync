@@ -14,13 +14,36 @@ import setCanvasPreview from "./setCanvasPreview";
 
 const MIN_DIMENSION = 256;
 
-const PhotoPreview = ({ user }) => {
+const PhotoPreview = ({ user, onBlobReady }) => {
   const [imageName, setImageName] = useState("");
   const [imageSrc, setImageSrc] = useState(null);
   const [crop, setCrop] = useState();
   const [showPreview, setShowPreview] = useState(false);
   const imageRef = useRef(null);
   const canvasPreviewRef = useRef(null);
+
+  const handleComplete = (c) => {
+    console.log("invoked");
+    if (
+      !imageRef.current ||
+      !canvasPreviewRef.current ||
+      !c?.width ||
+      !c?.height
+    )
+      return;
+    setCanvasPreview(imageRef.current, canvasPreviewRef.current, c);
+
+    // Convert canvas to blob
+    canvasPreviewRef.current.toBlob(
+      (blob) => {
+        if (blob && onBlobReady) {
+          onBlobReady(blob);
+        }
+      },
+      "image/jpeg",
+      0.2 // quality
+    );
+  };
 
   const selectImage = (event) => {
     const file = event.target.files?.[0];
@@ -62,6 +85,7 @@ const PhotoPreview = ({ user }) => {
     );
     const centeredCrop = centerCrop(crop, width, height);
     setCrop(centeredCrop);
+    handleComplete(crop);
   };
 
   return (
@@ -71,10 +95,7 @@ const PhotoPreview = ({ user }) => {
           user.avatar ? (
             <img src={user.avatar} alt="" />
           ) : (
-            <img
-              src={userIconWhite}
-              className={`size-[${MIN_DIMENSION}px] p-3`}
-            />
+            <img src={userIconWhite} className={`size-48 p-3`} />
           )
         ) : (
           <>
@@ -85,6 +106,7 @@ const PhotoPreview = ({ user }) => {
               keepSelection
               aspect={1}
               minWidth={MIN_DIMENSION}
+              onComplete={handleComplete}
             >
               <img
                 ref={imageRef}
@@ -96,20 +118,21 @@ const PhotoPreview = ({ user }) => {
             </ReactCrop>
 
             {/* Canvas Preview (always rendered but shown/hidden using styles) */}
-            <div className={`absolute flex items-center justify-center inset-0 bg-gray-400 ${
+            <div
+              className={`absolute flex items-center justify-center inset-0 bg-gray-400 ${
                 showPreview ? "" : "hidden"
-              }`}>
-
-            <canvas
-              ref={canvasPreviewRef}
-              className="rounded-full"
-              style={{
-                border: "1px solid black",
-                objectFit: "contain",
-                width: 256,
-                height: 256,
-              }}
-            />
+              }`}
+            >
+              <canvas
+                ref={canvasPreviewRef}
+                className="rounded-full"
+                style={{
+                  border: "1px solid black",
+                  objectFit: "contain",
+                  width: 256,
+                  height: 256,
+                }}
+              />
             </div>
           </>
         )}
@@ -136,7 +159,7 @@ const PhotoPreview = ({ user }) => {
                             : "text-gray-500 border-transparent"
                         }`}
             onClick={() => {
-              setShowPreview(prev => !prev)
+              setShowPreview((prev) => !prev);
               setCanvasPreview(
                 imageRef.current,
                 canvasPreviewRef.current,
@@ -160,7 +183,7 @@ const PhotoPreview = ({ user }) => {
           className="size-[1px] col-fit"
           onChange={selectImage}
         />
-        <span className="w-full border-1 py-1.5 px-3 col rounded-sm truncate">
+        <span className="w-full border-1 py-1.5 px-3 col rounded-sm truncate hover:ring-1">
           {imageName === "" ? "No file chosen" : imageName}
         </span>
         <span className="min-w-max border-1 py-1.5 px-3 ml-2 rounded-sm text-blue-400 border-blue-500 font-semibold hover:bg-blue-50 dark:hover:bg-blue-700/30 hover:ring-1">

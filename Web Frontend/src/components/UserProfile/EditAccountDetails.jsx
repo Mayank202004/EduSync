@@ -8,7 +8,8 @@ const EditAccountDetails = ({ user }) => {
           name="username"
           className="ring-1 p-2 w-full my-1.5 rounded-sm text-black dark:text-white"
           placeholder="Username"
-          defaultValue={user.username}
+          defaultValue={user?.username}
+          required
         />
       </label>
       <label>
@@ -17,8 +18,9 @@ const EditAccountDetails = ({ user }) => {
           type="text"
           name="fullName"
           className="ring-1 p-2 w-full my-1.5 rounded-sm text-black dark:text-white"
-          placeholder="Username"
-          defaultValue={user.fullName}
+          placeholder="Full name"
+          defaultValue={user?.fullName}
+          required
         />
         <span className="text-gray-500 dark:text-gray-400">
           Format: &lt;first name&gt; &lt;middle name&gt; &lt;last name&gt;
