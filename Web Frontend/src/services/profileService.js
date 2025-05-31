@@ -1,25 +1,24 @@
 import axiosInstance from "@/api/axiosInstance";
 
-const updateUserApi = async (username, fullName, avatarFormData = null) => {
-  const userDataRes = await axiosInstance.put("/users/update", {
+export const updateUserApi = async (username, fullName) => {
+  const response = await axiosInstance.put("/users/update", {
     username,
     fullName,
   });
 
-  let avatarDataRes;
-  if (avatarFormData) {
-    avatarDataRes = await axiosInstance.put(
-      "/users/update-avatar",
-      avatarFormData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-  }
-
-  return { userDataRes, avatarDataRes };
+  return response.data;
 };
 
-export default updateUserApi;
+export const updateAvatarApi = async (avatarFormData) => {
+  const response = await axiosInstance.put(
+    "/users/update-avatar",
+    avatarFormData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+};
