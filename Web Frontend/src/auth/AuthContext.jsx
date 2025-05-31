@@ -24,7 +24,6 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     setUser(userData.user);
     setRoleInfo(userData.roleData);
-    console.log(userData.roleData);
     setIsAuthenticated(true);
   };
   const logout = async () => {
