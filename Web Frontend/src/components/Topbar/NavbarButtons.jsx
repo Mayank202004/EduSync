@@ -55,11 +55,11 @@ export const ToggleTheme = ({ theme, setTheme }) => {
   };
 
   return (
-    <button onClick={handleToggleTheme} aria-label="Toggle Theme">
+    <button className="hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full p-1 flex duration-200" onClick={handleToggleTheme} aria-label="Toggle Theme">
       <img
         src={theme === "light" ? toggleDark : toggleLight}
         alt="Theme Toggle"
-        className="w-8 h-8 cursor-pointer select-none"
+        className="size-6.5 cursor-pointer select-none"
         draggable="false"
       />
     </button>
@@ -120,9 +120,9 @@ export const Avatar = () => {
         >
           <FontAwesomeIcon icon={faXmark} className="fa-lg" />
         </button>
-        <div className="flex flex-col place-items-center">
+        <div className="flex flex-col max-w-[70vw] place-items-center">
           <AvatarIcon size={"medium"} withHover={false} user={user} />
-          <h1 className="font-bold text-xl mt-2">{user.fullName}</h1>
+          <h1 className="font-bold text-xl mt-2 text-wrap text-center">{user.fullName}</h1>
           <button
             type="button"
             className="cursor-pointer space-x-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline"

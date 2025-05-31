@@ -22,9 +22,8 @@ const PendingFees = ({ isPending, feesData }) => {
       <h1 className="text-2xl font-bold m-3">Pending</h1>
       {isPending ? (
         <>
-          {Object.entries(feesData).map(([type, fees]) => {
-            console.log(fees);
-            return fees.length === 0 ? undefined : (
+          {Object.entries(feesData).map(([type, fees]) =>
+            fees.length === 0 ? undefined : (
               <FeeType key={type} type={`${capitalizeFirstLetter(type)} fees`}>
                 {fees.map((element) => (
                   <FeeCard
@@ -36,8 +35,8 @@ const PendingFees = ({ isPending, feesData }) => {
                   />
                 ))}
               </FeeType>
-            );
-          })}
+            )
+          )}
           <button
             type="button"
             disabled={selectedItems.length === 0}

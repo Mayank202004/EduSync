@@ -10,9 +10,11 @@ import {
   ToggleTheme,
   Avatar,
 } from "./NavbarButtons";
+import { useNavigate } from "react-router-dom";
 
 const ResponsiveTopBar = ({ theme, setTheme }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   //prevent scrolling when sidebar is open
   useEffect(() => {
@@ -32,8 +34,8 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
 
   return (
     <>
-      <header className="navbar w-full flex items-center bg-white dark:bg-black shadow-md px-4 py-3 max-h-15 duration-500">
-        <h1 className="Logo text-3xl font-bold text-black dark:text-white">
+      <header className="navbar w-full flex items-center bg-white dark:bg-black shadow-md px-5 pr-3 py-3 max-h-15 duration-500">
+        <h1 onClick={() => navigate("/")} className="Logo text-3xl font-bold text-black dark:text-white cursor-pointer">
           EduSync
         </h1>
         <div className="tablet:hidden ml-auto flex items-center gap-2 sm:gap-3">
@@ -54,7 +56,7 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
           </ul>
 
           <SearchBar />
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Message />
             <ToggleTheme theme={theme} setTheme={setTheme} />
             <Avatar />
