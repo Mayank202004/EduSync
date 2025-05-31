@@ -152,6 +152,13 @@ const loginUser = asyncHandler(async (req, res) => {
         "-password -refreshToken"
     );
 
+    let roleData = null;
+    if (loggedInUser.role === 'student') {
+        roleData = await Student.findOne({ userId: loggedInUser._id }).select("-parentContact -userId -address -dob -bloodGroup -allergies -height -weight -siblingInfo -parentsInfo -createdAt -updatedAt");
+    } else if (loggedInUser.role === 'teacher') {
+        roleData = await Teacher.findOne({ userId: loggedInUser._id }).select("-userid -address -phone -createdAt -updatedAt");
+    }
+
     //Options for cookies
     const options = {
         httpOnly: true,
@@ -168,6 +175,7 @@ const loginUser = asyncHandler(async (req, res) => {
                 200,
                 {
                     user: loggedInUser,
+                    roleData,
                     accessToken,
                     refreshToken,
                 },
@@ -280,11 +288,21 @@ const changeUserPassword = asyncHandler(async (req,res) =>{
  * @access Private (User)
  */
 const getCurrentUser = asyncHandler(async(req, res) => {
+    let roleData = null;
+    const loggedInUser=req.user;
+    if (loggedInUser.role === 'student') {
+        roleData = await Student.findOne({ userId: loggedInUser._id }).select("-parentContact -userId -address -dob -bloodGroup -allergies -height -weight -siblingInfo -parentsInfo -createdAt -updatedAt");
+    } else if (loggedInUser.role === 'teacher') {
+        roleData = await Teacher.findOne({ userId: loggedInUser._id }).select("-userid -address -phone -createdAt -updatedAt");
+    }
     return res
     .status(200)
     .json(new ApiResponse(
         200,
-        req.user,
+        {
+            user:loggedInUser,
+            roleData
+        },
         "User fetched successfully"
     ))
 });

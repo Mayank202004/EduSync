@@ -8,19 +8,23 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null); // null = loading
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [roleInfo, setRoleInfo] = useState(null);
 
   useEffect(() => {
     axiosInstance.get("/users/me")
       .then((res) => {
       setIsAuthenticated(true);
-      setUser(res.data.data);
+      setUser(res.data.data.user);
+      setRoleInfo(res.data.data.roleData);
     })
-      .catch(() => setIsAuthenticated(false))
-      .finally(() => setLoading(false));
+    .catch(() => setIsAuthenticated(false))
+    .finally(() => setLoading(false));
   }, []);
-
+  
   const login = (userData) => {
-    setUser(userData);
+    setUser(userData.user);
+    setRoleInfo(userData.roleData);
+    console.log(userData.roleData);
     setIsAuthenticated(true);
   };
   const logout = async () => {
@@ -29,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, logout,user, setUser, login }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, logout,user, setUser, login, roleInfo}}>
       {children}
     </AuthContext.Provider>
   );

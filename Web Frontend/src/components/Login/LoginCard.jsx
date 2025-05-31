@@ -33,7 +33,7 @@ function LoginCard({ switchToSignup}) {
     const response = await loginPromise;
 
     if (response.statusCode === 200) {
-      login(response.data.user);
+      login(response.data);
       navigate('/');
     } 
   } catch (err) {
