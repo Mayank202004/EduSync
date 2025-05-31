@@ -11,8 +11,47 @@ import { useRef, useState } from "react";
 import "react-image-crop/dist/ReactCrop.css";
 import userIconWhite from "@/assets/user_icon_white.png";
 import setCanvasPreview from "./setCanvasPreview";
+import { cn } from "@/lib/utils";
 
 const MIN_DIMENSION = 256;
+
+const isValidImageSize = (width, height) => {
+  return width < MIN_DIMENSION || height < MIN_DIMENSION;
+};
+
+const generateCenteredCrop = (image, min_dimension) => {
+  const { width, height } = image;
+  const cropWidthInPercent = (min_dimension / width) * 100;
+
+  const crop = makeAspectCrop(
+    {
+      unit: "%",
+      width: cropWidthInPercent,
+    },
+    1,
+    width,
+    height
+  );
+
+  return centerCrop(crop, width, height);
+};
+
+const CustomButton = ({ text, condition, callback }) => {
+  return (
+    <button
+      type="button" //important to have it as button as it is part of a form
+      className={cn(
+        "cursor-pointer py-1.5 px-4 rounded-sm border transition-colors",
+        condition
+          ? "bg-blue-50 text-blue-600 border-blue-300"
+          : "text-gray-500 border-transparent"
+      )}
+      onClick={callback}
+    >
+      {text}
+    </button>
+  );
+};
 
 const PhotoPreview = ({ user, onBlobReady }) => {
   const [imageName, setImageName] = useState("");
@@ -23,7 +62,6 @@ const PhotoPreview = ({ user, onBlobReady }) => {
   const canvasPreviewRef = useRef(null);
 
   const handleComplete = (c) => {
-    console.log("invoked");
     if (
       !imageRef.current ||
       !canvasPreviewRef.current ||
@@ -41,7 +79,7 @@ const PhotoPreview = ({ user, onBlobReady }) => {
         }
       },
       "image/jpeg",
-      0.2 // quality
+      0.8 // quality
     );
   };
 
@@ -51,13 +89,13 @@ const PhotoPreview = ({ user, onBlobReady }) => {
 
     const reader = new FileReader();
     reader.addEventListener("load", () => {
-      const imageElement = new Image();
+      const imageElement = new Image(); //creating an image object to check its height and width
       const imageUrl = reader.result?.toString() || "";
       imageElement.src = imageUrl;
 
       imageElement.addEventListener("load", (e) => {
         const { naturalWidth, naturalHeight } = e.currentTarget;
-        if (naturalWidth < MIN_DIMENSION || naturalHeight < MIN_DIMENSION) {
+        if (isValidImageSize(naturalWidth, naturalHeight)) {
           toast.error("Insufficient image size.");
           setImageSrc(null);
           setImageName("");
@@ -70,30 +108,30 @@ const PhotoPreview = ({ user, onBlobReady }) => {
     reader.readAsDataURL(file);
   };
 
-  const onImageLoad = (e) => {
-    const { width, height } = e.currentTarget;
-    const cropWidthInPercent = (MIN_DIMENSION / width) * 100;
-
-    const crop = makeAspectCrop(
-      {
-        unit: "%",
-        width: cropWidthInPercent,
-      },
-      1,
-      width,
-      height
+  const onImageLoad = (event) => {
+    const centeredCrop = generateCenteredCrop(
+      event.currentTarget,
+      MIN_DIMENSION
     );
-    const centeredCrop = centerCrop(crop, width, height);
     setCrop(centeredCrop);
     handleComplete(crop);
+  };
+
+  const previewCroppedImage = () => {
+    setShowPreview(true);
+    setCanvasPreview(
+      imageRef.current,
+      canvasPreviewRef.current,
+      convertToPixelCrop(crop, imageRef.current.width, imageRef.current.height)
+    );
   };
 
   return (
     <div className="w-[90%] sm:w-[85%] flex flex-col gap-5 border-1 mx-auto mb-10 py-6 px-6 sm:px-10 md:px-15 rounded-sm">
       <div className="container flex items-center justify-center min-w-2xs border w-fit h-fit mx-auto my-3 bg-gray-700 relative">
         {!imageSrc ? (
-          user.avatar ? (
-            <img src={user.avatar} alt="" />
+          user?.avatar ? (
+            <img src={user?.avatar} alt="" />
           ) : (
             <img src={userIconWhite} className={`size-48 p-3`} />
           )
@@ -119,18 +157,17 @@ const PhotoPreview = ({ user, onBlobReady }) => {
 
             {/* Canvas Preview (always rendered but shown/hidden using styles) */}
             <div
-              className={`absolute flex items-center justify-center inset-0 bg-gray-400 ${
-                showPreview ? "" : "hidden"
-              }`}
+              className={cn(
+                "absolute flex items-center justify-center inset-0 bg-gray-400",
+                { "hidden": showPreview }
+              )}
             >
               <canvas
                 ref={canvasPreviewRef}
-                className="rounded-full"
+                className="rounded-full object-contain border border-black"
                 style={{
-                  border: "1px solid black",
-                  objectFit: "contain",
-                  width: 256,
-                  height: 256,
+                  width: MIN_DIMENSION,
+                  height: MIN_DIMENSION,
                 }}
               />
             </div>
@@ -140,41 +177,19 @@ const PhotoPreview = ({ user, onBlobReady }) => {
 
       {imageSrc && crop ? (
         <div className="size-fit mx-auto space-x-2">
-          <button
-            className={`cursor-pointer py-1.5 px-4 rounded-sm border transition-colors
-                        ${
-                          !showPreview
-                            ? "bg-blue-50 text-blue-600 border-blue-300"
-                            : "text-gray-500 border-transparent"
-                        }`}
-            onClick={() => setShowPreview(false)}
-          >
-            Crop
-          </button>
-          <button
-            className={`cursor-pointer py-1.5 px-4 rounded-sm border transition-colors
-                        ${
-                          showPreview
-                            ? "bg-blue-50 text-blue-600 border-blue-300"
-                            : "text-gray-500 border-transparent"
-                        }`}
-            onClick={() => {
-              setShowPreview((prev) => !prev);
-              setCanvasPreview(
-                imageRef.current,
-                canvasPreviewRef.current,
-                convertToPixelCrop(
-                  crop,
-                  imageRef.current.width,
-                  imageRef.current.height
-                )
-              );
-            }}
-          >
-            Preview
-          </button>
+          <CustomButton
+            text="Crop"
+            condition={showPreview}
+            callback={previewCroppedImage}
+            />
+          <CustomButton
+            text="Preview"
+            condition={!showPreview}
+            callback={() => setShowPreview(false)}
+          />
         </div>
       ) : null}
+
       <label className="grid grid-cols-[0_1fr_auto] grid-rows-2 w-full cursor-pointer">
         <input
           type="file"

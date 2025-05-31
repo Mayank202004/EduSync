@@ -5,39 +5,33 @@ import EditAccountDetails from "@/components/UserProfile/EditAccountDetails";
 import PhotoPreview from "@/components/UserProfile/PhotoPreview";
 import { useState, useActionState } from "react";
 import toast from "react-hot-toast";
-import imageCompression from "browser-image-compression";
-
+import { compressImage } from "@/lib/compressImage";
 import updateUserApi from "@/services/profileService";
+
+const FULLNAME_REGEX = /^[a-zA-Z\s]+$/
 
 const UserProfile = () => {
   const { user } = useAuth();
   const [blob, setBlob] = useState(null);
   const [profileData, formAction, isPending] = useActionState(
     async (prevState, formData) => {
-      // const { username, fullName, avatar } = formData;
       const username = formData.get("username");
       const fullName = formData.get("fullName");
-      const avatar = formData.get("avatar");
 
-      console.log(username, fullName, avatar);
       if (!username?.trim() || !fullName?.trim()) {
         toast.error("Username and Full Name cannot be empty");
         return prevState;
       }
-
-      if (!blob) {
-        toast.error("No avatar image selected");
+      
+      if (!(FULLNAME_REGEX.test(fullName))) {
+        toast.error("Username should have alphabets and spaces only");
         return prevState;
       }
 
       try {
         const tempFormData = new FormData();
-        if (avatar !== user.avatar) {
-          const compressedBlob = await imageCompression(blob, {
-            maxSizeMB: 1,
-            maxWidthOrHeight: 800,
-            useWebWorker: true,
-          });
+        if (blob) { //compress if new image was selected
+          const compressedBlob = await compressImage(blob)
           tempFormData.append("avatar", compressedBlob);
         }
 
@@ -45,7 +39,7 @@ const UserProfile = () => {
           return await updateUserApi(
             username,
             fullName,
-            avatar !== user.avatar ? tempFormData : null
+            blob ? tempFormData : null
           );
         };
 
@@ -62,25 +56,19 @@ const UserProfile = () => {
               avatarDataRes?.data?.error ||
               "Something went wrong"
           );
-          return prevState;
+          return {...prevState, username, fullName};
         }
 
         // All went fine — refresh page or update UI
-        window.location.reload();
-
-        return {
-          username,
-          fullName,
-          avatar:
-            avatar !== user.avatar ? avatarDataRes?.data?.data?.avatar : avatar,
-        };
+        setTimeout(() => window.location.reload(), 200);
+        return {username, fullName}
       } catch (err) {
         const message =
           err.response?.data?.message ||
           err.message ||
           "Unknown error occurred";
         toast.error(message);
-        return prevState;
+        return {...prevState, username, fullName};
       }
     },
     {

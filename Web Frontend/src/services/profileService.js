@@ -6,8 +6,6 @@ const updateUserApi = async (username, fullName, avatarFormData = null) => {
     fullName,
   });
 
-  console.log("invoked", avatarFormData.get("avatar"));
-
   let avatarDataRes;
   if (avatarFormData) {
     avatarDataRes = await axiosInstance.put(
