@@ -241,4 +241,22 @@ export const addParentContact = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200,student,"Parent contact added successfully"));
 });
 
+/**
+ * @desc Get students information
+ * @route /api/v1/student/me
+ * @access Private (Students)  // **To Do: Later add midleware to allow both student and super admin
+ */
+export const getStudentInfo = asyncHandler(async (req, res) => {
+  if (!req.student) {
+    throw new ApiError(404, "Student not found");
+  }
+
+  const student = await Student.findById(req.student._id);
+
+  if (!student) {
+    throw new ApiError(404, "Student not found");
+  }
+
+  res.status(200).json(new ApiResponse(200, student, "Student info fetched successfully"));
+});
 

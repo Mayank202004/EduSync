@@ -761,7 +761,27 @@ const getDailyPresenteeForClassDiv = async (className, div) => {
   // If no attendance in current month return previous month's data
   if (data.length === 0) {
     const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const { start, end } = getMonthRange(previousMonth);
+    const { start, end } = getMonthRange(previousMonth);const getDailyPresenteeForClassDiv = async (className, div) => {
+  const now = new Date();
+
+  const getMonthRangeIST = (date) => {
+    const startUTC = new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1, 0, -330));
+    const endUTC = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999));
+    endUTC.setMinutes(endUTC.getMinutes() - 330); // Adjust for IST
+
+    return { start: startUTC, end: endUTC };
+  };
+  let { start: startOfMonth, end: endOfMonth } = getMonthRangeIST(now);
+  let data = await aggregateDailyPresentee(className, div, startOfMonth, endOfMonth);
+  // If no attendance in current month, fallback to previous month
+  if (data.length === 0) {
+    const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const { start, end } = getMonthRangeIST(previousMonth);
+    data = await aggregateDailyPresentee(className, div, start, end);
+  }
+  return data;
+};
+
     data = await aggregateDailyPresentee(className, div, start, end);
   }
   return data;
