@@ -12,13 +12,10 @@ import AttendanceDashboardSkeleton from './DashboardSkeleton';
 
 const COLORS = ['#34d399', '#3b82f6'];
 
-function AttendanceDashboard({dashboardData, setDashboardData}) {
-  // Hooks
-
-  
+function AttendanceDashboard({dashboardData, setDashboardData, isClassTeacher, className, div}) {
 
   // Set data for charts
-    const lineData = dashboardData?.dailyTotalPresentee || [];
+  const lineData = dashboardData?.dailyTotalPresentee || [];
   const barData = dashboardData?.divisionPresenteePercentage.map((item, index) => ({
     class: item.div,
     count: item.percentage,
@@ -43,7 +40,9 @@ function AttendanceDashboard({dashboardData, setDashboardData}) {
   if (!dashboardData) {
   return (
     <div className="flex items-center justify-center">
-      <AttendanceDashboardSkeleton />
+      <AttendanceDashboardSkeleton 
+        isClassTeacher={isClassTeacher}
+      />
     </div>
   );
 }

@@ -1,29 +1,17 @@
 import React from 'react'
+import { useAuth } from '@/auth/AuthContext';
 import { useState } from 'react';
 import Calendar from 'react-calendar';
 
-const myClass = '1';
-const myDiv = 'A';
-const dummyAttendanceByDate = {
-  '2025-05-22': {
-    present: ['Riya Sharma', 'Amit Verma', 'Sana Khan'],
-    absent: ['Rahul Singh']
-  },
-  '2025-05-23': {
-    present: ['Riya Sharma', 'Rahul Singh'],
-    absent: ['Amit Verma', 'Sana Khan']
-  }
-};
-
-function LeftSidebar({ onDateClicked = () => {}, markAttendance = ()=>{}}) {
-
-  const [isClassTeacher] = useState(true);
-  const [selectedClass, setSelectedClass] = useState(myClass);
-  const [selectedDiv, setSelectedDiv] = useState(myDiv);
+function LeftSidebar({ onDateClicked = () => {}, markAttendance = ()=>{}, isClassTeacher, className='1', div='A'}) {
+  const [selectedClass, setSelectedClass] = useState(className);
+  const [selectedDiv, setSelectedDiv] = useState(div);
   const [showAttendanceForm, setShowAttendanceForm] = useState(false);
-  const isViewingOwnClass = isClassTeacher && selectedClass === myClass && selectedDiv === myDiv;  
-  // const dateKey = selectedDate.toISOString().split('T')[0];
-  // const attendanceForDate = dummyAttendanceByDate[dateKey];
+
+  // Is user viewing their own class
+  const isViewingOwnClass = isClassTeacher &&
+    selectedClass === className &&
+    selectedDiv === div;
 
   return (
       <div className="w-full p-4 bg-white dark:bg-customDarkFg rounded h-full">
@@ -31,14 +19,14 @@ function LeftSidebar({ onDateClicked = () => {}, markAttendance = ()=>{}}) {
           <h2 className="text-xl font-semibold mb-2">Class Selection</h2>
           {isClassTeacher && (
             <p className="text-sm text-green-600 mb-2">
-              My Class: {myClass}-{myDiv} <span className="text-xs">(Dashboard view available)</span>
+              My Class: {className}-{div} <span className="text-xs">(Dashboard view available)</span>
             </p>
           )}
           <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
           <select
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded dark:bg-customDarkFg dark:text-white dark:border-gray-600"
           >
             <option value="">-- Select --</option>
             <option value="1">Class 1</option>
@@ -49,7 +37,7 @@ function LeftSidebar({ onDateClicked = () => {}, markAttendance = ()=>{}}) {
           <select
             value={selectedDiv}
             onChange={(e) => setSelectedDiv(e.target.value)}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded dark:bg-customDarkFg dark:text-white dark:border-gray-600"
           >
             <option value="">-- Select --</option>
             <option value="A">A</option>
@@ -80,6 +68,7 @@ function LeftSidebar({ onDateClicked = () => {}, markAttendance = ()=>{}}) {
           )} */}
         </div>
 
+        {isClassTeacher && (
         <div>
           <h2 className="text-xl font-semibold mt-6 mb-2">Attendance by Date</h2>
           <Calendar
@@ -88,6 +77,7 @@ function LeftSidebar({ onDateClicked = () => {}, markAttendance = ()=>{}}) {
             className="rounded border"
           />
         </div>
+      )}
       </div>
   )
 }
