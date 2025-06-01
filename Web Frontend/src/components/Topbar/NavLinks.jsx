@@ -32,7 +32,7 @@ const NavLinks = ({ closeMenuCallback }) => {
         </NavLink>
       </li>
       )}
-      {(role === 'teacher') && (
+      {(role === 'teacher' || role === 'super admin') && (
         <NavLink
           to="/attendance"
           className={navLinkClass}
