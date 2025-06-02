@@ -27,7 +27,7 @@ const App = () => {
   return (
     <div className="flex flex-col min-h-full w-full">
       <Topbar theme={theme} setTheme={setTheme} />
-      <div className="relative grow flex h-full w-full overflow-x-hidden transition-colors duration-500 bg-customLightBg text-black dark:bg-customDarkBg dark:text-white">
+      <div className="relative grow flex h-full w-full transition-colors duration-500 bg-customLightBg text-black dark:bg-customDarkBg dark:text-white">
         <Outlet />
       </div>
     </div>
