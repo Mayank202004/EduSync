@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   BarChart, Bar,
   PieChart, Pie, Cell,
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
@@ -15,11 +15,13 @@ const COLORS = ['#34d399', '#3b82f6'];
 function AttendanceDashboard({dashboardData, setDashboardData, isClassTeacher, className, div}) {
 
   // Set data for charts
-  const lineData = dashboardData?.dailyTotalPresentee || [];
-  const barData = dashboardData?.divisionPresenteePercentage.map((item, index) => ({
+  const lineData = dashboardData?.dailyTotalPresentee.data || [];
+  const totalStudents = dashboardData?.dailyTotalPresentee.totalStudents;
+  const barData = dashboardData?.divisionPresenteePercentage.data.map((item, index) => ({
     class: item.div,
     count: item.percentage,
   })) || [];
+  const barDataMonth = dashboardData?.divisionPresenteePercentage.month;
 
   const pieData = dashboardData?.genderStats.map((g) => ({
     name: g.gender.charAt(0).toUpperCase() + g.gender.slice(1),
@@ -56,9 +58,9 @@ function AttendanceDashboard({dashboardData, setDashboardData, isClassTeacher, c
           <LineChart width={500} height={200} data={lineData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
-            <YAxis domain={[0, 45]} />
+            <YAxis domain={[0, {totalStudents}]} allowDecimals={false} />
             <Tooltip />
-            <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} />
+            <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} name='Present Students' />
           </LineChart>
         </div>
 
@@ -68,8 +70,9 @@ function AttendanceDashboard({dashboardData, setDashboardData, isClassTeacher, c
             <XAxis dataKey="class" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="count" fill="#34d399" />
+            <Bar dataKey="count" fill="#34d399" name="Presentee Percentage"/>
           </BarChart>
+          <p className="text-sm text-gray-600 mt-2 text-center font-bold">Presentee %age for class {className} for {barDataMonth}</p>
         </div>
       </div>
 
@@ -84,6 +87,7 @@ function AttendanceDashboard({dashboardData, setDashboardData, isClassTeacher, c
               ))}
             </Pie>
             <Tooltip />
+            <Legend verticalAlign="bottom"/>
           </PieChart>
         </div>
 

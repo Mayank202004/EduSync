@@ -4,6 +4,7 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import ExcelJS from "exceljs";
+import moment from "moment-timezone";
 
 /**
  * @desc Mark attendence of a class
@@ -554,6 +555,7 @@ const getTopAttendees = async (className,div) => {
                         }
                     },
                     { $sort: { daysPresent: -1 } },
+                    { $limit: 6 },
                     {
                         $lookup: {
                             from: "students",
@@ -597,31 +599,39 @@ const getTopAttendees = async (className,div) => {
 
 
 /**
- * @desc Get presentee percentage per division for a class (current month or fallback to previous)
+ * @desc Get presentee percentage per division for a class (current or fallback to previous month)
  * @param {String} className - The class name (e.g., "6", "7", etc.)
- * @returns {Array} - Array of objects: [{ div: 'A', percentage: 87.5 }, ...]
+ * @returns {Object} - { month: "May, 2025", data: [{ div: "A", percentage: 87.5 }, ...] }
  */
 const getDivisionWisePresenteePercentage = async (className) => {
-    const now = new Date();
+    const now = moment().tz("Asia/Kolkata");
 
-    const getMonthRange = (date) => {
-        const start = new Date(date.getFullYear(), date.getMonth(), 1);
-        const end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+    const getMonthRange = (mDate) => {
+        const start = mDate.clone().startOf("month").toDate();
+        const end = mDate.clone().endOf("month").toDate();
         return { start, end };
     };
 
-    const { start: startOfMonth, end: endOfMonth } = getMonthRange(now);
-
+    // Try current month first
+    let { start: startOfMonth, end: endOfMonth } = getMonthRange(now);
     let data = await aggregateDivisionPresentee(className, startOfMonth, endOfMonth);
 
-    // If no attendance in current month, fallback to previous month
+    let usedDate = now;
+
+    // Fallback to previous month if current has no data
     if (data.length === 0) {
-        const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const previousMonth = now.clone().subtract(1, "month");
         const { start, end } = getMonthRange(previousMonth);
         data = await aggregateDivisionPresentee(className, start, end);
+        usedDate = previousMonth;
     }
 
-    return data;
+    const formattedMonth = usedDate.format("MMMM, YYYY"); // e.g., "May, 2025"
+
+    return {
+        month: formattedMonth,
+        data
+    };
 };
 
 /**
@@ -632,7 +642,7 @@ const getDivisionWisePresenteePercentage = async (className) => {
  * @returns {Array} - Array of the objects with division and percentage
  */
 async function aggregateDivisionPresentee(className, startDate, endDate) {
-    const result = await ClassAttendance.aggregate([
+    return await ClassAttendance.aggregate([
         {
             $match: {
                 class: className,
@@ -677,8 +687,6 @@ async function aggregateDivisionPresentee(className, startDate, endDate) {
         },
         { $sort: { div: 1 } }
     ]);
-
-    return result;
 }
 
 
@@ -768,7 +776,13 @@ const getDailyPresenteeForClassDiv = async (className, div) => {
     const { start, end } = getMonthRange(previousMonth);
     data = await aggregateDailyPresentee(className, div, start, end);
   }
-  return data;
+  // Get total students from students collection
+  const totalStudents = await Student.countDocuments({ class: className, div });
+
+  return {
+    totalStudents,
+    data: data,
+  };
 };
 
 /**
