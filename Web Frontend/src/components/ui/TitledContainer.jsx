@@ -18,10 +18,13 @@ import { cn } from "@/lib/utils";
  */
 const TitledContainer = ({ title, children, titleStyle, containerStyle }) => {
   return (
-    <div className={cn("container rounded-md py-6 px-6 sm:px-10 md:px-15 bg-white dark:bg-customDarkFg", containerStyle)}>
-      <h2 className={cn("font-bold text-lg mb-3", titleStyle)}>
-        {title}
-      </h2>
+    <div
+      className={cn(
+        "container rounded-md py-6 px-6 sm:px-10 md:px-15 bg-white dark:bg-customDarkFg",
+        containerStyle
+      )}
+    >
+      <h2 className={cn("font-bold text-lg mb-3", titleStyle)}>{title}</h2>
       {children}
     </div>
   );

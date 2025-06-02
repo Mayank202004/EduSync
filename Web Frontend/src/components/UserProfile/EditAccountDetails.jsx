@@ -1,7 +1,9 @@
 import { useActionState } from "react";
 import toast from "react-hot-toast";
+
 import Input from "../ui/Input";
 import SimpleButton from "../ui/SimpleButton";
+
 import { updateUserApi } from "@/services/profileService";
 
 const FULLNAME_REGEX = /^[a-zA-Z\s]+$/;
@@ -23,7 +25,7 @@ const accountInfoAction = async (prevState, formData) => {
   try {
     const apiCall = () => updateUserApi(username, fullName);
 
-    const response = await toast.promise(apiCall(), {
+    const response = await toast.promise(apiCall, {
       loading: "Updating account details...",
       success: "Profile updated successfully",
       error: "Failed to update profile",
@@ -80,13 +82,13 @@ const EditAccountDetails = ({ accountInfo }) => {
             defaultValue: accountData.fullName,
           }}
           hints={[
-            "Format: <first name> <middle name> <last name>",
-            "E.g: Mayank Sachin Chougale",
+            { text: "Format: <first name> <middle name> <last name>" },
+            { text: "E.g: Mayank Sachin Chougale" },
           ]}
         />
       </div>
       <SimpleButton buttonProps={{ type: "submit", disabled: isPending }}>
-        {isPending ? "Saving..." : "Save"}
+        {isPending ? "Saving..." : "Save Changes"}
       </SimpleButton>
     </form>
   );
