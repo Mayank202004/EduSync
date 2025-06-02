@@ -1,66 +1,37 @@
 //taken from: https://github.com/nikitadev-yt/react-image-cropper
 
-import ReactCrop from "react-image-crop";
-import toast from "react-hot-toast";
-import {
-  makeAspectCrop,
-  centerCrop,
-  convertToPixelCrop,
-} from "react-image-crop";
 import { useRef, useState } from "react";
+import ReactCrop from "react-image-crop";
+import { convertToPixelCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import userIconWhite from "@/assets/user_icon_white.png";
+import toast from "react-hot-toast";
+
 import setCanvasPreview from "./setCanvasPreview";
+import { compressImage } from "@/lib/compressImage";
 import { cn } from "@/lib/utils";
+import { isValidImageSize, generateCenteredCrop } from "@/lib/imageUtils";
+import userIconWhite from "@/assets/user_icon_white.png";
 import SimpleButton from "../ui/SimpleButton";
+import OutlinedButton from "../ui/OutlinedButton";
+
+import { updateAvatarApi } from "@/services/profileService";
 
 const MIN_DIMENSION = 200;
 
-const isValidImageSize = (width, height) => {
-  return width < MIN_DIMENSION || height < MIN_DIMENSION;
-};
-
-const generateCenteredCrop = (image, min_dimension) => {
-  const { width, height } = image;
-  const cropWidthInPercent = (min_dimension / width) * 100;
-
-  const crop = makeAspectCrop(
-    {
-      unit: "%",
-      width: cropWidthInPercent,
-    },
-    1,
-    width,
-    height
-  );
-
-  return centerCrop(crop, width, height);
-};
-
-const CustomButton = ({ text, condition, callback }) => {
-  return (
-    <button
-      type="button" //important to have it as button as it is part of a form
-      className={cn(
-        "cursor-pointer py-1.5 px-4 rounded-sm border transition-colors",
-        condition
-          ? "bg-blue-50 text-blue-600 border-blue-300"
-          : "text-gray-500 border-transparent"
-      )}
-      onClick={callback}
-    >
-      {text}
-    </button>
-  );
-};
-
-const PhotoPreview = ({ user, onBlobReady }) => {
+const PhotoPreview = ({ avatar }) => {
   const [imageName, setImageName] = useState("");
   const [imageSrc, setImageSrc] = useState(null);
   const [crop, setCrop] = useState();
   const [showPreview, setShowPreview] = useState(false);
   const imageRef = useRef(null);
   const canvasPreviewRef = useRef(null);
+  const [croppedBlob, setCroppedBlob] = useState(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  //the actual image painted will have smaller dimensions compared to original so
+  //this will set the minimum width of 200px x 200px crop relative to painted image in browser
+  const minCropWidth =
+    (MIN_DIMENSION / imageRef.current?.naturalWidth) * imageRef.current?.width;
 
   const handleComplete = (c) => {
     if (
@@ -75,8 +46,8 @@ const PhotoPreview = ({ user, onBlobReady }) => {
     // Convert canvas to blob
     canvasPreviewRef.current.toBlob(
       (blob) => {
-        if (blob && onBlobReady) {
-          onBlobReady(blob);
+        if (blob) {
+          setCroppedBlob(blob);
         }
       },
       "image/jpeg",
@@ -85,6 +56,8 @@ const PhotoPreview = ({ user, onBlobReady }) => {
   };
 
   const selectImage = (event) => {
+    setShowPreview(false);
+
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -96,7 +69,7 @@ const PhotoPreview = ({ user, onBlobReady }) => {
 
       imageElement.addEventListener("load", (e) => {
         const { naturalWidth, naturalHeight } = e.currentTarget;
-        if (isValidImageSize(naturalWidth, naturalHeight)) {
+        if (isValidImageSize(naturalWidth, naturalHeight, MIN_DIMENSION)) {
           toast.error("Insufficient image size.");
           setImageSrc(null);
           setImageName("");
@@ -127,13 +100,55 @@ const PhotoPreview = ({ user, onBlobReady }) => {
     );
   };
 
+  const updateProfileAvatar = async () => {
+    setIsUpdating(true);
+
+    await (async () => {
+      try {
+        const tempFormData = new FormData();
+        if (!croppedBlob) throw new Error("Cropped image not loaded");
+        //compress if new image was selected
+        const compressedBlob = await compressImage(croppedBlob);
+        console.log(compressedBlob);
+        tempFormData.append("avatar", compressedBlob);
+
+        const apiCall = async () => updateAvatarApi(tempFormData);
+        const response = await toast.promise(apiCall, {
+          loading: "Updating profile...",
+          success: "Profile updated successfully",
+          error: "Failed to update profile",
+        });
+
+        if (response.statusCode < 200 || response.statusCode > 299) {
+          toast.error(response.error || "Something went wrong while updating.");
+        }
+
+        // Reload only on success
+        setTimeout(() => window.location.reload(), 200);
+      } catch (err) {
+        const message =
+          err.response?.data?.message ||
+          err.message ||
+          "Unknown error occurred";
+        toast.error(message);
+      }
+    })();
+
+    setIsUpdating(false);
+  };
+
   return (
-    <form className="space-y-6">
-      <div className="flex flex-col gap-8 border-1 mx-auto sm:px-10 md:px-15 rounded-sm">
-        <div className="container flex items-center justify-center min-w-fit sm:min-w-2xs border w-fit h-fit mx-auto bg-gray-700 relative mt-4">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-5 border-1 mx-auto py-6 px-6 sm:px-10 md:px-15 rounded-sm">
+        <div
+          className={cn(
+            "container flex items-center justify-center border w-fit h-fit mx-auto my-3 bg-gray-700 relative",
+            "min-w-" + MIN_DIMENSION
+          )}
+        >
           {!imageSrc ? (
-            user?.avatar ? (
-              <img src={user?.avatar} alt="" />
+            avatar ? (
+              <img src={avatar} alt="" />
             ) : (
               <img src={userIconWhite} className={`size-48 p-3`} />
             )
@@ -145,14 +160,14 @@ const PhotoPreview = ({ user, onBlobReady }) => {
                 circularCrop
                 keepSelection
                 aspect={1}
-                minWidth={MIN_DIMENSION}
+                minWidth={minCropWidth}
                 onComplete={handleComplete}
               >
                 <img
                   ref={imageRef}
                   src={imageSrc}
                   alt="Upload"
-                  // style={{ maxHeight: "70vh" }}
+                  style={{ maxHeight: "70vh" }}
                   onLoad={onImageLoad}
                 />
               </ReactCrop>
@@ -161,15 +176,15 @@ const PhotoPreview = ({ user, onBlobReady }) => {
               <div
                 className={cn(
                   "absolute flex items-center justify-center inset-0 bg-gray-400",
-                  { hidden: showPreview }
+                  { hidden: !showPreview }
                 )}
               >
                 <canvas
                   ref={canvasPreviewRef}
-                  className="rounded-full h-full border border-black"
+                  className="rounded-full object-contain border border-black"
                   style={{
-                    maxWidth: MIN_DIMENSION,
-                    maxHeight: MIN_DIMENSION,
+                    width: MIN_DIMENSION,
+                    height: MIN_DIMENSION,
                   }}
                 />
               </div>
@@ -179,20 +194,33 @@ const PhotoPreview = ({ user, onBlobReady }) => {
 
         {imageSrc && crop ? (
           <div className="size-fit mx-auto space-x-2">
-            <CustomButton
-              text="Crop"
-              condition={showPreview}
-              callback={previewCroppedImage}
-            />
-            <CustomButton
-              text="Preview"
-              condition={!showPreview}
-              callback={() => setShowPreview(false)}
-            />
+            <OutlinedButton
+              buttonProps={{
+                type: "button",
+                onClick: () => setShowPreview(false),
+              }}
+              className={
+                !showPreview
+                  ? "dark:bg-blue-800/30 bg-blue-50 dark:text-white text-blue-600 border-blue-300"
+                  : "text-gray-500 border-transparent"
+              }
+            >
+              Crop
+            </OutlinedButton>
+            <OutlinedButton
+              buttonProps={{ type: "button", onClick: previewCroppedImage }}
+              className={
+                showPreview
+                  ? "dark:bg-blue-800/30 bg-blue-50 dark:text-white text-blue-600 border-blue-300"
+                  : "text-gray-500 border-transparent"
+              }
+            >
+              Preview
+            </OutlinedButton>
           </div>
         ) : null}
 
-        <label className="w-[90%] grid grid-cols-[0_1fr_auto] grid-rows-2 mx-auto cursor-pointer">
+        <label className="grid grid-cols-[0_1fr_auto] grid-rows-2 w-full cursor-pointer">
           <input
             type="file"
             accept=".jpg, .jpeg, .png"
@@ -211,8 +239,17 @@ const PhotoPreview = ({ user, onBlobReady }) => {
           </span>
         </label>
       </div>
-      <SimpleButton buttonProps={{ type: "submit" }}>Save</SimpleButton>
-    </form>
+      <SimpleButton
+        buttonProps={{
+          type: "submit",
+          onClick: updateProfileAvatar,
+          disabled: !crop,
+        }}
+        className="disabled:opacity-50"
+      >
+        {isUpdating ? "Saving..." : "Save Changes"}
+      </SimpleButton>
+    </div>
   );
 };
 
