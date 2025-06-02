@@ -41,7 +41,7 @@ function AttendanceDashboard({dashboardData, setDashboardData, isClassTeacher, c
 
   if (!dashboardData) {
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center h-full">
       <AttendanceDashboardSkeleton 
         isClassTeacher={isClassTeacher}
       />
@@ -50,7 +50,7 @@ function AttendanceDashboard({dashboardData, setDashboardData, isClassTeacher, c
 }
 
   return (
-    <div className="space-y-6 p-4 dark:bg-customDarkFg">
+    <div className="space-y-6 p-4 dark:bg-customDarkFg h-full">
       {/* First row: 2 charts */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">

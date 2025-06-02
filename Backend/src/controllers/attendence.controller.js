@@ -315,7 +315,7 @@ function convertToISTDateString(date) {
  * @access Private (Class Teacher/Class Coordinator/Super Admin)
  */
 export const exportAttendanceExcel = asyncHandler(async (req, res) => {
-    const { month, year, class: className, div } = req.body;
+    const { month, year, className, div } = req.body;
     const targetYear = year || new Date().getFullYear();
 
     const query = {};
@@ -340,7 +340,11 @@ export const exportAttendanceExcel = asyncHandler(async (req, res) => {
     if (!records.length) throw new ApiError(404, "No attendance records found");
 
     const students = await Student.find().populate("userId", "fullName");
-    const studentNames = students.map(s => s.userId.fullName);
+    const studentNames = students
+        .map(s => s.userId.fullName)
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b));
+
 
     const workbook = new ExcelJS.Workbook();
     const groupByMonth = {};

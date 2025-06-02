@@ -9,7 +9,7 @@ router.route("/mark").post(verifyJWT,verifyTeacher,markAttendance);
 router.route("/daily").post(verifyJWT,getDailyAttendance);
 router.route("/me").get(verifyJWT,getMyAttendance);
 router.route("/").get(verifyJWT,verifyTeacher,getAttendance);
-router.route("/export").get(verifyJWT,exportAttendanceExcel);
+router.route("/export").post(verifyJWT,exportAttendanceExcel);
 router.post("/students",verifyJWT,verifyTeacher,getStudentList);
 router.post("/dashboard",verifyJWT,verifyTeacher,getDashboardData)
 

@@ -48,3 +48,38 @@ export const markAttendance = async (absentStudents,permittedLeaveStudents, date
     const response = await axiosInstance.post(`${BASEURL}/attendence/mark`,{date,absentStudents,permittedLeaveStudents});
     return response.data;
 }
+
+/**
+ * @desc Exports excel for attendance
+ * Default : Returns yearly (If month and year provided then provides for a specific month)
+ * @param {String} month - Month for which attendance to export 
+ * @param {String} year  - Month for which attendance to export
+ * @returns {Promise} - Promise resolving to xlsx for attendance
+ */
+export const exportAttendance = async (className, div, month = "", year = "") => {
+  const payload = month && year ? { className, div, month, year } : { className, div };
+
+  const response = await axiosInstance.post(
+    `${BASEURL}/attendence/export`,
+    payload,
+    {
+      responseType: 'blob', // 👈 Receive binary data
+    }
+  );
+
+  const blob = new Blob([response.data], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank'; // 👈 Attempt to open in new tab
+  a.download = `Attendance_${className || 'Class'}_${div || 'Div'}_${month || 'All'}_${year || 'All'}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+
+  // Clean up
+  a.remove();
+  window.URL.revokeObjectURL(url);
+};
