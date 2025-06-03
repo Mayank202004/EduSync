@@ -42,7 +42,7 @@ const dummySchoolData = {
   ],
 };
 
-const TopLevelDashboard = ({ setSelectedClass }) => {
+const TopLevelDashboard = ({ onClassClicked }) => {
   const {
     overallAttendancePercentage,
     classWiseAttendance,
@@ -144,7 +144,7 @@ const TopLevelDashboard = ({ setSelectedClass }) => {
             <button
               key={cls}
               className="bg-blue-500 h-15 text-white py-2 rounded text-center text-sm hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600 shadow"
-              onClick={() => setSelectedClass(cls)}
+              onClick={() => onClassClicked(cls)}
             >
               Class {cls}
             </button>
