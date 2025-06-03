@@ -505,100 +505,131 @@ export const getStudentList = asyncHandler(async (req, res) => {
 
 
 /**
- * @desc Helper function to get gender distribution of a class
- * @param {String} className - Class name
- * @param {String} div - Division
+ * @desc Helper function to get gender distribution of entre school / of a class / of a specific div of a class
+ * @param {String} className - Class name (Optional)
+ * @param {String} div - Division (Optional)
  * @returns {Array} - Array of objects containing gender with their counts
  */
-const getGenderDistribution = async (className,div) => {
+const getGenderDistribution = async (className = null, div = null) => {
+    const matchStage = {};
 
-    const distribution = await Student.aggregate([
-        { $match: { class: className, div: div } },
-        { $group: { _id: "$gender", count: { $sum: 1 } } },
-        { $project: { gender: "$_id", count: 1, _id: 0 } }
-    ]);
+    if (className) matchStage.class = className;
+    if (div) matchStage.div = div;
 
-    return distribution;
+    const pipeline = [];
+
+    if (Object.keys(matchStage).length > 0) {
+        pipeline.push({ $match: matchStage });
+    }
+    pipeline.push(
+        {
+            $group: {
+                _id: "$gender",
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $project: {
+                gender: "$_id",
+                count: 1,
+                _id: 0
+            }
+        }
+    );
+    try {
+        const distribution = await Student.aggregate(pipeline);
+        return distribution;
+    } catch (error) {
+        throw error;
+    }
 };
 
 
 /**
- * @desc Helper function to get top attendees of a class
- * @param {String} className - Class name
- * @param {String} div - Division
+ * @desc Helper function to get top  6 attendees of entire school/ a class/ a div of a class
+ * @param {String} className - Class name (Optional)
+ * @param {String} div - Division (Optional)
  * @returns {Object} - Object containing total working days and top student attendance summary
  */
-const getTopAttendees = async (className,div) => {
+const getTopAttendees = async (className = null, div = null) => {
+    const matchStage = {};
+    if (className) matchStage.class = className;
+    if (div) matchStage.div = div;
 
-    const results = await ClassAttendance.aggregate([
-        {
-            $match: {
-                class: className,
-                div: div
-            }
-        },
-        {
-            $facet: {
-                // Total working days
-                totalDays: [
-                    { $group: { _id: "$date" } },
-                    { $count: "total" }
-                ],
-                // Attendance summary
-                studentAttendance: [
-                    { $unwind: "$attendance" },
-                    {
-                        $match: {
-                            "attendance.status": "Present"
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: "$attendance.studentId",
-                            daysPresent: { $sum: 1 }
-                        }
-                    },
-                    { $sort: { daysPresent: -1 } },
-                    { $limit: 6 },
-                    {
-                        $lookup: {
-                            from: "students",
-                            localField: "_id",
-                            foreignField: "_id",
-                            as: "student"
-                        }
-                    },
-                    { $unwind: "$student" },
-                    {
-                        $lookup: {
-                            from: "users", // Collection for User model
-                            localField: "student.userId",
-                            foreignField: "_id",
-                            as: "user"
-                        }
-                    },
-                    { $unwind: "$user" },
-                    {
-                        $project: {
-                            _id: 0,
-                            studentId: "$_id",
-                            name: "$user.fullName",
-                            daysPresent: 1
-                        }
+    const pipeline = [];
+
+    if (Object.keys(matchStage).length > 0) {
+        pipeline.push({ $match: matchStage });
+    }
+    pipeline.push({
+        $facet: {
+            // Total unique working days
+            totalDays: [
+                { $group: { _id: "$date" } },
+                { $count: "total" }
+            ],
+
+            // Attendance summary for top students
+            studentAttendance: [
+                { $unwind: "$attendance" },
+                {
+                    $match: {
+                        "attendance.status": "Present"
                     }
-                ]
-            }
+                },
+                {
+                    $group: {
+                        _id: "$attendance.studentId",
+                        daysPresent: { $sum: 1 }
+                    }
+                },
+                { $sort: { daysPresent: -1 } },
+                { $limit: 6 },
+                {
+                    $lookup: {
+                        from: "students",
+                        localField: "_id",
+                        foreignField: "_id",
+                        as: "student"
+                    }
+                },
+                { $unwind: "$student" },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "student.userId",
+                        foreignField: "_id",
+                        as: "user"
+                    }
+                },
+                { $unwind: "$user" },
+                {
+                    $project: {
+                        _id: 0,
+                        studentId: "$_id",
+                        name: "$user.fullName",
+                        daysPresent: 1
+                    }
+                }
+            ]
         }
-    ]);
+    });
 
-    const totalWorkingDays = results[0]?.totalDays[0]?.total || 0;
-    const studentAttendance = results[0]?.studentAttendance || [];
+    try {
+        const results = await ClassAttendance.aggregate(pipeline);
+        const totalWorkingDays = results[0]?.totalDays[0]?.total || 0;
+        const studentAttendance = results[0]?.studentAttendance || [];
 
-    return {
+        return {
             totalWorkingDays,
             studentAttendance
-        }
+        };
+    } catch (error) {
+        console.error("Error in getTopAttendees:", error);
+        throw error;
+    }
 };
+
 
 
 
@@ -639,7 +670,40 @@ const getDivisionWisePresenteePercentage = async (className) => {
 };
 
 /**
- * @desc Helper aggregation function to calculate presentee percentage
+ * @desc Helper function to fetch classwise present percentage
+ * @returns {Object} - { month: "May, 2025", data: [{ div: "A", percentage: 87.5 }, ...] } 
+ */
+const getClassWisePresenteePercentage = async () => {
+    const now = moment().tz("Asia/Kolkata");
+
+    const getMonthRange = (mDate) => {
+        const start = mDate.clone().startOf("month").toDate();
+        const end = mDate.clone().endOf("month").toDate();
+        return { start, end };
+    };
+    // Try current month first
+    let { start: startOfMonth, end: endOfMonth } = getMonthRange(now);
+    let data = await aggregateClassPresentee(startOfMonth, endOfMonth);
+
+    let usedDate = now;
+
+    // Fallback to previous month if current has no data
+    if (data.length === 0) {
+        const previousMonth = now.clone().subtract(1, "month");
+        const { start, end } = getMonthRange(previousMonth);
+        data = await aggregateClassPresentee(start, end);
+        usedDate = previousMonth;
+    }
+    const formattedMonth = usedDate.format("MMMM, YYYY"); // e.g., "May, 2025"
+    return {
+        month: formattedMonth,
+        data
+    };
+};
+
+
+/**
+ * @desc Helper aggregation function to calculate presentee percentage (For divisionwise)
  * @param {String} className - Class Name
  * @param {Date} startDate - Start date of the range
  * @param {Date} endDate - End date of the range
@@ -695,40 +759,107 @@ async function aggregateDivisionPresentee(className, startDate, endDate) {
 
 
 /**
+ * @desc Helper aggregation function to calculate presentee percentage (For classwise)
+ * @param {Date} startDate - Start date of the range
+ * @param {Date} endDate - End date of the range
+ * @returns {Array} - Array of the objects with division and percentage
+ */
+const aggregateClassPresentee = async (startDate, endDate) => {
+    return await ClassAttendance.aggregate([
+        {
+            $match: {
+                date: { $gte: startDate, $lte: endDate }
+            }
+        },
+        {
+            $unwind: "$attendance"
+        },
+        {
+            $match: {
+                "attendance.status": "Present"
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    class: "$class",
+                    date: "$date"
+                },
+                presentCount: { $sum: 1 }
+            }
+        },
+        {
+            $group: {
+                _id: "$_id.class",
+                totalDays: { $sum: 1 },
+                totalPresentees: { $sum: "$presentCount" }
+            }
+        },
+        {
+            $lookup: {
+                from: "students",
+                let: { classVal: "$_id" },
+                pipeline: [
+                    { $match: { $expr: { $eq: ["$class", "$$classVal"] } } },
+                    { $count: "totalStudents" }
+                ],
+                as: "studentInfo"
+            }
+        },
+        { $unwind: "$studentInfo" },
+        {
+            $project: {
+                class: "$_id",
+                presenteePercentage: {
+                    $round: [
+                        {
+                            $divide: [
+                                "$totalPresentees",
+                                { $multiply: ["$studentInfo.totalStudents", "$totalDays"] }
+                            ]
+                        },
+                        2
+                    ]
+                },
+                _id: 0
+            }
+        }
+    ]);
+};
+
+
+/**
  * @desc Helper function to get weekly absentee count
- * @param {String} className - Class name
- * @param {String} div - Division
+ * @param {String} className - Class name (Optional)
+ * @param {String} div - Division (Optional)
  * @returns {Array} - Array of objects with day and absent count
  */
-const getWeeklyAbsenteeCount = async (className, div) => {
+const getWeeklyAbsenteeCount = async (className = null, div = null) => {
     const now = new Date();
     const startOfWeek = new Date(now);
     startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
     startOfWeek.setHours(0, 0, 0, 0);
 
+    const matchConditions = {
+        date: { $gte: startOfWeek, $lte: now }
+    };
+
+    if (className) matchConditions.class = className;
+    if (div) matchConditions.div = div;
+
     const results = await ClassAttendance.aggregate([
-        {
-            $match: {
-                class: className,
-                div: div,
-                date: { $gte: startOfWeek, $lte: now }
-            }
-        },
+        { $match: matchConditions },
         { $unwind: "$attendance" },
+        { $match: { "attendance.status": "Absent" } },
         {
-            $match: {
-                "attendance.status": "Absent"
+            $group: {
+                _id: {
+                    $dayOfWeek: {
+                        $add: ["$date", 19800000] // Shift to IST (+5.5 hours)
+                    }
+                },
+                absent: { $sum: 1 }
             }
-        },
-        {
-          $group: {
-            _id: {
-              $dayOfWeek: {
-                $add: ["$date", 19800000]  // adding 5.5 hours in ms to shift to IST
-              }
-            },
-            absent: { $sum: 1 }
-          }
         }
     ]);
 
@@ -751,19 +882,25 @@ const getWeeklyAbsenteeCount = async (className, div) => {
     ];
 
     for (const item of results) {
-        if (item._id === 1) continue; // Skip Sunday (Holiday)
+        if (item._id === 1) continue; // Sunday (SKIP holiday)
         const day = dayMap[item._id];
         const entry = weekData.find(d => d.day === day);
-        if (entry) {
-            entry.absent = item.absent;
-        }
+        if (entry) entry.absent = item.absent;
     }
+
     return weekData;
 };
 
 
-const getDailyPresenteeForClassDiv = async (className, div) => {
+/**
+ * @desc Helper function to fetch daily present count for a month
+ * @param {String} className - Class Name (optional)
+ * @param {String} div - Division (Optional)
+ * @returns {Object} - Array of date and count of present student and total number of students
+ */
+const getDailyPresentee = async (className = null, div = null) => {
   const now = new Date();
+
   const getMonthRange = (date) => {
     const start = new Date(date.getFullYear(), date.getMonth(), 1);
     const end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
@@ -774,20 +911,26 @@ const getDailyPresenteeForClassDiv = async (className, div) => {
 
   let data = await aggregateDailyPresentee(className, div, startOfMonth, endOfMonth);
 
-  // If no attendance in current month return previous month's data
+  // If no attendance in current month, fallback to previous month
   if (data.length === 0) {
     const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const { start, end } = getMonthRange(previousMonth);
     data = await aggregateDailyPresentee(className, div, start, end);
   }
-  // Get total students from students collection
-  const totalStudents = await Student.countDocuments({ class: className, div });
+
+  // Total students match condition
+  const studentMatch = {};
+  if (className) studentMatch.class = className;
+  if (div) studentMatch.div = div;
+
+  const totalStudents = await Student.countDocuments(studentMatch);
 
   return {
     totalStudents,
-    data: data,
+    data,
   };
 };
+
 
 /**
  * @desc Helper function to aggregate daily presentee count
@@ -851,11 +994,11 @@ const aggregateDailyPresentee = async (className,div,startDate,endDate) => {
 
 
 /**
- * @desc Get all dashboard data for a class
+ * @desc Get all Teacher dashboard data for a class
  * @route GET /api/v1/attendance/dashboard
  * @access Private (Teacher)
  */
-export const getDashboardData = asyncHandler(async (req, res) => {
+export const getTeacherDashboardData = asyncHandler(async (req, res) => {
     const { className, div } = req.body;
 
     if (!className?.trim() || !div?.trim()) {
@@ -873,7 +1016,7 @@ export const getDashboardData = asyncHandler(async (req, res) => {
         getGenderDistribution(className, div),
         getWeeklyAbsenteeCount(className, div),
         getDivisionWisePresenteePercentage(className),
-        getDailyPresenteeForClassDiv(className,div)
+        getDailyPresentee(className,div)
     ]);
 
     res.status(200).json(new ApiResponse(
