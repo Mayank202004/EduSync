@@ -9,7 +9,7 @@ import { getAttendanceDashboardData } from '@/services/attendenceService';
 import MarkAttendance from '@/components/Attendance/MarkAttendance';
 import { useAuth } from '@/auth/AuthContext';
 
-function Attendance() {
+function TeacherAttendance() {
   const { roleInfo } = useAuth();
   const isClassTeacher = !!roleInfo?.classTeacher;
 const OwnClass = roleInfo?.classTeacher?.class ?? '1';
@@ -101,4 +101,4 @@ const OwnDiv = roleInfo?.classTeacher?.div ?? 'A';
   );
 }
 
-export default Attendance;
+export default TeacherAttendance;

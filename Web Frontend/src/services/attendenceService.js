@@ -63,7 +63,7 @@ export const exportAttendance = async (className, div, month = "", year = "") =>
     `${BASEURL}/attendence/export`,
     payload,
     {
-      responseType: 'blob', // 👈 Receive binary data
+      responseType: 'blob', //Receive binary data
     }
   );
 
@@ -74,7 +74,7 @@ export const exportAttendance = async (className, div, month = "", year = "") =>
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.target = '_blank'; // 👈 Attempt to open in new tab
+  a.target = '_blank'; // Attempt to open in new tab (Might not work in some browsers (will start direct download))
   a.download = `Attendance_${className || 'Class'}_${div || 'Div'}_${month || 'All'}_${year || 'All'}.xlsx`;
   document.body.appendChild(a);
   a.click();
