@@ -16,9 +16,16 @@ import { cn } from "@/lib/utils";
  *   <Input ... />
  * </TitledContainer>
  */
-const TitledContainer = ({ title, children, titleStyle, containerStyle }) => {
+const TitledContainer = ({
+  title,
+  children,
+  titleStyle,
+  containerStyle,
+  id = null,
+}) => {
   return (
     <div
+      id={id}
       className={cn(
         "container rounded-md py-6 px-6 sm:px-10 md:px-15 bg-white dark:bg-customDarkFg",
         containerStyle
