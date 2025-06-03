@@ -25,7 +25,6 @@ const useScrollspy = (
         // find the index of the section that is currently intersecting
         const indexOfElementIntersecting = entries.findIndex((entry) => {
           // if intersection > 0 it means entry is intersecting with the view port
-          if (entry.isIntersecting) console.log(entry)
           return entry.intersectionRatio > 0;
         });
 
@@ -38,7 +37,6 @@ const useScrollspy = (
         rootMargin,
       }
     );
-    console.log(options.root)
 
     const { current: ourObserver } = observer;
 

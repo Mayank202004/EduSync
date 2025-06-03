@@ -109,7 +109,6 @@ const PhotoPreview = ({ avatar }) => {
         if (!croppedBlob) throw new Error("Cropped image not loaded");
         //compress if new image was selected
         const compressedBlob = await compressImage(croppedBlob);
-        console.log(compressedBlob);
         tempFormData.append("avatar", compressedBlob);
 
         const apiCall = async () => updateAvatarApi(tempFormData);

@@ -3,32 +3,28 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/auth/AuthContext";
-import useScrollspy from "@/hooks/useScrollSpy";
 
+import SiblingsInfo from "@/components/UserProfile/SiblingsInfo";
 import AvatarIcon from "@/components/Topbar/AvatarIcon";
 import EditAccountDetails from "@/components/UserProfile/EditAccountDetails";
 import PhotoPreview from "@/components/UserProfile/PhotoPreview";
 import TitledContainer from "@/components/ui/TitledContainer";
+import ScrollSpy from "@/components/UserProfile/ScrollSpy";
 
 import { capitalizeFirstLetter } from "@/lib/utils";
-import { cn } from "@/lib/utils";
 
-const OFFSET = 0;
+const OFFSET = 40;
 const SECTIONS = [
   { id: "photo-preview", title: "Photo Preview" },
   { id: "account-details", title: "Account Details" },
+  { id: "siblings-info", title: "Siblings Info" },
 ];
 
 const UserProfile = () => {
+  const { user } = useAuth();
   const rootRef = useRef();
 
   const [elements, setElements] = useState();
-  const [activeIndex] = useScrollspy(elements, {
-    root: rootRef,
-    offset: OFFSET,
-  });
-
-  const { user } = useAuth();
 
   useEffect(() => {
     const elementsObjects = SECTIONS.map(({ id }) =>
@@ -36,25 +32,6 @@ const UserProfile = () => {
     );
     setElements(elementsObjects);
   }, []);
-
-  const handleLinkClick = (event, id) => {
-    event.preventDefault();
-
-    const element = document.getElementById(id);
-    const bodyRect = document.body.getBoundingClientRect().top;
-    const elementRect = element.getBoundingClientRect().top;
-    const elementPosition = elementRect - bodyRect;
-    const offsetPosition = elementPosition - OFFSET;
-
-    /**
-     * Note @MaximeHeckel: This doesn't work on Safari :(
-     * TODO: find an alternative for Safari
-     */
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: "smooth",
-    });
-  };
 
   return (
     <div
@@ -66,32 +43,12 @@ const UserProfile = () => {
         {capitalizeFirstLetter(user.role)}
       </h3>
       <div className="relative w-full h-full flex flex-col tablet:flex-row mx-auto my-6">
-        <div className="tablet:sticky tablet:self-start tablet:left-10 tablet:top-0 tablet:bottom-0 tablet:right-2 flex order-first tablet:mx-0 my-2 flex-col h-fit gap-3 p-4 tablet:p-2 max-w-xs tablet:max-w-56 w-full">
-          <h1 className="font-bold text-gray-400 tracking-widest">Jump to</h1>
-          <ul className="border-s-1 space-y-2.5 text-sm">
-            {SECTIONS.map(({ id, title }, index) => {
-              return (
-                <li
-                  key={index}
-                  className={cn(
-                    "flex flex-col px-3 opacity-50 border-s-3 border-gray-300 transition-all duration-200",
-                    index !== activeIndex && "not-hover:border-transparent",
-                    index === activeIndex &&
-                      "text-blue-400 opacity-100 border-blue-400 text-wrap"
-                  )}
-                >
-                  <a
-                    key={id}
-                    href={`#${id}-section`}
-                    onClick={(event) => handleLinkClick(event, `${id}-section`)}
-                  >
-                    {title}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+        <ScrollSpy
+          elements={elements}
+          rootRef={rootRef}
+          titleElementMap={SECTIONS}
+          offset={OFFSET}
+        />
         <div className="min-w-2xs max-w-3xl w-full flex flex-col gap-6 items-center rounded-md mx-auto mb-[50vh]">
           <TitledContainer
             id="photo-preview-section"
@@ -108,8 +65,10 @@ const UserProfile = () => {
               }}
             />
           </TitledContainer>
+          <TitledContainer id="siblings-info-section" title="Siblings Info">
+            <SiblingsInfo />
+          </TitledContainer>
         </div>
-        {/**self-start required to make sticky work, also dont add any overflow property on parent elements */}
       </div>
     </div>
   );
