@@ -9,7 +9,6 @@ const AdminProfileSection = lazy(() => import("./AdminProfileSection"));
 
 const EditUserProfile = () => {
   const { user } = useAuth();
-  console.log("loaded")
 
   return (
     <Suspense fallback={<LoadingScreen />}>

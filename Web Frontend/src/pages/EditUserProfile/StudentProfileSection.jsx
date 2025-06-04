@@ -13,6 +13,8 @@ import ScrollSpy from "@/components/UserProfile/ScrollSpy";
 
 import { capitalizeFirstLetter } from "@/lib/utils";
 
+import { getStudentInfo } from "@/services/studentInfoService";
+
 const OFFSET = 40;
 const SECTIONS = [
   { id: "photo-preview", title: "Photo Preview" },
@@ -23,6 +25,7 @@ const SECTIONS = [
 const StudentProfileSection = () => {
   const { user } = useAuth();
   const rootRef = useRef();
+  const [info, setInfo] = useState([]);
 
   const [elements, setElements] = useState();
 
@@ -31,6 +34,11 @@ const StudentProfileSection = () => {
       document.body.querySelector(`#${id}-section`)
     );
     setElements(elementsObjects);
+
+    (async () => {
+      const response = await getStudentInfo();
+      setInfo(response.data);
+    })();
   }, []);
 
   return (
@@ -66,7 +74,7 @@ const StudentProfileSection = () => {
             />
           </TitledContainer>
           <TitledContainer id="siblings-info-section" title="Siblings Info">
-            <SiblingsInfo />
+            <SiblingsInfo key={info} initialInfo={info.siblingInfo}/>
           </TitledContainer>
         </div>
       </div>
