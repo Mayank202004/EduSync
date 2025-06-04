@@ -1,13 +1,21 @@
 import { useActionState, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+
 import useExpandable from "@/hooks/useExpandable";
+
 import Input from "@/components/ui/Input";
 import SimpleButton from "../ui/SimpleButton";
-import { getStudentInfo } from "@/services/studentInfoService";
 import OutlinedButton from "../ui/OutlinedButton";
 import SelectOption from "../ui/SelectOption";
 import Checkbox from "../ui/CheckBox";
 
 import { CLASSES, DIVISIONS, SIBLING_RELATIONS } from "./siblingsInfoMaps";
+import validateSiblingForm from "./helpers/siblingValidation";
+
+import {
+  getStudentInfo,
+  addSiblingInfoApi,
+} from "@/services/studentInfoService";
 
 const SiblingsInfo = () => {
   // activeSibling is the current index of sibling selected by user in the info received from api
@@ -15,6 +23,8 @@ const SiblingsInfo = () => {
   const [activeSibling, setActiveSibling] = useState(-1);
   const { height, setExpanded, containerRef, expanded } = useExpandable(false);
   const [info, setInfo] = useState([]);
+
+  //form values are tracked using this state and form is updated using formaction
   const [formValues, setFormValues] = useState({
     relation: "Brother",
     name: "",
@@ -30,12 +40,37 @@ const SiblingsInfo = () => {
         relation: formData.get("relation") || "Brother",
         name: formData.get("name") || "",
         age: Number(formData.get("age") || 1),
-        isInSameSchool: formData.get("isInSameSchool") === "on", // checkbox returns "on" if checked
+        isInSameSchool: formData.get("isInSameSchool") === "on",
         class: formData.get("class") || "Jr. KG",
         div: formData.get("div") || "A",
       };
-      
-      setFormValues(values);
+
+      try {
+        validateSiblingForm(values);
+
+        const apiCall = () => addSiblingInfoApi(values)
+        const response = await toast.promise(apiCall, {
+          loading: "Saving...",
+          success: "Sibling information saved successfully!",
+          error: "Failed to save sibling information.",
+        });
+
+        if (response.statusCode < 200 || response.statusCode > 299) {
+          throw new Error(
+            response.error || "Something went wrong while updating."
+          );
+        }
+
+        setInfo(response.student.siblingInfo)
+      } catch (err) {
+        const message =
+          err?.response?.data?.message ||
+          err?.message ||
+          "An unknown error occurred while updating your profile.";
+        toast.error(message);
+      } finally {
+        setFormValues(values);
+      }
     },
     {}
   );
@@ -207,8 +242,15 @@ const SiblingsInfo = () => {
             </div>
           </div>
         </div>
-        <SimpleButton>
-          {activeSibling === -1 ? "Save" : "Save Changes"}
+        <SimpleButton
+          className={"disabled:opacity-60"}
+          buttonProps={{ disabled: isPending }}
+        >
+          {isPending
+            ? "Saving..."
+            : activeSibling === -1
+            ? "Save"
+            : "Save Changes"}
         </SimpleButton>
       </form>
     </>
