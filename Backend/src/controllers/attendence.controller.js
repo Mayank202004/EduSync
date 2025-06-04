@@ -695,8 +695,21 @@ const getClassWisePresenteePercentage = async () => {
         usedDate = previousMonth;
     }
     const formattedMonth = usedDate.format("MMMM, YYYY"); // e.g., "May, 2025"
+    
+     if (data.length === 0) {
+        return {
+            month: formattedMonth,
+            averagePercentage: 0,
+            data: []
+        };
+    }
+
+    const totalPercentage = data.reduce((sum, item) => sum + item.percentage, 0);
+    const averagePercentage = parseFloat((totalPercentage / data.length).toFixed(2));
+
     return {
         month: formattedMonth,
+        averagePercentage,
         data
     };
 };
