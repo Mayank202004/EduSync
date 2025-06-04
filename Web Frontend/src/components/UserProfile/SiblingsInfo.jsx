@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import useExpandable from "@/hooks/useExpandable";
 import Input from "@/components/ui/Input";
 import SimpleButton from "../ui/SimpleButton";
@@ -7,68 +7,91 @@ import OutlinedButton from "../ui/OutlinedButton";
 import SelectOption from "../ui/SelectOption";
 import Checkbox from "../ui/CheckBox";
 
-const CLASSES = [
-  { value: "Jr. KG", text: "Jr. KG" },
-  { value: "Sr. KG", text: "Sr. KG" },
-  { value: "1", text: "1" },
-  { value: "2", text: "2" },
-  { value: "3", text: "3" },
-  { value: "4", text: "4" },
-  { value: "5", text: "5" },
-  { value: "6", text: "6" },
-  { value: "7", text: "7" },
-  { value: "8", text: "8" },
-  { value: "9", text: "9" },
-  { value: "10", text: "10" },
-];
-
-const SIBLING_RELATIONS = [
-  { value: "Brother", text: "Brother" },
-  { value: "Sister", text: "Sister" },
-];
-
-const DIVISIONS = [
-  { value: "A", text: "A" },
-  { value: "B", text: "B" },
-  { value: "C", text: "C" },
-  { value: "D", text: "D" },
-];
+import { CLASSES, DIVISIONS, SIBLING_RELATIONS } from "./siblingsInfoMaps";
 
 const SiblingsInfo = () => {
+  // activeSibling is the current index of sibling selected by user in the info received from api
+  // -1 represents new sibling is being added
   const [activeSibling, setActiveSibling] = useState(-1);
   const { height, setExpanded, containerRef, expanded } = useExpandable(false);
   const [info, setInfo] = useState([]);
+  const [formValues, setFormValues] = useState({
+    relation: "Brother",
+    name: "",
+    age: 1,
+    isInSameSchool: false,
+    class: "Jr. KG",
+    div: "A",
+  });
+
+  const [_, formAction, isPending] = useActionState(
+    async (prevState, formData) => {
+      const values = {
+        relation: formData.get("relation") || "Brother",
+        name: formData.get("name") || "",
+        age: Number(formData.get("age") || 1),
+        isInSameSchool: formData.get("isInSameSchool") === "on", // checkbox returns "on" if checked
+        class: formData.get("class") || "Jr. KG",
+        div: formData.get("div") || "A",
+      };
+      
+      setFormValues(values);
+    },
+    {}
+  );
 
   useEffect(() => {
     (async () => {
       const response = await getStudentInfo();
-      setInfo(response.data.siblingInfo);
+      const siblings = response.data.siblingInfo || [];
+
+      setInfo(siblings);
+      const hasSiblings = siblings.length > 0;
+      setActiveSibling(hasSiblings ? 0 : -1);
     })();
   }, []);
 
   useEffect(() => {
-    setActiveSibling(info?.length > 0 ? 0 : -1);
-    console.log(info);
-  }, [info]);
+    if (activeSibling >= 0 && info.length > 0) {
+      const sibling = info[activeSibling];
+      setFormValues({
+        relation: sibling.relation,
+        name: sibling.name,
+        age: sibling.age,
+        isInSameSchool: sibling.isInSameSchool,
+        class: sibling.class,
+        div: sibling.div,
+      });
+    } else if (activeSibling === -1) {
+      // Add new sibling case
+      setFormValues({
+        relation: "Brother",
+        name: "",
+        age: 1,
+        isInSameSchool: false,
+        class: "Jr. KG",
+        div: "A",
+      });
+    }
+  }, [activeSibling, info]);
 
   useEffect(() => {
     setExpanded(
-      activeSibling >= 0 ? info?.at(activeSibling)?.isInSameSchool : false
+      activeSibling >= 0 ? info[activeSibling]?.isInSameSchool : false
     );
   }, [activeSibling, info, setExpanded]);
 
   return (
+    //setting keys as formValues is important to update those fields during re-renders
     <>
-      {info?.length > 0 && (
+      {info.length > 0 && (
         <div className="container flex flex-nowrap items-center gap-2 mb-3">
           <div className="flex flex-wrap items-center gap-1 justify-center w-fit text-sm">
             {info.map((sibling, index) => (
               <>
                 <OutlinedButton
                   variant="custom"
-                  key={
-                    activeSibling >= 0 ? info?.at(activeSibling)?._id : "New"
-                  }
+                  key={activeSibling >= 0 ? info[activeSibling]?._id : "New"}
                   buttonProps={{
                     type: "button",
                     onClick: () => setActiveSibling(index),
@@ -76,7 +99,7 @@ const SiblingsInfo = () => {
                   className={[
                     "w-fit border-0 py-2.5 rounded-full",
                     index === activeSibling
-                      ? "bg-gray-500/50"
+                      ? "bg-gray-300 dark:bg-gray-500/50"
                       : "hover:bg-gray-500/30 opacity-50",
                   ]}
                 >
@@ -87,75 +110,61 @@ const SiblingsInfo = () => {
           </div>
           <OutlinedButton
             buttonProps={{ onClick: () => setActiveSibling(-1) }}
-            variant="info"
-            className={["text-sm min-w-max rounded-full", activeSibling === -1 && "bg-cyan-500 text-white hover:bg-cyan-500"]}
+            variant="custom"
+            className={[
+              "text-sm min-w-max rounded-full",
+              activeSibling === -1
+                ? "bg-cyan-500 text-white"
+                : "hover:bg-cyan-500/30 border-cyan-500 text-cyan-500",
+            ]}
           >
             + Add
           </OutlinedButton>
         </div>
       )}
-      <form action={null} className="space-y-6">
+      <form action={formAction} className="space-y-6">
         <div className="flex flex-col gap-4 border-1 mx-auto py-5 px-6 sm:px-10 md:px-15 rounded-sm">
           <SelectOption
-            key={
-              activeSibling >= 0
-                ? info?.at(activeSibling)?._id + "relation"
-                : "relation default"
-            }
+            key={formValues.relation}
             title="Relationship to student: "
             options={SIBLING_RELATIONS}
             selectProps={{
               name: "relation",
               required: true,
-              defaultValue:
-                activeSibling >= 0
-                  ? info?.at(activeSibling)?.relation
-                  : "Brother",
+              defaultValue: formValues.relation,
             }}
             selectStyle="border border-gray-300 dark:border-gray-600"
           />
           <hr />
           <div className="flex gap-4">
             <Input
-              key={
-                activeSibling >= 0
-                  ? info?.at(activeSibling)._id + "name"
-                  : "name not loaded"
-              }
+              key={formValues.name}
               titleText="Name"
               inputProps={{
                 name: "name",
                 required: true,
-                defaultValue:
-                  activeSibling >= 0 ? info?.at(activeSibling)?.name : "",
+                defaultValue: formValues.name,
               }}
               labelStyle="basis-3/4"
             ></Input>
             <Input
-              key={
-                activeSibling >= 0
-                  ? info?.at(activeSibling)?._id + "age"
-                  : "age not loaded"
-              }
+              key={formValues.age}
               titleText="Age"
               inputProps={{
                 name: "age",
                 required: true,
                 type: "number",
-                defaultValue:
-                  activeSibling >= 0 ? info?.at(activeSibling)?.age : 1,
+                defaultValue: formValues.age,
               }}
               labelStyle="basis-1/4"
             ></Input>
           </div>
           <Checkbox
-            key={
-              activeSibling >= 0
-                ? info?.at(activeSibling)?.class + "class"
-                : "default sibling class"
-            }
+            key={formValues.isInSameSchool}
             label="Is the sibling currently studying in this school?"
             inputProps={{
+              value: "on",
+              name: "isInSameSchool",
               checked: expanded,
               onChange: (e) => {
                 setExpanded(e.target.checked);
@@ -174,36 +183,24 @@ const SiblingsInfo = () => {
             <hr />
             <div className="flex flex-wrap gap-2 justify-around">
               <SelectOption
-                key={
-                  activeSibling >= 0
-                    ? info?.at(activeSibling)?.class + "class"
-                    : "default sibling class"
-                }
+                key={formValues.class}
                 title="Select Class"
                 options={CLASSES}
                 selectProps={{
                   name: "class",
                   required: true,
-                  defaultValue:
-                    activeSibling >= 0
-                      ? info?.at(activeSibling)?.class
-                      : "Jr. KG",
+                  defaultValue: formValues.class,
                 }}
                 selectStyle="border border-gray-300 dark:border-gray-600"
               />
               <SelectOption
-                key={
-                  activeSibling >= 0
-                    ? info?.at(activeSibling).div + "div"
-                    : "default sibling div"
-                }
+                key={formValues.div}
                 title="Select Division"
                 options={DIVISIONS}
                 selectProps={{
                   name: "div",
                   required: true,
-                  defaultValue:
-                    activeSibling >= 0 ? info?.at(activeSibling)?.class : "A",
+                  defaultValue: formValues.div,
                 }}
                 selectStyle="border border-gray-300 dark:border-gray-600"
               />

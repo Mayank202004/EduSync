@@ -6,8 +6,6 @@ const useExpandable = (initialState = false) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    console.log("invoked")
-
     if (containerRef.current) {
       if (expanded) {
         setHeight(containerRef.current.scrollHeight);
