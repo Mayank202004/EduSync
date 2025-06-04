@@ -1,4 +1,4 @@
-import { isNonEmptyString, isBoolean, isValidNumber, isValidName } from "@/lib/textUtils";
+import { isNonEmptyString, isValidNumber, isValidName } from "@/lib/textUtils";
 
 const isValidRelation = (value) =>
   ["Brother", "Sister"].includes(value);
