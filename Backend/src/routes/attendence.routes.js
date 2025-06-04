@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { verifyJWT,verifyTeacher,verifyStudent } from '../middlewares/auth.middleware.js';
-import { markAttendance, getAttendance,getMyAttendance,getDailyAttendance,exportAttendanceExcel, getStudentList, getTeacherDashboardData} from "../controllers/attendence.controller.js"
+import { verifyJWT,verifyTeacher,verifyStudent, verifySuperAdmin } from '../middlewares/auth.middleware.js';
+import { markAttendance, getAttendance,getMyAttendance,getDailyAttendance,exportAttendanceExcel, getStudentList, getTeacherDashboardData, getTopLevelAdminDashboardData} from "../controllers/attendence.controller.js"
 
 const router = Router();
 
@@ -11,7 +11,8 @@ router.route("/me").get(verifyJWT,getMyAttendance);
 router.route("/").get(verifyJWT,verifyTeacher,getAttendance);
 router.route("/export").post(verifyJWT,exportAttendanceExcel);
 router.post("/students",verifyJWT,verifyTeacher,getStudentList);
-router.post("/dashboard",verifyJWT,verifyTeacher,getTeacherDashboardData)
+router.post("/dashboard",verifyJWT,verifyTeacher,getTeacherDashboardData);
+router.get("/admin-dashboard",verifyJWT,verifySuperAdmin,getTopLevelAdminDashboardData);
 
 
 export default router;

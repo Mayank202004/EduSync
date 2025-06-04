@@ -3,6 +3,7 @@ import { Student } from "../models/student.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { ClassStructure } from "../models/classStructure.model.js";
 import ExcelJS from "exceljs";
 import moment from "moment-timezone";
 
@@ -953,15 +954,15 @@ const getDailyPresentee = async (className = null, div = null) => {
  * @param {Date} endDate - End date of the range
  * @returns {Array} - Array of objects with date and total presentee count
  */
-const aggregateDailyPresentee = async (className,div,startDate,endDate) => {
+const aggregateDailyPresentee = async (className, div, startDate, endDate) => {
+  const matchConditions = {
+    date: { $gte: startDate, $lte: endDate },
+  };
+  if (className) matchConditions.class = className;
+  if (div) matchConditions.div = div;
+
   const result = await ClassAttendance.aggregate([
-    {
-      $match: {
-        class: className,
-        div: div,
-        date: { $gte: startDate, $lte: endDate }
-      }
-    },
+    { $match: matchConditions },
     { $unwind: "$attendance" },
     {
       $match: {
@@ -974,7 +975,7 @@ const aggregateDailyPresentee = async (className,div,startDate,endDate) => {
           date: {
             $dateToString: {
               format: "%Y-%m-%d",
-              date: { $add: ["$date", 19800000] } // Shift UTC to IST
+              date: { $add: ["$date", 19800000] } // Convert UTC to IST
             }
           }
         },
@@ -991,7 +992,6 @@ const aggregateDailyPresentee = async (className,div,startDate,endDate) => {
     { $sort: { date: 1 } }
   ]);
 
-  // Format: { date: 'Jan 1', total: 43 }
   const formatted = result.map(item => {
     const dateObj = new Date(item.date);
     const formattedDate = dateObj.toLocaleDateString("en-US", {
@@ -1040,6 +1040,48 @@ export const getTeacherDashboardData = asyncHandler(async (req, res) => {
             weeklyAbsenteeCount,
             divisionPresenteePercentage,
             dailyTotalPresentee
+        },
+        "Dashboard data fetched successfully"
+    ));
+});
+
+
+
+/**
+ * @desc Get all Super admin (Top level) dashboard data
+ * @route GET /api/v1/attendance/admin-dashboard
+ * @access Private (Super Admin))
+ */
+export const getTopLevelAdminDashboardData = asyncHandler(async (req, res) => {
+
+    const [
+        topAttendees,
+        genderStats,
+        weeklyAbsenteeCount,
+        PresenteePercentage,
+        dailyTotalPresentee,
+        classStructure,
+        totalStudents
+    ] = await Promise.all([
+        getTopAttendees(),
+        getGenderDistribution(),
+        getWeeklyAbsenteeCount(),
+        getClassWisePresenteePercentage,
+        getDailyPresentee(),
+        ClassStructure.find().sort({ className: 1 }),
+        Student.countDocuments()
+    ]);
+
+    res.status(200).json(new ApiResponse(
+        200,
+        {
+            topAttendees,
+            genderStats,
+            weeklyAbsenteeCount,
+            PresenteePercentage,
+            dailyTotalPresentee,
+            classStructure,
+            totalStudents
         },
         "Dashboard data fetched successfully"
     ));
