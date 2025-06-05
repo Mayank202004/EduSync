@@ -15,7 +15,7 @@ import {
   DIVISIONS,
   SIBLING_RELATIONS,
 } from "./helpers/siblingsInfoMaps";
-import validateSiblingForm from "./helpers/siblingValidation";
+import { validateSiblingForm } from "./helpers/siblingValidation";
 
 import { addSiblingInfoApi } from "@/services/studentInfoService";
 

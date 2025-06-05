@@ -21,7 +21,7 @@ const isValidClass = (value) =>
 
 const isValidDivision = (value) => ["A", "B", "C", "D"].includes(value);
 
-const validateSiblingForm = (values) => {
+export const validateSiblingForm = (values) => {
   const {
     name,
     relation,
@@ -65,5 +65,3 @@ const validateSiblingForm = (values) => {
 
   return true;
 };
-
-export default validateSiblingForm;

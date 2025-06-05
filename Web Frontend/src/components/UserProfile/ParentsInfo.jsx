@@ -64,6 +64,7 @@ const ParentsInfo = ({ initialInfo }) => {
             titleText="Income(in &#x20B9;)"
             labelStyle="basis-1/4"
             inputProps={{
+							type: "number",
               name: "fathers-income",
               defaultValue: state.fatherIncome,
             }}
@@ -88,6 +89,7 @@ const ParentsInfo = ({ initialInfo }) => {
             titleText="Income(in &#x20B9;)"
             labelStyle="basis-1/4"
             inputProps={{
+							type: "number",
               name: "mothers-income",
               defaultValue: state.motherIncome,
             }}

@@ -11,6 +11,7 @@ import PhotoPreview from "@/components/UserProfile/PhotoPreview";
 import TitledContainer from "@/components/ui/TitledContainer";
 import ScrollSpy from "@/components/UserProfile/ScrollSpy";
 import ParentsInfo from "@/components/UserProfile/ParentsInfo";
+import ParentsContact from "@/components/UserProfile/ParentsContact";
 import { capitalizeFirstLetter } from "@/lib/utils";
 
 import { getStudentInfo } from "@/services/studentInfoService";
@@ -21,6 +22,7 @@ const SECTIONS = [
   { id: "account-details", title: "Account Details" },
   { id: "siblings-info", title: "Siblings Info" },
   { id: "parents-info", title: "Parents Info" },
+  { id: "parents-contact", title: "Parents Contact" },
 ];
 
 const StudentProfileSection = () => {
@@ -80,6 +82,9 @@ const StudentProfileSection = () => {
           </TitledContainer>
           <TitledContainer id="parents-info-section" title="Parents Info">
             <ParentsInfo key={info} initialInfo={info.parentsInfo} />
+          </TitledContainer>
+          <TitledContainer id="parents-contact-section" title="Parents Contact">
+            <ParentsContact key={info} initialInfo={info.parentContact} />
           </TitledContainer>
         </div>
       </div>

@@ -14,3 +14,8 @@ export const addParentDetailsApi = async (data) => {
   const response = await axiosInstance.post("/student/parent-details", data);
   return response.data;
 }
+
+export const addParentContactApi = async (data) => {
+  const response = await axiosInstance.post("/student/parent-contact", data);
+  return response.data;
+}

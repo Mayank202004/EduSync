@@ -18,6 +18,11 @@ export const SIBLING_RELATIONS = [
   { value: "Sister", text: "Sister" },
 ];
 
+export const PARENT_RELATIONS = [
+  { value: "Father", text: "Father" },
+  { value: "Mother", text: "Mother" },
+];
+
 export const DIVISIONS = [
   { value: "A", text: "A" },
   { value: "B", text: "B" },
