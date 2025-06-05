@@ -10,19 +10,25 @@ import EditAccountDetails from "@/components/UserProfile/EditAccountDetails";
 import PhotoPreview from "@/components/UserProfile/PhotoPreview";
 import TitledContainer from "@/components/ui/TitledContainer";
 import ScrollSpy from "@/components/UserProfile/ScrollSpy";
-
+import ParentsInfo from "@/components/UserProfile/ParentsInfo";
+import ParentsContact from "@/components/UserProfile/ParentsContact";
 import { capitalizeFirstLetter } from "@/lib/utils";
+
+import { getStudentInfo } from "@/services/studentInfoService";
 
 const OFFSET = 40;
 const SECTIONS = [
   { id: "photo-preview", title: "Photo Preview" },
   { id: "account-details", title: "Account Details" },
   { id: "siblings-info", title: "Siblings Info" },
+  { id: "parents-info", title: "Parents Info" },
+  { id: "parents-contact", title: "Parents Contact" },
 ];
 
-const UserProfile = () => {
+const StudentProfileSection = () => {
   const { user } = useAuth();
   const rootRef = useRef();
+  const [info, setInfo] = useState([]);
 
   const [elements, setElements] = useState();
 
@@ -31,6 +37,12 @@ const UserProfile = () => {
       document.body.querySelector(`#${id}-section`)
     );
     setElements(elementsObjects);
+
+    (async () => {
+      const response = await getStudentInfo();
+      setInfo(response.data);
+      console.log(response.data);
+    })();
   }, []);
 
   return (
@@ -49,7 +61,7 @@ const UserProfile = () => {
           titleElementMap={SECTIONS}
           offset={OFFSET}
         />
-        <div className="min-w-2xs max-w-3xl w-full flex flex-col gap-6 items-center rounded-md mx-auto mb-[50vh]">
+        <div className="min-w-2xs max-w-4xl w-full flex flex-col gap-6 items-center rounded-md mx-auto mb-[50vh]">
           <TitledContainer
             id="photo-preview-section"
             title="Photo Preview"
@@ -66,7 +78,13 @@ const UserProfile = () => {
             />
           </TitledContainer>
           <TitledContainer id="siblings-info-section" title="Siblings Info">
-            <SiblingsInfo />
+            <SiblingsInfo key={info} initialInfo={info.siblingInfo} />
+          </TitledContainer>
+          <TitledContainer id="parents-info-section" title="Parents Info">
+            <ParentsInfo key={info} initialInfo={info.parentsInfo} />
+          </TitledContainer>
+          <TitledContainer id="parents-contact-section" title="Parents Contact">
+            <ParentsContact key={info} initialInfo={info.parentContact} />
           </TitledContainer>
         </div>
       </div>
@@ -74,4 +92,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default StudentProfileSection;

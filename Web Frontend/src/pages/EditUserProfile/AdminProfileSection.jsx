@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/auth/AuthContext";
 
-import SiblingsInfo from "@/components/UserProfile/SiblingsInfo";
 import AvatarIcon from "@/components/Topbar/AvatarIcon";
 import EditAccountDetails from "@/components/UserProfile/EditAccountDetails";
 import PhotoPreview from "@/components/UserProfile/PhotoPreview";
@@ -17,10 +16,9 @@ const OFFSET = 40;
 const SECTIONS = [
   { id: "photo-preview", title: "Photo Preview" },
   { id: "account-details", title: "Account Details" },
-  { id: "siblings-info", title: "Siblings Info" },
 ];
 
-const UserProfile = () => {
+const AdminProfileSection = () => {
   const { user } = useAuth();
   const rootRef = useRef();
 
@@ -65,13 +63,10 @@ const UserProfile = () => {
               }}
             />
           </TitledContainer>
-          <TitledContainer id="siblings-info-section" title="Siblings Info">
-            <SiblingsInfo />
-          </TitledContainer>
         </div>
       </div>
     </div>
   );
 };
 
-export default UserProfile;
+export default AdminProfileSection;

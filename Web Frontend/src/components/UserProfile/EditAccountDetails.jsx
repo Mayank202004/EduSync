@@ -63,6 +63,7 @@ const EditAccountDetails = ({ accountInfo }) => {
     <form className="space-y-6" action={formAction}>
       <div className="flex flex-col gap-4 border-1 mx-auto py-5 px-6 sm:px-10 md:px-15 rounded-sm">
         <Input
+          key={accountData.username}
           titleText="Username"
           inputProps={{
             name: "username",
@@ -73,6 +74,7 @@ const EditAccountDetails = ({ accountInfo }) => {
           }}
         />
         <Input
+          key={accountData.fullName}
           titleText="Full Name"
           inputProps={{
             name: "fullName",

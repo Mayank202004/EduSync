@@ -27,7 +27,7 @@ const TitledContainer = ({
     <div
       id={id}
       className={cn(
-        "container rounded-md py-6 px-6 sm:px-10 md:px-15 bg-white dark:bg-customDarkFg",
+        "container rounded-md px-4 py-6 sm:px-10 md:px-15 bg-white dark:bg-customDarkFg",
         containerStyle
       )}
     >

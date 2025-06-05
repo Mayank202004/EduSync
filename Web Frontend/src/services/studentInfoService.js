@@ -1,0 +1,21 @@
+import axiosInstance from "@/api/axiosInstance";
+
+export const getStudentInfo = async () => {
+  const response = await axiosInstance.get("/student/me");
+  return response.data;
+};
+
+export const addSiblingInfoApi = async (data) => {
+  const response = await axiosInstance.post("/student/sibling-details", data);
+  return response.data;
+};
+
+export const addParentDetailsApi = async (data) => {
+  const response = await axiosInstance.post("/student/parent-details", data);
+  return response.data;
+}
+
+export const addParentContactApi = async (data) => {
+  const response = await axiosInstance.post("/student/parent-contact", data);
+  return response.data;
+}
