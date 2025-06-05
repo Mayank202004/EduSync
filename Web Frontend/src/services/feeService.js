@@ -1,14 +1,12 @@
-import axiosInstance from '@/api/axiosInstance';
-
-const BASEURL = import.meta.env.VITE_API_BASE_URL;
+import axiosInstance from "@/api/axiosInstance";
 
 /**
- * 
+ *
  * @desc Function to get student's fees info
  * @returns {Promise} - Promise resolving to the response data
+ * @throws Will throw an error if the update fails.
  */
-
 export const getUserFees = async () => {
-    const response = await axiosInstance.get(`${BASEURL}/fee/myfees`);
-    return response.data;
-}
+  const response = await axiosInstance.get("/fee/myfees");
+  return response.data;
+};

@@ -1,12 +1,13 @@
 import useScrollspy from "@/hooks/useScrollSpy";
+
 import scrollToElemendId from "@/lib/scrollToElementId";
 import { cn } from "@/lib/utils";
 
-const ScrollSpy = ({elements, titleElementMap, offset, rootRef}) => {
+const ScrollSpy = ({ elements, titleElementMap, offset, rootRef }) => {
   const [activeIndex] = useScrollspy(elements, {
-      root: rootRef,
-      offset: offset,
-    });
+    root: rootRef,
+    offset: offset,
+  });
 
   return (
     //self-start required to make sticky work, also dont add any overflow property on parent elements

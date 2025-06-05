@@ -4,14 +4,14 @@ import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/auth/AuthContext";
 
-import SiblingsInfo from "@/components/UserProfile/SiblingsInfo";
+import SiblingsInfo from "@/components/EditUserProfile/SiblingsInfo";
 import AvatarIcon from "@/components/Topbar/AvatarIcon";
-import EditAccountDetails from "@/components/UserProfile/EditAccountDetails";
-import PhotoPreview from "@/components/UserProfile/PhotoPreview";
+import EditAccountDetails from "@/components/EditUserProfile/EditAccountDetails";
+import PhotoPreview from "@/components/EditUserProfile/PhotoPreview";
 import TitledContainer from "@/components/ui/TitledContainer";
-import ScrollSpy from "@/components/UserProfile/ScrollSpy";
-import ParentsInfo from "@/components/UserProfile/ParentsInfo";
-import ParentsContact from "@/components/UserProfile/ParentsContact";
+import ScrollSpy from "@/components/EditUserProfile/ScrollSpy";
+import ParentsInfo from "@/components/EditUserProfile/ParentsInfo";
+import ParentsContact from "@/components/EditUserProfile/ParentsContact";
 import { capitalizeFirstLetter } from "@/lib/utils";
 
 import { getStudentInfo } from "@/services/studentInfoService";

@@ -5,10 +5,10 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/auth/AuthContext";
 
 import AvatarIcon from "@/components/Topbar/AvatarIcon";
-import EditAccountDetails from "@/components/UserProfile/EditAccountDetails";
-import PhotoPreview from "@/components/UserProfile/PhotoPreview";
+import EditAccountDetails from "@/components/EditUserProfile/EditAccountDetails";
+import PhotoPreview from "@/components/EditUserProfile/PhotoPreview";
 import TitledContainer from "@/components/ui/TitledContainer";
-import ScrollSpy from "@/components/UserProfile/ScrollSpy";
+import ScrollSpy from "@/components/EditUserProfile/ScrollSpy";
 
 import { capitalizeFirstLetter } from "@/lib/utils";
 
@@ -47,7 +47,7 @@ const TeacherProfileSection = () => {
           titleElementMap={SECTIONS}
           offset={OFFSET}
         />
-        <div className="min-w-2xs max-w-3xl w-full flex flex-col gap-6 items-center rounded-md mx-auto mb-[50vh]">
+        <div className="min-w-2xs max-w-4xl w-full flex flex-col gap-6 items-center rounded-md mx-auto mb-[50vh]">
           <TitledContainer
             id="photo-preview-section"
             title="Photo Preview"
