@@ -83,6 +83,7 @@ const SiblingsInfo = ({ initialInfo }) => {
       <form action={formAction} className="space-y-6">
         <div className="flex flex-col gap-4 border-1 mx-auto py-5 px-6 sm:px-10 md:px-15 rounded-sm">
           <SelectOption
+            key={formValues.relation}
             title="Relationship to student: "
             options={SIBLING_RELATIONS}
             selectProps={{
@@ -95,6 +96,7 @@ const SiblingsInfo = ({ initialInfo }) => {
           <hr />
           <div className="flex gap-4">
             <Input
+              key={formValues.name}
               titleText="Name"
               inputProps={{
                 name: "name",
@@ -104,6 +106,7 @@ const SiblingsInfo = ({ initialInfo }) => {
               labelStyle="basis-3/4"
             ></Input>
             <Input
+              key={formValues.age}
               titleText="Age"
               inputProps={{
                 name: "age",
@@ -115,6 +118,7 @@ const SiblingsInfo = ({ initialInfo }) => {
             ></Input>
           </div>
           <Checkbox
+            key={expanded}
             label="Is the sibling currently studying in this school?"
             inputProps={{
               value: "on",
@@ -137,6 +141,7 @@ const SiblingsInfo = ({ initialInfo }) => {
             <hr />
             <div className="flex flex-wrap gap-2 justify-around">
               <SelectOption
+                key={formValues.class}
                 title="Select Class"
                 options={CLASSES}
                 selectProps={{
@@ -147,6 +152,7 @@ const SiblingsInfo = ({ initialInfo }) => {
                 selectStyle="border border-gray-300 dark:border-gray-600"
               />
               <SelectOption
+                key={formValues.div}
                 title="Select Division"
                 options={DIVISIONS}
                 selectProps={{
