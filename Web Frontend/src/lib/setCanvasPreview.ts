@@ -1,10 +1,10 @@
 //taken from: https://github.com/nikitadev-yt/react-image-cropper
 
 const setCanvasPreview = (
-  image, // HTMLImageElement
-  canvas, // HTMLCanvasElement
-  crop // PixelCrop
-) => {
+  image: HTMLImageElement, // HTMLImageElement
+  canvas: HTMLCanvasElement, // HTMLCanvasElement
+  crop: { x: number; y: number; width: number; height: number } // PixelCrop
+): void => {
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     throw new Error("No 2d context");
@@ -44,4 +44,5 @@ const setCanvasPreview = (
 
   ctx.restore();
 };
+
 export default setCanvasPreview;

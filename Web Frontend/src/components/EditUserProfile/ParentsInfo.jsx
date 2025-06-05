@@ -1,37 +1,9 @@
 import { useActionState } from "react";
-import toast from "react-hot-toast";
-import Input from "../ui/Input";
-import SimpleButton from "../ui/SimpleButton";
-import { validateParentInfoForm } from "./helpers/parentsDetailsValidation";
 
-import { addParentDetailsApi } from "@/services/studentInfoService";
+import Input from "@/components/ui/Input";
+import SimpleButton from "@/components/ui/SimpleButton";
 
-const parentInfoAction = async (prevState, formData) => {
-  const values = {
-    fatherName: formData.get("fathers-name")?.toString() ?? "",
-    fatherOccupation: formData.get("fathers-occupation")?.toString() ?? "",
-    fatherIncome: Number(formData.get("fathers-income") ?? 0),
-    motherName: formData.get("mothers-name")?.toString() ?? "",
-    motherOccupation: formData.get("mothers-occupation")?.toString() ?? "",
-    motherIncome: Number(formData.get("mothers-income") ?? 0),
-  };
-
-  try {
-    validateParentInfoForm(values);
-    toast.promise(addParentDetailsApi(values), {
-      loading: "Updating...",
-      success: "Parent details saved successfully",
-      error: "Something went wrong",
-    });
-  } catch (err) {
-    const message =
-      err?.response?.data?.message ||
-      err?.message ||
-      "An unknown error occurred while updating your profile.";
-    toast.error(message);
-  }
-  return values;
-};
+import parentInfoAction from "./form_actions/parentInfoAction";
 
 const ParentsInfo = ({ initialInfo }) => {
   const [state, formAction, isPending] = useActionState(parentInfoAction, {
@@ -64,7 +36,7 @@ const ParentsInfo = ({ initialInfo }) => {
             titleText="Income(in &#x20B9;)"
             labelStyle="basis-1/4"
             inputProps={{
-							type: "number",
+              type: "number",
               name: "fathers-income",
               defaultValue: state.fatherIncome,
             }}
@@ -89,7 +61,7 @@ const ParentsInfo = ({ initialInfo }) => {
             titleText="Income(in &#x20B9;)"
             labelStyle="basis-1/4"
             inputProps={{
-							type: "number",
+              type: "number",
               name: "mothers-income",
               defaultValue: state.motherIncome,
             }}
