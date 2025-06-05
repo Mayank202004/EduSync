@@ -10,7 +10,7 @@ import EditAccountDetails from "@/components/UserProfile/EditAccountDetails";
 import PhotoPreview from "@/components/UserProfile/PhotoPreview";
 import TitledContainer from "@/components/ui/TitledContainer";
 import ScrollSpy from "@/components/UserProfile/ScrollSpy";
-
+import ParentsInfo from "@/components/UserProfile/ParentsInfo";
 import { capitalizeFirstLetter } from "@/lib/utils";
 
 import { getStudentInfo } from "@/services/studentInfoService";
@@ -20,6 +20,7 @@ const SECTIONS = [
   { id: "photo-preview", title: "Photo Preview" },
   { id: "account-details", title: "Account Details" },
   { id: "siblings-info", title: "Siblings Info" },
+  { id: "parents-info", title: "Parents Info" },
 ];
 
 const StudentProfileSection = () => {
@@ -38,6 +39,7 @@ const StudentProfileSection = () => {
     (async () => {
       const response = await getStudentInfo();
       setInfo(response.data);
+      console.log(response.data);
     })();
   }, []);
 
@@ -57,7 +59,7 @@ const StudentProfileSection = () => {
           titleElementMap={SECTIONS}
           offset={OFFSET}
         />
-        <div className="min-w-2xs max-w-3xl w-full flex flex-col gap-6 items-center rounded-md mx-auto mb-[50vh]">
+        <div className="min-w-2xs max-w-4xl w-full flex flex-col gap-6 items-center rounded-md mx-auto mb-[50vh]">
           <TitledContainer
             id="photo-preview-section"
             title="Photo Preview"
@@ -74,7 +76,10 @@ const StudentProfileSection = () => {
             />
           </TitledContainer>
           <TitledContainer id="siblings-info-section" title="Siblings Info">
-            <SiblingsInfo key={info} initialInfo={info.siblingInfo}/>
+            <SiblingsInfo key={info} initialInfo={info.siblingInfo} />
+          </TitledContainer>
+          <TitledContainer id="parents-info-section" title="Parents Info">
+            <ParentsInfo key={info} initialInfo={info.parentsInfo} />
           </TitledContainer>
         </div>
       </div>

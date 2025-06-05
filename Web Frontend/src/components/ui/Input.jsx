@@ -32,7 +32,7 @@ const Input = ({
   return (
     <label className={cn(labelStyle)}>
       {titleText && (
-        <span className={cn("font-bold", titleStyle)}>{titleText}</span>
+        <span className={cn("font-semibold tracking-wide", titleStyle)}>{titleText}</span>
       )}
       <input
         className={cn(
