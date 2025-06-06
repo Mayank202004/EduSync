@@ -705,8 +705,9 @@ const getClassWisePresenteePercentage = async () => {
         };
     }
 
-    const totalPercentage = data.reduce((sum, item) => sum + item.percentage, 0);
+    const totalPercentage = data.reduce((sum, item) => sum + item. presenteePercentage, 0);
     const averagePercentage = parseFloat((totalPercentage / data.length).toFixed(2));
+
 
     return {
         month: formattedMonth,
@@ -826,13 +827,18 @@ const aggregateClassPresentee = async (startDate, endDate) => {
                 class: "$_id",
                 presenteePercentage: {
                     $round: [
-                        {
+                      {
+                        $multiply: [
+                          {
                             $divide: [
-                                "$totalPresentees",
-                                { $multiply: ["$studentInfo.totalStudents", "$totalDays"] }
+                              "$totalPresentees",
+                              { $multiply: ["$studentInfo.totalStudents", "$totalDays"] }
                             ]
-                        },
-                        2
+                          },
+                          100
+                        ]
+                      },
+                      2
                     ]
                 },
                 _id: 0
@@ -1066,9 +1072,9 @@ export const getTopLevelAdminDashboardData = asyncHandler(async (req, res) => {
         getTopAttendees(),
         getGenderDistribution(),
         getWeeklyAbsenteeCount(),
-        getClassWisePresenteePercentage,
+        getClassWisePresenteePercentage(),
         getDailyPresentee(),
-        ClassStructure.find().sort({ className: 1 }),
+        ClassStructure.find().sort({ className: 1 }).select("-createdAt -updatedAt -__v -_id"),
         Student.countDocuments()
     ]);
 
