@@ -15,6 +15,15 @@ export const getAttendanceDashboardData = async (className,div) => {
 }
 
 /**
+ * @desc Funcion to fetch top level admin dashboard data
+ * @returns {Promise<Object>} - Promise rsolving to the top level dashboard data
+ */
+export const getTopLevelDashboardData = async () =>{
+  const response = await axiosInstance.get(`${BASEURL}/attendence/admin-dashboard`);
+  return response.data;
+}
+
+/**
  * @desc Function to fetch attendance summary for a specific date
  * @param {String} className - Class name  
  * @param {String} div - Division
