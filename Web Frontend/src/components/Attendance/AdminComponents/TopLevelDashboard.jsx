@@ -9,52 +9,33 @@ import {
 
 const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
 
-const dummySchoolData = {
-  overallAttendancePercentage: 86,
-  classWiseAttendance: [
-    { className: '1', percentage: 89 },
-    { className: '2', percentage: 82 },
-    { className: '3', percentage: 91 },
-    { className: '4', percentage: 76 },
-    { className: '5', percentage: 88 },
-    { className: '6', percentage: 80 },
-    { className: '7', percentage: 84 },
-    { className: '8', percentage: 78 },
-  ],
-  genderStats: [
-    { gender: 'Male', count: 540 },
-    { gender: 'Female', count: 480 },
-  ],
-  weeklyAbsenteeCount: [
-    { day: 'Mon', absent: 42 },
-    { day: 'Tue', absent: 38 },
-    { day: 'Wed', absent: 35 },
-    { day: 'Thu', absent: 41 },
-    { day: 'Fri', absent: 30 },
-    { day: 'Sat', absent: 25 },
-  ],
-  dailyTotalPresentee: [
-    { date: '2025-05-26', total: 890 },
-    { date: '2025-05-27', total: 905 },
-    { date: '2025-05-28', total: 915 },
-    { date: '2025-05-29', total: 880 },
-    { date: '2025-05-30', total: 899 },
-  ],
-};
+const TopLevelDashboard = ({ dashboardData,setDashboardData, onClassClicked }) => {
 
-const TopLevelDashboard = ({ onClassClicked }) => {
-  const {
-    overallAttendancePercentage,
-    classWiseAttendance,
-    genderStats,
-    weeklyAbsenteeCount,
-    dailyTotalPresentee,
-  } = dummySchoolData;
+  const overallAttendancePercentage = dashboardData?.PresenteePercentage?.averagePercentage || 0;
+  const classWiseAttendance = dashboardData?.PresenteePercentage?.data?.map(d => ({
+    className: d.class,
+    percentage: d.presenteePercentage,
+  })) || [];
 
-  const pieData = genderStats.map(g => ({
-    name: g.gender,
+  const weeklyAbsenteeCount = dashboardData?.weeklyAbsenteeCount || [];
+  
+  const pieData = dashboardData?.genderStats?.map(g => ({
+    name: g.gender.charAt(0).toUpperCase() + g.gender.slice(1),
     value: g.count,
-  }));
+  })) || [];
+  
+  const lineData = dashboardData?.dailyTotalPresentee?.data || [];
+   const totalStudents = dashboardData?.totalStudents || 0;
+  const totalClasses = dashboardData?.classStructure?.length || 0;
+  
+// To Do: Custom skeleton loading
+    if (!dashboardData) {
+    return (
+      <div className="flex justify-center items-center h-[300px]">
+        <p className="text-gray-500 dark:text-gray-400 text-lg">Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full overflow-y-auto bg-white dark:bg-customDarkFg px-4 py-2 space-y-6">
@@ -68,11 +49,11 @@ const TopLevelDashboard = ({ onClassClicked }) => {
         </div>
         <div className="bg-white dark:bg-customDarkFg p-4 rounded border border-gray-200 dark:border-gray-600 text-center shadow">
           <h2 className="text-sm font-semibold text-gray-500">Total Students</h2>
-          <p className="text-2xl md:text-4xl font-bold text-blue-600 dark:text-blue-400">{genderStats[0].count + genderStats[1].count}</p>
+          <p className="text-2xl md:text-4xl font-bold text-blue-600 dark:text-blue-400">{totalStudents}</p>
         </div>
         <div className="bg-white dark:bg-customDarkFg p-4 rounded border border-gray-200 dark:border-gray-600 text-center shadow">
           <h2 className="text-sm font-semibold text-gray-500">Total Classes</h2>
-          <p className="text-2xl md:text-4xl font-bold text-yellow-600 dark:text-yellow-400">8</p>
+          <p className="text-2xl md:text-4xl font-bold text-yellow-600 dark:text-yellow-400">{totalClasses}</p>
         </div>
       </div>
 
@@ -112,7 +93,7 @@ const TopLevelDashboard = ({ onClassClicked }) => {
         <div className="bg-white dark:bg-customDarkFg p-4 rounded border border-gray-200 dark:border-gray-600 shadow h-[300px]">
           <h2 className="text-md font-semibold mb-2">Daily Total Presentees</h2>
           <ResponsiveContainer width="100%" height="85%">
-            <LineChart data={dailyTotalPresentee}>
+            <LineChart data={lineData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis />
@@ -140,13 +121,13 @@ const TopLevelDashboard = ({ onClassClicked }) => {
       <div>
         <h2 className="text-md font-semibold mb-2">Class Overview</h2>
         <div className="grid grid-cols-6 gap-4">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map(cls => (
+          {dashboardData.classStructure.map(cls => (
             <button
               key={cls}
               className="bg-blue-500 h-15 text-white py-2 rounded text-center text-sm hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600 shadow"
-              onClick={() => onClassClicked(cls)}
+              onClick={() => onClassClicked(cls.className)}
             >
-              Class {cls}
+              Class {cls.className}
             </button>
           ))}
         </div>
