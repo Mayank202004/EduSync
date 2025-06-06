@@ -30,6 +30,7 @@ const ParentsInfo = ({ initialInfo }) => {
             inputProps={{
               name: "fathers-occupation",
               defaultValue: state.fatherOccupation,
+              required: true,
             }}
           />
           <Input
@@ -39,6 +40,7 @@ const ParentsInfo = ({ initialInfo }) => {
               type: "number",
               name: "fathers-income",
               defaultValue: state.fatherIncome,
+              required: true,
             }}
           />
         </div>
@@ -46,7 +48,11 @@ const ParentsInfo = ({ initialInfo }) => {
         <h2 className="font-bold text-lg">Mother's Info</h2>
         <Input
           titleText="Name"
-          inputProps={{ name: "mothers-name", defaultValue: state.motherName }}
+          inputProps={{
+            name: "mothers-name",
+            defaultValue: state.motherName,
+            required: true,
+          }}
         />
         <div className="flex gap-3">
           <Input
@@ -55,6 +61,7 @@ const ParentsInfo = ({ initialInfo }) => {
             inputProps={{
               name: "mothers-occupation",
               defaultValue: state.motherOccupation,
+              required: true,
             }}
           />
           <Input
@@ -64,6 +71,7 @@ const ParentsInfo = ({ initialInfo }) => {
               type: "number",
               name: "mothers-income",
               defaultValue: state.motherIncome,
+              required: true,
             }}
           />
         </div>

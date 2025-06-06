@@ -5,8 +5,8 @@ import validateAccountDetails from "../validators/accountDetailsValidation";
 
 const accountDetailsAction = async (prevState, formData) => {
   const values = {
-    username: formData.get("username"),
-    fullName: formData.get("fullName"),
+    username: formData.get("username")?.trim() || "",
+    fullName: formData.get("fullName")?.trim() || "",
   };
 
   try {

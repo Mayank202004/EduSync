@@ -25,7 +25,7 @@ const SiblingsInfo = ({ initialInfo }) => {
     {
       relation: "Brother",
       name: "",
-      age: 1,
+      age: 0,
       isInSameSchool: false,
       class: "Jr. KG",
       div: "A",

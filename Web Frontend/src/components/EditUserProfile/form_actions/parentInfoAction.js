@@ -5,11 +5,11 @@ import { addParentDetailsApi } from "@/services/studentInfoService";
 
 const parentInfoAction = async (prevState, formData) => {
   const values = {
-    fatherName: formData.get("fathers-name")?.toString() ?? "",
-    fatherOccupation: formData.get("fathers-occupation")?.toString() ?? "",
+    fatherName: formData.get("fathers-name")?.trim() || "",
+    fatherOccupation: formData.get("fathers-occupation")?.trim() || "",
     fatherIncome: Number(formData.get("fathers-income") ?? 0),
-    motherName: formData.get("mothers-name")?.toString() ?? "",
-    motherOccupation: formData.get("mothers-occupation")?.toString() ?? "",
+    motherName: formData.get("mothers-name")?.trim() || "",
+    motherOccupation: formData.get("mothers-occupation")?.trim() || "",
     motherIncome: Number(formData.get("mothers-income") ?? 0),
   };
 

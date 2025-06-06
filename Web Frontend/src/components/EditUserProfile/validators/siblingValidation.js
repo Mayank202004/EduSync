@@ -46,6 +46,10 @@ export const validateSiblingForm = (values) => {
   if (!isValidRelation(relation)) {
     throw new Error("Invalid relation. Must be 'Brother' or 'Sister'");
   }
+  
+  if (age === 0) {
+    throw new Error("Age cannot be 0");
+  }
 
   if (isInSameSchool) {
     if (!isNonEmptyString(siblingClass) || !isNonEmptyString(div)) {

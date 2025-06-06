@@ -5,12 +5,12 @@ import { addSiblingInfoApi } from "@/services/studentInfoService";
 
 const siblingInfoAction = async (prevState, formData, setInfo) => {
   const values = {
-    relation: formData.get("relation") || "Brother",
-    name: formData.get("name") || "",
-    age: Number(formData.get("age") || 1),
-    isInSameSchool: formData.get("isInSameSchool") === "on",
-    class: formData.get("class") || "Jr. KG",
-    div: formData.get("div") || "A",
+    relation: formData.get("relation")?.trim() || "Brother",
+    name: formData.get("name")?.trim() || "",
+    age: Number(formData.get("age") || 0),
+    isInSameSchool: formData.get("isInSameSchool")?.trim() === "on",
+    class: formData.get("class")?.trim() || "Jr. KG",
+    div: formData.get("div")?.trim() || "A",
   };
 
   try {
