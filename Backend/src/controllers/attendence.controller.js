@@ -1092,3 +1092,47 @@ export const getTopLevelAdminDashboardData = asyncHandler(async (req, res) => {
         "Dashboard data fetched successfully"
     ));
 });
+
+/**
+ * @desc Get all Super admin (Class level) dashboard data
+ * @route GET /api/v1/attendance/admin-class-dashboard
+ * @access Private (Super Admin)
+ */
+export const getClassLevelAdminDashboardData = asyncHandler(async (req, res) => {
+
+    const className = req.params.className;
+    if(!className?.trim()){
+        throw new ApiError(400,"ClassName is required");
+    }
+    const [
+        topAttendees,
+        genderStats,
+        weeklyAbsenteeCount,
+        divWisePresenteePercentage,
+        dailyTotalPresentee,
+        classStructure,
+        totalStudents
+    ] = await Promise.all([
+        getTopAttendees(className),
+        getGenderDistribution(className),
+        getWeeklyAbsenteeCount(className),
+        getDivisionWisePresenteePercentage(className),
+        getDailyPresentee(className),
+        ClassStructure.find({className}).sort({ className: 1 }).select("-createdAt -updatedAt -__v -_id"),
+        Student.countDocuments({ class: className })
+    ]);
+
+    res.status(200).json(new ApiResponse(
+        200,
+        {
+            topAttendees,
+            genderStats,
+            weeklyAbsenteeCount,
+            divWisePresenteePercentage,
+            dailyTotalPresentee,
+            classStructure,
+            totalStudents
+        },
+        "Dashboard data fetched successfully"
+    ));
+});
