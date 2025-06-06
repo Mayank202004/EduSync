@@ -1,9 +1,10 @@
 //taken from: https://github.com/nikitadev-yt/react-image-cropper
+import { PixelCrop } from "react-image-crop";
 
 const setCanvasPreview = (
   image: HTMLImageElement, // HTMLImageElement
   canvas: HTMLCanvasElement, // HTMLCanvasElement
-  crop: { x: number; y: number; width: number; height: number } // PixelCrop
+  crop: PixelCrop // PixelCrop
 ): void => {
   const ctx = canvas.getContext("2d");
   if (!ctx) {

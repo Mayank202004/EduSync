@@ -1,7 +1,7 @@
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const ParentsContactTable = ({ contacts = [], onDelete = () => {} }) => {
+const AllergiesTable = ({ allergies = [], onDelete = () => {} }) => {
   return (
     <>
       <hr className="my-6" />
@@ -11,29 +11,25 @@ const ParentsContactTable = ({ contacts = [], onDelete = () => {} }) => {
             <thead className="bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200">
               <tr>
                 <th className="px-2 py-2 w-10"></th>
-                <th className="px-4 py-2">Name</th>
-                <th className="px-4 py-2">Relation</th>
-                <th className="px-4 py-2">Phone</th>
+                <th className="px-4 py-2">Allergy</th>
               </tr>
             </thead>
             <tbody className="divide-y dark:divide-gray-700">
-              {contacts.map((person) => (
+              {allergies.map((allergy) => (
                 <tr
-                  key={person._id}
+                  key={allergy}
                   className="transition-colors duration-300 group"
                 >
-                  <td className="text-center transition duration-300 md:invisible md:group-hover:visible">
+                  <td className="text-center transition-opacity duration-300 md:invisible md:group-hover:visible">
                     <button
-                      onClick={() => onDelete(person._id)}
+                      onClick={() => onDelete(allergy)}
                       className="flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 text-red-500 hover:text-red-700 cursor-pointer p-1 aspect-square h-10 rounded-full"
                       title="Delete"
                     >
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
                   </td>
-                  <td className="px-4 py-2">{person.name}</td>
-                  <td className="px-4 py-2">{person.relation}</td>
-                  <td className="px-4 py-2">{person.phone}</td>
+                  <td className="px-4 py-2">{allergy}</td>
                 </tr>
               ))}
             </tbody>
@@ -44,4 +40,4 @@ const ParentsContactTable = ({ contacts = [], onDelete = () => {} }) => {
   );
 };
 
-export default ParentsContactTable;
+export default AllergiesTable;

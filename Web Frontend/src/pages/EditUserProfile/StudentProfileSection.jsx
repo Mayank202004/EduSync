@@ -5,13 +5,14 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/auth/AuthContext";
 
 import SiblingsInfo from "@/components/EditUserProfile/SiblingsInfo";
-import AvatarIcon from "@/components/Topbar/AvatarIcon";
 import EditAccountDetails from "@/components/EditUserProfile/EditAccountDetails";
 import PhotoPreview from "@/components/EditUserProfile/PhotoPreview";
 import TitledContainer from "@/components/ui/TitledContainer";
 import ScrollSpy from "@/components/EditUserProfile/ScrollSpy";
 import ParentsInfo from "@/components/EditUserProfile/ParentsInfo";
 import ParentsContact from "@/components/EditUserProfile/ParentsContact";
+import Allergies from "@/components/EditUserProfile/Allergies";
+
 import { capitalizeFirstLetter } from "@/lib/utils";
 
 import { getStudentInfo } from "@/services/studentInfoService";
@@ -23,6 +24,7 @@ const SECTIONS = [
   { id: "siblings-info", title: "Siblings Info" },
   { id: "parents-info", title: "Parents Info" },
   { id: "parents-contact", title: "Parents Contact" },
+  { id: "allergies", title: "Allergies" }
 ];
 
 const StudentProfileSection = () => {
@@ -41,7 +43,6 @@ const StudentProfileSection = () => {
     (async () => {
       const response = await getStudentInfo();
       setInfo(response.data);
-      console.log(response.data);
     })();
   }, []);
 
@@ -78,13 +79,16 @@ const StudentProfileSection = () => {
             />
           </TitledContainer>
           <TitledContainer id="siblings-info-section" title="Siblings Info">
-            <SiblingsInfo key={info} initialInfo={info.siblingInfo} />
+            <SiblingsInfo key={info.siblingInfo} initialInfo={info.siblingInfo} />
           </TitledContainer>
           <TitledContainer id="parents-info-section" title="Parents Info">
-            <ParentsInfo key={info} initialInfo={info.parentsInfo} />
+            <ParentsInfo key={info.parentsInfo} initialInfo={info.parentsInfo} />
           </TitledContainer>
           <TitledContainer id="parents-contact-section" title="Parents Contact">
-            <ParentsContact key={info} initialInfo={info.parentContact} />
+            <ParentsContact key={info.parentContact} initialInfo={info.parentContact} />
+          </TitledContainer>
+          <TitledContainer id="allergies-section" title="Allergies">
+            <Allergies key={info.allergies} initialInfo={info.allergies}/>
           </TitledContainer>
         </div>
       </div>

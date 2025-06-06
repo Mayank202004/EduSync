@@ -61,3 +61,16 @@ export const addParentContactApi = async (data) => {
   const response = await axiosInstance.post("/student/parent-contact", data);
   return response.data;
 };
+
+/**
+ * Submits allergy details for the student.
+ *
+ * @param {String} data - The allergy information.
+ * @param {string} data.allergy - Name of the allergy.
+ * @returns {Promise<Object>} The saved allergy record.
+ * @throws Will throw an error if the request fails.
+ */
+export const addAllergyApi = async (data) => {
+  const response = await axiosInstance.post("/student/allergy", data);
+  return response.data;
+};

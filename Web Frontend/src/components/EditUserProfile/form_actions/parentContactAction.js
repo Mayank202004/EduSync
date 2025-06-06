@@ -5,9 +5,9 @@ import { addParentContactApi } from "@/services/studentInfoService";
 
 export const parentContactAction = async (prevState, formData, setInfo) => {
   const values = {
-    name: formData.get("name")?.toString().trim() || "",
-    phone: formData.get("phone") || "",
-    relation: formData.get("relation")?.toString().trim() || "",
+    name: formData.get("name")?.trim() || "",
+    phone: formData.get("phone")?.trim() || "",
+    relation: formData.get("relation")?.trim() || "",
   };
 
   try {
