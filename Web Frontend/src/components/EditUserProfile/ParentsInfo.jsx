@@ -23,7 +23,7 @@ const ParentsInfo = ({ initialInfo }) => {
           titleText="Name"
           inputProps={{ name: "fathers-name", defaultValue: state.fatherName }}
         />
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Input
             titleText="Occupation"
             labelStyle="basis-3/4"
@@ -54,7 +54,7 @@ const ParentsInfo = ({ initialInfo }) => {
             required: true,
           }}
         />
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Input
             titleText="Occupation"
             labelStyle="basis-3/4"

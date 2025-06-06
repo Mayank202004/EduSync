@@ -22,10 +22,10 @@ const ParentsContactTable = ({ contacts = [], onDelete = () => {} }) => {
                   key={person._id}
                   className="transition-colors duration-300 group"
                 >
-                  <td className="text-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                  <td className="text-center transition duration-300 md:invisible md:group-hover:visible">
                     <button
                       onClick={() => onDelete(person._id)}
-                      className="flex items-center justify-center invisible group-hover:visible hover:bg-gray-300 dark:hover:bg-gray-600 text-red-500 hover:text-red-700 cursor-pointer p-1 aspect-square h-10 rounded-full"
+                      className="flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 text-red-500 hover:text-red-700 cursor-pointer p-1 aspect-square h-10 rounded-full"
                       title="Delete"
                     >
                       <FontAwesomeIcon icon={faTrash} />

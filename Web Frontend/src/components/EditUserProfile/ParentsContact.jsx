@@ -34,7 +34,7 @@ const ParentsContact = ({ initialInfo }) => {
             }}
             selectStyle="border border-gray-300 dark:border-gray-600"
           />
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Input
               key={parentContact.name + "name-ParentsContact"}
               labelStyle="basis-3/5"
