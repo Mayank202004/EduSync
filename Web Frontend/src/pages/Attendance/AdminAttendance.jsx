@@ -4,7 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 import AttendanceDashboard from '@/components/Attendance/Dashboard';
 import DaysSummary from '@/components/Attendance/DaysSummary';
 import { useEffect } from 'react';
-import { getAttendanceDashboardData } from '@/services/attendenceService';
+import { getAttendanceDashboardData, getTopLevelDashboardData } from '@/services/attendenceService';
 import TopLevelDashboard from '@/components/Attendance/AdminComponents/TopLevelDashboard';
 import ClassDashboard from '@/components/Attendance/AdminComponents/ClassDashboard';
 
@@ -17,17 +17,17 @@ function AdminAttendance() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
 
-  // useEffect(() => {
-  //   const fetchDashboardData = async () => {
-  //     try {
-  //       const response = await getAttendanceDashboardData(OwnClass,OwnDiv);
-  //       setDashboardData(response.data);
-  //     } catch (error) {
-  //       // handled by axios interceptor
-  //     }
-  //   };
-  //   fetchDashboardData();
-  // }, [selectedClass,selectedDiv]);
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await getTopLevelDashboardData();
+        setDashboardData(response.data);
+      } catch (error) {
+        // handled by axios interceptor
+      }
+    };
+    fetchDashboardData();
+  }, []);
 
 
 
@@ -45,7 +45,7 @@ function AdminAttendance() {
               ) : (
                 <TopLevelDashboard
                   dashboardData={dashboardData}
-                  setDashboardData={setDashboardData}
+                  // setDashboardData={setDashboardData}
                   onClassClicked={(cls)=>{setSelectedClass(cls)}}
                 />
               )}

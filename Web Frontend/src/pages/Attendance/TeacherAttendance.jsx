@@ -12,8 +12,8 @@ import { useAuth } from '@/auth/AuthContext';
 function TeacherAttendance() {
   const { roleInfo } = useAuth();
   const isClassTeacher = !!roleInfo?.classTeacher;
-const OwnClass = roleInfo?.classTeacher?.class ?? '1';
-const OwnDiv = roleInfo?.classTeacher?.div ?? 'A';
+  const OwnClass = roleInfo?.classTeacher?.class ?? '1';
+  const OwnDiv = roleInfo?.classTeacher?.div ?? 'A';
 
 
   // States
