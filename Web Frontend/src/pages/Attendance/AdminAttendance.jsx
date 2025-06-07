@@ -30,10 +30,9 @@ function AdminAttendance() {
   }, []);
 
 
-
   return (
     <div className="flex w-full min-h-screen bg-transparent">
-      <div className="w-full py-4 pl-2 pr-4 overflow-y-auto">
+      <div className="w-full py-4 pl-2 pr-4">
         {/* Main Content */}
         <div className="flex-1 space-y-6 h-full">
           <div className="bg-white dark:bg-customDarkFg p-4 rounded shadow gap-4 h-full">
@@ -46,7 +45,13 @@ function AdminAttendance() {
                 <TopLevelDashboard
                   dashboardData={dashboardData}
                   // setDashboardData={setDashboardData}
-                  onClassClicked={(cls)=>{setSelectedClass(cls)}}
+                  onClassClicked={(cls)=>{
+                    setSelectedClass(cls);
+                    setTimeout(() => { // Scroll to top (for class dashbaord screen)
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }, 50);
+                  }
+                }
                 />
               )}
             </div>

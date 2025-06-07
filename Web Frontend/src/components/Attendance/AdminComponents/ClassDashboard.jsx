@@ -7,6 +7,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { getClassLevelDashboardData } from '@/services/attendenceService';
+import TopLevelDashboardSkeleton from './TopLevelSkeleton';
 
 const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 
@@ -26,34 +27,28 @@ const ClassDashboard = ({ selectedClass, onBack }) => {
     fetchDashboardData();
   }, [selectedClass]);
 
-  if (!dashboardData) return <p>Loading data for Class {selectedClass}...</p>;
 
-  const {
-    genderStats,
-    divWisePresenteePercentage,
-    weeklyAbsenteeCount,
-    dailyTotalPresentee,
-    topAttendees,
-    classStructure,
-    totalStudents
-  } = dashboardData;
-
-  const pieData = genderStats.map(g => ({
+  const pieData = dashboardData?.genderStats.map(g => ({
     name: g.gender[0].toUpperCase() + g.gender.slice(1), // capitalize
     value: g.count
   }));
-
-  const divisions = (classStructure.find(cls => cls.className === selectedClass.toString())?.divisions) || [];
-  const divisionAttendance = divWisePresenteePercentage?.data || [];
+  
+  const divisions = dashboardData?.classStructure?.[0]?.divisions || [];
+  const divisionAttendance = dashboardData?.divWisePresenteePercentage?.data || [];
 
   const avgAttendance = (
     divisionAttendance.reduce((sum, d) => sum + d.percentage, 0) / (divisionAttendance.length || 1)
   ).toFixed(1);
 
-  const topStudents = topAttendees?.studentAttendance.map(s => ({
+  const topStudents = dashboardData?.topAttendees?.studentAttendance.map(s => ({
     name: s.name,
-    attendance: ((s.daysPresent / topAttendees.totalWorkingDays) * 100).toFixed(0)
+    attendance: ((s.daysPresent / dashboardData?.topAttendees.totalWorkingDays) * 100).toFixed(0)
   })) || [];
+
+  if (!dashboardData) {
+    return <TopLevelDashboardSkeleton/>
+  }
+
 
   return (
     <div className="w-full h-full overflow-y-auto bg-white dark:bg-customDarkFg px-4 py-2 space-y-6">
@@ -77,7 +72,7 @@ const ClassDashboard = ({ selectedClass, onBack }) => {
         <div className="bg-white dark:bg-customDarkFg p-4 rounded border text-center shadow">
           <h2 className="text-sm font-semibold text-gray-500">Total Students</h2>
           <p className="text-2xl md:text-4xl font-bold text-blue-600 dark:text-blue-400">
-            {totalStudents}
+            {dashboardData?.totalStudents}
           </p>
         </div>
         <div className="bg-white dark:bg-customDarkFg p-4 rounded border text-center shadow">
@@ -151,10 +146,10 @@ const ClassDashboard = ({ selectedClass, onBack }) => {
         <div className="bg-white dark:bg-customDarkFg p-3 rounded border shadow h-[260px]">
           <h2 className="text-md font-semibold mb-1">Daily Total Presentees</h2>
           <ResponsiveContainer width="100%" height="85%">
-            <LineChart data={dailyTotalPresentee.data}>
+            <LineChart data={dashboardData?.dailyTotalPresentee.data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
-              <YAxis domain={[0, totalStudents]} />
+              <YAxis domain={[0, dashboardData?.totalStudents]} />
               <Tooltip />
               <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} />
             </LineChart>
@@ -165,7 +160,7 @@ const ClassDashboard = ({ selectedClass, onBack }) => {
         <div className="bg-white dark:bg-customDarkFg p-3 rounded border shadow h-[260px]">
           <h2 className="text-md font-semibold mb-1">Weekly Absentee Pattern</h2>
           <ResponsiveContainer width="100%" height="85%">
-            <RadarChart outerRadius="80%" data={weeklyAbsenteeCount}>
+            <RadarChart outerRadius="80%" data={dashboardData?.weeklyAbsenteeCount}>
               <PolarGrid />
               <PolarAngleAxis dataKey="day" />
               <PolarRadiusAxis />

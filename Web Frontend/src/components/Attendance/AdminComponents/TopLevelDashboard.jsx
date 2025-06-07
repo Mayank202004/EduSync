@@ -29,8 +29,7 @@ const TopLevelDashboard = ({ dashboardData,setDashboardData, onClassClicked }) =
    const totalStudents = dashboardData?.totalStudents || 0;
   const totalClasses = dashboardData?.classStructure?.length || 0;
   
-// To Do: Custom skeleton loading
-    if (!dashboardData) {
+  if (!dashboardData) {
     return <TopLevelDashboardSkeleton/>
   }
 
