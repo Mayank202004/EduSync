@@ -12,7 +12,7 @@ import AttendanceDashboardSkeleton from './DashboardSkeleton';
 
 const COLORS = ['#34d399', '#3b82f6'];
 
-function AttendanceDashboard({dashboardData, setDashboardData, isClassTeacher, className, div}) {
+function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=false, className, div}) {
 
   // Set data for charts
   const lineData = dashboardData?.dailyTotalPresentee.data || [];
@@ -40,14 +40,15 @@ function AttendanceDashboard({dashboardData, setDashboardData, isClassTeacher, c
 
 
   if (!dashboardData) {
-  return (
-    <div className="flex items-center justify-center h-full">
-      <AttendanceDashboardSkeleton 
-        isClassTeacher={isClassTeacher}
-      />
-    </div>
-  );
-}
+    return (
+      <div className="flex items-center justify-center h-full">
+        <AttendanceDashboardSkeleton 
+          isClassTeacher={isClassTeacher}
+          isSuperAdmin={isSuperAdmin}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-4 dark:bg-customDarkFg h-full">

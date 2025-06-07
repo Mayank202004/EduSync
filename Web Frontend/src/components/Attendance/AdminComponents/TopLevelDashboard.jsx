@@ -119,7 +119,7 @@ const TopLevelDashboard = ({ dashboardData,setDashboardData, onClassClicked }) =
         <div className="grid grid-cols-6 gap-4">
           {dashboardData.classStructure.map(cls => (
             <button
-              key={cls}
+              key={cls.className}
               className="bg-blue-500 h-15 text-white py-2 rounded text-center text-sm hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600 shadow"
               onClick={() => onClassClicked(cls.className)}
             >

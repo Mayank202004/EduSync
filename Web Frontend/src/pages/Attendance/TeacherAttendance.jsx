@@ -87,7 +87,6 @@ function TeacherAttendance() {
               ) : (
                 <AttendanceDashboard
                   dashboardData={dashboardData}
-                  setDashboardData={setDashboardData}
                   isClassTeacher={isClassTeacher}
                   className={OwnClass}
                   div={OwnDiv}

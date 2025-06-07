@@ -11,7 +11,7 @@ import TopLevelDashboardSkeleton from './TopLevelSkeleton';
 
 const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 
-const ClassDashboard = ({ selectedClass, onBack }) => {
+const ClassDashboard = ({ selectedClass, onBack=()=>{}, onDivisionClicked=()=>{}}) => {
   const [dashboardData, setDashboardData] = useState(null);
 
   useEffect(() => {
@@ -90,6 +90,7 @@ const ClassDashboard = ({ selectedClass, onBack }) => {
           {divisions.map(div => (
             <div
               key={div}
+              onClick={() => onDivisionClicked(div)}
               className="bg-blue-500 text-white rounded shadow py-2 text-center cursor-pointer hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600"
             >
               Division {div}

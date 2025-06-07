@@ -12,10 +12,11 @@ function AdminAttendance() {
 
   // States
   const [selectedClass, setSelectedClass] = useState(null);
-  const [selectedDiv, setSelectedDiv] = useState('A');
+  const [selectedDiv, setSelectedDiv] = useState(null);
   const [showAttendanceForm, setShowAttendanceForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
+  const [divDashboardData,setDivDashboardData] = useState(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -29,6 +30,22 @@ function AdminAttendance() {
     fetchDashboardData();
   }, []);
 
+  // Fetch data when a division is selected (Division level dashboard)
+  useEffect(() => {
+    if (!selectedClass || !selectedDiv) {
+      return;
+    }
+    const fetchDashboardData = async () => {
+      try {
+        const response = await getAttendanceDashboardData(selectedClass, selectedDiv);
+        setDivDashboardData(response.data);
+      } catch (error) {
+        // handled by axios interceptor
+      }
+    };
+    fetchDashboardData();
+  }, [selectedDiv]);
+
 
   return (
     <div className="flex w-full min-h-screen bg-transparent">
@@ -36,25 +53,35 @@ function AdminAttendance() {
         {/* Main Content */}
         <div className="flex-1 space-y-6 h-full">
           <div className="bg-white dark:bg-customDarkFg p-4 rounded shadow gap-4 h-full">
-              {selectedClass ? (
-                <ClassDashboard
-                  onBack={() => setSelectedClass(null)} 
-                  selectedClass={selectedClass}
+            {selectedClass ? (
+              selectedDiv ? (
+                <AttendanceDashboard
+                  dashboardData={divDashboardData}
+                  onBack={() => setSelectedDiv(null)}
+                  isSuperAdmin={true}
+                  className={selectedClass}
+                  div={selectedDiv}
                 />
               ) : (
-                <TopLevelDashboard
-                  dashboardData={dashboardData}
-                  // setDashboardData={setDashboardData}
-                  onClassClicked={(cls)=>{
-                    setSelectedClass(cls);
-                    setTimeout(() => { // Scroll to top (for class dashbaord screen)
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }, 50);
-                  }
-                }
+                <ClassDashboard
+                  onBack={() => setSelectedClass(null)}
+                  onDivisionClicked={(div) => setSelectedDiv(div)}
+                  selectedClass={selectedClass}
                 />
-              )}
-            </div>
+              )
+            ) : (
+              <TopLevelDashboard
+                dashboardData={dashboardData}
+                onClassClicked={(cls) => {
+                  setSelectedClass(cls);
+                  setSelectedDiv(null);
+                  setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }, 50);
+                }}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
