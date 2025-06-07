@@ -6,6 +6,7 @@ import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   ResponsiveContainer
 } from 'recharts';
+import TopLevelDashboardSkeleton from './TopLevelSkeleton';
 
 const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
 
@@ -30,11 +31,7 @@ const TopLevelDashboard = ({ dashboardData,setDashboardData, onClassClicked }) =
   
 // To Do: Custom skeleton loading
     if (!dashboardData) {
-    return (
-      <div className="flex justify-center items-center h-[300px]">
-        <p className="text-gray-500 dark:text-gray-400 text-lg">Loading dashboard...</p>
-      </div>
-    );
+    return <TopLevelDashboardSkeleton/>
   }
 
   return (
