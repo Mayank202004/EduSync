@@ -39,7 +39,7 @@ const Input = ({
       )}
       <input
         className={cn(
-          "focus:ring-1 not-focus:border p-2 w-full my-1.5 rounded-sm text-black dark:text-white",
+          "focus:outline-none focus:ring-2 focus:ring-blue-400 not-focus:border p-2 w-full my-1.5 rounded-sm text-black dark:text-white",
           hasError && "border border-red-500 focus:ring-red-500",
           inputStyle
         )}
