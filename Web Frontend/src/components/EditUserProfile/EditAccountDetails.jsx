@@ -23,7 +23,7 @@ const EditAccountDetails = ({ accountInfo }) => {
         <Input
           key={accountData.inputValues.username}
           titleText="Username"
-          error={accountData.error?.get("username")}
+          error={accountData.errors?.get("username")}
           inputProps={{
             name: "username",
             type: "text",
@@ -35,7 +35,7 @@ const EditAccountDetails = ({ accountInfo }) => {
         <Input
           key={accountData.inputValues.fullName}
           titleText="Full Name"
-          error={accountData.error?.get("fullName")}
+          error={accountData.errors?.get("fullName")}
           inputProps={{
             name: "fullName",
             type: "text",
