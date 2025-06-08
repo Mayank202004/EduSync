@@ -1,6 +1,7 @@
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import NotificationDropdown from "./NotificationDropdown";
 import {
   faCircleQuestion,
   faMessage,
@@ -33,10 +34,7 @@ export const SearchBar = () => {
 
 export const Message = () => {
   return (
-    <FontAwesomeIcon
-      icon={faMessage}
-      className="text-black dark:text-white text-2xl"
-    />
+    <NotificationDropdown/>
   );
 };
 
