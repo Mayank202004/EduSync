@@ -6,13 +6,16 @@ import SimpleButton from "@/components/ui/SimpleButton";
 import parentInfoAction from "./form_actions/parentInfoAction";
 
 const ParentsInfo = ({ initialInfo }) => {
-  const [state, formAction, isPending] = useActionState(parentInfoAction, {
-    fatherName: initialInfo?.fatherName || "",
-    fatherOccupation: initialInfo?.fatherOccupation || "",
-    fatherIncome: initialInfo?.fatherIncome ?? 0,
-    motherName: initialInfo?.motherName || "",
-    motherOccupation: initialInfo?.motherOccupation || "",
-    motherIncome: initialInfo?.motherIncome ?? 0,
+  const [parentInfo, formAction, isPending] = useActionState(parentInfoAction, {
+    errors: null,
+    inputValues: {
+      fatherName: initialInfo?.fatherName || "",
+      fatherOccupation: initialInfo?.fatherOccupation || "",
+      fatherIncome: initialInfo?.fatherIncome ?? 0,
+      motherName: initialInfo?.motherName || "",
+      motherOccupation: initialInfo?.motherOccupation || "",
+      motherIncome: initialInfo?.motherIncome ?? 0,
+    },
   });
 
   return (
@@ -21,25 +24,28 @@ const ParentsInfo = ({ initialInfo }) => {
         <h2 className="font-bold text-lg">Father's Info</h2>
         <Input
           titleText="Name"
-          inputProps={{ name: "fathers-name", defaultValue: state.fatherName }}
+          error={parentInfo.errors?.get("fathers-name")}
+          inputProps={{ name: "fathers-name", defaultValue: parentInfo.inputValues.fatherName }}
         />
         <div className="flex flex-col sm:flex-row gap-3">
           <Input
             titleText="Occupation"
             labelStyle="basis-3/4"
+            error={parentInfo.errors?.get("fathers-occupation")}
             inputProps={{
               name: "fathers-occupation",
-              defaultValue: state.fatherOccupation,
+              defaultValue: parentInfo.inputValues.fatherOccupation,
               required: true,
             }}
           />
           <Input
             titleText="Income(in &#x20B9;)"
             labelStyle="basis-1/4"
+            error={parentInfo.errors?.get("fathers-income")}
             inputProps={{
               type: "number",
               name: "fathers-income",
-              defaultValue: state.fatherIncome,
+              defaultValue: parentInfo.inputValues.fatherIncome,
               required: true,
             }}
           />
@@ -48,9 +54,10 @@ const ParentsInfo = ({ initialInfo }) => {
         <h2 className="font-bold text-lg">Mother's Info</h2>
         <Input
           titleText="Name"
+          error={parentInfo.errors?.get("mothers-name")}
           inputProps={{
             name: "mothers-name",
-            defaultValue: state.motherName,
+            defaultValue: parentInfo.inputValues.motherName,
             required: true,
           }}
         />
@@ -58,19 +65,21 @@ const ParentsInfo = ({ initialInfo }) => {
           <Input
             titleText="Occupation"
             labelStyle="basis-3/4"
+            error={parentInfo.errors?.get("mothers-occupation")}
             inputProps={{
               name: "mothers-occupation",
-              defaultValue: state.motherOccupation,
+              defaultValue: parentInfo.inputValues.motherOccupation,
               required: true,
             }}
           />
           <Input
             titleText="Income(in &#x20B9;)"
             labelStyle="basis-1/4"
+            error={parentInfo.errors?.get("mothers-income")}
             inputProps={{
               type: "number",
               name: "mothers-income",
-              defaultValue: state.motherIncome,
+              defaultValue: parentInfo.inputValues.motherIncome,
               required: true,
             }}
           />

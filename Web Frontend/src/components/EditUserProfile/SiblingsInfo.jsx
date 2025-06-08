@@ -20,15 +20,18 @@ const SiblingsInfo = ({ initialInfo }) => {
   const { height, setExpanded, containerRef, expanded } = useExpandable(false);
   const [info, setInfo] = useState(initialInfo);
 
-  const [formValues, formAction, isPending] = useActionState(
+  const [siblingInfo, formAction, isPending] = useActionState(
     (prevState, formData) => siblingInfoAction(prevState, formData, setInfo),
     {
-      relation: "Brother",
-      name: "",
-      age: 0,
-      isInSameSchool: false,
-      class: "Jr. KG",
-      div: "A",
+      errors: null,
+      inputValues: {
+        relation: "Brother",
+        name: "",
+        age: 0,
+        isInSameSchool: false,
+        class: "Jr. KG",
+        div: "A",
+      },
     }
   );
 
@@ -37,36 +40,38 @@ const SiblingsInfo = ({ initialInfo }) => {
       <form action={formAction} className="space-y-6">
         <div className="flex flex-col gap-4 border-1 mx-auto py-5 px-6 sm:px-10 md:px-15 rounded-sm">
           <SelectOption
-            key={formValues.relation}
+            key={siblingInfo.inputValues.relation}
             title="Relationship to student: "
             options={SIBLING_RELATIONS}
             selectProps={{
               name: "relation",
               required: true,
-              defaultValue: formValues.relation,
+              defaultValue: siblingInfo.inputValues.relation,
             }}
             selectStyle="border border-gray-300 dark:border-gray-600"
           />
           <hr />
           <div className="flex gap-4">
             <Input
-              key={formValues.name}
+              key={siblingInfo.inputValues.name}
+              error={siblingInfo.errors?.get("name")}
               titleText="Name"
               inputProps={{
                 name: "name",
                 required: true,
-                defaultValue: formValues.name,
+                defaultValue: siblingInfo.inputValues.name,
               }}
               labelStyle="basis-3/4"
             ></Input>
             <Input
-              key={formValues.age}
+              key={siblingInfo.inputValues.age}
+              error={siblingInfo.errors?.get("age")}
               titleText="Age"
               inputProps={{
                 name: "age",
                 required: true,
                 type: "number",
-                defaultValue: formValues.age,
+                defaultValue: siblingInfo.inputValues.age,
               }}
               labelStyle="basis-1/4"
             ></Input>
@@ -95,24 +100,24 @@ const SiblingsInfo = ({ initialInfo }) => {
             <hr />
             <div className="flex flex-wrap gap-2 justify-around">
               <SelectOption
-                key={formValues.class}
+                key={siblingInfo.inputValues.class}
                 title="Select Class"
                 options={CLASSES}
                 selectProps={{
                   name: "class",
                   required: true,
-                  defaultValue: formValues.class,
+                  defaultValue: siblingInfo.inputValues.class,
                 }}
                 selectStyle="border border-gray-300 dark:border-gray-600"
               />
               <SelectOption
-                key={formValues.div}
+                key={siblingInfo.inputValues.div}
                 title="Select Division"
                 options={DIVISIONS}
                 selectProps={{
                   name: "div",
                   required: true,
-                  defaultValue: formValues.div,
+                  defaultValue: siblingInfo.inputValues.div,
                 }}
                 selectStyle="border border-gray-300 dark:border-gray-600"
               />
