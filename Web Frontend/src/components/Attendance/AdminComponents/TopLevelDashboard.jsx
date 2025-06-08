@@ -105,7 +105,7 @@ const TopLevelDashboard = ({ dashboardData,setDashboardData, onClassClicked }) =
             <RadarChart outerRadius="80%" data={weeklyAbsenteeCount}>
               <PolarGrid />
               <PolarAngleAxis dataKey="day" />
-              <PolarRadiusAxis />
+              <PolarRadiusAxis allowDecimals={false} />
               <Radar name="Absents" dataKey="absent" stroke="#ef4444" fill="#ef4444" fillOpacity={0.6} />
               <Tooltip />
             </RadarChart>
