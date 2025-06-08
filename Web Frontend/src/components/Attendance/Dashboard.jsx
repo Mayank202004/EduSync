@@ -9,10 +9,11 @@ import { useState, useEffect } from 'react';
 import { getAttendanceDashboardData } from '@/services/attendenceService';
 import LoadingScreen from '../Loading';
 import AttendanceDashboardSkeleton from './DashboardSkeleton';
+import { ArrowLeft } from 'lucide-react';
 
 const COLORS = ['#34d399', '#3b82f6'];
 
-function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=false, className, div}) {
+function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=false, className, div,goBack=()=>{}}) {
 
   // Set data for charts
   const lineData = dashboardData?.dailyTotalPresentee.data || [];
@@ -51,68 +52,78 @@ function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=f
   }
 
   return (
-    <div className="space-y-6 p-4 dark:bg-customDarkFg h-full">
-      {/* First row: 2 charts */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">Total Attendance Report</h2>
-          <LineChart width={500} height={200} data={lineData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis domain={[0, {totalStudents}]} allowDecimals={false} />
-            <Tooltip />
-            <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} name='Present Students' />
-          </LineChart>
+    <div className='flex flex-col'>
+      {(isSuperAdmin) && (
+      <button
+          onClick={goBack}
+          className='mb-4 flex items-center text-blue-600 hover:underline'
+          >
+          <ArrowLeft className='mr-2' size={18} />
+          Back to dashboard
+      </button>)}
+      <div className="space-y-6 p-4 dark:bg-customDarkFg h-full">
+        {/* First row: 2 charts */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
+            <h2 className="text-lg font-semibold mb-2">Total Attendance Report</h2>
+            <LineChart width={500} height={200} data={lineData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis domain={[0, {totalStudents}]} allowDecimals={false} />
+              <Tooltip />
+              <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} name='Present Students' />
+            </LineChart>
+          </div>
+
+          <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
+            <h2 className="text-lg font-semibold mb-2">Presentee by Division</h2>
+            <BarChart width={400} height={200} data={barData}>
+              <XAxis dataKey="class" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="count" fill="#34d399" name="Presentee Percentage"/>
+            </BarChart>
+            <p className="text-sm text-gray-600 mt-2 text-center font-bold">Presentee %age for class {className} for {barDataMonth}</p>
+          </div>
         </div>
 
-        <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">Presentee by Division</h2>
-          <BarChart width={400} height={200} data={barData}>
-            <XAxis dataKey="class" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="count" fill="#34d399" name="Presentee Percentage"/>
-          </BarChart>
-          <p className="text-sm text-gray-600 mt-2 text-center font-bold">Presentee %age for class {className} for {barDataMonth}</p>
-        </div>
-      </div>
+        {/* Second row: 3 charts */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
+            <h2 className="text-lg font-semibold mb-2">Students by Gender</h2>
+            <PieChart width={300} height={200}>
+              <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend verticalAlign="bottom"/>
+            </PieChart>
+          </div>
 
-      {/* Second row: 3 charts */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">Students by Gender</h2>
-          <PieChart width={300} height={200}>
-            <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
-              {pieData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
+            <h2 className="text-lg font-semibold mb-2">Top 6 Attendant</h2>
+            <ul className="space-y-2">
+              {topStudents.map((student, index) => (
+                <li key={index} className="flex justify-between">
+                  <span>{student.name}</span>
+                  <span>{student.percentage} ({student.days} days)</span>
+                </li>
               ))}
-            </Pie>
-            <Tooltip />
-            <Legend verticalAlign="bottom"/>
-          </PieChart>
-        </div>
+            </ul>
+          </div>
 
-        <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">Top 6 Attendant</h2>
-          <ul className="space-y-2">
-            {topStudents.map((student, index) => (
-              <li key={index} className="flex justify-between">
-                <span>{student.name}</span>
-                <span>{student.percentage} ({student.days} days)</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-2">Weekly Absent</h2>
-          <RadarChart outerRadius={70} width={300} height={250} data={radarData}>
-            <PolarGrid />
-            <PolarAngleAxis dataKey="day" />
-            <PolarRadiusAxis />
-            <Radar name="Absents" dataKey="absent" stroke="#10b981" fill="#10b981" fillOpacity={0.6} />
-            <Tooltip />
-          </RadarChart>
+          <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
+            <h2 className="text-lg font-semibold mb-2">Weekly Absent</h2>
+            <RadarChart outerRadius={70} width={300} height={250} data={radarData}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="day" />
+              <PolarRadiusAxis allowDecimals={false} />
+              <Radar name="Absents" dataKey="absent" stroke="#10b981" fill="#10b981" fillOpacity={0.6} />
+              <Tooltip />
+            </RadarChart>
+          </div>
         </div>
       </div>
     </div>

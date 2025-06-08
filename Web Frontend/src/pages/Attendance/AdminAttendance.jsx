@@ -57,7 +57,7 @@ function AdminAttendance() {
               selectedDiv ? (
                 <AttendanceDashboard
                   dashboardData={divDashboardData}
-                  onBack={() => setSelectedDiv(null)}
+                  goBack={() => setSelectedDiv(null)}
                   isSuperAdmin={true}
                   className={selectedClass}
                   div={selectedDiv}
