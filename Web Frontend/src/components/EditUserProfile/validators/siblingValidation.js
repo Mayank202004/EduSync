@@ -1,7 +1,6 @@
 import { isNonEmptyString, isValidNumber, isValidName } from "@/lib/textUtils";
 
-const isValidRelation = (value) =>
-  ["Brother", "Sister"].includes(value);
+const isValidRelation = (value) => ["Brother", "Sister"].includes(value);
 
 const isValidClass = (value) =>
   [
@@ -31,41 +30,41 @@ export const validateSiblingForm = (values) => {
     div = null,
   } = values;
 
-  if (
-    !isNonEmptyString(name) ||
-    !isNonEmptyString(relation) ||
-    !isValidNumber(age)
-  ) {
-    throw new Error("Name, Relation and Age cannot be empty");
+  const errors = new Map();
+
+  if (!isNonEmptyString(name)) {
+    errors.set("name", "Name cannot be empty.");
+  } else if (!isValidName(name)) {
+    errors.set("name", "Name must contain only alphabets and spaces.");
   }
 
-  if (!isValidName(name)) {
-    throw new Error("Name must contain only alphabets and spaces")
+  if (!isNonEmptyString(relation)) {
+    throw new Error("Relation cannot be empty.");
+  } else if (!isValidRelation(relation)) {
+    throw new Error("Invalid relation. Must be 'Brother' or 'Sister'.");
   }
 
-  if (!isValidRelation(relation)) {
-    throw new Error("Invalid relation. Must be 'Brother' or 'Sister'");
-  }
-  
-  if (age === 0) {
-    throw new Error("Age cannot be 0");
+  if (!isValidNumber(age)) {
+    errors.set("age", "Age must be a valid number.");
+  } else if (age === 0) {
+    errors.set("age", "Age cannot be 0.");
   }
 
   if (isInSameSchool) {
-    if (!isNonEmptyString(siblingClass) || !isNonEmptyString(div)) {
+    if (!isNonEmptyString(siblingClass)) {
+      throw new Error("Class is required when sibling is in the same school.");
+    } else if (!isValidClass(siblingClass)) {
+      throw new Error("Invalid class value.");
+    }
+
+    if (!isNonEmptyString(div)) {
       throw new Error(
-        "Class and division are required when sibling is in the same school"
+        "Division is required when sibling is in the same school."
       );
-    }
-
-    if (!isValidClass(siblingClass)) {
-      throw new Error("Invalid class value");
-    }
-
-    if (!isValidDivision(div)) {
-      throw new Error("Invalid division value");
+    } else if (!isValidDivision(div)) {
+      throw new Error("Invalid division value.");
     }
   }
 
-  return true;
+  return errors;
 };

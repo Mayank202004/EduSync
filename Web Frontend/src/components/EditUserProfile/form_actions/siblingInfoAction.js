@@ -14,7 +14,8 @@ const siblingInfoAction = async (prevState, formData, setInfo) => {
   };
 
   try {
-    validateSiblingForm(values);
+    const errors = validateSiblingForm(values);
+    if (errors.size !== 0) return {errors, inputValues: values}
 
     const response = await toast.promise(addSiblingInfoApi(values), {
       loading: "Saving...",
@@ -27,13 +28,16 @@ const siblingInfoAction = async (prevState, formData, setInfo) => {
     }
 
     setInfo(response.student.siblingInfo);
-    return {
-      relation: "Brother",
-      name: "",
-      age: 1,
-      isInSameSchool: false,
-      class: "Jr. KG",
-      div: "A",
+    return {errors: null, inputValues: {
+      errors: null,
+      inputValues: {
+        relation: "Brother",
+        name: "",
+        age: 1,
+        isInSameSchool: false,
+        class: "Jr. KG",
+        div: "A",
+      }},
     };
   } catch (err) {
     const message =
@@ -41,7 +45,7 @@ const siblingInfoAction = async (prevState, formData, setInfo) => {
       err?.message ||
       "An unknown error occurred while updating your profile.";
     toast.error(message);
-    return values;
+    return {errors: null, inputValues: values};
   }
 };
 

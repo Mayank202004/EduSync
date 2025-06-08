@@ -14,7 +14,9 @@ const parentInfoAction = async (prevState, formData) => {
   };
 
   try {
-    validateParentInfoForm(values);
+    const errors = validateParentInfoForm(values);
+    if (errors.size !== 0) return { errors, inputValues: values };
+
     toast.promise(addParentDetailsApi(values), {
       loading: "Updating...",
       success: "Parent details saved successfully",
@@ -27,7 +29,7 @@ const parentInfoAction = async (prevState, formData) => {
       "An unknown error occurred while updating your profile.";
     toast.error(message);
   }
-  return values;
+  return { errors: null, inputValues: values };
 };
 
 export default parentInfoAction;

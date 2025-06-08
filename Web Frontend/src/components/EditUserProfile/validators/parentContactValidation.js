@@ -1,21 +1,27 @@
-import { isNonEmptyString, isValidName } from "@/lib/textUtils";
+import { isNonEmptyString, isValidName, isValidNumber } from "@/lib/textUtils";
 
-const isValidRelation = (value) =>
-  ["Father", "Mother"].includes(value);
+const isValidRelation = (value) => ["Father", "Mother"].includes(value);
 
 export const validateParentContact = (values) => {
-  const {name, relation, phone} = values;
-  if (!isNonEmptyString(name) || !isValidName(name)) {
-    throw new Error("Please enter a valid name (letters and spaces only).");
+  const { name, relation, phone } = values;
+  const errors = new Map();
+
+  if (!isNonEmptyString(name)) {
+    errors.set("name", "Name cannot be empty.");
+  } else if (!isValidName(name)) {
+    errors.set("name", "Name should contain letters and spaces only.");
   }
 
-  if (!isNonEmptyString(relation) || !isValidRelation(relation)) {
-    throw new Error("Please enter a valid relation (letters and spaces only).");
+  if (!isNonEmptyString(relation)) {
+    throw new Error("Relation cannot be empty.");
+  } else if (!isValidRelation(relation)) {
+    throw new Error("Relation should contain letters and spaces only.");
   }
 
-  if (!/^\d{10}$/.test(phone)) {
-    throw new Error("Phone number must be exactly 10 digits.");
+  const phoneNum = Number(phone);
+  if (!isValidNumber(phoneNum) || phone.toString().length !== 10) {
+    errors.set("phone", "Phone number must be a valid 10-digit number.");
   }
 
-  return true;
+  return errors;
 };

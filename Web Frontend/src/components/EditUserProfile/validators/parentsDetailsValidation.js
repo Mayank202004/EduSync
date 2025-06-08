@@ -1,8 +1,4 @@
-import {
-  isValidName,
-  isNonEmptyString,
-  isValidNumber,
-} from "@/lib/textUtils"; // adjust path if needed
+import { isValidName, isNonEmptyString, isValidNumber } from "@/lib/textUtils";
 
 export const validateParentInfoForm = (data) => {
   const {
@@ -14,17 +10,41 @@ export const validateParentInfoForm = (data) => {
     motherIncome,
   } = data;
 
-  if (
-    ![fatherName, fatherOccupation, motherName, motherOccupation].every(isNonEmptyString)
-  ) {
-    throw new Error("All text fields must be non-empty.");
+  const errors = new Map();
+
+  if (!isNonEmptyString(fatherName)) {
+    errors.set("fathers-name", "Father's name cannot be empty.");
+  } else if (!isValidName(fatherName)) {
+    errors.set(
+      "fathers-name",
+      "Father's name should contain only letters and spaces."
+    );
   }
 
-  if (![fatherName, motherName].every(isValidName)) {
-    throw new Error("Names must contain only letters and spaces.");
+  if (!isNonEmptyString(motherName)) {
+    errors.set("mothers-name", "Mother's name cannot be empty.");
+  } else if (!isValidName(motherName)) {
+    errors.set(
+      "mothers-name",
+      "Mother's name should contain only letters and spaces."
+    );
   }
 
-  if (![fatherIncome, motherIncome].every(isValidNumber)) {
-    throw new Error("Income must be a valid number.");
+  if (!isNonEmptyString(fatherOccupation)) {
+    errors.set("fathers-occupation", "Father's occupation cannot be empty.");
   }
+
+  if (!isNonEmptyString(motherOccupation)) {
+    errors.set("mothers-occupation", "Mother's occupation cannot be empty.");
+  }
+
+  if (!isValidNumber(fatherIncome)) {
+    errors.set("fathers-income", "Father's income must be a valid number.");
+  }
+
+  if (!isValidNumber(motherIncome)) {
+    errors.set("mothers-income", "Mother's income must be a valid number.");
+  }
+
+  return errors;
 };
