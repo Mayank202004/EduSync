@@ -53,8 +53,8 @@ function SignupCard({switchToLogin}) {
 
   return (
     <div className="h-full w-100 flex items-center justify-center">
-      <div className="w-full bg-white dark:bg-customDarkFg rounded-xl p-8">
-        <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6">EduSync</h1>
+      <div className="w-full bg-white rounded-xl p-8">
+        <h1 className="text-3xl font-bold text-center text-gray-800">EduSync</h1>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           
           <input
@@ -65,7 +65,7 @@ function SignupCard({switchToLogin}) {
               setFullName(e.target.value)
               setErrors(prev => ({ ...prev, fullName: null })); // Clear error on change
             }}
-            className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
+            className={`border text-black rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           />
           {errors.fullName && (
             <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
@@ -78,7 +78,7 @@ function SignupCard({switchToLogin}) {
               setUsername(e.target.value)
               setErrors(prev => ({ ...prev, username: null })); // Clear error on change
             }}
-            className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
+            className={`border text-black rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           />
           {errors.username && (
             <p className="text-red-500 text-sm mt-1">{errors.username}</p>
@@ -90,11 +90,11 @@ function SignupCard({switchToLogin}) {
               setRole(e.target.value)
               setErrors(prev => ({ ...prev, role: null })); // Clear error on change
             }}
-            className={`border rounded-md p-3 py-1.5 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
+            className={`border text-black rounded-md p-3 py-1.5 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           >
-            <option value="" disabled className="text-white dark:text-black">Select Role</option>
-            <option value="student" className="text-white dark:text-black">Student</option>
-            <option value="teacher" className="text-white dark:text-black">Teacher</option>
+            <option value="" disabled className="text-black">Select Role</option>
+            <option value="student" className="text-black">Student</option>
+            <option value="teacher" className="text-black">Teacher</option>
           </select>
           {errors.role && (
             <p className="text-red-500 text-sm mt-1">{errors.role}</p>
@@ -108,7 +108,7 @@ function SignupCard({switchToLogin}) {
               setEmail(e.target.value);
               setErrors(prev => ({ ...prev, email: null })); // Clear error on change
             }}
-            className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
+            className={`border text-black rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           />
           {errors.email && (
             <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -122,7 +122,7 @@ function SignupCard({switchToLogin}) {
               setPassword(e.target.value)
               setErrors(prev => ({ ...prev, password: null })); // Clear error on change
             }}
-            className={`border rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
+            className={`border text-black rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
           />
           {errors.password && (
             <p className="text-red-500 text-sm mt-1">{errors.password}</p>
@@ -130,7 +130,7 @@ function SignupCard({switchToLogin}) {
 
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md p-3 transition duration-200 cursor-pointer"
+            className="bg-blue-600 hover:bg-blue-700 font-semibold rounded-md p-3 transition duration-200 cursor-pointer"
           >
             Sign Up
           </button>
