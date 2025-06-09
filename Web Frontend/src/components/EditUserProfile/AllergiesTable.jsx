@@ -16,14 +16,11 @@ const AllergiesTable = ({ allergies = [], onDelete = () => {} }) => {
             </thead>
             <tbody className="divide-y dark:divide-gray-700">
               {allergies.map((allergy) => (
-                <tr
-                  key={allergy}
-                  className="transition-colors duration-300 group"
-                >
-                  <td className="text-center transition-opacity duration-300 md:invisible md:group-hover:visible">
+                <tr key={allergy}>
+                  <td className="text-center">
                     <button
                       onClick={() => onDelete(allergy)}
-                      className="flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 text-red-500 hover:text-red-700 cursor-pointer p-1 aspect-square h-10 rounded-full"
+                      className="flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 text-red-500 hover:text-red-700 transition-colors duration-300 cursor-pointer p-1 aspect-square h-10 rounded-full"
                       title="Delete"
                     >
                       <FontAwesomeIcon icon={faTrash} />
