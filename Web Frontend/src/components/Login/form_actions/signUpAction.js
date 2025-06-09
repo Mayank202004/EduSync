@@ -17,22 +17,15 @@ const signUpAction = async (prevState, formData, onSuccess) => {
     const errors = validateSignUp(values);
     if (errors.size !== 0) return { errors, inputValues: values };
 
-    const response = await toast.promise(signupApi(values), {
+    await toast.promise(signupApi(values), {
       loading: "Creating Account...",
-      success: "Account Created! Proceed to login.",
+      success: () => {
+        onSuccess(); // Swap signupcard to loginCard
+        return "Account Created! Proceed to login.";
+      },
     });
-
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw new Error(response.error || "Something went wrong while updating.");
-    }
-
-    onSuccess(); // Swap signupcard to loginCard
   } catch (err) {
-    const message =
-      err?.response?.data?.message ||
-      err?.message ||
-      "An unknown error occurred while updating your profile.";
-    toast.error(message);
+    if (err?.message) toast.error("Login failed. Please try again.");
   }
   return { errors: null, inputValues: values };
 };

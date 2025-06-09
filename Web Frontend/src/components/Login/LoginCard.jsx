@@ -1,88 +1,93 @@
 import React from "react";
-import { loginApi } from "@/services/authService";
-import { useState } from "react";
-import { useAuth } from "@/auth/AuthContext";
+import { useActionState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 
-function LoginCard({ switchToSignup }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+import { useAuth } from "@/auth/AuthContext";
+
+import Input from "../ui/Input";
+import SimpleButton from "../ui/SimpleButton";
+import LinkButton from "../ui/LinkButton";
+
+import signInAction from "./form_actions/signInAction";
+
+const inputStyle =
+  "border text-black border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-black my-0.5";
+
+const LoginCard = ({ switchToSignup }) => {
   const { login } = useAuth();
   const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const loginPromise = loginApi(email, password);
-
-    // Toast based on promise state
-    toast.promise(loginPromise, {
-      loading: "Logging in...",
-      success: (response) => {
-        return `Welcome, ${response.data.user.username || "User"}!`;
+  const [signInValues, formAction, isPending] = useActionState(
+    (prevState, formData) => signInAction(prevState, formData, onSuccess),
+    {
+      errors: null,
+      inputValues: {
+        identifier: "",
+        password: "",
       },
-    });
+    }
+  );
 
-    try {
-      const response = await loginPromise;
-
-    if (response.statusCode === 200) {
-      login(response.data);
-      navigate('/');
-    } 
-  } catch (err) {
-    // Already handled by toast
-  }
+  const onSuccess = (data) => {
+    login(data);
+    navigate("/");
   };
 
   return (
     <div className="h-full w-100 flex items-center justify-center">
-      <div className="w-full bg-white rounded-xl p-8">
+      <div className="w-full bg-white rounded-xl p-8 justify-center">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
           EduSync
         </h1>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Username or Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="border text-black border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        <form className="flex flex-col gap-2" action={formAction}>
+          <Input
+            inputStyle={inputStyle}
+            key={signInValues.inputValues.identifier + "identifier-SignIn"}
+            error={signInValues.errors?.get("identifier")}
+            inputProps={{
+              name: "identifier",
+              required: true,
+              placeholder: "Username or Email",
+              defaultValue: signInValues.inputValues.identifier,
+            }}
           />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="border text-black border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          <Input
+            inputStyle={inputStyle}
+            key={signInValues.inputValues.password + "password-SignIp"}
+            error={signInValues.errors?.get("password")}
+            inputProps={{
+              type: "password",
+              name: "password",
+              required: true,
+              placeholder: "Password",
+              defaultValue: signInValues.inputValues.password,
+            }}
           />
-          <button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md p-3 transition cursor-pointer duration-200"
+          <SimpleButton
+            buttonProps={{ type: "submit", disabled: isPending }}
+            predefinedColor="custom"
+            className="w-full bg-blue-600 not-disabled:hover:bg-blue-700 text-white font-semibold disabled:opacity-60"
           >
-            Login
-          </button>
+            {isPending ? "Signing in..." : "Sign in"}
+          </SimpleButton>
         </form>
 
-        <div className="mt-4 text-sm text-center text-gray-600">
-          <Link to="/forgot-password" className="text-blue-500 hover:underline">
-            Forgot password?
-          </Link>
-        </div>
+        <Link
+          to="/forgot-password"
+          className="block text-blue-500 hover:underline mt-4 text-sm text-center"
+        >
+          Forgot password?
+        </Link>
 
-        <div className="mt-4 text-sm text-center text-gray-600">
-          Don’t have an account?{" "}
-          <button
-            onClick={switchToSignup}
-            className="text-blue-500 hover:underline cursor-pointer"
-          >
-            Sign up
-          </button>
+        <div className="flex flex-wrap gap-1.5 mt-0.5 w-fit mx-auto text-center text-sm text-gray-600">
+          <span className="">Don’t have an account??</span>
+          <LinkButton
+            text="Sign up"
+            buttonProps={{ onClick: switchToSignup }}
+          />
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default LoginCard;

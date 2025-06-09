@@ -102,8 +102,8 @@ function SignupCard({ switchToLogin }) {
             {isPending ? "Signing up..." : "Sign Up"}
           </SimpleButton>
         </form>
-        <div className="flex flex-wrap gap-1.5 w-fit mx-auto text-center text-gray-600">
-          <span>Already have an account account?</span>
+        <div className="flex flex-wrap gap-1.5 mt-0.5 w-fit mx-auto text-center text-sm text-gray-600">
+          <span className="">Already have an account account?</span>
           <LinkButton text="Sign in" buttonProps={{ onClick: switchToLogin }} />
         </div>
       </div>
