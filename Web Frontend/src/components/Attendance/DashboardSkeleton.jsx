@@ -23,7 +23,7 @@ const SkeletonList = () => (
 function AttendanceDashboardSkeleton({isClassTeacher=true,isSuperAdmin=true}) {
   return (
     <div className='flex flex-col'>
-      {!isClassTeacher || !isSuperAdmin && (
+      {!isClassTeacher && !isSuperAdmin && (
         <div className="p-4 mx-4 bg-yellow-100 dark:bg-yellow-50 text-yellow-800 rounded-md border border-yellow-300">
             <p className='font-bold'>Seems like you are not a class teacher. If this is a mistake contact super admin</p>
           </div>
