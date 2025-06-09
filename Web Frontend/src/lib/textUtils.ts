@@ -1,4 +1,8 @@
 const FULLNAME_REGEX: RegExp = /^[a-zA-Z\s]+$/;
+const EMAIL_REGEX: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export const isValidEmail = (email: string): boolean =>
+  typeof email === "string" && EMAIL_REGEX.test(email);
 
 export const isValidName = (name: string): boolean => FULLNAME_REGEX.test(name);
 

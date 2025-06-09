@@ -28,21 +28,15 @@ export const loginApi = async (identifier, password) => {
 
 /**
  * @desc Function to handle user signup
- * @param {string} fullname - User's full name
- * @param {string} usersname - User's username
- * @param {string} email - User's email address
- * @param {string} password - User's password
- * @param {string} role - Users role
- * @returns {Promise} - Promise resolving to the repsosne data
- *
+ * @param {object} data - User's data to be sent to API
+ * @param {string} data.fullName - User's full name
+ * @param {string} data.username - User's username
+ * @param {string} data.email - User's email address
+ * @param {string} data.password - User's password
+ * @param {string} data.role - User's role
+ * @returns {Promise<any>} - Promise resolving to the response data
  */
-export const signupApi = async (fullName, username, email, password, role) => {
-  const response = await axiosInstance.post(`/users/register`, {
-    fullName,
-    username,
-    email,
-    password,
-    role,
-  });
+export const signupApi = async (data) => {
+  const response = await axiosInstance.post(`/users/register`, data);
   return response.data;
 };
