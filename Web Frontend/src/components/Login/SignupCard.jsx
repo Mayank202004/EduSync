@@ -40,7 +40,7 @@ function SignupCard({ switchToLogin }) {
               error={signUpValues.errors?.get("fullName")}
               inputProps={{
                 name: "fullName",
-                // required: true,
+                required: true,
                 placeholder: "Full Name",
                 defaultValue: signUpValues.inputValues.fullName,
               }}
@@ -51,7 +51,7 @@ function SignupCard({ switchToLogin }) {
               error={signUpValues.errors?.get("username")}
               inputProps={{
                 name: "username",
-                // required: true,
+                required: true,
                 placeholder: "Username",
                 defaultValue: signUpValues.inputValues.username,
               }}
@@ -65,7 +65,7 @@ function SignupCard({ switchToLogin }) {
               nostyle={true}
               selectProps={{
                 name: "role",
-                // required: true,
+                required: true,
                 defaultValue: signUpValues.inputValues.role,
               }}
             />
@@ -76,7 +76,7 @@ function SignupCard({ switchToLogin }) {
               inputProps={{
                 type: "email",
                 name: "email",
-                // required: true,
+                required: true,
                 placeholder: "Email",
                 defaultValue: signUpValues.inputValues.email,
               }}
@@ -88,7 +88,7 @@ function SignupCard({ switchToLogin }) {
               inputProps={{
                 type: "password",
                 name: "password",
-                // required: true,
+                required: true,
                 placeholder: "Password",
                 defaultValue: signUpValues.inputValues.password,
               }}
