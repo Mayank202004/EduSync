@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import FeeTable from "@/components/Fees/AdminComponents/FeeTable";
 import { formatDate } from "@/utils/utils.js";
 import AddFeeModal from "@/components/Fees/AdminComponents/AddFeeModal";
+import { getAllFees } from "@/services/feeService";
 
 const dummyFeesData = [
   {
@@ -90,9 +91,24 @@ const dummyFeesData = [
 
 
 export default function AdminFees() {
+    // Hooks
   const [feesData, setFeesData] = useState(dummyFeesData);
   const [selectedClass, setSelectedClass] = useState(dummyFeesData[0].class);
-  const [showAddModal, setShowAddModal] = useState(false)
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  // Fetch All Fee structures
+  useEffect(() => {
+      const fetchFeesData = async () => {
+        try {
+          const response = await getAllFees();
+          console.log(response.data);
+          setFeesData(response.data);
+        } catch (error) {
+          // handled by axios interceptor
+        }
+      };
+      fetchFeesData();
+    }, []);
 
   const handleEdit = (item) => {
     console.log("Edit clicked for:", item);
