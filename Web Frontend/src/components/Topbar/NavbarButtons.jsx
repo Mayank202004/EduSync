@@ -94,7 +94,7 @@ export const Avatar = () => {
       error: "Failed",
     });
     await logout();
-    navigate("/", { replace: true });
+    navigate("/login");
   };
 
   const editProfile = () => {

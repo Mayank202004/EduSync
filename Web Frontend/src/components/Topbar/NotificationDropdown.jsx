@@ -18,11 +18,11 @@ const NotificationDropdown = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+        className="container cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
       >
         <FontAwesomeIcon
             icon={faMessage}
-            className="text-black dark:text-white text-2xl"
+            className="text-black dark:text-white size-6.5 fa-xl p-2 translate-y-0.5"
         />
       </button>
 
