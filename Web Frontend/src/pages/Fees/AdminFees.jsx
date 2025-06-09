@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
-
-
+import FeeTable from "@/components/Fees/AdminComponents/FeeTable";
+import { formatDate } from "@/utils/utils.js";
+import AddFeeModal from "@/components/Fees/AdminComponents/AddFeeModal";
 
 const dummyFeesData = [
   {
@@ -88,56 +89,86 @@ const dummyFeesData = [
 ];
 
 
-
-
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-IN", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-const FeeRow = ({ fee, className, feeType, onEdit }) => (
-  <tr className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition">
-    <td className="py-2 px-3 text-sm text-gray-900 dark:text-white">{className}</td>
-    <td className="py-2 px-3 text-sm text-gray-900 dark:text-white">{feeType}</td>
-    <td className="py-2 px-3 text-sm text-gray-900 dark:text-white">{fee.title}</td>
-    <td className="py-2 px-3 text-sm text-gray-700 dark:text-gray-300">{formatDate(fee.dueDate)}</td>
-    <td className="py-2 px-3 text-sm text-gray-700 dark:text-gray-300">₹{fee.amount}</td>
-    <td className="py-2 px-3 text-sm text-gray-700 dark:text-gray-300">₹{fee.discount}</td>
-    <td className="py-2 px-3 text-sm">
-      <span className={`px-2 py-1 rounded text-xs font-medium ${fee.compulsory ? "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100" : "bg-yellow-100 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100"}`}>
-        {fee.compulsory ? "Yes" : "No"}
-      </span>
-    </td>
-    <td className="py-2 px-3 text-right">
-      <button onClick={() => onEdit(fee)} className="text-blue-500 hover:text-blue-700">
-        <FontAwesomeIcon icon={faPenToSquare} />
-      </button>
-    </td>
-  </tr>
-);
-
 export default function AdminFees() {
-  const [feesData] = useState(dummyFeesData);
+  const [feesData, setFeesData] = useState(dummyFeesData);
   const [selectedClass, setSelectedClass] = useState(dummyFeesData[0].class);
-  const [mode, setMode] = useState("single");
+  const [showAddModal, setShowAddModal] = useState(false)
 
   const handleEdit = (item) => {
     console.log("Edit clicked for:", item);
   };
 
+  const handleAddFee = () => {
+    setShowAddModal(true);
+  };
+
+  const handleAddRequest = async (payload) => {
+    //To do : Add backend request
+    return new Promise((resolve) => {
+      setTimeout(() => resolve({ data: payload }), 1000);
+    });
+  };
+
+  const handleAddFeeSubmit = (newFee) => {
+    setFeesData((prevData) => {
+      const updatedData = [...prevData];
+  
+      if (newFee.addToAll) {
+        // Add to all classes
+        return updatedData.map((classData) => {
+          const feeIndex = classData.fee.findIndex(f => f.feeType === newFee.feeType);
+          const newStructure = {
+            _id: Date.now().toString(),
+            title: newFee.title,
+            dueDate: newFee.dueDate,
+            amount: newFee.amount,
+            discount: newFee.discount,
+            compulsory: newFee.compulsory,
+          };
+      
+          if (feeIndex !== -1) {
+            classData.fee[feeIndex].structure.push(newStructure);
+          } else {
+            classData.fee.push({ feeType: newFee.feeType, structure: [newStructure] });
+          }
+          return classData;
+        });
+      } else {
+        const classIndex = updatedData.findIndex(c => c.class === newFee.className);
+        if (classIndex !== -1) {
+          const feeIndex = updatedData[classIndex].fee.findIndex(f => f.feeType === newFee.feeType);
+          const newStructure = {
+            _id: Date.now().toString(),
+            title: newFee.title,
+            dueDate: newFee.dueDate,
+            amount: newFee.amount,
+            discount: newFee.discount,
+            compulsory: newFee.compulsory,
+          };
+      
+          if (feeIndex !== -1) {
+            updatedData[classIndex].fee[feeIndex].structure.push(newStructure);
+          } else {
+            updatedData[classIndex].fee.push({ feeType: newFee.feeType, structure: [newStructure] });
+          }
+        }
+        return updatedData;
+      }
+    });
+  
+    setShowAddModal(false);
+  };
+  
+
+
   const getVisibleFees = () => {
-    const classes = mode === "all" ? feesData : feesData.filter((c) => c.class === selectedClass);
+    const classObj = feesData.find((c) => c.class === selectedClass);
+    if (!classObj) return [];
     const allFees = [];
 
-    classes.forEach((cls) => {
-      cls.fee.forEach((feeBlock) => {
-        feeBlock.structure.forEach((fee) => {
-          allFees.push({ ...fee, className: cls.class, feeType: feeBlock.feeType });
-        });
+    classObj.fee.forEach((feeBlock) => {
+      feeBlock.structure.forEach((fee) => {
+        allFees.push({ ...fee, className: classObj.class, feeType: feeBlock.feeType });
       });
     });
 
@@ -152,7 +183,6 @@ export default function AdminFees() {
           <select
             value={selectedClass}
             onChange={(e) => setSelectedClass(e.target.value)}
-            disabled={mode === "all"}
             className="px-3 py-2 rounded-md border dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
           >
             {feesData.map((item) => (
@@ -162,41 +192,22 @@ export default function AdminFees() {
             ))}
           </select>
           <button
-            className="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={() => setMode(mode === "all" ? "single" : "all")}
+            className="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white"
+            onClick={handleAddFee}
           >
-            {mode === "all" ? "View Single Class" : "Edit All Classes"}
+            Add Fee
           </button>
         </div>
       </div>
-
-      <div className="overflow-auto bg-white dark:bg-gray-800 rounded-xl shadow-md">
-        <table className="min-w-full text-left text-sm">
-          <thead className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-            <tr>
-              <th className="py-3 px-4 font-semibold">Class</th>
-              <th className="py-3 px-4 font-semibold">Fee Type</th>
-              <th className="py-3 px-4 font-semibold">Title</th>
-              <th className="py-3 px-4 font-semibold">Due Date</th>
-              <th className="py-3 px-4 font-semibold">Amount</th>
-              <th className="py-3 px-4 font-semibold">Discount</th>
-              <th className="py-3 px-4 font-semibold">Compulsory</th>
-              <th className="py-3 px-4 font-semibold text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {getVisibleFees().map((fee) => (
-              <FeeRow
-                key={fee._id}
-                fee={fee}
-                className={fee.className}
-                feeType={fee.feeType}
-                onEdit={handleEdit}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Fee Table Component */}
+      <FeeTable visibleFees={getVisibleFees()} onEdit={handleEdit} />
+      {showAddModal && (
+        <AddFeeModal
+          onClose={() => setShowAddModal(false)}
+          onAdd={handleAddRequest}
+          onSubmit={handleAddFeeSubmit}
+        />
+      )}
     </div>
   );
 }
