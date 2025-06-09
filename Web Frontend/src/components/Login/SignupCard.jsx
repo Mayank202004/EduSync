@@ -1,154 +1,114 @@
-import React from 'react'
-import { loginApi, signupApi } from '@/services/authService';
-import { useState } from 'react';
-import { useAuth } from '@/auth/AuthContext';
-import { Link,useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import React, { useActionState } from "react";
 
-function SignupCard({switchToLogin}) {
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [fullName, setFullName] = useState('');
-  const [role, setRole] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
+import Input from "@/components/ui/Input";
+import SelectOption from "@/components/ui/SelectOption";
+import SimpleButton from "@/components/ui/SimpleButton";
+import LinkButton from "@/components/ui/LinkButton";
 
-  const { login } = useAuth();
-  const navigate = useNavigate();
+import signUpAction from "./form_actions/signUpAction";
+import { ROLES_MAP } from "./value_maps/signupMaps";
 
-  const handleSubmit = async (e) => {
-      e.preventDefault();
-      
-      const signupPromise = signupApi(fullName,username, email,password, role);
+const inputStyle =
+  "border text-black border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-black my-0.5";
 
-    // Toast based on promise state
-    toast.promise(
-      signupPromise,
-      {
-        loading: 'Creating Account...',
-        success: (response) => {
-          return `Account Created! Proceed to login.`;
-        },
-        error: (err) => {
-          if(err?.response?.data?.message === 'Validation error'){
-            setErrors(err.response.data.data);
-          }
-          return err?.response?.data?.message || 'Signup failed';
-        },
-      }
-    );
-
-    try {
-    const response = await signupPromise;
-
-    if (response.statusCode === 201) {
-      switchToLogin(); // Swap signupcard to loginCard
-      
-    } 
-  } catch (err) {
-    // Already handled by toast
-  }
-    };
-
+function SignupCard({ switchToLogin }) {
+  const [signUpValues, formAction, isPending] = useActionState(
+    (prevState, formData) => signUpAction(prevState, formData, switchToLogin),
+    {
+      errors: null,
+      inputValues: {
+        email: "",
+        username: "",
+        fullName: "",
+        role: "",
+        password: "",
+      },
+    }
+  );
 
   return (
     <div className="h-full w-100 flex items-center justify-center">
       <div className="w-full bg-white rounded-xl p-8">
-        <h1 className="text-3xl font-bold text-center text-gray-800">EduSync</h1>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={fullName}
-            onChange={(e) => {
-              setFullName(e.target.value)
-              setErrors(prev => ({ ...prev, fullName: null })); // Clear error on change
-            }}
-            className={`border text-black rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
-          />
-          {errors.fullName && (
-            <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
-          )}
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => {
-              setUsername(e.target.value)
-              setErrors(prev => ({ ...prev, username: null })); // Clear error on change
-            }}
-            className={`border text-black rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
-          />
-          {errors.username && (
-            <p className="text-red-500 text-sm mt-1">{errors.username}</p>
-          )}
-
-          <select
-            value={role}
-            onChange={(e) => {
-              setRole(e.target.value)
-              setErrors(prev => ({ ...prev, role: null })); // Clear error on change
-            }}
-            className={`border text-black rounded-md p-3 py-1.5 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">
+          EduSync
+        </h1>
+        <form className="space-y-4" action={formAction}>
+          <div className="flex flex-col gap-1">
+            <Input
+              inputStyle={inputStyle}
+              key={signUpValues.inputValues.fullName + "fullName-Signup"}
+              error={signUpValues.errors?.get("fullName")}
+              inputProps={{
+                name: "fullName",
+                required: true,
+                placeholder: "Full Name",
+                defaultValue: signUpValues.inputValues.fullName,
+              }}
+            />
+            <Input
+              inputStyle={inputStyle}
+              key={signUpValues.inputValues.username + "username-Signup"}
+              error={signUpValues.errors?.get("username")}
+              inputProps={{
+                name: "username",
+                required: true,
+                placeholder: "Username",
+                defaultValue: signUpValues.inputValues.username,
+              }}
+            />
+            <SelectOption
+              key={signUpValues.inputValues.role + "role-Signup"}
+              options={ROLES_MAP}
+              containerStyle="w-full my-1.5"
+              selectStyle="w-full border text-black rounded-md p-2.5 focus:outline-none focus:ring-2 border-gray-300 focus:ring-blue-400"
+              optionStyle="text-black dark:bg-white"
+              nostyle={true}
+              selectProps={{
+                name: "role",
+                required: true,
+                defaultValue: signUpValues.inputValues.role,
+              }}
+            />
+            <Input
+              inputStyle={inputStyle}
+              key={signUpValues.inputValues.email + "email-Signup"}
+              error={signUpValues.errors?.get("email")}
+              inputProps={{
+                type: "email",
+                name: "email",
+                required: true,
+                placeholder: "Email",
+                defaultValue: signUpValues.inputValues.email,
+              }}
+            />
+            <Input
+              inputStyle={inputStyle}
+              key={signUpValues.inputValues.password + "password-Signup"}
+              error={signUpValues.errors?.get("password")}
+              inputProps={{
+                type: "password",
+                name: "password",
+                required: true,
+                placeholder: "Password",
+                defaultValue: signUpValues.inputValues.password,
+              }}
+            />
+          </div>
+          <SimpleButton
+            buttonProps={{ disabled: isPending }}
+            predefinedColor="custom"
+            className="w-full bg-blue-600 not-disabled:hover:bg-blue-700 text-white font-semibold disabled:opacity-60"
           >
-            <option value="" disabled className="text-black">Select Role</option>
-            <option value="student" className="text-black">Student</option>
-            <option value="teacher" className="text-black">Teacher</option>
-          </select>
-          {errors.role && (
-            <p className="text-red-500 text-sm mt-1">{errors.role}</p>
-          )}
-
-          <input
-            type="text"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setErrors(prev => ({ ...prev, email: null })); // Clear error on change
-            }}
-            className={`border text-black rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-          )}
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value)
-              setErrors(prev => ({ ...prev, password: null })); // Clear error on change
-            }}
-            className={`border text-black rounded-md p-3 focus:outline-none focus:ring-2 ${errors.fullName ? 'border-red-500 focus:ring-red-400' : 'border-gray-300 focus:ring-blue-400'}`}
-          />
-          {errors.password && (
-            <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-          )}
-
-          <button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 font-semibold rounded-md p-3 transition duration-200 cursor-pointer"
-          >
-            Sign Up
-          </button>
+            {isPending ? "Signing up..." : "Sign Up"}
+          </SimpleButton>
         </form>
-
-        <div className="mt-2 text-sm text-center text-gray-600">
-          Already have an  account account?{" "}
-          <button
-            onClick={switchToLogin} // Swap signupCard with loginCard
-            className="text-blue-500 hover:underline cursor-pointer"
-          >
-            Sign in
-          </button>
+        <div className="flex flex-wrap gap-1.5 mt-0.5 w-fit mx-auto text-center text-sm text-gray-600">
+          <span className="">Already have an account account?</span>
+          <LinkButton text="Sign in" buttonProps={{ onClick: switchToLogin }} />
         </div>
-
       </div>
     </div>
   );
 }
 
-export default SignupCard
+export default SignupCard;

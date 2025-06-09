@@ -28,8 +28,6 @@ const Input = ({
   error,
   hints,
 }) => {
-  const hasError = !!error;
-
   return (
     <label className={cn(labelStyle)}>
       {titleText && (
@@ -39,14 +37,14 @@ const Input = ({
       )}
       <input
         className={cn(
-          "focus:ring-1 not-focus:border p-2 w-full my-1.5 rounded-sm text-black dark:text-white",
-          hasError && "border border-red-500 focus:ring-red-500",
-          inputStyle
+          "focus:outline-none focus:ring-2 focus:ring-blue-400 not-focus:border p-2 w-full my-1.5 rounded-sm text-black dark:text-white",
+          inputStyle,
+          error && "border border-red-500 focus:ring-red-500"
         )}
         {...inputProps}
       />
-      {hasError && (
-        <span className="block text-sm text-red-500">
+      {error && (
+        <span className="block text-sm text-red-500 leading-4.5">
           {"*" + error}
         </span>
       )}

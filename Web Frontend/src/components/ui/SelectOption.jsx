@@ -8,6 +8,7 @@ const SelectOption = ({
   title,
   titleStyle = "",
   containerStyle = "",
+  nostyle=false
 }) => {
   return (
     <div className={cn("flex w-fit gap-4 items-center", containerStyle)}>
@@ -15,7 +16,7 @@ const SelectOption = ({
       <select
         {...selectProps}
         className={cn(
-          "w-fit p-2 pe-5 bg-blue-300 dark:bg-blue-700/50 rounded-sm",
+          !nostyle && "w-fit p-2 pe-5 bg-blue-300 dark:bg-blue-700/50 rounded-sm",
           selectStyle
         )}
       >
