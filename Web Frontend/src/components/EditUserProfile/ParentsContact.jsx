@@ -13,9 +13,12 @@ const ParentsContact = ({ initialInfo }) => {
   const [parentContact, formAction, isPending] = useActionState(
     (prevState, formData) => parentContactAction(prevState, formData, setInfo),
     {
-      name: "",
-      phone: "",
-      relation: "",
+      errors: null,
+      inputValues: {
+        name: "",
+        phone: "",
+        relation: "",
+      },
     }
   );
 
@@ -24,34 +27,36 @@ const ParentsContact = ({ initialInfo }) => {
       <form action={formAction} className="space-y-6">
         <div className="flex flex-col gap-4 border-1 mx-auto py-5 px-6 sm:px-10 md:px-15 rounded-sm">
           <SelectOption
-            key={parentContact.relation}
+            key={parentContact.inputValues.relation}
             title="Relationship to student: "
             options={PARENT_RELATIONS}
             selectProps={{
               name: "relation",
               required: true,
-              defaultValue: parentContact.relation,
+              defaultValue: parentContact.inputValues.relation,
             }}
             selectStyle="border border-gray-300 dark:border-gray-600"
           />
           <div className="flex flex-col sm:flex-row gap-3">
             <Input
-              key={parentContact.name + "name-ParentsContact"}
+              key={parentContact.inputValues.name + "name-ParentsContact"}
               labelStyle="basis-3/5"
               titleText="Name"
+              error={parentContact.errors?.get("name")}
               inputProps={{
                 name: "name",
-                defaultValue: parentContact.name,
+                defaultValue: parentContact.inputValues.name,
                 required: true,
               }}
             />
             <Input
-              key={parentContact.phone + "phone-ParentsContact"}
+              key={parentContact.inputValues.phone + "phone-ParentsContact"}
               labelStyle="basis-2/5"
               titleText="Phone"
+              error={parentContact.errors?.get("phone")}
               inputProps={{
                 name: "phone",
-                defaultValue: parentContact.phone,
+                defaultValue: parentContact.inputValues.phone,
                 required: true,
               }}
             />

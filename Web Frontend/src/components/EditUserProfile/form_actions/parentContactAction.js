@@ -11,7 +11,9 @@ export const parentContactAction = async (prevState, formData, setInfo) => {
   };
 
   try {
-    validateParentContact(values);
+    const errors = validateParentContact(values);
+    if (errors.size !== 0) return { errors, inputValues: values };
+
     const response = await toast.promise(addParentContactApi(values), {
       loading: "Adding...",
       success: "Contact added successfully",
@@ -19,7 +21,7 @@ export const parentContactAction = async (prevState, formData, setInfo) => {
     });
 
     setInfo(response.data.parentContact);
-    return { name: "", phone: "", relation: "" };
+    return {errors: null, inputValues: { name: "", phone: "", relation: "" }};
   } catch (err) {
     const message =
       err?.response?.data?.message ||
@@ -27,7 +29,7 @@ export const parentContactAction = async (prevState, formData, setInfo) => {
       "An unknown error occurred while updating your profile.";
 
     toast.error(message);
-    return values;
+    return {errors: null, inputValues: values};
   }
 };
 

@@ -38,8 +38,8 @@ function LoginCard({ switchToSignup }) {
 
   return (
     <div className="h-full w-100 flex items-center justify-center">
-      <div className="w-full bg-white dark:bg-customDarkFg rounded-xl p-8">
-        <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-6">
+      <div className="w-full bg-white rounded-xl p-8">
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
           EduSync
         </h1>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
@@ -48,14 +48,14 @@ function LoginCard({ switchToSignup }) {
             placeholder="Username or Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="border text-black border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="border text-black border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
           <button
             type="submit"
@@ -71,7 +71,7 @@ function LoginCard({ switchToSignup }) {
           </Link>
         </div>
 
-        <div className="mt-4 text-sm text-center text-gray-600 dark:text-gray-400">
+        <div className="mt-4 text-sm text-center text-gray-600">
           Don’t have an account?{" "}
           <button
             onClick={switchToSignup}

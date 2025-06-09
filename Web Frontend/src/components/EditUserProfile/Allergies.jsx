@@ -10,7 +10,7 @@ const Allergies = ({ initialInfo }) => {
   const [info, setInfo] = useState(initialInfo);
   const [allergy, formAction, isPending] = useActionState(
     (prevState, formData) => allergyAction(prevState, formData, setInfo),
-    ""
+    {error: null, inputValue: ""}
   );
 
   return (
@@ -19,7 +19,8 @@ const Allergies = ({ initialInfo }) => {
         <div className="flex flex-col gap-4 border-1 mx-auto py-5 px-6 sm:px-10 md:px-15 rounded-sm">
           <Input
             titleText="Allergy"
-            inputProps={{ defaultValue: allergy, name: "allergy" }}
+            error={allergy.error?.get("allergy")}
+            inputProps={{ defaultValue: allergy.inputValue, name: "allergy" }}
           />
         </div>
         <SimpleButton

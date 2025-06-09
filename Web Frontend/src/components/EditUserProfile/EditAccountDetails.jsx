@@ -9,8 +9,11 @@ const EditAccountDetails = ({ accountInfo }) => {
   const [accountData, formAction, isPending] = useActionState(
     accountDetailsAction,
     {
-      username: accountInfo.username,
-      fullName: accountInfo.fullName,
+      errors: null,
+      inputValues: {
+        username: accountInfo.username,
+        fullName: accountInfo.fullName,
+      },
     }
   );
 
@@ -18,25 +21,27 @@ const EditAccountDetails = ({ accountInfo }) => {
     <form className="space-y-6" action={formAction}>
       <div className="flex flex-col gap-4 border-1 mx-auto py-5 px-6 sm:px-10 md:px-15 rounded-sm">
         <Input
-          key={accountData.username}
+          key={accountData.inputValues.username}
           titleText="Username"
+          error={accountData.errors?.get("username")}
           inputProps={{
             name: "username",
             type: "text",
             placeholder: "Username",
             required: true,
-            defaultValue: accountData.username,
+            defaultValue: accountData.inputValues.username,
           }}
         />
         <Input
-          key={accountData.fullName}
+          key={accountData.inputValues.fullName}
           titleText="Full Name"
+          error={accountData.errors?.get("fullName")}
           inputProps={{
             name: "fullName",
             type: "text",
             placeholder: "Full Name",
             required: true,
-            defaultValue: accountData.fullName,
+            defaultValue: accountData.inputValues.fullName,
           }}
           hints={[
             { text: "Format: <first name> <middle name> <last name>" },
