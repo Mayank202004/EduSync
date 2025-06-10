@@ -1,4 +1,5 @@
 import axiosInstance from "@/api/axiosInstance";
+import { isValidEmail } from "@/lib/textUtils";
 
 /**
  * @desc Function to log user out
@@ -9,40 +10,33 @@ export const logoutApi = async () => {
 };
 
 /**
- *
- * @param {string} identifier - User's email address or username
- * @param {string} password - User's password
- * @returns {Promise} - Promise ressolving to the response data
+ * @desc Logs in a user using username or email and password.
+ * @param {object} data - User's data to be sent to API
+ * @param {string} data.identifier - User's email address or username
+ * @param {string} data.password - User's password
+ * @returns {Promise} - Promise resolving to the response data
  */
+export const loginApi = async (data) => {
+  const {identifier, password} = data
+  const body = isValidEmail(identifier)
+    ? { email: identifier, password }
+    : { username: identifier, password };
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-export const loginApi = async (identifier, password) => {
-  const body = EMAIL_REGEX.test(identifier)
-    ? { email: identifier, password } // send as “email”
-    : { username: identifier, password }; // send as “username”
-
-  const { data } = await axiosInstance.post("/users/login", body);
-
-  return data;
+  const response = await axiosInstance.post("/users/login", body);
+  return response.data;
 };
 
 /**
  * @desc Function to handle user signup
- * @param {string} fullname - User's full name
- * @param {string} usersname - User's username
- * @param {string} email - User's email address
- * @param {string} password - User's password
- * @param {string} role - Users role
- * @returns {Promise} - Promise resolving to the repsosne data
- *
+ * @param {object} data - User's data to be sent to API
+ * @param {string} data.fullName - User's full name
+ * @param {string} data.username - User's username
+ * @param {string} data.email - User's email address
+ * @param {string} data.password - User's password
+ * @param {string} data.role - User's role
+ * @returns {Promise<any>} - Promise resolving to the response data
  */
-export const signupApi = async (fullName, username, email, password, role) => {
-  const response = await axiosInstance.post(`/users/register`, {
-    fullName,
-    username,
-    email,
-    password,
-    role,
-  });
+export const signupApi = async (data) => {
+  const response = await axiosInstance.post(`/users/register`, data);
   return response.data;
 };

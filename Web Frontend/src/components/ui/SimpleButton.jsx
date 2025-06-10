@@ -1,7 +1,8 @@
 import { cn } from "@/lib/utils";
 
 const BUTTON_STYLES = {
-  blue: "bg-blue-300 dark:bg-blue-400 hover:bg-blue-400 dark:hover:bg-blue-300"
+  blue: "bg-blue-300 dark:bg-blue-400 hover:bg-blue-400 dark:hover:bg-blue-300",
+  custom: " "
 }
 
 /**
@@ -25,7 +26,7 @@ const SimpleButton = ({ buttonProps, className, predefinedColor="blue", children
   return (
     <button
       {...buttonProps}
-      className={cn("cursor-pointer py-2 px-4 w-fit flex ml-auto rounded-sm duration-200", buttonColor, className)}
+      className={cn("cursor-pointer py-2 px-4 w-fit flex ml-auto rounded-sm duration-200 justify-center", buttonColor, className)}
     >
       {children}
     </button>
