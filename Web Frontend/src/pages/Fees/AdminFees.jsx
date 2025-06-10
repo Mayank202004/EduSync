@@ -5,95 +5,14 @@ import FeeTable from "@/components/Fees/AdminComponents/FeeTable";
 import { formatDate } from "@/utils/utils.js";
 import AddFeeModal from "@/components/Fees/AdminComponents/AddFeeModal";
 import { getAllFees } from "@/services/feeService";
+import AdminFeesSkeleton from "@/components/Fees/AdminComponents/feeSkeleton";
 
-const dummyFeesData = [
-  {
-    _id: "68299233501c1a93bc38181b",
-    class: "1",
-    fee: [
-      {
-        feeType: "Tuition Fee",
-        structure: [
-          {
-            _id: "68299233501c1a93bc381809",
-            title: "Term 1",
-            dueDate: "2025-06-30T00:00:00.000+00:00",
-            compulsory: true,
-            amount: 12000,
-            discount: 1000,
-          },
-          {
-            _id: "68299233501c1a93bc381810",
-            title: "Term 2",
-            dueDate: "2025-09-01T00:00:00.000+00:00",
-            compulsory: false,
-            amount: 13000,
-            discount: 0,
-          },
-        ],
-      },
-      {
-        feeType: "Transport Fee",
-        structure: [
-          {
-            _id: "68299233501c1a93bc381820",
-            title: "Annual",
-            dueDate: "2025-06-15T00:00:00.000+00:00",
-            compulsory: true,
-            amount: 8000,
-            discount: 500,
-          },
-        ],
-      },
-      {
-        feeType: "Other Fee",
-        structure: [
-          {
-            _id: "68299233501c1a93bc381830",
-            title: "Library",
-            dueDate: "2025-07-15T00:00:00.000+00:00",
-            compulsory: true,
-            amount: 1500,
-            discount: 0,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    _id: "68299233501c1a93bc38181c",
-    class: "2",
-    fee: [
-      {
-        feeType: "Tuition Fee",
-        structure: [
-          {
-            _id: "68299233501c1a93bc381811",
-            title: "Term 1",
-            dueDate: "2025-06-30T00:00:00.000+00:00",
-            compulsory: true,
-            amount: 14000,
-            discount: 1000,
-          },
-          {
-            _id: "68299233501c1a93bc381812",
-            title: "Term 2",
-            dueDate: "2025-09-01T00:00:00.000+00:00",
-            compulsory: false,
-            amount: 13500,
-            discount: 500,
-          },
-        ],
-      },
-    ],
-  },
-];
 
 
 export default function AdminFees() {
     // Hooks
-  const [feesData, setFeesData] = useState(dummyFeesData);
-  const [selectedClass, setSelectedClass] = useState(dummyFeesData[0].class);
+  const [feesData, setFeesData] = useState(null);
+  const [selectedClass, setSelectedClass] = useState("1");
   const [showAddModal, setShowAddModal] = useState(false);
 
   // Fetch All Fee structures
@@ -101,7 +20,6 @@ export default function AdminFees() {
       const fetchFeesData = async () => {
         try {
           const response = await getAllFees();
-          console.log(response.data);
           setFeesData(response.data);
         } catch (error) {
           // handled by axios interceptor
@@ -111,6 +29,7 @@ export default function AdminFees() {
     }, []);
 
   const handleEdit = (item) => {
+    // To Do : 
     console.log("Edit clicked for:", item);
   };
 
@@ -177,53 +96,75 @@ export default function AdminFees() {
   
 
 
-  const getVisibleFees = () => {
-    const classObj = feesData.find((c) => c.class === selectedClass);
-    if (!classObj) return [];
-    const allFees = [];
+ const getFeesByType = () => {
+  const classObj = feesData?.find((c) => c.class === selectedClass);
+  if (!classObj) return {};
 
-    classObj.fee.forEach((feeBlock) => {
-      feeBlock.structure.forEach((fee) => {
-        allFees.push({ ...fee, className: classObj.class, feeType: feeBlock.feeType });
-      });
+  const grouped = {};
+
+  classObj.fee.forEach((feeBlock) => {
+    const type = feeBlock.feeType;
+    if (!grouped[type]) grouped[type] = [];
+
+    feeBlock.structure.forEach((fee) => {
+      grouped[type].push({ ...fee, className: classObj.class, feeType: type });
     });
+  });
 
-    return allFees;
-  };
+  return grouped; // { "Tuition": [...], "Transport": [...], ... }
+};
 
+
+  // if (!feesData) return <AdminFeesSkeleton />;
+  const groupedFees = getFeesByType();
   return (
-    <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen w-full">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Fees Dashboard</h1>
-        <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 sm:mt-0">
-          <select
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
-            className="px-3 py-2 rounded-md border dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-          >
-            {feesData.map((item) => (
-              <option key={item.class} value={item.class}>
-                Class {item.class}
-              </option>
-            ))}
-          </select>
-          <button
-            className="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white"
-            onClick={handleAddFee}
-          >
-            Add Fee
-          </button>
-        </div>
+    <>
+      {/* Skeleton */}
+      <div
+        className={`absolute top-0 left-0 w-full transition-opacity duration-500 ${!feesData ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+      >
+        <AdminFeesSkeleton />
       </div>
-      {/* Fee Table Component */}
-      <FeeTable visibleFees={getVisibleFees()} onEdit={handleEdit} />
-      {showAddModal && (
-        <AddFeeModal
+      <div className={`p-6 bg-gray-50 dark:bg-gray-900 min-h-screen w-full transition-opacity duration-700 ${!feesData ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Fees Dashboard</h1>
+          <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 sm:mt-0">
+            <select
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+              className="px-3 py-2 rounded-md border dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+            >
+              {feesData?.map((item) => (
+                <option key={item.class} value={item.class}>
+                  Class {item.class}
+                </option>
+              ))}
+            </select>
+            <button
+              className="px-4 py-2 rounded-md bg-green-600 hover:bg-green-700 text-white"
+              onClick={handleAddFee}
+              >
+              Add Fee
+            </button>
+          </div>
+        </div>
+        {/* Fee Table Component */}
+
+        {Object.entries(groupedFees).map(([type, fees]) => (
+          <div key={type}>
+            <h2 className="text-xl font-bold my-4">{type} Fees</h2>
+            <FeeTable visibleFees={fees} onEdit={handleEdit} />
+          </div>
+        ))}
+
+        {showAddModal && (
+          <AddFeeModal
           onClose={() => setShowAddModal(false)}
           onAdd={handleAddRequest}
           onSubmit={handleAddFeeSubmit}
-        />
-      )}
-    </div>
+          />
+        )}
+      </div>
+    </>
   );
 }
