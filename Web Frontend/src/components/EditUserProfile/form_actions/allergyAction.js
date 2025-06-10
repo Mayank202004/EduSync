@@ -10,20 +10,16 @@ const allergyAction = async (prevState, formData, setInfo) => {
     const error = validateAllergy(values);
     if (error.size !== 0) return { error, inputValues: values.allergy };
 
-    const response = await toast.promise(addAllergyApi(values), {
+    toast.promise(addAllergyApi(values), {
       loading: "Updating...",
-      success: "Allergy added successfully",
-      error: "Something went wrong",
+      success: (response) => {
+        setInfo(response.data.allergies);
+        return "Allergies updated successfully";
+      },
     });
-    setInfo(response.data.allergies);
-    return {error: null, inputValues: ""};
-  } catch (err) {
-    const message =
-      err?.response?.data?.message ||
-      err?.message ||
-      "An unknown error occurred while updating your profile.";
-    toast.error(message);
-    return { error: null, inputValues: values.allergy };
+    return { error: null, inputValues: "" };
+  } catch (_) {
+    //already handled by axios interceptor
   }
 };
 

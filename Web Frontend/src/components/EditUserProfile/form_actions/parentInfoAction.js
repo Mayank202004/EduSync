@@ -19,17 +19,15 @@ const parentInfoAction = async (prevState, formData) => {
 
     toast.promise(addParentDetailsApi(values), {
       loading: "Updating...",
-      success: "Parent details saved successfully",
-      error: "Something went wrong",
+      success: (_) => {
+        return "Parent details saved successfully"
+      },
     });
-  } catch (err) {
-    const message =
-      err?.response?.data?.message ||
-      err?.message ||
-      "An unknown error occurred while updating your profile.";
-    toast.error(message);
+
+    return { errors: null, inputValues: values };
+  } catch (_) {
+    //already handled by axios interceptor
   }
-  return { errors: null, inputValues: values };
 };
 
 export default parentInfoAction;

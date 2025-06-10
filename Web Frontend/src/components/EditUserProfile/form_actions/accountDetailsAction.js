@@ -13,26 +13,18 @@ const accountDetailsAction = async (prevState, formData) => {
     const errors = validateAccountDetails(values);
     if (errors.size !== 0) return { errors, inputValues: values };
 
-    const response = await toast.promise(updateUserApi(values), {
+    toast.promise(updateUserApi(values), {
       loading: "Updating account details...",
-      success: "Profile updated successfully",
-      error: "Failed to update profile",
+      success: (_) => {
+        setTimeout(() => window.location.reload(), 200);
+        return "Profile updated successfully";
+      },
     });
 
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      throw new Error(response.error || "Something went wrong while updating.");
-    }
-    // Reload only on success
-    setTimeout(() => window.location.reload(), 200);
-  } catch (err) {
-    const message =
-      err?.response?.data?.message ||
-      err?.message ||
-      "An unknown error occurred while updating your profile.";
-
-    toast.error(message);
+    return { errors: null, inputValues: values };
+  } catch (_) {
+    //alrady handled by axios interceptor
   }
-  return { errors: null, inputValues: values };
 };
 
 export default accountDetailsAction;
