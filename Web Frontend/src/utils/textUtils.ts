@@ -13,3 +13,7 @@ export const isBoolean = (value: any): boolean => typeof value === "boolean";
 
 export const isValidNumber = (value: any): boolean =>
   typeof value === "number" && !isNaN(value) && isFinite(value);
+
+export function capitalizeFirstLetter(input: String) {
+  return `${input.at(0).toUpperCase()}${input.slice(1)}`
+}

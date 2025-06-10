@@ -1,4 +1,4 @@
-import { isNonEmptyString } from "@/lib/textUtils";
+import { isNonEmptyString } from "@/utils/textUtils";
 
 export const validateAllergy = (values) => {
   const { allergy } = values;

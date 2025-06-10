@@ -1,7 +1,7 @@
 import useScrollspy from "@/hooks/useScrollSpy";
 
 import scrollToElemendId from "@/lib/scrollToElementId";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 const ScrollSpy = ({ elements, titleElementMap, offset, rootRef }) => {
   const [activeIndex] = useScrollspy(elements, {

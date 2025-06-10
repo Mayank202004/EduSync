@@ -1,4 +1,4 @@
-import { isNonEmptyString, isValidName } from "@/lib/textUtils";
+import { isNonEmptyString, isValidName } from "@/utils/textUtils";
 
 export const validateAccountDetails = (values) => {
   const { username, fullName } = values;

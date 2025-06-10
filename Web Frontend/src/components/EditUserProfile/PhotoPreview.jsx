@@ -7,9 +7,9 @@ import "react-image-crop/dist/ReactCrop.css";
 import toast from "react-hot-toast";
 
 import setCanvasPreview from "@/lib/setCanvasPreview";
-import { compressImage } from "@/lib/compressImage";
-import { cn } from "@/lib/utils";
-import { isValidImageSize, generateCenteredCrop } from "@/lib/imageUtils";
+import { compressImage } from "@/utils/imageUtils";
+import { cn } from "@/lib/cn";
+import { isValidImageSize, generateCenteredCrop } from "@/utils/imageUtils";
 import userIconWhite from "@/assets/user_icon_white.png";
 import SimpleButton from "@/components/ui/SimpleButton";
 import OutlinedButton from "@/components/ui/OutlinedButton";

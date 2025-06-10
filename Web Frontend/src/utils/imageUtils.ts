@@ -1,4 +1,5 @@
 import { makeAspectCrop, centerCrop, type Crop } from "react-image-crop";
+import imageCompression from "browser-image-compression";
 
 /**
  * Checks if the image dimensions are below the required minimum.
@@ -44,3 +45,30 @@ export const generateCenteredCrop = (
 
   return centerCrop(initialCrop, width, height);
 };
+
+/**
+ * Compresses an image Blob using browser-image-compression
+ * @param blob - The original image blob
+ * @param maxSizeMB - Maximum size in MB (default 1 MB)
+ * @param maxWidthOrHeight - Max width or height in pixels (default 800)
+ * @returns A Promise that resolves with the compressed image blob
+ */
+export async function compressImage(
+  blob: File,
+  maxSizeMB: number = 1,
+  maxWidthOrHeight: number = 800
+): Promise<Blob> {
+  try {
+    const options = {
+      maxSizeMB,
+      maxWidthOrHeight,
+      useWebWorker: true,
+    };
+
+    const compressedBlob = await imageCompression(blob, options);
+    return compressedBlob;
+  } catch (error) {
+    console.error("Image compression failed:", error);
+    throw error;
+  }
+}

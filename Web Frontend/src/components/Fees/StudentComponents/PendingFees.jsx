@@ -1,7 +1,7 @@
 import { useState } from "react";
 import FeeCard from "./FeeCard";
 import FeeType from "./FeeType";
-import { capitalizeFirstLetter } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/utils/textUtils";
 
 const PendingFees = ({ isPending, feesData }) => {
   const [selectedItems, setSelectedItems] = useState([]); //store ids of selected items

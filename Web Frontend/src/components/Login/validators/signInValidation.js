@@ -1,4 +1,4 @@
-import { isNonEmptyString, isValidEmail } from "@/lib/textUtils";
+import { isNonEmptyString, isValidEmail } from "@/utils/textUtils";
 
 export const validateSignIn = (values) => {
   const { identifier, password } = values;

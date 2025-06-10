@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 import NavLinks from "./NavLinks";
 import {
   SearchBar,

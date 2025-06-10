@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import PaymentFAQs from "@/components/Fees/FAQs";
 import RaiseTicket from "@/components/Fees/RaiseTicket";
-import PendingFees from "@/components/Fees/PendingFees";
-import PaidFees from "@/components/Fees/PaidFees";
+import PendingFees from "@/components/Fees/StudentComponents/PendingFees";
+import PaidFees from "@/components/Fees/StudentComponents/PaidFees";
 import { getUserFees } from "@/services/feeService";
-import FeeCardSkeleton from "@/components/Fees/FeeCardSkeleton";
+import FeeCardSkeleton from "@/components/Fees/StudentComponents/FeeCardSkeleton";
 
 const Fees = () => {
   const [feesData, setFeesData] = useState([]);

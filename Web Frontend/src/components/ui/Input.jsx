@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 /**
  * A styled input field with optional title, hints, and single error support.

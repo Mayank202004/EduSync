@@ -1,6 +1,6 @@
 import PaidFeesCard from "./PaidFeesCard";
 import FeeType from "./FeeType";
-import { capitalizeFirstLetter } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/utils/textUtils";
 
 const PaidFees = ({ isPaid, feesData }) => {
   //keys prepended with paid so react can distinguish between paid and pending componenets as they reuse the same componenets

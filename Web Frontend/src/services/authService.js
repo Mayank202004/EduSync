@@ -1,5 +1,5 @@
 import axiosInstance from "@/api/axiosInstance";
-import { isValidEmail } from "@/lib/textUtils";
+import { isValidEmail } from "@/utils/textUtils";
 
 /**
  * @desc Function to log user out

@@ -1,7 +1,7 @@
 import React from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 import colorFromName from "@/lib/colorFromName";
-import { capitalizeFirstLetter } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/utils/textUtils";
 
 const sizeMap = {
   small: {

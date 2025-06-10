@@ -2,7 +2,7 @@ import React, { useState, useEffect} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 import FeeTable from "@/components/Fees/AdminComponents/FeeTable";
-import { formatDate } from "@/utils/utils.js";
+import { formatDate } from "@/utils/dateUtils.js";
 import AddFeeModal from "@/components/Fees/AdminComponents/AddFeeModal";
 import { getAllFees } from "@/services/feeService";
 import AdminFeesSkeleton from "@/components/Fees/AdminComponents/feeSkeleton";

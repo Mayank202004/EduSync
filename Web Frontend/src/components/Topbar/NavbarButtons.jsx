@@ -14,7 +14,7 @@ import toggleLight from "../../assets/day.png";
 import toggleDark from "../../assets/night.png";
 import AvatarIcon from "./AvatarIcon";
 import toast from "react-hot-toast";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 export const SearchBar = () => {
   return (

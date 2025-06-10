@@ -1,4 +1,4 @@
-import { isValidName, isNonEmptyString, isValidNumber } from "@/lib/textUtils";
+import { isValidName, isNonEmptyString, isValidNumber } from "@/utils/textUtils";
 
 export const validateParentInfoForm = (data) => {
   const {

@@ -1,4 +1,4 @@
-import { isValidEmail, isValidName, isNonEmptyString } from "@/lib/textUtils";
+import { isValidEmail, isValidName, isNonEmptyString } from "@/utils/textUtils";
 import { ROLES_MAP } from "../value_maps/signupMaps";
 
 export const isValidRole = (role) => {

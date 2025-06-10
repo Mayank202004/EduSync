@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 const BUTTON_STYLES = {
   blue: "bg-blue-300 dark:bg-blue-400 hover:bg-blue-400 dark:hover:bg-blue-300",

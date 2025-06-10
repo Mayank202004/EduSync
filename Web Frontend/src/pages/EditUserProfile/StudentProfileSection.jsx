@@ -13,7 +13,7 @@ import ParentsInfo from "@/components/EditUserProfile/ParentsInfo";
 import ParentsContact from "@/components/EditUserProfile/ParentsContact";
 import Allergies from "@/components/EditUserProfile/Allergies";
 
-import { capitalizeFirstLetter } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/utils/textUtils";
 
 import { getStudentInfo } from "@/services/studentInfoService";
 

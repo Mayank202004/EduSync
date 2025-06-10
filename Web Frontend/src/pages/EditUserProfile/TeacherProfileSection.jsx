@@ -10,7 +10,7 @@ import PhotoPreview from "@/components/EditUserProfile/PhotoPreview";
 import TitledContainer from "@/components/ui/TitledContainer";
 import ScrollSpy from "@/components/EditUserProfile/ScrollSpy";
 
-import { capitalizeFirstLetter } from "@/lib/utils";
+import { capitalizeFirstLetter } from "@/utils/textUtils";
 
 const OFFSET = 40;
 const SECTIONS = [
