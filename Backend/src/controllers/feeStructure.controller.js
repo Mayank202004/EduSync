@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { FeeStructure } from "../models/feeStructure.model.js";
 import { FeeItem } from "../models/feeStructure.model.js";
+import { ClassStructure } from "../models/classStructure.model.js";
 
 /**
  * @desc Add fee details for a specific class

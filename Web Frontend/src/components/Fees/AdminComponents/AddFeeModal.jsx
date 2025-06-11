@@ -102,7 +102,7 @@ const AddFeeModal = ({
           <select
             value={feeType}
             onChange={(e) => setFeeType(e.target.value)}
-            className="w-full border px-3 py-2 rounded"
+            className="w-full border px-3 py-2 rounded bg-customDarkFg"
           >
             {FEE_TYPES.map((type) => (
               <option key={type} value={type}>{type}</option>
