@@ -2,47 +2,99 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { FeeStructure } from "../models/feeStructure.model.js";
+import { FeeItem } from "../models/feeStructure.model.js";
 
 /**
  * @desc Add fee details for a specific class
  * @route POST /api/feeStructure/add
  * @access Private (Super Admin)
  */
-const addFeeStructure = asyncHandler(async(req,res)=>{
-    const {className,amount,feeType,dueDate,compulsory=true,discount=0,title}=req.body;
-    if(!className?.trim() || !amount || !feeType?.trim() || !title?.trim()){
-        throw new ApiError(400,"All fields are required");
+const addFeeStructure = asyncHandler(async (req, res) => {
+  const {
+    className,
+    amount,
+    feeType,
+    dueDate,
+    compulsory = true,
+    discount = 0,
+    title,
+    addToAllClasses = false
+  } = req.body;
+
+  if (!amount || !feeType?.trim() || !title?.trim()) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  if (dueDate && new Date(dueDate) < new Date()) {
+    throw new ApiError(400, "Invalid due date");
+  }
+
+  let classList = [];
+
+  if (addToAllClasses) {
+    const allClasses = await ClassStructure.find({}, "className");
+    classList = allClasses.map(c => c.className);
+  } else {
+    if (!className?.trim()) {
+      throw new ApiError(400, "className is required when not adding to all classes");
     }
-    if(dueDate && new Date(dueDate) < new Date()){
-        throw new ApiError(400,"Invalid due date");
+    classList = [className.trim()];
+  }
+
+  for (const currentClass of classList) {
+    let feeStructure = await FeeStructure.findOne({ class: currentClass });
+
+    if (!feeStructure) {
+      feeStructure = await FeeStructure.create({
+        class: currentClass,
+        fee: [
+          { feeType: "Tuition Fee", structure: [] },
+          { feeType: "Transport Fee", structure: [] },
+          { feeType: "Other Fee", structure: [] }
+        ]
+      });
     }
-    const feeStructure = await FeeStructure.findOne({class:className});
-    if(!feeStructure){
-        throw new ApiError(404,"Fee structure not found");
+
+    let feeTypeBlock = feeStructure.fee.find(fee => fee.feeType === feeType.trim());
+
+    if (!feeTypeBlock) {
+      throw new ApiError(404, "Fee Type not found");
     }
-    const feeTypeIndex = feeStructure.fee.findIndex(fee=>fee.feeType===feeType);
-    if(feeTypeIndex===-1){
-        throw new ApiError(404,"Fee type not found");
+
+    let existingItemId = null;
+    for (const id of feeTypeBlock.structure) {
+      const item = await FeeItem.findById(id);
+      if (item?.title === title.trim()) {
+        existingItemId = id;
+        break;
+      }
     }
-    const feeIndex = feeStructure.fee[feeTypeIndex].structure.findIndex(fee=>fee.title===title);
-    if(feeIndex!==-1){
-        feeStructure.fee[feeTypeIndex].structure[feeIndex].amount=amount;
-        feeStructure.fee[feeTypeIndex].structure[feeIndex].dueDate=dueDate;
-        feeStructure.fee[feeTypeIndex].structure[feeIndex].compulsory=compulsory;
-        feeStructure.fee[feeTypeIndex].structure[feeIndex].discount=discount;
+
+    if (existingItemId) {
+      await FeeItem.findByIdAndUpdate(existingItemId, {
+        amount,
+        dueDate,
+        compulsory,
+        discount
+      });
+    } else {
+      const newFeeItem = await FeeItem.create({
+        title: title.trim(),
+        amount,
+        dueDate,
+        compulsory,
+        discount
+      });
+      feeTypeBlock.structure.push(newFeeItem._id);
     }
-    else{
-        feeStructure.fee[feeTypeIndex].structure.push({
-            title,
-            amount,
-            dueDate,
-            compulsory,
-            discount,
-        });
-    }
+
     await feeStructure.save();
-    return res.status(200).json(new ApiResponse(200,null,"Fee structure updated successfully"));
+  }
+  return res.status(200).json(new ApiResponse(200, null, "Fee structure updated successfully"));
 });
+
+
+
 
 const setDueDate = asyncHandler(async(req,res)=>{
     const {feeType,title,dueDate}=req.body;
