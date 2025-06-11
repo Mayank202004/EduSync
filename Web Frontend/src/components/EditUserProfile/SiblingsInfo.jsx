@@ -8,6 +8,7 @@ import OutlinedButton from "@/components/ui/OutlinedButton";
 import SelectOption from "@/components/ui/SelectOption";
 import Checkbox from "@/components/ui/CheckBox";
 import SiblingsTable from "./SiblingTable";
+import ExpandableDiv from "@/components/ui/ExpandableDiv";
 
 import siblingInfoAction from "./form_actions/siblingInfoAction";
 import {
@@ -88,14 +89,10 @@ const SiblingsInfo = ({ initialInfo }) => {
               },
             }}
           />
-          <div
-            ref={containerRef}
+          <ExpandableDiv
+            containerRef={containerRef}
             className="space-y-4"
-            style={{
-              maxHeight: `${height}px`,
-              transition: "max-height 0.3s ease",
-              overflow: "hidden",
-            }}
+            height={height}
           >
             <hr />
             <div className="flex flex-wrap gap-2 justify-around">
@@ -122,7 +119,7 @@ const SiblingsInfo = ({ initialInfo }) => {
                 selectStyle="border border-gray-300 dark:border-gray-600"
               />
             </div>
-          </div>
+          </ExpandableDiv>
         </div>
         <SimpleButton
           className={"disabled:opacity-60"}

@@ -15,7 +15,7 @@ const Fees = () => {
       try {
         const response = await getUserFees();
         setFeesData(response.data);
-      } catch (err) {
+      } catch (_) {
         //handle later
       } finally {
         setIsLoading(false);
@@ -50,7 +50,7 @@ const Fees = () => {
           <FeeCardSkeleton />
         </div>
       ) : (
-        <div className="p-4 tablet:mr-0 w-full tablet:h-full border-x-1">
+        <div className="tablet:min-w-[60%] p-4 tablet:mr-0 w-full tablet:h-full border-x-1">
           <PendingFees isPending={isPending} feesData={feesData.pending} />
           <hr className="mt-6" />
           <PaidFees isPaid={isPaid} feesData={feesData.paid} />
