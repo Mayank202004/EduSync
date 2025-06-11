@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { formatDateTime } from "@/utils/dateUtils";
 
 const FeeCard = ({
   feeData,
@@ -42,28 +43,11 @@ const FeeCard = ({
         </div>
         <p className="text-gray-600 dark:text-gray-400">
           {isSelectable
-            ? `Due Date: ${new Date(feeData.dueDate).toLocaleDateString(
-                "en-IN",
-                {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                  hour12: true
-                }
-              )}`
-            : `Paid On: ${new Date(feeData.paidOn).toLocaleDateString("en-IN", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true
-              })}`}
+            ? `Due Date: ${formatDateTime(feeData.dueDate)}`
+            : `Paid On: ${formatDateTime(feeData.paidOn)}`}
         </p>
         <hr className="my-2" />
-        <p className="line-clamp-1">Description: Yearly fees</p>
+        <p>Description: {feeData.title}</p>
       </div>
     </li>
   );
