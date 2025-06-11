@@ -1,5 +1,7 @@
+import { addFeeStructure } from "@/services/feeService";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
+import { formatToYYYYMM_D } from "@/utils/dateUtils";
 
 const FEE_TYPES = ["Tuition Fee", "Transport Fee", "Other Fee"];
 
@@ -7,9 +9,9 @@ const AddFeeModal = ({
   onClose,
   onSubmit,
   onAdd,
-  loadingMessage = "Adding fee...",
+  loadingMessage = "Adding fee data...",
   successMessage = "Fee added successfully!",
-  errorMessage = "Failed to add fee",
+  errorMessage = "",
 }) => {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
@@ -31,22 +33,22 @@ const AddFeeModal = ({
     const payload = {
       title,
       amount: parseFloat(amount),
-      dueDate,
+      dueDate: formatToYYYYMM_D(dueDate),
       feeType,
       discount: parseFloat(discount),
       compulsory,
       className: addToAll ? null : className.trim(),
-      addToAll,
+      addToAllClasses: addToAll,
     };
 
     try {
-      const response = await toast.promise(onAdd(payload), {
+      const response = await toast.promise(addFeeStructure(payload), {
         loading: loadingMessage,
         success: successMessage,
         error: errorMessage,
       });
 
-      onSubmit(response.data);
+      onSubmit(payload);
     } catch (err) {
       // Error is handled by toast.promise
     }

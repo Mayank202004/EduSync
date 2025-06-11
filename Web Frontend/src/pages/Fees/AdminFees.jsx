@@ -115,7 +115,6 @@ export default function AdminFees() {
 };
 
 
-  // if (!feesData) return <AdminFeesSkeleton />;
   const groupedFees = getFeesByType();
   return (
     <>
@@ -125,7 +124,7 @@ export default function AdminFees() {
       >
         <AdminFeesSkeleton />
       </div>
-      <div className={`p-6 bg-gray-50 dark:bg-gray-900 min-h-screen w-full transition-opacity duration-700 ${!feesData ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+      <div className={`p-6 bg-gray-50 dark:bg-customDarkBg min-h-screen w-full transition-opacity duration-700 ${!feesData ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Fees Dashboard</h1>
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 sm:mt-0">

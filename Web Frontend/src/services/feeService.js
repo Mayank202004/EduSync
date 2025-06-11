@@ -19,3 +19,13 @@ export const getAllFees = async () => {
   const response = await axiosInstance.get("/feestructure/all")
   return response.data;
 }
+
+/**
+ * @desc Function to add new fee structure
+ * @param {Object} - data {className, amount, title, feeType, dueDate, compulasory, discount, addToAllClasses} 
+ * @returns {Promise} Promise resolving to success message
+ */
+export const addFeeStructure = async (data) => {
+  const response = await axiosInstance.post("/feestructure/add", data);
+  return response.data;
+}
