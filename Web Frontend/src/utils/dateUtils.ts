@@ -12,7 +12,6 @@ export function formatDate(dateString: string): string {
   });
 }
 
-<<<<<<< Updated upstream
 /**
  * @desc Formats date in the format YYYY-MM-DD
  * @param dateStr - Date String
@@ -26,7 +25,7 @@ export const formatToYYYYMM_D = (dateStr) => {
   return `${year}-${month}-${day}`;
 };
 
-=======
+
 export const formatDateTime = (dateTimeString: string): string => {
   return new Date(dateTimeString).toLocaleDateString("en-IN", {
     day: "2-digit",
@@ -37,4 +36,4 @@ export const formatDateTime = (dateTimeString: string): string => {
     hour12: true,
   });
 };
->>>>>>> Stashed changes
+
