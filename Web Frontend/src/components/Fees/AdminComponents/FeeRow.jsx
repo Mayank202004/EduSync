@@ -9,7 +9,7 @@ export default function FeeRow({ fee, className, feeType, onEdit }) {
       <td className="py-2 px-3 text-sm text-gray-900 dark:text-white">{className}</td>
       <td className="py-2 px-3 text-sm text-gray-900 dark:text-white">{feeType}</td>
       <td className="py-2 px-3 text-sm text-gray-900 dark:text-white">{fee.title}</td>
-      <td className="py-2 px-3 text-sm text-gray-700 dark:text-gray-300">{formatDate(fee.dueDate)}</td>
+      <td className="py-2 px-3 text-sm text-gray-700 dark:text-gray-300">{(fee.dueDate) ? formatDate(fee.dueDate) : ""}</td>
       <td className="py-2 px-3 text-sm text-gray-700 dark:text-gray-300">₹{fee.amount}</td>
       <td className="py-2 px-3 text-sm text-gray-700 dark:text-gray-300">₹{fee.discount}</td>
       <td className="py-2 px-3 text-sm">

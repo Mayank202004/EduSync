@@ -18,6 +18,7 @@ export function formatDate(dateString: string): string {
  * @returns {String} - In hte format YYYY-MM-DD
  */
 export const formatToYYYYMM_D = (dateStr) => {
+  if(!dateStr) return "";
   const date = new Date(dateStr);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0"); // 2-digit month
