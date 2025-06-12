@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { cn } from "@/lib/cn";
+
 import NavLinks from "./NavLinks";
-import {
-  SearchBar,
-  Message,
-  Question,
-  ToggleTheme,
-  Avatar,
-} from "./NavbarButtons";
-import { useNavigate } from "react-router-dom";
+import { SearchBar, Question } from "./NavbarButtons";
+import Avatar from "./Avatar";
+import ToggleTheme from "./ToggleTheme";
+import NotificationDropdown from "./NotificationDropdown";
+
+import { cn } from "@/lib/cn";
 
 const ResponsiveTopBar = ({ theme, setTheme }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,10 +35,15 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
   return (
     <>
       <header className="navbar w-full flex items-center bg-white dark:bg-black shadow-md px-5 pr-3 py-3 max-h-15 duration-500">
-        <h1 onClick={() => navigate("/")} className="Logo text-3xl font-bold text-black dark:text-white cursor-pointer">
+        <h1
+          onClick={() => navigate("/")}
+          className="Logo text-3xl font-bold text-black dark:text-white cursor-pointer"
+        >
           EduSync
         </h1>
-        <div className="tablet:hidden ml-auto flex items-center gap-2 sm:gap-3">
+        {/* Mobile Topbar */}
+        <div className="tablet:hidden ml-auto flex items-center gap-1.5 sm:gap-2">
+          <NotificationDropdown />
           <Avatar />
           <button
             className="tablet:hidden size-fit p-2 rounded-sm hover:bg-gray-300 dark:hover:bg-gray-700 cursor-pointer"
@@ -50,19 +55,21 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
             />
           </button>
         </div>
+        {/* Desktop Topbar */}
         <nav className="hidden tablet:flex w-full items-center">
           <ul className="flex gap-8 w-fit text-lg mx-auto font-bold">
             <NavLinks closeMenuCallback={() => setIsOpen(false)} />
           </ul>
 
           <SearchBar />
-          <div className="flex items-center gap-2">
-            <Message />
+          <div className="flex items-center gap-1">
+            <NotificationDropdown />
             <ToggleTheme theme={theme} setTheme={setTheme} />
             <Avatar />
           </div>
         </nav>
       </header>
+      {/* Side menu */}
       <div
         className={cn(
           "fixed tablet:hidden inset-0 top-15 z-20 bg-transparent w-full h-full",
@@ -87,11 +94,9 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
           >
             <NavLinks closeMenuCallback={() => setIsOpen(false)} />
             <SearchBar />
-
-            <div className="flex items-center mx-auto gap-3">
-              <Message />
+            <span className="mx-auto">
               <ToggleTheme theme={theme} setTheme={setTheme} />
-            </div>
+            </span>
           </ul>
         </nav>
       </div>
