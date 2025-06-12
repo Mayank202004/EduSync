@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { useAuth } from '@/auth/AuthContext';
 import LoadingScreen from '@/components/Loading';
+import Unauthorized401 from '../Unauthorized401';
 
 const TeacherAttendance = lazy(() => import('./TeacherAttendance'));
 const AdminAttendance = lazy(() => import('./AdminAttendance'));
@@ -19,7 +20,7 @@ export default function Resources() {
       Component = AdminAttendance;
       break;
     default:
-      return <div>Unauthorized</div>; // To DO: Make a Unauthorised page 
+      return <Unauthorized401 />; // To DO: Make a Unauthorised page 
   }
 
   return (
