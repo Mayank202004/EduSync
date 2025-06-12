@@ -519,9 +519,32 @@ const getGenderDistribution = async (className = null, div = null) => {
 
     const pipeline = [];
 
+    // Step 1: class/div filter
     if (Object.keys(matchStage).length > 0) {
         pipeline.push({ $match: matchStage });
     }
+
+    // Step 2: Join with the User collection
+    pipeline.push({
+        $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "user"
+        }
+    });
+
+    // Step 3: Unwind user array
+    pipeline.push({ $unwind: "$user" });
+
+    // Step 4: Filter only verified users
+    pipeline.push({
+        $match: {
+            "user.verified": true
+        }
+    });
+
+    // Step 5: Group by gender
     pipeline.push(
         {
             $group: {
@@ -537,6 +560,7 @@ const getGenderDistribution = async (className = null, div = null) => {
             }
         }
     );
+
     try {
         const distribution = await Student.aggregate(pipeline);
         return distribution;
@@ -544,6 +568,7 @@ const getGenderDistribution = async (className = null, div = null) => {
         throw error;
     }
 };
+
 
 
 /**
@@ -1075,7 +1100,7 @@ export const getTopLevelAdminDashboardData = asyncHandler(async (req, res) => {
         getClassWisePresenteePercentage(),
         getDailyPresentee(),
         ClassStructure.find().sort({ className: 1 }).select("-createdAt -updatedAt -__v -_id"),
-        Student.countDocuments()
+        getVerifiedStudentCount()
     ]);
 
     res.status(200).json(new ApiResponse(
@@ -1136,3 +1161,35 @@ export const getClassLevelAdminDashboardData = asyncHandler(async (req, res) => 
         "Dashboard data fetched successfully"
     ));
 });
+
+/**
+ * @desc Helper function get total verified student count
+ * @returns {Number} - Number of verified students
+ */
+const getVerifiedStudentCount = async () => {
+  try {
+    const result = await Student.aggregate([
+      {
+        $lookup: {
+          from: "users",   
+          localField: "userId",
+          foreignField: "_id",
+          as: "user"
+        }
+      },
+      { $unwind: "$user" },
+      {
+        $match: {
+          "user.verified": true
+        }
+      },
+      {
+        $count: "total"
+      }
+    ]);
+
+    return result[0]?.total || 0;
+  } catch (error) {
+    throw error;
+  }
+};
