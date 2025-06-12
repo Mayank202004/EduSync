@@ -81,9 +81,8 @@ const LoginCard = ({ switchToSignup }) => {
         <div className="flex flex-wrap gap-1.5 mt-0.5 w-fit mx-auto text-center text-sm text-gray-600">
           <span className="">Don’t have an account??</span>
           <LinkButton
-            text="Sign up"
             buttonProps={{ onClick: switchToSignup }}
-          />
+          >Sign up</LinkButton>
         </div>
       </div>
     </div>
