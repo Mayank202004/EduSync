@@ -26,7 +26,6 @@ export const formatToYYYYMM_D = (dateStr) => {
   return `${year}-${month}-${day}`;
 };
 
-
 export const formatDateTime = (dateTimeString: string): string => {
   return new Date(dateTimeString).toLocaleDateString("en-IN", {
     day: "2-digit",
@@ -37,4 +36,3 @@ export const formatDateTime = (dateTimeString: string): string => {
     hour12: true,
   });
 };
-

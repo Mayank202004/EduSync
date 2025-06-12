@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "@/auth/AuthContext";
 
 const NavLinks = ({ closeMenuCallback }) => {
-  const { user } = useAuth(); 
+  const { user } = useAuth();
   const role = user?.role;
   /**
    * @desc Function to determine the class for navigation links
@@ -21,25 +21,27 @@ const NavLinks = ({ closeMenuCallback }) => {
           Home
         </NavLink>
       </li>
-      {(role === 'student' || role === 'super admin') && (
-      <li>
-        <NavLink
-          to="/fees"
-          className={navLinkClass}
-          onClick={closeMenuCallback}
-        >
-          Fees
-        </NavLink>
-      </li>
+      {(role === "student" || role === "super admin") && (
+        <li>
+          <NavLink
+            to="/fees"
+            className={navLinkClass}
+            onClick={closeMenuCallback}
+          >
+            Fees
+          </NavLink>
+        </li>
       )}
-      {(role === 'teacher' || role === 'super admin') && (
-        <NavLink
-          to="/attendance"
-          className={navLinkClass}
-          onClick={closeMenuCallback}
-        >
-          Attendance
-        </NavLink>
+      {(role === "teacher" || role === "super admin") && (
+        <li>
+          <NavLink
+            to="/attendance"
+            className={navLinkClass}
+            onClick={closeMenuCallback}
+          >
+            Attendance
+          </NavLink>
+        </li>
       )}
       <li>
         <NavLink

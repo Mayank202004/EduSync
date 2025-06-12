@@ -35,7 +35,7 @@ const Fees = () => {
 
   return (
     <div className="tablet:flex min-h-full w-full">
-      <div className="tablet:w-3/10 tablet:h-full tablet:grow">
+      <div className="tablet:sticky self-start top-0 left-0 bottom-0 h-fit tablet:w-3/10">
         <h1 className="font-bold text-3xl mt-4 w-fit mx-auto tablet:mt-10 tablet:mb-2">
           Fees
         </h1>
@@ -57,7 +57,7 @@ const Fees = () => {
         </div>
       )}
       <hr className="tablet:hidden" />
-      <div className="flex flex-col tablet:w-1/2 tablet:min-h-full">
+      <div className="flex flex-col tablet:sticky self-start top-0 right-0 bottom-0 h-fit tablet:w-1/2">
         <PaymentFAQs />
         <RaiseTicket />
       </div>
