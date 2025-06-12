@@ -1,4 +1,3 @@
-import React from "react";
 import { cn } from "@/lib/cn";
 import colorFromName from "@/lib/colorFromName";
 import { capitalizeFirstLetter } from "@/utils/textUtils";
@@ -18,7 +17,12 @@ const sizeMap = {
   },
 };
 
-const AvatarIcon = ({ size = "small", withHover = true, callback=null, user }) => {
+const AvatarIcon = ({
+  size = "small",
+  withHover = true,
+  callback = null,
+  user,
+}) => {
   const initial = capitalizeFirstLetter(user.fullName.at(0) || "");
   const { container, text } = sizeMap[size] || sizeMap.small;
 

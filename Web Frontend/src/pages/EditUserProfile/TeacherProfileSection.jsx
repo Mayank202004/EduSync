@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/auth/AuthContext";
 
-import AvatarIcon from "@/components/Topbar/AvatarIcon";
+import AvatarIcon from "@/components/ui/AvatarIcon";
 import EditAccountDetails from "@/components/EditUserProfile/EditAccountDetails";
 import PhotoPreview from "@/components/EditUserProfile/PhotoPreview";
 import TitledContainer from "@/components/ui/TitledContainer";

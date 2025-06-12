@@ -1,8 +1,9 @@
-// NotificationDropdown.jsx
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClipboardList } from "@fortawesome/free-solid-svg-icons";
 import { faMessage } from "@fortawesome/free-regular-svg-icons";
+
+import IconTextButton from "@/components/ui/IconTextButton";
 
 const notifications = [
   { id: 1, message: "You have 1 tasks due today" },
@@ -16,15 +17,16 @@ const NotificationDropdown = () => {
 
   return (
     <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="container cursor-pointer rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        <FontAwesomeIcon
+      <IconTextButton
+        buttonProps={{ onClick: () => setIsOpen(!isOpen) }}
+        icon={
+          <FontAwesomeIcon
             icon={faMessage}
-            className="text-black dark:text-white size-6.5 fa-xl p-2 translate-y-0.5"
-        />
-      </button>
+            className="text-black dark:text-white size-6.5 text-2xl box-content p-1.5 translate-y-1"
+          />
+        }
+        className="container rounded-full p-0"
+      />
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg z-50">

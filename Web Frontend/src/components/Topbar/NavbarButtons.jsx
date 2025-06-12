@@ -1,20 +1,11 @@
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import NotificationDropdown from "./NotificationDropdown";
-import {
-  faCircleQuestion,
-  faMessage,
-  faPenToSquare,
-} from "@fortawesome/free-regular-svg-icons";
+import { Link } from "react-router-dom";
+import { faCircleQuestion } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightFromBracket, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { useAuth } from "@/auth/AuthContext";
-import toggleLight from "../../assets/day.png";
-import toggleDark from "../../assets/night.png";
-import AvatarIcon from "./AvatarIcon";
-import toast from "react-hot-toast";
-import { cn } from "@/lib/cn";
+
+import AvatarIcon from "@/components/ui/AvatarIcon";
+import IconTextButton from "@/components/ui/IconTextButton";
+import NotificationDropdown from "./NotificationDropdown";
 
 export const SearchBar = () => {
   return (
@@ -32,12 +23,6 @@ export const SearchBar = () => {
   );
 };
 
-export const Message = () => {
-  return (
-    <NotificationDropdown/>
-  );
-};
-
 export const Question = () => {
   return (
     <FontAwesomeIcon
@@ -47,99 +32,3 @@ export const Question = () => {
   );
 };
 
-export const ToggleTheme = ({ theme, setTheme }) => {
-  const handleToggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
-
-  return (
-    <button className="hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full p-1 flex duration-200" onClick={handleToggleTheme} aria-label="Toggle Theme">
-      <img
-        src={theme === "light" ? toggleDark : toggleLight}
-        alt="Theme Toggle"
-        className="size-6.5 cursor-pointer select-none"
-        draggable="false"
-      />
-    </button>
-  );
-};
-
-export const Avatar = () => {
-  const { user, logout } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
-  const containerRef = useRef(null);
-
-  //event listener to close container if clicked outside the container
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("pointerdown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside); // for mobile
-
-    return () => {
-      document.removeEventListener("pointerdown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-    };
-  }, []);
-
-  const logoutUser = async () => {
-    toast.promise(logout, {
-      loading: "Logging out...",
-      success: "Logged Out",
-      error: "Failed",
-    });
-    await logout();
-    navigate("/login");
-  };
-
-  const editProfile = () => {
-    setIsOpen(false);
-    navigate("user/edit");
-  };
-
-  return (
-    <div ref={containerRef}>
-      <AvatarIcon user={user} callback={() => setIsOpen((prev) => !prev)} />
-      <div
-        className={cn(
-          "absolute right-2 mt-4 w-max bg-customLightBg dark:bg-customDarkBg py-5 px-10 rounded-sm ring-1 ring-gray-500 z-10 flex flex-col gap-3 transition-tranform duration-100 origin-top-right",
-          isOpen ? "scale-100" : "scale-0"
-        )}
-      >
-        <button
-          type="button"
-          className="absolute top-4 right-4 hover:bg-gray-300 dark:hover:bg-gray-700 size-8 rounded-full cursor-pointer"
-          onClick={() => setIsOpen(false)}
-        >
-          <FontAwesomeIcon icon={faXmark} className="fa-lg" />
-        </button>
-        <div className="flex flex-col max-w-[70vw] place-items-center">
-          <AvatarIcon size={"medium"} withHover={false} user={user} />
-          <h1 className="font-bold text-xl mt-2 text-wrap text-center">{user.fullName}</h1>
-          <button
-            type="button"
-            className="cursor-pointer space-x-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline"
-            onClick={editProfile}
-          >
-            <FontAwesomeIcon icon={faPenToSquare} />
-            <span>Edit Profile</span>
-          </button>
-        </div>
-        <hr />
-        <button
-          type="button"
-          onClick={logoutUser}
-          className="flex gap-2 mx-auto py-1 px-2 w-fit rounded-sm items-center justify-center cursor-pointer text-red-400 dark:text-red-400 hover:bg-gray-300/50 hover:dark:bg-gray-700/50"
-        >
-          <FontAwesomeIcon icon={faRightFromBracket} />
-          <span>Logout</span>
-        </button>
-      </div>
-    </div>
-  );
-};
