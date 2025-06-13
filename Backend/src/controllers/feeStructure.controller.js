@@ -96,7 +96,7 @@ const addFeeStructure = asyncHandler(async (req, res) => {
 
 
 
-
+// Unutilized (Subjected to removal in future after proper checks are done) To DO:
 const setDueDate = asyncHandler(async(req,res)=>{
     const {feeType,title,dueDate}=req.body;
 
@@ -187,6 +187,11 @@ const deleteFeeType = asyncHandler(async (req, res) => {
   }
 });
 
+/**
+ * @desc Get fee structure for a specific class
+ * @route GET /api/feeStructure/:className
+ * @access Private (Super Admin)
+ */
 const getClassFeeStructure = asyncHandler(async(req,res)=>{
     const {className} = req.params;
     if(!className.trim()){
@@ -199,6 +204,11 @@ const getClassFeeStructure = asyncHandler(async(req,res)=>{
     return res.status(200).json(new ApiResponse(200,feeStructure,"Fee structure fetched successfully"));
 })
 
+/**
+ * @desc Get all fee structures
+ * @route GET /api/feeStructure/getAll
+ * @access Private (Super Admin)
+ */
 const getAllFeeStructures = asyncHandler(async(req,res)=>{
     const feeStructures = await FeeStructure.find().populate("fee.structure");
     if(!feeStructures || feeStructures.length==0){
@@ -207,8 +217,64 @@ const getAllFeeStructures = asyncHandler(async(req,res)=>{
     return res.status(200).json(new ApiResponse(200,feeStructures,"Fee structures fetched sucessfully"));
 });
 
-const getMyFeeStructure = asyncHandler(async(req,res)=>{
-  return;
+
+
+/**
+ * @desc Update a specific fee item or fee item belonging to each class
+ * @route PUT /api/feeStructure/update
+ * @access Private (Super Admin)
+ */
+const updateFeeStructure = asyncHandler(async (req, res) => {
+  const {
+    feeId,
+    title,
+    feeType,
+    amount,
+    dueDate,
+    discount,
+    className,
+    updateAllClasses = false,
+  } = req.body;
+
+  if (!feeId?.trim() && !title?.trim()) {
+    throw new ApiError(400, "At least one of feeId or title is required");
+  }
+  if (
+    !feeType?.trim() ||
+    !amount?.toString().trim() ||
+    !dueDate?.trim() ||
+    !discount?.toString().trim()
+  ) {
+    throw new ApiError(400, "All fields are required");
+  }
+  if (!updateAllClasses && !className?.trim()) {
+    throw new ApiError(400, "className is required when not updating all classes");
+  }
+
+  const updatePayload = {
+    title: feeType,
+    amount: Number(amount),
+    dueDate: new Date(dueDate),
+    discount: Number(discount),
+  };
+
+  if (updateAllClasses) {
+    const result = await FeeItem.updateMany(
+      { title: title },
+      { $set: updatePayload }
+    );
+
+    return res.status(200).json(new ApiResponse(200,null,`Updated ${result.modifiedCount} fee items`));
+  } else {
+    // Update a specific class
+    const updated = await FeeItem.findByIdAndUpdate(feeId, updatePayload);
+
+    if (!updated) {
+      throw new ApiError(404, "Fee item not found");
+    }
+    return res.status(200).json(new ApiResponse(200,null,"Fee item updated successfully"));
+  }
 });
 
-export {addFeeStructure,setDueDate, deleteFeeType, getAllFeeStructures , getClassFeeStructure};
+
+export {addFeeStructure,setDueDate, deleteFeeType, getAllFeeStructures , getClassFeeStructure, updateFeeStructure};

@@ -9,5 +9,6 @@ router.get('/all',verifyJWT,FeeStructureController.getAllFeeStructures);
 router.get('/:className',verifyJWT,FeeStructureController.getClassFeeStructure);
 router.put('/set-due-date',verifyJWT,verifySuperAdmin,FeeStructureController.setDueDate);
 router.delete('/delete',verifyJWT,verifySuperAdmin,FeeStructureController.deleteFeeType);
+router.put('/update',verifyJWT,verifySuperAdmin,FeeStructureController.updateFeeStructure);
 
 export default router;
