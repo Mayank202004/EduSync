@@ -18,7 +18,11 @@ export default function FeeRow({ fee, className, feeType, onEdit }) {
         </span>
       </td>
       <td className="py-2 px-3 text-right">
-        <button onClick={() => onEdit(fee)} className="text-blue-500 hover:text-blue-700">
+        <button onClick={() => onEdit({
+          ...fee,
+          className,
+          feeType,
+        })} className="text-blue-500 hover:text-blue-700">
           <FontAwesomeIcon icon={faPenToSquare} />
         </button>
       </td>

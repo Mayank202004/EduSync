@@ -21,8 +21,8 @@ export const formatToYYYYMM_D = (dateStr) => {
   if(!dateStr) return "";
   const date = new Date(dateStr);
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // 2-digit month
-  const day = date.getDate(); // No pad
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // padstart so that month is always 2 digits
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
