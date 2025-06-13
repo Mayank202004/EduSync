@@ -6,6 +6,7 @@ import { formatDate } from "@/utils/dateUtils";
 import AddFeeModal from "@/components/Fees/AdminComponents/AddFeeModal";
 import { getAllFees } from "@/services/feeService";
 import AdminFeesSkeleton from "@/components/Fees/AdminComponents/feeSkeleton";
+import EditFeeModal from "@/components/Fees/AdminComponents/EditFeeModal";
 
 
 
@@ -14,6 +15,9 @@ export default function AdminFees() {
   const [feesData, setFeesData] = useState(null);
   const [selectedClass, setSelectedClass] = useState("1");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedFeeData, setSelectedFeeData] = useState(null);
+
 
   // Fetch All Fee structures
   useEffect(() => {
@@ -29,9 +33,10 @@ export default function AdminFees() {
     }, []);
 
   const handleEdit = (item) => {
-    // To Do : 
-    console.log("Edit clicked for:", item);
+    setSelectedFeeData(item); 
+    setShowEditModal(true);
   };
+
 
   const handleAddFee = () => {
     setShowAddModal(true);
@@ -93,6 +98,59 @@ export default function AdminFees() {
   
     setShowAddModal(false);
   };
+
+  const handleEditFeeSubmit = (editedFee) => {
+    setFeesData((prevData) => {
+      const updatedData = [...prevData];
+
+      // If editing all classes
+      if (editedFee.editAllClasses) {
+        return updatedData.map((classData) => {
+          classData.fee = classData.fee.map((feeBlock) => {
+            if (feeBlock.feeType === editedFee.feeType) {
+              feeBlock.structure = feeBlock.structure.map((feeItem) => {
+                if (feeItem.title === editedFee.title) {
+                  return {
+                    ...feeItem,
+                    amount: editedFee.amount,
+                    dueDate: editedFee.dueDate,
+                    discount: editedFee.discount,
+                  };
+                }
+                return feeItem;
+              });
+            }
+            return feeBlock;
+          });
+          return classData;
+        });
+      }
+
+      // Else: edit specific class only
+      const classIndex = updatedData.findIndex(c => c.class === editedFee.className);
+      if (classIndex !== -1) {
+        updatedData[classIndex].fee = updatedData[classIndex].fee.map((feeBlock) => {
+          if (feeBlock.feeType === editedFee.feeType) {
+            feeBlock.structure = feeBlock.structure.map((feeItem) => {
+              if (feeItem._id === editedFee.id) {
+                return {
+                  ...feeItem,
+                  amount: editedFee.amount,
+                  dueDate: editedFee.dueDate,
+                  discount: editedFee.discount,
+                };
+              }
+              return feeItem;
+            });
+          }
+          return feeBlock;
+        });
+      }
+
+      return updatedData;
+    });
+  };
+
   
 
 
@@ -161,6 +219,17 @@ export default function AdminFees() {
           onClose={() => setShowAddModal(false)}
           onAdd={handleAddRequest}
           onSubmit={handleAddFeeSubmit}
+          />
+        )}
+
+        {showEditModal && selectedFeeData && (
+          <EditFeeModal
+            feeData={selectedFeeData}
+            onClose={() => {
+              setShowEditModal(false);
+              setSelectedFeeData(null);
+            }}
+            onSubmit={handleEditFeeSubmit}
           />
         )}
       </div>
