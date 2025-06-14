@@ -3,7 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   BarChart, Bar,
   PieChart, Pie, Cell,
-  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer
 } from 'recharts';
 import { useState, useEffect } from 'react';
 import { getAttendanceDashboardData } from '@/services/attendenceService';
@@ -66,23 +66,27 @@ function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=f
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
             <h2 className="text-lg font-semibold mb-2">Total Attendance Report</h2>
-            <LineChart width={500} height={200} data={lineData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis domain={[0, {totalStudents}]} allowDecimals={false} />
-              <Tooltip />
-              <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} name='Present Students' />
-            </LineChart>
+            <ResponsiveContainer width="100%" height="85%">
+              <LineChart data={lineData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis domain={[0, {totalStudents}]} allowDecimals={false} />
+                <Tooltip />
+                <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} name='Present Students' />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
 
           <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
             <h2 className="text-lg font-semibold mb-2">Presentee by Division</h2>
-            <BarChart width={400} height={200} data={barData}>
-              <XAxis dataKey="class" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="count" fill="#34d399" name="Presentee Percentage"/>
-            </BarChart>
+            <ResponsiveContainer width="100%" height="85%">
+              <BarChart data={barData}>
+                <XAxis dataKey="class" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#34d399" name="Presentee Percentage"/>
+              </BarChart>
+            </ResponsiveContainer>
             <p className="text-sm text-gray-600 mt-2 text-center font-bold">Presentee %age for class {className} for {barDataMonth}</p>
           </div>
         </div>
@@ -91,15 +95,17 @@ function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=f
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
             <h2 className="text-lg font-semibold mb-2">Students by Gender</h2>
-            <PieChart width={300} height={200}>
-              <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
-                {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend verticalAlign="bottom"/>
-            </PieChart>
+            <ResponsiveContainer width="100%" height="85%">
+              <PieChart width={300} height={200}>
+                <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                  <Legend verticalAlign="bottom"/>
+              </PieChart>
+            </ResponsiveContainer>
           </div>
 
           <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
@@ -116,6 +122,7 @@ function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=f
 
           <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
             <h2 className="text-lg font-semibold mb-2">Weekly Absent</h2>
+            <ResponsiveContainer width="100%" height="85%"> 
             <RadarChart outerRadius={70} width={300} height={250} data={radarData}>
               <PolarGrid />
               <PolarAngleAxis dataKey="day" />
@@ -123,6 +130,7 @@ function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=f
               <Radar name="Absents" dataKey="absent" stroke="#10b981" fill="#10b981" fillOpacity={0.6} />
               <Tooltip />
             </RadarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>

@@ -116,7 +116,7 @@ const TopLevelDashboard = ({ dashboardData,setDashboardData, onClassClicked }) =
       {/* All Classes Grid */}
       <div>
         <h2 className="text-md font-semibold mb-2">Class Overview</h2>
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
           {dashboardData.classStructure.map(cls => (
             <button
               key={cls.className}
