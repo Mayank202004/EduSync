@@ -5,37 +5,35 @@ const ParentsContactTable = ({ contacts = [], onDelete = () => {} }) => {
   return (
     <>
       <hr className="my-6" />
-      <div className="container flex flex-nowrap items-center gap-2 mb-3">
-        <div className="w-full">
-          <table className="min-w-full text-left text-sm border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
-            <thead className="bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200">
-              <tr>
-                <th className="px-2 py-2 w-10"></th>
-                <th className="px-4 py-2">Name</th>
-                <th className="px-4 py-2">Relation</th>
-                <th className="px-4 py-2">Phone</th>
+      <div className="overflow-auto rounded-xl">
+        <table className="min-w-full table-fixed text-left text-sm">
+          <thead className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+            <tr>
+              <th className="w-[5%] py-3 px-4 font-semibold text-center"></th>
+              <th className="w-[30%] py-3 px-4 font-semibold">Name</th>
+              <th className="w-[25%] py-3 px-4 font-semibold">Relation</th>
+              <th className="w-[40%] py-3 px-4 font-semibold">Phone</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            {contacts.map((person) => (
+              <tr key={person._id}>
+                <td className="text-center">
+                  <button
+                    onClick={() => onDelete(person._id)}
+                    className="flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 text-red-500 hover:text-red-700 transition-colors duration-300 cursor-pointer p-1 aspect-square h-10 rounded-full"
+                    title="Delete"
+                  >
+                    <FontAwesomeIcon icon={faTrash} />
+                  </button>
+                </td>
+                <td className="px-4 py-2">{person.name}</td>
+                <td className="px-4 py-2">{person.relation}</td>
+                <td className="px-4 py-2">{person.phone}</td>
               </tr>
-            </thead>
-            <tbody className="divide-y dark:divide-gray-700">
-              {contacts.map((person) => (
-                <tr key={person._id}>
-                  <td className="text-center">
-                    <button
-                      onClick={() => onDelete(person._id)}
-                      className="flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 text-red-500 hover:text-red-700 transition-colors duration-300 cursor-pointer p-1 aspect-square h-10 rounded-full"
-                      title="Delete"
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </td>
-                  <td className="px-4 py-2">{person.name}</td>
-                  <td className="px-4 py-2">{person.relation}</td>
-                  <td className="px-4 py-2">{person.phone}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </>
   );
