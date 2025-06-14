@@ -17,7 +17,7 @@ const Avatar = () => {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const containerRef = useClickOutside(() => setIsOpen(false));
+  const [containerRef, ignoreContainerRef] = useClickOutside(() => setIsOpen(false));
 
   const logoutUser = async () => {
     toast.promise(logout, {
@@ -36,7 +36,7 @@ const Avatar = () => {
 
   return (
     <div ref={containerRef}>
-      <AvatarIcon user={user} callback={() => setIsOpen((prev) => !prev)} />
+      <AvatarIcon ref={ignoreContainerRef} user={user} callback={() => setIsOpen((prev) => !prev)} />
       <div
         className={cn(
           "absolute right-2 mt-4 w-max bg-customLightBg dark:bg-customDarkBg py-5 px-10 rounded-sm ring-1 ring-gray-500 z-10 flex flex-col gap-3 transition-tranform duration-100 origin-top-right",

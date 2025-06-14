@@ -4,6 +4,9 @@ import { faClipboardList } from "@fortawesome/free-solid-svg-icons";
 import { faMessage } from "@fortawesome/free-regular-svg-icons";
 
 import IconTextButton from "@/components/ui/IconTextButton";
+import useClickOutside from "@/hooks/useClickOutside";
+
+import { cn } from "@/lib/cn";
 
 const notifications = [
   { id: 1, message: "You have 1 tasks due today" },
@@ -14,11 +17,13 @@ const notifications = [
 
 const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [containerRef, ignoreContainerRef] = useClickOutside(() => setIsOpen(false));
 
   return (
-    <div className="relative">
+    <div className="sm:relative">
       <IconTextButton
-        buttonProps={{ onClick: () => setIsOpen(!isOpen) }}
+        ref={ignoreContainerRef}
+        buttonProps={{ onClick: () => setIsOpen(prev => !prev) }}
         icon={
           <FontAwesomeIcon
             icon={faMessage}
@@ -28,29 +33,33 @@ const NotificationDropdown = () => {
         className="container rounded-full p-0"
       />
 
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg z-50">
-          <div className="p-3 border-b text-sm font-semibold text-gray-700 dark:text-gray-200">
-            Notifications
-          </div>
-          <div className="max-h-96 overflow-y-auto">
-            {notifications.map((n) => (
-              <div
-                key={n.id}
-                className="flex items-start gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                <FontAwesomeIcon
-                  icon={faClipboardList}
-                  className="text-indigo-500 text-xl mt-1"
-                />
-                <span className="text-sm text-gray-800 dark:text-gray-100">
-                  {n.message}
-                </span>
-              </div>
-            ))}
-          </div>
+      <div
+        ref={containerRef}
+        className={cn(
+          "absolute right-2 mt-3 w-80 sm:right-0 sm:mt-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg z-50 transition-tranform duration-100 origin-top-right",
+          isOpen ? "scale-100" : "scale-0"
+        )}
+      >
+        <div className="p-3 border-b text-sm font-semibold text-gray-700 dark:text-gray-200">
+          Notifications
         </div>
-      )}
+        <div className="max-h-96 overflow-y-auto">
+          {notifications.map((n) => (
+            <div
+              key={n.id}
+              className="flex items-start gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <FontAwesomeIcon
+                icon={faClipboardList}
+                className="text-indigo-500 text-xl mt-1"
+              />
+              <span className="text-sm text-gray-800 dark:text-gray-100">
+                {n.message}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
