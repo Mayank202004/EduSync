@@ -67,7 +67,7 @@ function ResourcesCard({
 
   return (
     <div className='bg-white dark:bg-customDarkFg p-5 rounded-md'>
-      <div className='flex items-center justify-between gap-5'>
+      <div className='flex items-center justify-between gap-5 flex-col sm:flex-row'>
         <div>
           {role != 'student' && (
             <button

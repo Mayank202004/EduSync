@@ -43,7 +43,7 @@ function ClassesCard({ classes,setClasses, onClassSelect, role='teacher' }) {
   }
   return (
     <div className='bg-white dark:bg-customDarkFg p-5 rounded-md w-full max-w-6xl'>
-      <div className='mb-4 flex items-center justify-between'>
+      <div className='mb-4 flex items-center justify-between flex-col sm:flex-row gap-2'>
         {/* Left side: Heading and description */}
         <div>
           <h1 className='text-2xl font-bold'>Select Class</h1>
