@@ -9,6 +9,7 @@ import Resources from '@/pages/Resources';
 import App from '@/App';
 import EditUserProfile from '@/pages/EditUserProfile';
 import Attendance from '@/pages/Attendance';
+import NotFound404 from '@/pages/NotFound404';
 
 const routes = createRoutesFromElements(
   <>
@@ -23,6 +24,8 @@ const routes = createRoutesFromElements(
       <Route path="/attendance" element={<Attendance />} />
       <Route path="/user/edit" element={<EditUserProfile />}/>
     </Route>
+
+    <Route path="/*" element={<NotFound404 />} />
   </>
 );
 
