@@ -1,19 +1,53 @@
 import connectDatabase from "./config/database.js";
 import { app } from "./app.js";
 import { seedDefaultFeeStructures } from "./seed/feeStructure.seed.js";
+import { Server } from "socket.io";
+import http from "http";
+import { setupSocket } from "./sockets/setupSocket.js";
+import cookie from "cookie";
+import jwt from "jsonwebtoken";
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Setup socket.io server
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    credentials: true,
+  },
+});
+io.use((socket, next) => {
+  const cookies = cookie.parse(socket.handshake.headers.cookie || "");
+  const token = cookies.token || cookies.accessToken;
+
+  if (!token) return next(new Error("Token missing"));
+
+  try {
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+    user.className = socket.handshake.query.className || null; // Inject className if sent as query
+    socket.user = user;
+    next();
+  } catch (err) {
+    return next(new Error("Invalid token"));
+  }
+});
+setupSocket(io); // Initialize socket events 
 
 connectDatabase()
-    .then(() => {
-        app.listen(process.env.PORT || 3000, () => {
-            console.log(`Server is running at port : ${process.env.PORT}`);
-        });
-    })
-    .catch((error) => {
-        console.error("MongoDB connection failed");
-        console.error(`Details : ${error}`);
-        process.exit(1);
+  .then(() => {
+    server.listen(process.env.PORT || 3000, () => {
+      console.log(`Server is running at port : ${process.env.PORT}`);
     });
+  })
+  .catch((error) => {
+    console.error("MongoDB connection failed");
+    console.error(`Details : ${error}`);
+    process.exit(1);
+  });
+
 await seedDefaultFeeStructures();
+
 
 // Routes Imports
 import userRouter from "./routes/user.routes.js";
