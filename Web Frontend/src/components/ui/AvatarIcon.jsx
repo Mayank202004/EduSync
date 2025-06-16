@@ -18,6 +18,7 @@ const sizeMap = {
 };
 
 const AvatarIcon = ({
+  ref,
   size = "small",
   withHover = true,
   callback = null,
@@ -28,6 +29,7 @@ const AvatarIcon = ({
 
   return (
     <div
+      ref={ref}
       onClick={callback}
       className={cn(
         "flex items-center justify-center text-center rounded-full overflow-hidden bg-cover ring-gray-500 dark:ring-white",

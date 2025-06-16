@@ -10,7 +10,7 @@ const ToggleTheme = ({ theme, setTheme }) => {
 
   return (
     <IconTextButton
-      buttonProps={{ onClick: handleToggleTheme, ariaLabel: "Toggle Theme" }}
+      buttonProps={{ onClick: handleToggleTheme, "aria-label": "Toggle Theme" }}
       icon={
         <img
           src={theme === "light" ? toggleDark : toggleLight}
