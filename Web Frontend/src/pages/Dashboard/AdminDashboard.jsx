@@ -1,10 +1,10 @@
 import React from 'react';
-import LeftSidebar from './components/Home/Sidebar/LeftSideBar';
-import RightSidebar from './components/Home/Sidebar/RightSidebar';
-import HomeContent from './components/Home/HomeContent';
+import LeftSidebar from '@/components/Home/Sidebar/LeftSidebar';
+import RightSidebar from '@/components/Home/Sidebar/RightSidebar';
+import HomeContent from '@/components/Home/HomeContent';
 
 
-const Layout = () => {
+const AdminDashboard = () => {
   return (
     <div className="flex grow w-full min-h-full bg-transparent">
       <div className="w-[20%] border-r border-gray-200 dark:border-gray-700">
@@ -20,4 +20,4 @@ const Layout = () => {
   );
 };
 
-export default Layout;
+export default AdminDashboard;
