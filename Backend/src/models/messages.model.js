@@ -1,13 +1,30 @@
-// models/Message.js
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const messageSchema = new mongoose.Schema({
-  room: { type: String, required: true }, // 'school', 'class-10A', 'private-studentId-teacherId'
-  sender: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  receiver: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // null for group messages
-  message: { type: String, required: true },
-  seen: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
-},);
+// TODO: Add image and pdf file sharing in the next version
+const chatMessageSchema = new Schema(
+  {
+    sender: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    content: {
+      type: String,
+    },
+    attachments: {
+      type: [
+        {
+          url: String,
+          localPath: String,
+        },
+      ],
+      default: [],
+    },
+    chat: {
+      type: Schema.Types.ObjectId,
+      ref: "Chat",
+    },
+  },
+  { timestamps: true }
+);
 
-export const Message = mongoose.model("Message", messageSchema);
+export const ChatMessage = mongoose.model("ChatMessage", chatMessageSchema);
