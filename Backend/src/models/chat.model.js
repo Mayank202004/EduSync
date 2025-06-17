@@ -10,12 +10,11 @@ const chatSchema = new Schema(
       type: Boolean,
       default: false, // true for class/school channels, false for private chats
     },
+    participants: [{ type: Schema.Types.ObjectId, ref: "User" }],
     className: String, // e.g., "10" – used only for class group filtering
     div: String,       // e.g., "A" – used with className for student’s class chat
-    lastMessage: {
-      type: Schema.Types.ObjectId,
-      ref: "ChatMessage",
-    },
   },
   { timestamps: true }
 );
+
+export const Chat = mongoose.model("Chat", chatSchema);

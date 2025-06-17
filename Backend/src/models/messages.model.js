@@ -27,4 +27,4 @@ const chatMessageSchema = new Schema(
   { timestamps: true }
 );
 
-export const ChatMessage = mongoose.model("ChatMessage", chatMessageSchema);
+export const Message = mongoose.model("ChatMessage", chatMessageSchema);
