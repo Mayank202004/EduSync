@@ -10,17 +10,41 @@ import { Teacher } from "../models/teacher.model.js";
  */
 export const getStudentChats = async (userId,className,div) => {
   // 1. Fetch School Group Chat
-  const schoolGroupChat = await Chat.findOne({
-    isGroupChat: true,
-    name: "School",
-  }).select("-updatedAt -createdAt -__v -participants");
+  const schoolGroupChat = await Chat.aggregate([
+    {
+      $match: {
+        isGroupChat: true,
+        name: "School",
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        isGroupChat: 1,
+        participantsCount: { $size: "$participants" },
+      },
+    },
+  ]);
+
 
   // 2. Fetch Class Group Chat
-  const classGroupChat = await Chat.findOne({
-    isGroupChat: true,
-    className,
-    div,
-  }).select("-updatedAt -createdAt -__v -participants");
+  const classGroupChat = await Chat.aggregate([
+    {
+      $match: {
+        isGroupChat: true,
+        className,
+        div
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        isGroupChat: 1,
+        participantsCount: { $size: "$participants" },
+      },
+    },
+  ]);
+
 
   // 3. Get All Teachers teaching this student’s class/div
   const teachers = await Teacher.find({

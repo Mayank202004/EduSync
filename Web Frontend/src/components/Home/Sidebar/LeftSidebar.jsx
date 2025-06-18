@@ -10,7 +10,9 @@ const directMessages = [
   { title: "Aditya Sunil", subtitle: "Student", avatarUrl: "../avatar.png" },
 ];
 
-const LeftSidebar = () => {
+const LeftSidebar = ({ chatData }) => {
+  console.log(`Received Chatdata : ${chatData}`)
+  if (!chatData) return <div>Loading Sidebar...</div>; //
   return (
     <div className="max-w-17/20 p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto">
       <div className="flex items-center justify-center gap-2 align-middle mb-3 px-3">
@@ -21,16 +23,16 @@ const LeftSidebar = () => {
         <h2 className="font-semibold text-1.5xl">Channels</h2>
       </div>
 
-      <ExpandableItem title="Announcements" defaultExpanded={true}>
+      {chatData?.announcements &&<ExpandableItem title="Announcements" defaultExpanded={true}>
         <ExpandableItemChild
-          title="School A - Kolhapur"
-          subtitle="2136 Members"
+          title={chatData?.announcements[0]?.name ?? "Unnamed Channel"}
+          subtitle={`${chatData?.announcements[0]?.participantsCount} Members`}
         />
-      </ExpandableItem>
+      </ExpandableItem>}
 
-      <ExpandableItem title="Sections" defaultExpanded={true}>
-        <ExpandableItemChild title="IX C" subtitle="85 Members" />
-      </ExpandableItem>
+      {chatData?.sectionChats && <ExpandableItem title="Sections" defaultExpanded={true}>
+        <ExpandableItemChild title={chatData?.sectionChats[0]?.name ?? "Unnamed Channel"} subtitle={`${chatData?.sectionChats[0]?.participantsCount} Members`} />
+      </ExpandableItem>}
 
       <h2 className="font-semibold mb-2 mt-4">Direct Messages</h2>
       <input
@@ -38,12 +40,12 @@ const LeftSidebar = () => {
         placeholder="Search for people"
         className="w-full p-1 mb-2 border rounded placeholder:text-gray-700 dark:placeholder:text-gray-300"
       />
-      {directMessages.map((item, index) => (
+      {chatData?.personalChats.map((item, index) => (
         <ExpandableItemChild
           key={index}
-          title={item.title}
-          subtitle={item.subtitle}
-          avatarUrl={item.avatarUrl}
+          title={item.teacher.name}
+          subtitle={item.teacher.subjects}
+          avatarUrl={item.avatar ?? ""}
         />
       ))}
     </div>
