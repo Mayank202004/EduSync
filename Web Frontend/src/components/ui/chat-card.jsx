@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import { SmilePlus, Send, MoreHorizontal, Check, CheckCheck } from "lucide-react";
 
 const ChatCard = ({
@@ -17,6 +17,10 @@ const ChatCard = ({
 }) => {
   const [messages, setMessages] = useState(initialMessages);
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(() => {
+  setMessages(initialMessages);
+}, [initialMessages]);
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;

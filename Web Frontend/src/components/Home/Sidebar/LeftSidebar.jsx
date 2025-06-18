@@ -11,7 +11,6 @@ const directMessages = [
 ];
 
 const LeftSidebar = ({ chatData }) => {
-  console.log(`Received Chatdata : ${chatData}`)
   if (!chatData) return <div>Loading Sidebar...</div>; //
   return (
     <div className="max-w-17/20 p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto">

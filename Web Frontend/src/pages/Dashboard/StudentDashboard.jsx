@@ -12,7 +12,6 @@ const StudentDashboard = () => {
   useEffect(() => {
     const getDashboardData = async () => {
       const response = await fetchStudentDashboardData();
-      console.log(response.data.chatData);
       setChats(response?.data.chatData);
     };
     getDashboardData();

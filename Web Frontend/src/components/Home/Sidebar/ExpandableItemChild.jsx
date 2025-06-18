@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import ChatCard from "/src/components/ui/chat-card.jsx";
+import { getChatMessages } from "@/services/chatService";
 
 const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
   const [showPopup, setShowPopup] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   const CURRENT_USER = {
     name: title,
@@ -16,6 +19,24 @@ const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
   const handleClosePopup = () => {
     setShowPopup(false); // Close popup
   };
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (!chatId || !showPopup) return;
+      setLoadingMessages(true);
+      try {
+        const response = await getChatMessages(chatId);
+        setMessages(response.data || []);
+        console.log(response);
+      } catch (err) {
+          console.error("Failed to fetch messages:", err);
+      } finally {
+        setLoadingMessages(false);
+      }
+    };
+
+    fetchMessages();
+  }, [showPopup, chatId]);
 
   return (
     <div>
@@ -46,12 +67,13 @@ const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
               X
             </button>
             <ChatCard
-              chatName={title} // Use title as chat name
-              membersCount={1} // Set to 1 as we are just showing this user in the popup
-              onlineCount={1} // Assume the user is online
-              initialMessages={[]} // No initial messages
+              chatName={title}
+              membersCount={1}
+              onlineCount={1}
+              initialMessages={messages}
+              loading={loadingMessages}
               currentUser={CURRENT_USER}
-              className="border border-zinc-200 dark:border-zinc-700" // Tailwind class for light/dark mode
+              className="border border-zinc-200 dark:border-zinc-700"
               onSendMessage={(message) => console.log("Sent:", message)}
               onReaction={(messageId, emoji) => console.log("Reaction:", messageId, emoji)}
               onMoreClick={() => console.log("More clicked")}
