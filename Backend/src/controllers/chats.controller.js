@@ -1,8 +1,6 @@
 import { Chat } from "../models/chat.model.js";
 import { Teacher } from "../models/teacher.model.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/apiError.js";
-import { ApiResponse } from "../utils/apiResponse.js";
+
 /**
  * @desc Helper function to fetch all chats for a student
  * @param {String} userId 
@@ -15,23 +13,14 @@ export const getStudentChats = async (userId,className,div) => {
   const schoolGroupChat = await Chat.findOne({
     isGroupChat: true,
     name: "School",
-  });
+  }).select("-updatedAt -createdAt -__v -participants");
 
   // 2. Fetch Class Group Chat
   const classGroupChat = await Chat.findOne({
     isGroupChat: true,
     className,
     div,
-  });
-
-  // Prepare group chats response
-  const groupChats = [schoolGroupChat, classGroupChat]
-    .filter(Boolean)
-    .map(chat => ({
-      _id: chat._id,
-      name: chat.name,
-      isGroupChat: true,
-    }));
+  }).select("-updatedAt -createdAt -__v -participants");
 
   // 3. Get All Teachers teaching this student’s class/div
   const teachers = await Teacher.find({
@@ -88,7 +77,8 @@ export const getStudentChats = async (userId,className,div) => {
 
   // Return final response
   return {
-    groupChats,
+    announcements: schoolGroupChat,
+    sectionChats: classGroupChat,
     personalChats,
   };
 };
@@ -101,13 +91,4 @@ export const getTeacherChats = async (userId,teacher) => {
   });
 
   // To Do: Prepae roup chats based on all classes that the teacher teaches 
-
 }
-
-export const fetchDashboardData = asyncHandler(async (req, res) => {
-    const user = req.user;
-    const student = req.student;
-
-    const chatData = await getStudentChats(user._id,student.class,student.div);
-    return res.status(200).json(new ApiResponse(200, {chatData}, "Dashboard data fetched successfully"));
-})

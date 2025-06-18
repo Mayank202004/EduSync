@@ -1,4 +1,7 @@
-import React from 'react'
+import React from 'react';
+import LeftSidebar from '@/components/Home/Sidebar/LeftSidebar';
+import RightSidebar from '@/components/Home/Sidebar/RightSidebar';
+import HomeContent from '@/components/Home/HomeContent';
 
 const TeacherDashboard = () => {
   return (
