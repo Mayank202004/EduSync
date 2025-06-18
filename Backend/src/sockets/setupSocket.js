@@ -6,15 +6,7 @@ export const setupSocket = (io) => {
     const user = socket.user;
     onlineUsers[user._id] = socket.id;
 
-    // Join general group rooms
-    socket.join("school");
-    socket.join(`class-${user.className}`);
     socket.join(`user-${user._id}`); // personal notification room
-
-    socket.on("joinPrivateChat", ({ peerId }) => {
-      const room = getPrivateRoomName(user._id, peerId);
-      socket.join(room);
-    });
 
     socket.on("sendMessage", async ({ room, message, receiverId }) => {
       // Save to DB

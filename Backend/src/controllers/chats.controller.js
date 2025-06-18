@@ -1,5 +1,9 @@
 import { Chat } from "../models/chat.model.js";
 import { Teacher } from "../models/teacher.model.js";
+import { Message } from "../models/messages.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/apiError.js";
+import { ApiResponse } from "../utils/apiResponse.js";
 
 /**
  * @desc Helper function to fetch all chats for a student
@@ -116,3 +120,15 @@ export const getTeacherChats = async (userId,teacher) => {
 
   // To Do: Prepae roup chats based on all classes that the teacher teaches 
 }
+
+
+/**
+ * @desc Fetch Message for given chat id
+ * @route GET /api/v1/chats/:chatId
+ * @access Private (User)
+ */
+export const getMessages = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const messages = await Message.find({ chat: id });
+  res.status(200).json(new ApiResponse(200, messages, "Messages fetched successfully"));
+});

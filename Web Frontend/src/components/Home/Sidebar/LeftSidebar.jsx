@@ -23,17 +23,25 @@ const LeftSidebar = ({ chatData }) => {
         <h2 className="font-semibold text-1.5xl">Channels</h2>
       </div>
 
+      {/* Announcements Chats */}
       {chatData?.announcements &&<ExpandableItem title="Announcements" defaultExpanded={true}>
         <ExpandableItemChild
           title={chatData?.announcements[0]?.name ?? "Unnamed Channel"}
           subtitle={`${chatData?.announcements[0]?.participantsCount} Members`}
+          chatId={chatData?.announcements[0]?._id}
         />
       </ExpandableItem>}
 
+      {/* Section Chats */}
       {chatData?.sectionChats && <ExpandableItem title="Sections" defaultExpanded={true}>
-        <ExpandableItemChild title={chatData?.sectionChats[0]?.name ?? "Unnamed Channel"} subtitle={`${chatData?.sectionChats[0]?.participantsCount} Members`} />
+        <ExpandableItemChild 
+          title={chatData?.sectionChats[0]?.name ?? "Unnamed Channel"} 
+          subtitle={`${chatData?.sectionChats[0]?.participantsCount} Members`} 
+          chatId={chatData?.sectionChats[0]?._id}
+        />
       </ExpandableItem>}
 
+      {/* Direct Messages */}
       <h2 className="font-semibold mb-2 mt-4">Direct Messages</h2>
       <input
         type="text"
@@ -46,6 +54,7 @@ const LeftSidebar = ({ chatData }) => {
           title={item.teacher.name}
           subtitle={item.teacher.subjects}
           avatarUrl={item.avatar ?? ""}
+          chatId={item._id}
         />
       ))}
     </div>

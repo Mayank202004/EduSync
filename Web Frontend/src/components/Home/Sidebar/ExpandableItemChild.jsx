@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ChatCard from "/src/components/ui/chat-card.jsx";
 
-const ExpandableItemChild = ({ title, subtitle, avatar }) => {
+const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
   const [showPopup, setShowPopup] = useState(false);
 
   const CURRENT_USER = {

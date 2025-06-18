@@ -60,7 +60,7 @@ import paidFeeRouter from "./routes/paidFees.routes.js";
 import calendarRouter from "./routes/calendar.routes.js";
 import classRouter from "./routes/classStructure.routes.js"
 import dashboardRouter from "./routes/dashboard.routes.js"
-
+import chatRouter from "./routes/chat.routes.js"
 
 // Routes Declarations
 app.use("/api/v1/users", userRouter);
@@ -73,6 +73,7 @@ app.use("/api/v1/fee",paidFeeRouter);
 app.use("/api/v1/calendar",calendarRouter);
 app.use("/api/v1/class",classRouter);
 app.use("/api/v1/dashboard",dashboardRouter);
+app.use("/api/v1/chat",chatRouter);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
