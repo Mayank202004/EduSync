@@ -1,6 +1,6 @@
 // File: UserProfile/index.jsx
 import { Suspense, lazy } from "react";
-import { useAuth } from "@/auth/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import LoadingScreen from "@/components/Loading";
 
 const StudentProfileSection = lazy(() => import("./StudentProfileSection"));

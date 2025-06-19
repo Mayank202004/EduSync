@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import LoadingScreen from '@/components/Loading';
 import Unauthorized401 from '../Unauthorized401';
 

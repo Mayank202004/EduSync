@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useState, useEffect} from 'react';
 import { getAttendanceByDate } from '@/services/attendenceService';
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import DaySummarySkeleton from './DaySummarySkeleton';
 
 function DaysSummary({className,div,date,goBack = ()=>{}}) {

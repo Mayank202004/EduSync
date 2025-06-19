@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '@/auth/AuthContext'; // assumes useAuth provides isAuthenticated & loading
+import { useAuth } from '@/context/AuthContext'; // assumes useAuth provides isAuthenticated & loading
 import LoadingScreen from './Loading';
 
 const ProtectedRoute = ({ children }) => {

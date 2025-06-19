@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { useAuth } from "@/auth/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 
 import SiblingsInfo from "@/components/EditUserProfile/SiblingsInfo";
 import EditAccountDetails from "@/components/EditUserProfile/EditAccountDetails";

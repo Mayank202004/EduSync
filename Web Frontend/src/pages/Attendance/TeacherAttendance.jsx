@@ -7,7 +7,7 @@ import DaysSummary from '@/components/Attendance/DaysSummary';
 import { useEffect } from 'react';
 import { getAttendanceDashboardData } from '@/services/attendenceService';
 import MarkAttendance from '@/components/Attendance/MarkAttendance';
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 function TeacherAttendance() {
   const { roleInfo } = useAuth();

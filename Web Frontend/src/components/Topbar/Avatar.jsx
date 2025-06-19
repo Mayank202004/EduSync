@@ -9,7 +9,7 @@ import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import AvatarIcon from "../ui/AvatarIcon";
 import IconTextButton from "../ui/IconTextButton";
-import { useAuth } from "@/auth/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 
 import { cn } from "@/lib/cn";
 

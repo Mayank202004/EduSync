@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { useAuth } from "@/auth/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 
 import AvatarIcon from "@/components/ui/AvatarIcon";
 import EditAccountDetails from "@/components/EditUserProfile/EditAccountDetails";

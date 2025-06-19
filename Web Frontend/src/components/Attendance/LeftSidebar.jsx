@@ -1,5 +1,5 @@
 import React from 'react'
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useState } from 'react';
 import Calendar from 'react-calendar';
 import { exportAttendance } from '@/services/attendenceService';

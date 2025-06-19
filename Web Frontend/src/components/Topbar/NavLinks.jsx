@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { useAuth } from "@/auth/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 
 const NavLinks = ({ closeMenuCallback }) => {
   const { user } = useAuth();

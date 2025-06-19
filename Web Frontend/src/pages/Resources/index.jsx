@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import LoadingScreen from '@/components/Loading';
 
 const StudentResources = lazy(() => import('./StudentResources'));
