@@ -1,4 +1,5 @@
 import { Message } from "../models/messages.model.js";
+import { Chat } from "../models/chat.model.js";
 const onlineUsers = {}; // userId → socketId
 
 export const setupSocket = (io) => {
@@ -8,32 +9,42 @@ export const setupSocket = (io) => {
 
     socket.join(`user-${user._id}`); // personal notification room
 
-    socket.on("sendMessage", async ({ room, message, receiverId }) => {
+    socket.on("sendMessage", async ({ chatId, content, attachments=[] }) => {
       // Save to DB
       await Message.create({
-        room,
+        chat:chatId,
         sender: user._id,
-        receiver: receiverId || null,
-        message,
+        content,
+        attachments
       });
 
-      // Emit to room
-      io.to(room).emit("receiveMessage", {
-        room,
-        message,
-        sender: user._id,
-      });
-
-      // Also notify individual user if they are not in room
-      const receiverSocketId = onlineUsers[receiverId];
-      if (receiverSocketId) {
-        io.to(receiverSocketId).emit("notifyNewMessage", {
+    // Emit to chat room
+    io.to(`chat-${chatId}`).emit("receiveMessage", {
+      chatId,
+      content,
+      attachments,
+      sender: user._id,
+    });
+    
+    // Notify all participants in chat (not just receiver)
+    const chat = await Chat.findById(chatId).populate("participants", "_id");
+    
+    for (const participant of chat.participants) {
+      const id = participant._id.toString();
+      if (id !== user._id.toString()) {
+        io.to(`user-${id}`).emit("notifyNewMessage", {
+          chatId,
           from: user._id,
-          room,
-          preview: message,
+          preview: content.slice(0, 100),
         });
       }
+    }
     });
+
+    socket.on("joinChat", (chatId) => {
+      socket.join(`chat-${chatId}`);
+    });
+
 
     socket.on("disconnect", () => {
       delete onlineUsers[user._id];
