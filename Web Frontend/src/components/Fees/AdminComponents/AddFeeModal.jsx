@@ -102,7 +102,7 @@ const AddFeeModal = ({
           <select
             value={feeType}
             onChange={(e) => setFeeType(e.target.value)}
-            className="w-full border px-3 py-2 rounded bg-customDarkFg"
+            className="w-full border px-3 py-2 rounded bg-white dark:bg-customDarkFg"
           >
             {FEE_TYPES.map((type) => (
               <option key={type} value={type}>{type}</option>
@@ -159,7 +159,7 @@ const AddFeeModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            className="px-4 py-2 bg-gray-300 rounded dark:bg-gray-600 hover:bg-gray-400"
           >
             Cancel
           </button>
