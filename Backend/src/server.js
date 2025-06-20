@@ -18,20 +18,27 @@ const io = new Server(server, {
   },
 });
 io.use((socket, next) => {
-  const cookies = cookie.parse(socket.handshake.headers.cookie || "");
-  const token = cookies.token || cookies.accessToken;
-
-  if (!token) return next(new Error("Token missing"));
-
   try {
-    const user = jwt.verify(token, process.env.JWT_SECRET);
-    user.className = socket.handshake.query.className || null; // Inject className if sent as query
+    const cookies = cookie.parse(socket.handshake.headers.cookie || "");
+    let token = cookies.accessToken;
+
+    // Try fallback token from auth
+    if (!token && socket.handshake.auth?.token) {
+      token = socket.handshake.auth.token;
+    }
+
+    if (!token) {
+      return next(new Error("Token missing"));
+    }
+    const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    user.className = socket.handshake.query.className || null;
     socket.user = user;
     next();
   } catch (err) {
     return next(new Error("Invalid token"));
   }
 });
+
 setupSocket(io); // Initialize socket events 
 
 connectDatabase()
