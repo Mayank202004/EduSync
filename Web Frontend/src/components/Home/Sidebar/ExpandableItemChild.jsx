@@ -1,6 +1,7 @@
 import React, { useState, useEffect} from "react";
 import ChatCard from "/src/components/ui/chat-card.jsx";
 import { getChatMessages } from "@/services/chatService";
+import useClickOutside from "@/hooks/useClickOutside";
 
 const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
   const [showPopup, setShowPopup] = useState(false);
@@ -19,6 +20,8 @@ const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
   const handleClosePopup = () => {
     setShowPopup(false); // Close popup
   };
+
+  const [containerRef] = useClickOutside(handleClosePopup);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -59,7 +62,7 @@ const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
       {/* Popup for Chat Screen */}
       {showPopup && (
         <div className="fixed bottom-0 left-0 mb-4 ml-4 z-50">
-          <div className="bg-transparent dark:bg-transaparent p-4 w-96 relative">
+          <div ref={containerRef} className="bg-transparent dark:bg-transaparent p-4 w-96 relative">
             <button
               onClick={handleClosePopup}
               className="absolute top-2 right-2 text-black dark:text-white bg-white dark:bg-gray-600 hover:bg-gray-500 p-2 rounded-full"
