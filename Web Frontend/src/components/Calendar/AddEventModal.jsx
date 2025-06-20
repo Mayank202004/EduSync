@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { addCalendarEvent } from "@/services/calendarService";
+import useClickOutside from "@/hooks/useClickOutside";
 
 const AddEventModal = ({ onClose, onSubmit }) => {
     // Hooks
     const [isSingleDay, setIsSingleDay] = useState(true);
     const [eventType, setEventType] = useState("event");
+
+    const [containerRef] = useClickOutside(onClose);
 
     /**
      * @desc Event handler for form submission
@@ -46,6 +49,7 @@ const AddEventModal = ({ onClose, onSubmit }) => {
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-md flex items-center justify-center">
       <form
+        ref={containerRef}
         onSubmit={handleSubmit}
         className="bg-white dark:bg-customDarkFg rounded-xl p-6 w-[90%] max-w-md shadow-lg"
       >

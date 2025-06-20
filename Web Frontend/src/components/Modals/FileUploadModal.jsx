@@ -1,3 +1,4 @@
+import useClickOutside from "@/hooks/useClickOutside";
 import React, { useState, useRef } from "react";
 import toast from "react-hot-toast";
 
@@ -15,6 +16,8 @@ const FileUploadModal = ({
   const [files, setFiles] = useState([]);
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+
+  const [containerRef] = useClickOutside(onClose)
 
   const handleFileSelect = (e) => {
     const selected = Array.from(e.target.files || []);
@@ -63,6 +66,7 @@ const FileUploadModal = ({
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-md flex items-center justify-center">
       <form
+        ref={containerRef}
         onSubmit={handleSubmit}
         onDrop={handleDrop}
         onDragOver={handleDragOver}

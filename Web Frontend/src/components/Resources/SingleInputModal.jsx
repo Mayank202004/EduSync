@@ -1,3 +1,4 @@
+import useClickOutside from "@/hooks/useClickOutside";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -13,6 +14,8 @@ const SingleInputModal = ({
   onAdd 
 }) => {
   const [value, setValue] = useState("");
+
+  const [containerRef] = useClickOutside(onClose);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,6 +43,7 @@ const SingleInputModal = ({
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-md flex items-center justify-center">
       <form
+        ref={containerRef}
         onSubmit={handleSubmit}
         className="bg-white dark:bg-customDarkFg rounded-xl p-6 w-[90%] max-w-md shadow-lg"
       >

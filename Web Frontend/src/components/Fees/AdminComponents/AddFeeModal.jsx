@@ -2,6 +2,7 @@ import { addFeeStructure } from "@/services/feeService";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { formatToYYYYMM_D } from "@/utils/dateUtils";
+import useClickOutside from "@/hooks/useClickOutside";
 
 const FEE_TYPES = ["Tuition Fee", "Transport Fee", "Other Fee"];
 
@@ -21,6 +22,8 @@ const AddFeeModal = ({
   const [compulsory, setCompulsory] = useState(false);
   const [addToAll, setAddToAll] = useState(false);
   const [className, setClassName] = useState("");
+
+  const [containerRef] = useClickOutside(onClose)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,6 +61,7 @@ const AddFeeModal = ({
     <div className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
+        ref={containerRef}
         className="bg-white dark:bg-customDarkFg rounded-xl p-6 w-[90%] max-w-md shadow-lg"
       >
         <h2 className="text-xl font-bold mb-4">Add New Fee</h2>

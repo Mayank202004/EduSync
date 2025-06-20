@@ -21,7 +21,7 @@ const useClickOutside = (onClickOutside) => {
         ignoreContainerRef.current &&
         ignoreContainerRef.current.contains(target);
 
-      if (isOutsideMain && !isInsideIgnore) {
+        if (isOutsideMain && !isInsideIgnore) {
         onClickOutside();
       }
     };
