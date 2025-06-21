@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { formatToYYYYMM_D } from "@/utils/dateUtils";
+import useClickOutside from "@/hooks/useClickOutside";
 
 const EditFeeModal = ({
   onClose,
@@ -15,8 +16,8 @@ const EditFeeModal = ({
   feeData.dueDate ? formatToYYYYMM_D(feeData.dueDate) : "");
   const [discount, setDiscount] = useState(feeData.discount || 0);
   const [editAll, setEditAll] = useState(false);
-  console.log(feeData);
 
+  const [containerRef] = useClickOutside(onClose);
   const handleSubmit = async (e) => {
       e.preventDefault();
 
@@ -45,6 +46,7 @@ const EditFeeModal = ({
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center">
       <form
+        ref={containerRef}
         onSubmit={handleSubmit}
         className="bg-white dark:bg-customDarkFg rounded-xl p-6 w-[90%] max-w-md shadow-lg"
       >
