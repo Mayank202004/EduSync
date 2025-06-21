@@ -3,8 +3,19 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { formatToYYYYMM_D } from "@/utils/dateUtils";
 import useClickOutside from "@/hooks/useClickOutside";
+import useExpandable from "@/hooks/useExpandable";
 
-const FEE_TYPES = ["Tuition Fee", "Transport Fee", "Other Fee"];
+import Input from "@/components/ui/Input";
+import SelectOption from "@/components/ui/SelectOption";
+import Checkbox from "@/components/ui/CheckBox";
+import ExpandableDiv from "@/components/ui/ExpandableDiv";
+import SimpleButton from "@/components/ui/SimpleButton";
+
+const FEE_TYPES = [
+  { value: "Tuition Fee", text: "Tuition Fee" },
+  { value: "Transport Fee", text: "Transport Fee" },
+  { value: "Other Fee", text: "Other Fee" },
+];
 
 const AddFeeModal = ({
   onClose,
@@ -23,12 +34,18 @@ const AddFeeModal = ({
   const [addToAll, setAddToAll] = useState(false);
   const [className, setClassName] = useState("");
 
-  const [containerRef] = useClickOutside(onClose)
+  const [backgroundContainerRef] = useClickOutside(onClose);
+  const { expanded, setExpanded, height, containerRef } = useExpandable(true);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!title.trim() || !amount || !dueDate || (!addToAll && !className.trim())) {
+    if (
+      !title.trim() ||
+      !amount ||
+      !dueDate ||
+      (!addToAll && !className.trim())
+    ) {
       toast.error("Please fill all required fields.");
       return;
     }
@@ -61,47 +78,45 @@ const AddFeeModal = ({
     <div className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
-        ref={containerRef}
+        ref={backgroundContainerRef}
         className="bg-white dark:bg-customDarkFg rounded-xl p-6 w-[90%] max-w-md shadow-lg"
       >
         <h2 className="text-xl font-bold mb-4">Add New Fee</h2>
 
-        <div className="mb-3">
-          <label className="block mb-1 font-medium">Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full border px-3 py-2 rounded"
-            placeholder="e.g. Term 1"
-            required
-          />
-        </div>
+        <Input
+          titleText="Title"
+          inputProps={{
+            name: "title",
+            type: "text",
+            placeholder: "e.g. Term 1",
+            required: true,
+          }}
+        />
+        <Input
+          titleText="Amount (₹)"
+          inputProps={{
+            name: "title",
+            type: "number",
+            placeholder: "e.g. 12000",
+            required: true,
+          }}
+        />
+        <Input
+          titleText="Due date"
+          inputProps={{
+            name: "due_date",
+            type: "date",
+            required: true,
+          }}
+        />
+        <SelectOption
+          title="Fee type"
+          options={FEE_TYPES}
+          containerStyle="flex-col gap-1.5 items-start w-full"
+          selectStyle="w-full"
+        />
 
-        <div className="mb-3">
-          <label className="block mb-1 font-medium">Amount (₹)</label>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full border px-3 py-2 rounded"
-            placeholder="e.g. 12000"
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label className="block mb-1 font-medium">Due Date</label>
-          <input
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            className="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
-
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label className="block mb-1 font-medium">Fee Type</label>
           <select
             value={feeType}
@@ -109,70 +124,57 @@ const AddFeeModal = ({
             className="w-full border px-3 py-2 rounded bg-white dark:bg-customDarkFg"
           >
             {FEE_TYPES.map((type) => (
-              <option key={type} value={type}>{type}</option>
+              <option key={type} value={type}>
+                {type}
+              </option>
             ))}
           </select>
-        </div>
+        </div> */}
 
-        <div className="mb-3">
-          <label className="block mb-1 font-medium">Discount (%)</label>
-          <input
-            type="number"
-            value={discount}
-            onChange={(e) => setDiscount(e.target.value)}
-            className="w-full border px-3 py-2 rounded"
-            placeholder="e.g. 10"
+        <Input
+          titleText="Discount (%)"
+          inputProps={{
+            name: "discount",
+            type: "number",
+            placeholder: "e.g. 10",
+          }}
+        />
+
+        <hr className="my-2" />
+        <Checkbox
+          label="Compulsory fee"
+          inputProps={{ name: "compulsory_fee" }}
+        />
+        <Checkbox
+          label="Add to all classes"
+          inputProps={{
+            name: "add_to_all",
+            checked: !expanded,
+            onChange: (e) => {
+              setExpanded(!e.target.checked);
+            },
+          }}
+        />
+
+        <ExpandableDiv
+          className="mt-1.5"
+          containerRef={containerRef}
+          height={height}
+        >
+          <Input
+            titleText="Class name"
+            inputProps={{ name: "class_name", placeholder: "e.g. 1, 2A" }}
           />
-        </div>
+        </ExpandableDiv>
 
-        <div className="flex items-center mb-3 gap-2">
-          <input
-            type="checkbox"
-            checked={compulsory}
-            onChange={(e) => setCompulsory(e.target.checked)}
-            id="compulsory"
-          />
-          <label htmlFor="compulsory" className="font-medium">Compulsory Fee</label>
-        </div>
-
-        <div className="flex items-center mb-3 gap-2">
-          <input
-            type="checkbox"
-            checked={addToAll}
-            onChange={(e) => setAddToAll(e.target.checked)}
-            id="addToAll"
-          />
-          <label htmlFor="addToAll" className="font-medium">Add to All Classes</label>
-        </div>
-
-        {!addToAll && (
-          <div className="mb-3">
-            <label className="block mb-1 font-medium">Class Name</label>
-            <input
-              type="text"
-              value={className}
-              onChange={(e) => setClassName(e.target.value)}
-              className="w-full border px-3 py-2 rounded"
-              placeholder="e.g. 1, 2A"
-              required={!addToAll}
-            />
-          </div>
-        )}
-
-        <div className="flex justify-end gap-2 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-300 rounded dark:bg-gray-600 hover:bg-gray-400"
+        <div className="flex gap-2 ml-auto my-2">
+          <SimpleButton
+            predefinedColor="gray"
+            buttonProps={{ type: "button", onClick: onClose }}
           >
             Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Add Fee
-          </button>
+          </SimpleButton>
+          <SimpleButton className="ml-0" predefinedColor="blue">Add Fee</SimpleButton>
         </div>
       </form>
     </div>
