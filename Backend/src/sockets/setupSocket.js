@@ -43,7 +43,14 @@ export const setupSocket = (io) => {
 
     socket.on("joinChat", (chatId) => {
       socket.join(`chat-${chatId}`);
+      console.log("Socket joined chat room:", `chat-${chatId}`);
     });
+
+    socket.on("leaveChat", (chatId) => {
+      socket.leave(`chat-${chatId}`);
+      console.log("Left chatroom", `chat-${chatId}`);
+    });
+
 
 
     socket.on("disconnect", () => {

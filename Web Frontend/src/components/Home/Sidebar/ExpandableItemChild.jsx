@@ -2,8 +2,10 @@ import React, { useState, useEffect} from "react";
 import ChatCard from "/src/components/ui/chat-card.jsx";
 import { getChatMessages } from "@/services/chatService";
 import useClickOutside from "@/hooks/useClickOutside";
+import { useSocket} from "@/context/SocketContext";
 
 const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
+  const { socket } = useSocket();
   const [showPopup, setShowPopup] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
@@ -13,12 +15,18 @@ const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
     avatar: avatar || "src/assets/avatar.png", // Default avatar if none is provided
   };
 
-  const handleClick = () => {
-    setShowPopup(true); // Open popup when clicked
-  };
+const handleClick = () => {
+  if (socket && socket.connected) {
+    socket.emit("joinChat", chatId); 
+  }
+  setShowPopup(true);
+};
 
   const handleClosePopup = () => {
-    setShowPopup(false); // Close popup
+    if (socket && socket.connected) {
+    socket.emit("leaveChat", chatId); 
+  }
+    setShowPopup(false); 
   };
 
   const [containerRef] = useClickOutside(handleClosePopup);
