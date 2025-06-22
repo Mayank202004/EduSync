@@ -1,7 +1,4 @@
-import { addFeeStructure } from "@/services/feeService";
-import React, { useState } from "react";
-import toast from "react-hot-toast";
-import { formatToYYYYMM_D } from "@/utils/dateUtils";
+import { useActionState, useState } from "react";
 import useClickOutside from "@/hooks/useClickOutside";
 import useExpandable from "@/hooks/useExpandable";
 
@@ -11,144 +8,119 @@ import Checkbox from "@/components/ui/CheckBox";
 import ExpandableDiv from "@/components/ui/ExpandableDiv";
 import SimpleButton from "@/components/ui/SimpleButton";
 
-const FEE_TYPES = [
-  { value: "Tuition Fee", text: "Tuition Fee" },
-  { value: "Transport Fee", text: "Transport Fee" },
-  { value: "Other Fee", text: "Other Fee" },
-];
+import { newFeeAction } from "./form_actions/newFeeAction";
+
+import { FEE_TYPES } from "./value_maps/feeMaps";
 
 const AddFeeModal = ({
   onClose,
-  onSubmit,
-  onAdd,
-  loadingMessage = "Adding fee data...",
-  successMessage = "Fee added successfully!",
-  errorMessage = "",
+  // onSubmit,
+  // onAdd,
 }) => {
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [dueDate, setDueDate] = useState("");
-  const [feeType, setFeeType] = useState(FEE_TYPES[0]);
-  const [discount, setDiscount] = useState(0);
-  const [compulsory, setCompulsory] = useState(false);
-  const [addToAll, setAddToAll] = useState(false);
-  const [className, setClassName] = useState("");
-
   const [backgroundContainerRef] = useClickOutside(onClose);
   const { expanded, setExpanded, height, containerRef } = useExpandable(true);
+  const [isCompulsory, setIsCompulsory] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (
-      !title.trim() ||
-      !amount ||
-      !dueDate ||
-      (!addToAll && !className.trim())
-    ) {
-      toast.error("Please fill all required fields.");
-      return;
-    }
-
-    const payload = {
-      title,
-      amount: parseFloat(amount),
-      dueDate: formatToYYYYMM_D(dueDate),
-      feeType,
-      discount: parseFloat(discount),
-      compulsory,
-      className: addToAll ? null : className.trim(),
-      addToAllClasses: addToAll,
-    };
-
-    try {
-      const response = await toast.promise(addFeeStructure(payload), {
-        loading: loadingMessage,
-        success: successMessage,
-        error: errorMessage,
-      });
-
-      onSubmit(payload);
-    } catch (err) {
-      // Error is handled by toast.promise
-    }
-  };
+  const [feeInfo, formAction, isPending] = useActionState(newFeeAction, {
+    errors: null,
+    inputValues: {
+      title: "",
+      amount: "",
+      dueDate: "",
+      feeType: FEE_TYPES[0].value,
+      discount: "",
+      compulsory: false,
+      addToAll: false,
+      className: "",
+    },
+  });
 
   return (
     <div className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center">
       <form
-        onSubmit={handleSubmit}
+        action={formAction}
         ref={backgroundContainerRef}
         className="bg-white dark:bg-customDarkFg rounded-xl p-6 w-[90%] max-w-md shadow-lg"
       >
         <h2 className="text-xl font-bold mb-4">Add New Fee</h2>
 
         <Input
+          key={feeInfo.inputValues.title + "title"}
           titleText="Title"
+          error={feeInfo.errors?.get("title")}
           inputProps={{
             name: "title",
             type: "text",
             placeholder: "e.g. Term 1",
+            defaultValue: feeInfo.inputValues.title,
             required: true,
           }}
         />
         <Input
+          key={feeInfo.inputValues.amount + "amount"}
           titleText="Amount (₹)"
+          error={feeInfo.errors?.get("amount")}
           inputProps={{
-            name: "title",
+            name: "amount",
             type: "number",
             placeholder: "e.g. 12000",
+            defaultValue: feeInfo.inputValues.amount,
             required: true,
           }}
         />
         <Input
+          key={feeInfo.inputValues.dueDate + "dueDate"}
           titleText="Due date"
+          error={feeInfo.errors?.get("dueDate")}
           inputProps={{
-            name: "due_date",
+            name: "dueDate",
             type: "date",
+            defaultValue: feeInfo.inputValues.dueDate,
             required: true,
           }}
         />
         <SelectOption
+          key={feeInfo.inputValues.feeType}
           title="Fee type"
           options={FEE_TYPES}
+          selectProps={{
+            name:"feeType",
+            required: true,
+            defaultValue: feeInfo.inputValues.feeType,
+          }}
           containerStyle="flex-col gap-1.5 items-start w-full"
           selectStyle="w-full"
         />
 
-        {/* <div className="mb-3">
-          <label className="block mb-1 font-medium">Fee Type</label>
-          <select
-            value={feeType}
-            onChange={(e) => setFeeType(e.target.value)}
-            className="w-full border px-3 py-2 rounded bg-white dark:bg-customDarkFg"
-          >
-            {FEE_TYPES.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </div> */}
-
         <Input
+          key={feeInfo.inputValues.discount + "discount"}
           titleText="Discount (%)"
+          error={feeInfo.errors?.get("discount")}
           inputProps={{
             name: "discount",
             type: "number",
             placeholder: "e.g. 10",
+            defaultValue: feeInfo.inputValues.discount,
           }}
         />
 
         <hr className="my-2" />
         <Checkbox
+          key={feeInfo.inputValues.compulsory + "compulsory"}
           label="Compulsory fee"
-          inputProps={{ name: "compulsory_fee" }}
+          inputProps={{
+            name: "compulsory",
+            value: "compulsary",
+            checked: isCompulsory,
+            onChange: (e) => setIsCompulsory(e.target.checked)
+          }}
         />
         <Checkbox
+          key={feeInfo.inputValues.addToAll}
           label="Add to all classes"
           inputProps={{
-            name: "add_to_all",
+            name: "addToAll",
+            value: "addtoAll",
             checked: !expanded,
             onChange: (e) => {
               setExpanded(!e.target.checked);
@@ -162,19 +134,28 @@ const AddFeeModal = ({
           height={height}
         >
           <Input
+            key={feeInfo.inputValues.className + "className"}
             titleText="Class name"
-            inputProps={{ name: "class_name", placeholder: "e.g. 1, 2A" }}
+            error={feeInfo.errors?.get("className")}
+            inputProps={{
+              name: "className",
+              placeholder: "e.g. 1, 2A",
+              defaultValue: feeInfo.inputValues.className,
+              required: expanded
+            }}
           />
         </ExpandableDiv>
 
         <div className="flex gap-2 ml-auto my-2">
           <SimpleButton
             predefinedColor="gray"
-            buttonProps={{ type: "button", onClick: onClose }}
+            buttonProps={{ type: "button", onClick: onClose, disabled: isPending }}
           >
             Cancel
           </SimpleButton>
-          <SimpleButton className="ml-0" predefinedColor="blue">Add Fee</SimpleButton>
+          <SimpleButton className="ml-0" predefinedColor="blue" buttonProps={{ disabled: isPending }}>
+            {isPending ? "Adding...": "Add Fee"}
+          </SimpleButton>
         </div>
       </form>
     </div>
