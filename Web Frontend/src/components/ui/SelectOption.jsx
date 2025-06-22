@@ -11,7 +11,7 @@ const SelectOption = ({
   nostyle=false
 }) => {
   return (
-    <div className={cn("flex w-fit gap-4 items-center", containerStyle)}>
+    <div className={cn("flex w-fit gap-4 items-center mb-1.5", containerStyle)}>
       {title && <label className={cn("font-semibold", titleStyle)}>{title}</label>}
       <select
         {...selectProps}

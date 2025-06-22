@@ -1,8 +1,9 @@
 import { cn } from "@/lib/cn";
 
 const BUTTON_STYLES = {
-  blue: "bg-blue-300 dark:bg-blue-400 hover:bg-blue-400 dark:hover:bg-blue-300",
+  blue: "bg-blue-300 dark:bg-blue-500 hover:bg-blue-400 dark:hover:bg-blue-400 disabled:opacity-50",
   green: "bg-green-400 text-black hover:not-disabled:bg-green-600 disabled:opacity-50",
+  gray: "bg-gray-300 dark:bg-gray-600 hover:not-disabled:bg-gray-400 disabled:opacity-50",
   custom: " "
 }
 

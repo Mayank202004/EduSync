@@ -18,6 +18,7 @@ const useExpandable = (initialState = false) => {
   return {
     expanded,
     setExpanded,
+    setHeight,
     height,
     containerRef,
   };

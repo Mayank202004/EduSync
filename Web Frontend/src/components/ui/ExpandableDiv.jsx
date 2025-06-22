@@ -4,7 +4,7 @@ const ExpandableDiv = ({ containerRef, height, className, children }) => {
   return (
     <div
       ref={containerRef}
-      className={cn(className)}
+      className={cn("px-0.5", className)}
       style={{
         maxHeight: `${height}px`,
         transition: "max-height 0.3s ease",
