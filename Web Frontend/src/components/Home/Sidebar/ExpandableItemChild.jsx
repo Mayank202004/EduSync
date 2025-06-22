@@ -5,7 +5,7 @@ import useClickOutside from "@/hooks/useClickOutside";
 import { useSocket} from "@/context/SocketContext";
 
 const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
-  const { socket } = useSocket();
+  const { socket, setActiveChat} = useSocket();
   const [showPopup, setShowPopup] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
@@ -15,17 +15,25 @@ const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
     avatar: avatar || "src/assets/avatar.png", // Default avatar if none is provided
   };
 
+/**
+ * @desc Opens the chat popup on click
+ */  
 const handleClick = () => {
   if (socket && socket.connected) {
-    socket.emit("joinChat", chatId); 
+    socket.emit("joinChat", chatId);
   }
+  setActiveChat(chatId); 
   setShowPopup(true);
 };
 
+/**
+ * @desc Closes the chat popup 
+ */
   const handleClosePopup = () => {
     if (socket && socket.connected) {
-    socket.emit("leaveChat", chatId); 
-  }
+      socket.emit("leaveChat", chatId); 
+    }
+    setActiveChat(null);
     setShowPopup(false); 
   };
 
@@ -85,7 +93,11 @@ const handleClick = () => {
               loading={loadingMessages}
               currentUser={CURRENT_USER}
               className="border border-zinc-200 dark:border-zinc-700"
-              onSendMessage={(message) => console.log("Sent:", message)}
+              onSendMessage={
+                (chatId,content,attachments) => {
+                  socket.emit("sendMessage", { chatId, content, attachments });
+                }
+              }
               onReaction={(messageId, emoji) => console.log("Reaction:", messageId, emoji)}
               onMoreClick={() => console.log("More clicked")}
             />

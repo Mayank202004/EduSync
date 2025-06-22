@@ -10,6 +10,15 @@ export const SocketProvider = ({ children }) => {
   const { user } = useAuth();
   const [socket, setSocket] = useState(null);
   const [unseen, setUnseen] = useState({}); // { chatId: count }
+  const activeChatId = useRef(null);
+
+  /**
+   * @desc Sets the active chat
+   * @param {String} chatId 
+   */
+  const setActiveChat = (chatId) => {
+    activeChatId.current = chatId;
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -50,7 +59,7 @@ export const SocketProvider = ({ children }) => {
   }, [user]);
 
   return (
-    <SocketContext.Provider value={{ socket, unseen, setUnseen }}>
+    <SocketContext.Provider value={{ socket, unseen, setUnseen, setActiveChat}}>
       {children}
     </SocketContext.Provider>
   );
