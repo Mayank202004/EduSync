@@ -138,7 +138,10 @@ export const getTeacherChats = async (userId,teacher) => {
  */
 export const getMessages = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const messages = await Message.find({ chat: id });
+  const messages = await Message.find({ chat: id }).populate({
+    path: "sender",
+    select: "username fullName avatar" // To Do : remove fullName if not needed (Also create a profile page to be vieweed by others)
+  });
   res.status(200).json(new ApiResponse(200, messages, "Messages fetched successfully"));
 });
 

@@ -14,8 +14,9 @@ const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
 
   const CURRENT_USER = {
     _id: user?._id,
-    name: title,
-    avatar: user?.avatar || "src/assets/avatar.png", // Default avatar if none is provided
+    fullName: user?.fullName,
+    username: user?.username,
+    avatar: user?.avatar || "src/assets/avatar.png", // Default avatar if none is provided To Do
   };
 
 /**

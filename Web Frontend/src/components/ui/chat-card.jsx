@@ -1,5 +1,6 @@
 import React, { useState, useEffect} from "react";
 import { SmilePlus, Send, MoreHorizontal, Check, CheckCheck } from "lucide-react";
+import { formatDate } from "@/utils/dateUtils";
 import { useSocket } from "@/context/SocketContext";
 
 const ChatCard = ({
@@ -10,7 +11,8 @@ const ChatCard = ({
   initialMessages = [],
   currentUser = {
     _id: null,
-    name: "You",
+    fullName: "You",
+    username: null,
     avatar: "../assets/avatar.png",
   },
   onSendMessage= ()=>{},
@@ -46,22 +48,21 @@ const ChatCard = ({
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
 
+    console.log(`Testing msg user name : ${currentUser.name} avatar : ${currentUser.avatar}`);
     const newMessage = {
       id: Date.now().toString(),
       content: inputValue,
       sender: {
-        name: currentUser.name,
+        _id: currentUser._id,
+        fullName: currentUser.fullName,
         avatar: currentUser.avatar,
         isOnline: true,
         isCurrentUser: true,
       },
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      }),
+      updatedAt: new Date(),
       status: "sent",
     };
+
 
     setMessages((prev) => [...prev, newMessage]);
     setInputValue("");
@@ -84,7 +85,7 @@ const ChatCard = ({
   const handleReaction = (messageId, emoji) => {
     setMessages((prev) =>
       prev.map((message) => {
-        if (message.id === messageId) {
+        if (message._id === messageId) {
           const existingReaction = message.reactions?.find((r) => r.emoji === emoji);
           const newReactions = message.reactions || [];
 
@@ -138,30 +139,31 @@ const ChatCard = ({
       <div key={message.id} className="message flex gap-3 items-start">
         <img
           src={message.sender.avatar}
-          alt={message.sender.name}
+          alt={message.sender.username}
           draggable="false"
           className="w-9 h-9 rounded-full"
         />
         <div className="message-content flex flex-col">
           <div className="message-header flex justify-between text-sm text-gray-400 gap-3">
-            <span className="sender-name text-black dark:text-white">{message.sender.name}</span>
-            <span className="timestamp">{message.timestamp}</span>
+            <span className="sender-name text-black dark:text-white font-bold break-words flex-grow">{message.sender.fullName}</span>
+            <span className="timestamp shrink-0">{formatDate(message.updatedAt)}</span>
           </div>
           <p className="message-text text-black dark:text-white">{message.content}</p>
-          {message.reactions && message.reactions.length > 0 && (
-            <div className="reactions flex space-x-2">
-              {message.reactions.map((reaction) => (
+          <div className="reactions flex space-x-2 mt-1">
+            {["👍", "❤️", "😂"].map((emoji) => {
+              const reaction = message.reactions?.find((r) => r.emoji === emoji);
+              return (
                 <button
-                  key={reaction.emoji}
-                  onClick={() => handleReaction(message.id, reaction.emoji)}
-                  className="reaction-btn flex items-center space-x-1 text-gray-300"
+                  key={emoji}
+                  onClick={() => handleReaction(message._id, emoji)}
+                  className="reaction-btn flex items-center space-x-1 text-gray-600 dark:text-gray-300"
                 >
-                  <span>{reaction.emoji}</span>
-                  <span>{reaction.count}</span>
+                  <span>{emoji}</span>
+                  <span>{reaction?.count ?? 0}</span>
                 </button>
-              ))}
-            </div>
-          )}
+              );
+            })}
+          </div>
         </div>
       </div>
     ))
