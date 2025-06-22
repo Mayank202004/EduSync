@@ -11,7 +11,7 @@ const directMessages = [
 ];
 
 const LeftSidebar = ({ chatData }) => {
-  if (!chatData) return <div>Loading Sidebar...</div>; //
+  // if (!chatData) return <div>Loading Sidebar...</div>; // To do : add skeleton loading
   return (
     <div className="max-w-17/20 p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto">
       <div className="flex items-center justify-center gap-2 align-middle mb-3 px-3">

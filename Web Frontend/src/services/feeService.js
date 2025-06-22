@@ -29,3 +29,10 @@ export const addFeeStructure = async (data) => {
   const response = await axiosInstance.post("/feestructure/add", data);
   return response.data;
 }
+
+
+export const updateFeeStructure = async (data) => {
+  console.log("Mock updateFeeStructure called with:", data);
+  return { success: true };
+};
+
