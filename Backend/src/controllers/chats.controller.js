@@ -132,3 +132,19 @@ export const getMessages = asyncHandler(async (req, res) => {
   const messages = await Message.find({ chat: id });
   res.status(200).json(new ApiResponse(200, messages, "Messages fetched successfully"));
 });
+
+/**
+ * @desc Update unread message count to 0 for a given chatid
+ * @route PUT /api/v1/chats/:chatId
+ * @access Private (User)
+ */
+export const resetUnreadCount = asyncHandler(async (req, res) => {
+  const { chatId } = req.params;
+  const chat = await Chat.findById(chatId);
+  if(!chat){
+    throw new ApiError(404, "Chat not found");
+  }
+  chat.unreadCounts.set(req.user._id, 0);
+  await chat.save();
+  res.status(200).json(new ApiResponse(200, chat, "Unread count reset successfully"));
+});

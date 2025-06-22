@@ -13,6 +13,11 @@ const chatSchema = new Schema(
     participants: [{ type: Schema.Types.ObjectId, ref: "User" }],
     className: String, // e.g., "10" – used only for class group filtering
     div: String,       // e.g., "A" – used with className for student’s class chat
+    unreadCounts: {
+      type: Map,
+      of: Number, // key: userId, value: unreadCount
+      default: {},
+    },
   },
   { timestamps: true }
 );
