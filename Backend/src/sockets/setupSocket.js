@@ -29,26 +29,28 @@ export const setupSocket = (io) => {
     // Notify all participants in chat (not just receiver)
     const chat = await Chat.findById(chatId).populate("participants", "_id");
     
-    for (const participant of chat.participants) {
-      const id = participant._id.toString();
-      if (id !== user._id.toString()) {
-        io.to(`user-${id}`).emit("notifyNewMessage", {
-          chatId,
-          from: user._id,
-          preview: content.slice(0, 100),
-        });
+    if (chat && Array.isArray(chat.participants)) {
+      for (const participant of chat.participants) {
+        const id = participant._id.toString();
+        if (id !== user._id.toString()) {
+          io.to(`user-${id}`).emit("notifyNewMessage", {
+            chatId,
+            from: user._id,
+            preview: content.slice(0, 100),
+          });
+        }
       }
     }
     });
 
     socket.on("joinChat", (chatId) => {
       socket.join(`chat-${chatId}`);
-      console.log("Socket joined chat room:", `chat-${chatId}`);
+      //console.log("Socket joined chat room:", `chat-${chatId}`);
     });
 
     socket.on("leaveChat", (chatId) => {
       socket.leave(`chat-${chatId}`);
-      console.log("Left chatroom", `chat-${chatId}`);
+      //console.log("Left chatroom", `chat-${chatId}`);
     });
 
 

@@ -59,7 +59,7 @@ export const SocketProvider = ({ children }) => {
   }, [user]);
 
   return (
-    <SocketContext.Provider value={{ socket, unseen, setUnseen, setActiveChat}}>
+    <SocketContext.Provider value={{ socket, unseen, setUnseen,activeChatId, setActiveChat}}>
       {children}
     </SocketContext.Provider>
   );

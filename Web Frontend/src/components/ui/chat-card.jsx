@@ -1,26 +1,47 @@
 import React, { useState, useEffect} from "react";
 import { SmilePlus, Send, MoreHorizontal, Check, CheckCheck } from "lucide-react";
+import { useSocket } from "@/context/SocketContext";
 
 const ChatCard = ({
   chatName = "Team Chat",
+  chatId=null,
   membersCount = 3,
   onlineCount = 2,
   initialMessages = [],
   currentUser = {
+    _id: null,
     name: "You",
     avatar: "../assets/avatar.png",
   },
-  onSendMessage,
-  onReaction,
-  onMoreClick,
+  onSendMessage= ()=>{},
+  onReaction=()=>{},
+  onMoreClick=()=>{},
   className,
 }) => {
+  const {socket} = useSocket();
   const [messages, setMessages] = useState(initialMessages);
   const [inputValue, setInputValue] = useState("");
+  const [attachments, setAttachments] = useState([]);
 
+  // Setting initial message
   useEffect(() => {
-  setMessages(initialMessages);
-}, [initialMessages]);
+    setMessages(initialMessages);
+  }, [initialMessages]);
+
+  // Listen for incoming messages
+  useEffect(() => {
+    if (!socket) return;
+    const handleIncoming = (message) => {
+      if(message.sender == currentUser._id) return;
+      if (message.chatId === chatId) {
+        setMessages((prev) => [...prev, message]);
+      }
+    };
+    socket.on("receiveMessage", handleIncoming);
+    return () => socket.off("receiveMessage", handleIncoming);
+  }, [socket]);
+
+
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -44,7 +65,7 @@ const ChatCard = ({
 
     setMessages((prev) => [...prev, newMessage]);
     setInputValue("");
-    onSendMessage?.(inputValue);
+    onSendMessage(inputValue,attachments);
 
     // Simulate message delivery and read status
     setTimeout(() => {

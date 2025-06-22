@@ -3,16 +3,19 @@ import ChatCard from "/src/components/ui/chat-card.jsx";
 import { getChatMessages } from "@/services/chatService";
 import useClickOutside from "@/hooks/useClickOutside";
 import { useSocket} from "@/context/SocketContext";
+import { useAuth } from "@/context/AuthContext";
 
 const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
-  const { socket, setActiveChat} = useSocket();
+  const { socket, activeChatId,setActiveChat} = useSocket();
   const [showPopup, setShowPopup] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const { user } = useAuth();
 
   const CURRENT_USER = {
+    _id: user?._id,
     name: title,
-    avatar: avatar || "src/assets/avatar.png", // Default avatar if none is provided
+    avatar: user?.avatar || "src/assets/avatar.png", // Default avatar if none is provided
   };
 
 /**
@@ -87,6 +90,7 @@ const handleClick = () => {
             </button>
             <ChatCard
               chatName={title}
+              chatId={activeChatId.current}
               membersCount={1}
               onlineCount={1}
               initialMessages={messages}
@@ -94,8 +98,8 @@ const handleClick = () => {
               currentUser={CURRENT_USER}
               className="border border-zinc-200 dark:border-zinc-700"
               onSendMessage={
-                (chatId,content,attachments) => {
-                  socket.emit("sendMessage", { chatId, content, attachments });
+                (content,attachments) => {
+                  socket.emit("sendMessage", { chatId:activeChatId.current, content, attachments });
                 }
               }
               onReaction={(messageId, emoji) => console.log("Reaction:", messageId, emoji)}
