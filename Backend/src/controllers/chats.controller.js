@@ -26,6 +26,9 @@ export const getStudentChats = async (userId,className,div) => {
         name: 1,
         isGroupChat: 1,
         participantsCount: { $size: "$participants" },
+        unreadMessageCount: {
+          $ifNull: [`$unreadCounts.${userId.toString()}`, 0],
+        },
       },
     },
   ]);
@@ -45,6 +48,9 @@ export const getStudentChats = async (userId,className,div) => {
         name: 1,
         isGroupChat: 1,
         participantsCount: { $size: "$participants" },
+        unreadMessageCount: {
+          $ifNull: [`$unreadCounts.${userId.toString()}`, 0],
+        },
       },
     },
   ]);
@@ -80,6 +86,8 @@ export const getStudentChats = async (userId,className,div) => {
         });
       }
 
+      const unreadMessageCount = chat.unreadCounts.get(userId.toString()) || 0;
+
       // Get subject(s) taught by this teacher to the student
       const subjectNames = teacher.subjects
         .filter(sub =>
@@ -90,6 +98,7 @@ export const getStudentChats = async (userId,className,div) => {
       return {
         chatId: chat._id,
         updatedAt: chat.updatedAt,
+        unreadMessageCount, 
         teacher: {
           _id: teacherUserId,
           name: teacher.userId.fullName,
