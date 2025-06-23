@@ -120,15 +120,104 @@ export const getStudentChats = async (userId,className,div) => {
   };
 };
 
-export const getTeacherChats = async (userId,teacher) => {
+/**
+ * @desc Helper function to fetch all chats for a teacher
+ * @param {Object} - teacher details object
+ * @returns {Object} - { groupChats, personalChats }
+ */
+export const getTeacherChats = async (teacher) => {
+  const teacherId = teacher?._id;
+  const teacherUserId = teacher?.userId;
   // 1. Fetch School Group Chat
-  const schoolGroupChat = await Chat.findOne({
-    isGroupChat: true,
-    name: "School Channel",
+  const schoolGroupChat = await Chat.aggregate([
+    {
+      $match: {
+        isGroupChat: true,
+        name: "School",
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        isGroupChat: 1,
+        participantsCount: { $size: "$participants" },
+        unreadMessageCount: {
+          $ifNull: [`$unreadCounts.${teacherUserId.toString()}`, 0],
+        },
+      },
+    },
+  ]);
+
+   
+  // 3. Flatten all classes/div combinations the teacher teaches
+  const classDivPairs = [];
+  teacher.subjects.forEach(subject => {
+    subject.classes.forEach(cls => {
+      cls.div.forEach(d => {
+        classDivPairs.push({ class: cls.class, div: d });
+      });
+    });
   });
 
-  // To Do: Prepae roup chats based on all classes that the teacher teaches 
-}
+  // 4. Get class group chats for all class/div pairs
+  const classGroupChats = await Chat.aggregate([
+    {
+      $match: {
+        isGroupChat: true,
+        $or: classDivPairs.map(pair => ({
+          className: pair.class,
+          div: pair.div,
+        })),
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        className: 1,
+        div: 1,
+        isGroupChat: 1,
+        participantsCount: { $size: "$participants" },
+        unreadMessageCount: {
+          $ifNull: [`$unreadCounts.${teacherUserId.toString()}`, 0],
+        },
+      },
+    },
+  ]);
+
+  // 5. Get all private (non-group) chats for the teacher
+  const personalChatsRaw = await Chat.find({
+    isGroupChat: false,
+    participants: teacherUserId,
+  })
+    .populate({
+      path: "participants",
+      select: "fullName avatar",
+      match: { _id: { $ne: teacherUserId } }, // get the other participant only
+    })
+    .sort({ updatedAt: -1 });
+
+  const personalChats = personalChatsRaw.map(chat => {
+    const otherUser = chat.participants[0]; // the student
+    return {
+      chatId: chat._id,
+      updatedAt: chat.updatedAt,
+      unreadMessageCount: chat.unreadCounts?.get?.(teacherUserId.toString()) || 0,
+      student: {
+        _id: otherUser?._id,
+        name: otherUser?.fullName,
+        avatar: otherUser?.avatar,
+      },
+    };
+  });
+
+  // Final response
+  return {
+    announcements: schoolGroupChat,
+    sectionChats: classGroupChats,
+    personalChats,
+  };
+};
+
 
 
 /**

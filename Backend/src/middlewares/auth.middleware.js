@@ -58,7 +58,7 @@ export const verifyTeacher = asyncHandler(async (req, _, next) => {
         throw new ApiError(403, "Forbidden: You do not have permission to access this resource.");
     }
 
-    const teacher = await Teacher.findOne({userId:user._id}).select("-phone -address -userId -classCoordinator");
+    const teacher = await Teacher.findOne({userId:user._id}).select("-phone -address -classCoordinator");
 
     if (!teacher) {
         throw new ApiError(404, "No teacher found");
