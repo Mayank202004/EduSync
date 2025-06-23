@@ -6,6 +6,7 @@ import http from "http";
 import { setupSocket } from "./sockets/setupSocket.js";
 import cookie from "cookie";
 import jwt from "jsonwebtoken";
+import { User } from "./models/user.model.js";
 
 // Create HTTP server
 const server = http.createServer(app);
@@ -17,7 +18,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
-io.use((socket, next) => {
+io.use(async(socket, next) => {
   try {
     const cookies = cookie.parse(socket.handshake.headers.cookie || "");
     let token = cookies.accessToken;
@@ -30,7 +31,10 @@ io.use((socket, next) => {
     if (!token) {
       return next(new Error("Token missing"));
     }
-    const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const user = await User.findById(decoded._id).select("-password");
+    
+    if (!user) return next(new Error("User not found"));
     user.className = socket.handshake.query.className || null;
     socket.user = user;
     next();

@@ -31,14 +31,20 @@ const LeftSidebar = ({ chatData }) => {
         />
       </ExpandableItem>}
 
-      {/* Section Chats */}
-      {chatData?.sectionChats && <ExpandableItem title="Sections" defaultExpanded={true}>
-        <ExpandableItemChild 
-          title={chatData?.sectionChats[0]?.name ?? "Unnamed Channel"} 
-          subtitle={`${chatData?.sectionChats[0]?.participantsCount} Members`} 
-          chatId={chatData?.sectionChats[0]?._id}
-        />
-      </ExpandableItem>}
+     {/* Section Chats */}
+     {chatData?.sectionChats && (
+       <ExpandableItem title="Sections" defaultExpanded={true}>
+         {chatData.sectionChats.map((item, index) => (
+           <ExpandableItemChild
+             key={index}
+             title={item.name ?? "Unnamed Channel"}
+             subtitle={`${item.participantsCount} Members`}
+             chatId={item._id}
+           />
+         ))}
+       </ExpandableItem>
+     )}
+
 
       {/* Direct Messages */}
       <h2 className="font-semibold mb-2 mt-4">Direct Messages</h2>
@@ -47,15 +53,24 @@ const LeftSidebar = ({ chatData }) => {
         placeholder="Search for people"
         className="w-full p-1 mb-2 border rounded placeholder:text-gray-700 dark:placeholder:text-gray-300"
       />
-      {chatData?.personalChats.map((item, index) => (
-        <ExpandableItemChild
-          key={index}
-          title={item.teacher.name}
-          subtitle={item.teacher.subjects}
-          avatarUrl={item.avatar ?? ""}
-          chatId={item._id}
-        />
-      ))}
+      {chatData?.personalChats.map((item, index) => {
+        const isStudentView = !!item.teacher;
+        const person = isStudentView ? item.teacher : item.student;
+
+        return (
+          <ExpandableItemChild
+            key={index}
+            title={person?.name ?? "Unknown"}
+            subtitle={
+              isStudentView
+                ? (person?.subjects?.join(", ") ?? "No subjects")
+                : "Student"
+            }
+            avatarUrl={person?.avatar ?? "../avatar.png"}
+            chatId={item.chatId}
+          />
+        );
+      })}
     </div>
   );
 };

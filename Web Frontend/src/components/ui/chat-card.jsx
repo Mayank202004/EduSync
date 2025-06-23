@@ -48,7 +48,6 @@ const ChatCard = ({
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
 
-    console.log(`Testing msg user name : ${currentUser.name} avatar : ${currentUser.avatar}`);
     const newMessage = {
       id: Date.now().toString(),
       content: inputValue,

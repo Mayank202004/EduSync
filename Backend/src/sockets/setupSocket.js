@@ -23,7 +23,8 @@ export const setupSocket = (io) => {
       chatId,
       content,
       attachments,
-      sender: user._id,
+      sender: user,
+      updatedAt: Date.now()
     });
     
     // Notify all participants in chat (not just receiver)

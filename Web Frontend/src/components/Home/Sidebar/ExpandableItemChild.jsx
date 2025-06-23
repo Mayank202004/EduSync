@@ -50,7 +50,6 @@ const handleClick = () => {
       try {
         const response = await getChatMessages(chatId);
         setMessages(response.data || []);
-        console.log(response);
       } catch (err) {
           console.error("Failed to fetch messages:", err);
       } finally {
