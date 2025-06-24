@@ -2,9 +2,11 @@ import React, { useState, useEffect} from "react";
 import { SmilePlus, Send, MoreHorizontal, Check, CheckCheck } from "lucide-react";
 import { formatDate } from "@/utils/dateUtils";
 import { useSocket } from "@/context/SocketContext";
+import AvatarIcon from "./AvatarIcon";
 
 const ChatCard = ({
   chatName = "Team Chat",
+  avatar = null,
   chatId=null,
   membersCount = 3,
   onlineCount = 2,
@@ -13,7 +15,7 @@ const ChatCard = ({
     _id: null,
     fullName: "You",
     username: null,
-    avatar: "../assets/avatar.png",
+    avatar: null,
   },
   onSendMessage= ()=>{},
   onReaction=()=>{},
@@ -114,8 +116,8 @@ const ChatCard = ({
     <div className={`chat-card w-full max-w-md mx-auto bg-customLightBg2 dark:bg-gray-900 text-white rounded-lg overflow-hidden ${className}`}>
       <div className="chat-card-header flex justify-between p-4 bg-customLightBg2 dark:bg-gray-900">
         <div className="chat-info flex gap-3 items-center">
-          <div className="avatar relative w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-            {chatName.charAt(0)}
+          <div className="avatar relative w-9 h-9 rounded-full flex items-center justify-center">
+            <AvatarIcon withHover={false} user={{"fullName":chatName, avatar}} />
             <div className="status-indicator absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-customLightBg2 dark:border-gray-900"></div>
           </div>
           <div className="chat-name">
@@ -136,12 +138,9 @@ const ChatCard = ({
   ) : (
     messages.map((message) => (
       <div key={message.id} className="message flex gap-3 items-start">
-        <img
-          src={message.sender.avatar}
-          alt={message.sender.username}
-          draggable="false"
-          className="w-9 h-9 rounded-full"
-        />
+        <div className="w-9 h-9 rounded-full">
+          <AvatarIcon withHover={false} user={{"fullName":message.sender.username, avatar:message.sender.avatar}} />
+        </div>
         <div className="message-content flex flex-col">
           <div className="message-header flex justify-between text-sm text-gray-400 gap-3">
             <span className="sender-name text-black dark:text-white font-bold break-words flex-grow">{message.sender.fullName}</span>

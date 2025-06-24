@@ -4,6 +4,7 @@ import { getChatMessages } from "@/services/chatService";
 import useClickOutside from "@/hooks/useClickOutside";
 import { useSocket} from "@/context/SocketContext";
 import { useAuth } from "@/context/AuthContext";
+import AvatarIcon from "@/components/ui/AvatarIcon";
 
 const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
   const { socket, activeChatId,setActiveChat} = useSocket();
@@ -16,7 +17,7 @@ const ExpandableItemChild = ({ title, subtitle, avatar, chatId}) => {
     _id: user?._id,
     fullName: user?.fullName,
     username: user?.username,
-    avatar: user?.avatar || "src/assets/avatar.png", // Default avatar if none is provided To Do
+    avatar: user?.avatar,
   };
 
 /**
@@ -67,8 +68,8 @@ const handleClick = () => {
         onClick={handleClick} // Open popup on click
       >
         {/* Avatar circle */}
-        <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-bold">
-          {avatar || title.charAt(0)}
+        <div className="w-8 h-8 rounded-full flex items-center justify-center">
+          <AvatarIcon withHover={false} user={{"fullName":title, avatar}} />
         </div>
 
         {/* Text content */}
@@ -90,6 +91,7 @@ const handleClick = () => {
             </button>
             <ChatCard
               chatName={title}
+              avatar={avatar}
               chatId={activeChatId.current}
               membersCount={1}
               onlineCount={1}

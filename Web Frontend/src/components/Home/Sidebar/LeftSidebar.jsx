@@ -66,7 +66,7 @@ const LeftSidebar = ({ chatData }) => {
                 ? (person?.subjects?.join(", ") ?? "No subjects")
                 : "Student"
             }
-            avatarUrl={person?.avatar ?? "../avatar.png"}
+            avatar={person?.avatar}
             chatId={item.chatId}
           />
         );
