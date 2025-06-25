@@ -15,6 +15,10 @@ const ticketSchema = new Schema({
         type: String,
         required: true
     },
+    subCategory: {
+        type: String,
+        default: "Other"
+    },
     title: {
         type: String,
         required: true

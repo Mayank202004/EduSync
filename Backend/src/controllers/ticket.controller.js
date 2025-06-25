@@ -9,7 +9,7 @@ import { ApiError } from "../utils/apiError.js";
  * @access  Private
  */
 export const createTicket = asyncHandler(async (req, res) => {
-  const { title, description, category } = req.body;
+  const { title, description, category, subCategory } = req.body;
 
   if (!title?.trim() || !description?.trim() || !category?.trim()) {
     throw new ApiError(400, "Title ,description and category are required");
@@ -19,6 +19,7 @@ export const createTicket = asyncHandler(async (req, res) => {
     issuedBy: req.user._id,
     issuerEmail: req.user.email,
     category,
+    subCategory: subCategory ?? "Other",
     title,
     description
   });
@@ -36,7 +37,7 @@ export const createTicket = asyncHandler(async (req, res) => {
 export const getOpenTickets = asyncHandler(async (_, res) => {
   const priorityOrder = { high: 3, medium: 2, low: 1 };
 
-  const tickets = await Ticket.find({ status: "open" }).lean();
+  const tickets = await Ticket.find({ status: "open" }).select("-__v").lean();
 
   const sorted = tickets.sort((a, b) => {
     const priorityDiff =
@@ -58,7 +59,7 @@ export const getOpenTickets = asyncHandler(async (_, res) => {
 export const getClosedTickets = asyncHandler(async (_, res) => {
   const tickets = await Ticket.find({
     status: { $in: ["closed", "resolved"] },
-  }).sort({ updatedAt: -1 });
+  }).sort({ updatedAt: -1 }).select("-__v");
 
   res
     .status(200)
