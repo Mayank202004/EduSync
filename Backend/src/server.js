@@ -72,6 +72,7 @@ import calendarRouter from "./routes/calendar.routes.js";
 import classRouter from "./routes/classStructure.routes.js"
 import dashboardRouter from "./routes/dashboard.routes.js"
 import chatRouter from "./routes/chat.routes.js"
+import faqRouter from "./routes/faq.routes.js"
 
 // Routes Declarations
 app.use("/api/v1/users", userRouter);
@@ -85,6 +86,7 @@ app.use("/api/v1/calendar",calendarRouter);
 app.use("/api/v1/class",classRouter);
 app.use("/api/v1/dashboard",dashboardRouter);
 app.use("/api/v1/chat",chatRouter);
+app.use("/api/v1/faq",faqRouter);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
