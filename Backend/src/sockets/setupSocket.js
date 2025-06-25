@@ -7,7 +7,10 @@ export const setupSocket = (io) => {
     const user = socket.user;
     onlineUsers[user._id] = socket.id;
 
-    socket.join(`user-${user._id}`); // personal notification room
+    socket.emit("currentOnlineUsers", Object.keys(onlineUsers));
+    socket.broadcast.emit("userConnected", user._id); // Broadcast to others that this user just came online
+
+    socket.join(`user-${user._id}`); // personal notification room To Do: remove this later if not needed
 
     socket.on("sendMessage", async ({ chatId, content, attachments=[] }) => {
       // Save to DB
@@ -54,13 +57,17 @@ export const setupSocket = (io) => {
       //console.log("Left chatroom", `chat-${chatId}`);
     });
 
-
-
     socket.on("disconnect", () => {
       delete onlineUsers[user._id];
+      socket.broadcast.emit("userDisconnected", user._id);
     });
   });
 };
 
-const getPrivateRoomName = (id1, id2) =>
-  `private-${[id1, id2].sort().join("-")}`;
+
+const getOnlineCountForChat = (chat) => {
+  return chat.participants.reduce((count, participant) => {
+    return onlineUsers[participant._id.toString()] ? count + 1 : count;
+  }, 0);
+};
+
