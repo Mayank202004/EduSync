@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import PaymentFAQs from "@/components/Fees/FAQs";
-import RaiseTicket from "@/components/Fees/RaiseTicket";
+import PaymentFAQs from "@/components/Fees/StudentComponents/FAQs";
+import RaiseTicket from "@/components/Fees/StudentComponents/RaiseTicket";
 import PendingFees from "@/components/Fees/StudentComponents/PendingFees";
 import PaidFees from "@/components/Fees/StudentComponents/PaidFees";
 import { getUserFees } from "@/services/feeService";
