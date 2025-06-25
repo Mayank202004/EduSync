@@ -28,6 +28,7 @@ const LeftSidebar = ({ chatData }) => {
           title={chatData?.announcements[0]?.name ?? "Unnamed Channel"}
           subtitle={`${chatData?.announcements[0]?.participantsCount} Members`}
           chatId={chatData?.announcements[0]?._id}
+          unreadCount={chatData?.announcements[0]?.unreadMessageCount}
         />
       </ExpandableItem>}
 
@@ -40,6 +41,7 @@ const LeftSidebar = ({ chatData }) => {
              title={item.name ?? "Unnamed Channel"}
              subtitle={`${item.participantsCount} Members`}
              chatId={item._id}
+             unreadCount={item.unreadMessageCount}
            />
          ))}
        </ExpandableItem>
@@ -68,6 +70,8 @@ const LeftSidebar = ({ chatData }) => {
             }
             avatar={person?.avatar}
             chatId={item.chatId}
+            userId={person?._id}
+            unreadCount={item.unreadMessageCount}
           />
         );
       })}
