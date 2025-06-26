@@ -1,4 +1,4 @@
-import ExpandableItem from "./ExpandableItem";
+import ExpandableItem from "../../ui/ExpandableItem";
 import ExpandableItemChild from "./ExpandableItemChild";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendar } from "@fortawesome/free-regular-svg-icons";
