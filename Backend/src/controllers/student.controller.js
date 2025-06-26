@@ -29,6 +29,18 @@ export const addClassDetails = asyncHandler(async (req, res) => {
             throw new ApiError(404, "Student not found");
         }
         await User.findByIdAndUpdate(student.userId, { verified: true });
+        
+        // Join "School" group
+        const schoolChat = await Chat.findOneAndUpdate(
+          { name: "School", isGroupChat: true },
+          { $addToSet: { participants: user._id } }
+        );
+
+        // Join specific "Class" group (e.g., "Class 1-A")
+        const classChat = await Chat.findOneAndUpdate(
+          { className, div, isGroupChat: true },
+          { $addToSet: { participants: user._id } }
+        );
         res.status(200).json(new ApiResponse(200,student,"Added class details successfully"));
     }catch(error){
         throw new ApiError(500, error.message);
