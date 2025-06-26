@@ -50,7 +50,7 @@ export const RaiseTicketModal = ({ closeModalCallback }) => {
             placeholder: "Description"
           }}
         />
-        <span className="block font-semibold my-1">Attachment</span>
+        <span className="block font-semibold mb-1">Attachment</span>
         <label className="grid grid-cols-[0_1fr_auto] grid-rows-2 w-full cursor-pointer">
           <input
             type="file"
