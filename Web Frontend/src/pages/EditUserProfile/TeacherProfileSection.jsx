@@ -18,6 +18,8 @@ const SECTIONS = [
   { id: "account-details", title: "Account Details" },
 ];
 
+const titledContainerStyle = "px-4 py-6 sm:px-10";
+
 const TeacherProfileSection = () => {
   const { user } = useAuth();
   const rootRef = useRef();
@@ -51,11 +53,15 @@ const TeacherProfileSection = () => {
           <TitledContainer
             id="photo-preview-section"
             title="Photo Preview"
-            containerStyle="px-2 sm:px-6"
+            containerStyle={titledContainerStyle + "px-2 sm:px-6"}
           >
             <PhotoPreview avatar={user.avatar} />
           </TitledContainer>
-          <TitledContainer id="account-details-section" title="Account details">
+          <TitledContainer
+            id="account-details-section"
+            title="Account details"
+            containerStyle={titledContainerStyle}
+          >
             <EditAccountDetails
               accountInfo={{
                 fullName: user.fullName,

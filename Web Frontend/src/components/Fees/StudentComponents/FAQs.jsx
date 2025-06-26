@@ -1,38 +1,46 @@
 import { useEffect, useState } from "react";
 
-import ExpandableItem from "@/components/Home/Sidebar/ExpandableItem";
+import ExpandableItem from "@/components/ui/ExpandableItem";
+import TitledContainer from "@/components/ui/TitledContainer";
+
 import { getAllFaqs } from "@/services/faqsService";
 
 const PaymentFAQs = () => {
   const [faqs, setFAQs] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchFaqs = async () => {
       try {
         const response = await getAllFaqs();
-        console.log(response);
         setFAQs(response.data);
       } catch (_) {
         //handle later
-      } finally {
-        setIsLoading(false);
       }
     };
     fetchFaqs();
   }, []);
+
   return (
-    <div className="w-[80%] mx-auto bg-white mt-10 mb-6 py-2 px-4 rounded-sm dark:bg-customDarkFg">
-      <h2 className="text-lg font-bold">Payment FAQs</h2>
-      <hr className="my-2" />
-      <div className="flex flex-col gap-2">
-        {faqs.map(({ question, answer, _id }) => (
-          <ExpandableItem key={_id} title={question}>
-            <p>{answer}</p>
-          </ExpandableItem>
+    <TitledContainer
+      title="FAQs"
+      containerStyle="w-[80%] mx-auto mt-10 mb-6 p-4"
+      titleStyle="border-b-1"
+    >
+      <div className="flex flex-col gap-1.5">
+        {faqs.map(({ question, answer, _id }, index, array) => (
+          <>
+            <ExpandableItem
+              key={_id}
+              title={question}
+              childrenContainerStyle="pl-2 border-l-1"
+            >
+              <p>{answer}</p>
+            </ExpandableItem>
+            {index !== array.length - 1 && <hr />}
+          </>
         ))}
       </div>
-    </div>
+    </TitledContainer>
   );
 };
 

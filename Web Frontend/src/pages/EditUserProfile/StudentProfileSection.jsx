@@ -24,8 +24,10 @@ const SECTIONS = [
   { id: "siblings-info", title: "Siblings Info" },
   { id: "parents-info", title: "Parents Info" },
   { id: "parents-contact", title: "Parents Contact" },
-  { id: "allergies", title: "Allergies" }
+  { id: "allergies", title: "Allergies" },
 ];
+
+const titledContainerStyle = "px-4 py-6 sm:px-10";
 
 const StudentProfileSection = () => {
   const { user } = useAuth();
@@ -66,11 +68,15 @@ const StudentProfileSection = () => {
           <TitledContainer
             id="photo-preview-section"
             title="Photo Preview"
-            containerStyle="px-2 sm:px-6"
+            containerStyle={titledContainerStyle + "px-2 sm:px-6"}
           >
             <PhotoPreview avatar={user.avatar} />
           </TitledContainer>
-          <TitledContainer id="account-details-section" title="Account details">
+          <TitledContainer
+            id="account-details-section"
+            title="Account details"
+            containerStyle={titledContainerStyle}
+          >
             <EditAccountDetails
               accountInfo={{
                 fullName: user.fullName,
@@ -78,17 +84,42 @@ const StudentProfileSection = () => {
               }}
             />
           </TitledContainer>
-          <TitledContainer id="siblings-info-section" title="Siblings Info">
-            <SiblingsInfo key={info.siblingInfo} initialInfo={info.siblingInfo} />
+          <TitledContainer
+            id="siblings-info-section"
+            title="Siblings Info"
+            containerStyle={titledContainerStyle}
+          >
+            <SiblingsInfo
+              key={info.siblingInfo}
+              initialInfo={info.siblingInfo}
+            />
           </TitledContainer>
-          <TitledContainer id="parents-info-section" title="Parents Info">
-            <ParentsInfo key={info.parentsInfo} initialInfo={info.parentsInfo} />
+          <TitledContainer
+            id="parents-info-section"
+            title="Parents Info"
+            containerStyle={titledContainerStyle}
+          >
+            <ParentsInfo
+              key={info.parentsInfo}
+              initialInfo={info.parentsInfo}
+            />
           </TitledContainer>
-          <TitledContainer id="parents-contact-section" title="Parents Contact">
-            <ParentsContact key={info.parentContact} initialInfo={info.parentContact} />
+          <TitledContainer
+            id="parents-contact-section"
+            title="Parents Contact"
+            containerStyle={titledContainerStyle}
+          >
+            <ParentsContact
+              key={info.parentContact}
+              initialInfo={info.parentContact}
+            />
           </TitledContainer>
-          <TitledContainer id="allergies-section" title="Allergies">
-            <Allergies key={info.allergies} initialInfo={info.allergies}/>
+          <TitledContainer
+            id="allergies-section"
+            title="Allergies"
+            containerStyle={titledContainerStyle}
+          >
+            <Allergies key={info.allergies} initialInfo={info.allergies} />
           </TitledContainer>
         </div>
       </div>

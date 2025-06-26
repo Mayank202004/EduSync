@@ -1,5 +1,5 @@
 import React from "react";
-import ExpandableItem from "./ExpandableItem";
+import ExpandableItem from "../../ui/ExpandableItem";
 import ExpandableItemChild from "./ExpandableItemChild";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMessage } from "@fortawesome/free-regular-svg-icons";
@@ -23,30 +23,31 @@ const LeftSidebar = ({ chatData }) => {
       </div>
 
       {/* Announcements Chats */}
-      {chatData?.announcements &&<ExpandableItem title="Announcements" defaultExpanded={true}>
-        <ExpandableItemChild
-          title={chatData?.announcements[0]?.name ?? "Unnamed Channel"}
-          subtitle={`${chatData?.announcements[0]?.participantsCount} Members`}
-          chatId={chatData?.announcements[0]?._id}
-          unreadCount={chatData?.announcements[0]?.unreadMessageCount}
-        />
-      </ExpandableItem>}
+      {chatData?.announcements && (
+        <ExpandableItem title="Announcements" defaultExpanded={true}>
+          <ExpandableItemChild
+            title={chatData?.announcements[0]?.name ?? "Unnamed Channel"}
+            subtitle={`${chatData?.announcements[0]?.participantsCount} Members`}
+            chatId={chatData?.announcements[0]?._id}
+            unreadCount={chatData?.announcements[0]?.unreadMessageCount}
+          />
+        </ExpandableItem>
+      )}
 
-     {/* Section Chats */}
-     {chatData?.sectionChats && (
-       <ExpandableItem title="Sections" defaultExpanded={true}>
-         {chatData.sectionChats.map((item, index) => (
-           <ExpandableItemChild
-             key={index}
-             title={item.name ?? "Unnamed Channel"}
-             subtitle={`${item.participantsCount} Members`}
-             chatId={item._id}
-             unreadCount={item.unreadMessageCount}
-           />
-         ))}
-       </ExpandableItem>
-     )}
-
+      {/* Section Chats */}
+      {chatData?.sectionChats && (
+        <ExpandableItem title="Sections" defaultExpanded={true}>
+          {chatData.sectionChats.map((item, index) => (
+            <ExpandableItemChild
+              key={index}
+              title={item.name ?? "Unnamed Channel"}
+              subtitle={`${item.participantsCount} Members`}
+              chatId={item._id}
+              unreadCount={item.unreadMessageCount}
+            />
+          ))}
+        </ExpandableItem>
+      )}
 
       {/* Direct Messages */}
       <h2 className="font-semibold mb-2 mt-4">Direct Messages</h2>
@@ -65,7 +66,7 @@ const LeftSidebar = ({ chatData }) => {
             title={person?.name ?? "Unknown"}
             subtitle={
               isStudentView
-                ? (person?.subjects?.join(", ") ?? "No subjects")
+                ? person?.subjects?.join(", ") ?? "No subjects"
                 : "Student"
             }
             avatar={person?.avatar}
