@@ -236,25 +236,55 @@ export const addAllergy = asyncHandler(async (req, res) => {
     res.status(200).json(new ApiResponse(200,student,"Allergy added successfully"));
 });
 
-// Add Parents Contact
+/**
+ * @desc Add Parent Contact
+ * @route /student/parent-contact
+ * @access Private (student)
+ */
 export const addParentContact = asyncHandler(async (req, res) => {
-    const { name,relation, phone } = req.body;
+  const { name, relation, phone } = req.body;
 
-    if (!name?.trim() || !phone?.trim() || !relation.trim()) {
-        throw new ApiError(400, "name, relation and phone are required");
-    }
+  if (!name?.trim() || !relation?.trim() || !phone?.trim()) {
+    throw new ApiError(400, "Name, relation, and phone are required");
+  }
 
-    const student = await Student.findOneAndUpdate(
-        { userId: req.user._id },
-        { $push: { parentContact: { name,relation, phone } } }, 
-        { new: true, runValidators: true }
+  const student = await Student.findOne({ userId: req.user._id });
+
+  if (!student) {
+    throw new ApiError(404, "Student not found");
+  }
+
+  const existingContacts = student.parentContact || [];
+
+  const normalizedRelation = relation.trim().toLowerCase();
+  const normalizedName = name.trim().toLowerCase();
+
+  // Check if already existing
+  if (["father", "mother"].includes(normalizedRelation)) {
+    const alreadyHasRelation = existingContacts.some(
+      (contact) => contact.relation.trim().toLowerCase() === normalizedRelation
     );
-
-    if (!student) {
-        throw new ApiError(404, "Student not found");
+    if (alreadyHasRelation) {
+      throw new ApiError(400, `Contact with relation '${relation}' already exists`);
     }
-    res.status(200).json(new ApiResponse(200,student,"Parent contact added successfully"));
+  } else {
+    const nameExists = existingContacts.some(
+      (contact) => contact.name.trim().toLowerCase() === normalizedName
+    );
+    if (nameExists) {
+      throw new ApiError(400, `Contact with name '${name}' already exists`);
+    }
+  }
+
+  // Push new contact
+  student.parentContact.push({ name, relation, phone });
+  await student.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, student, "Parent contact added successfully"));
 });
+
 
 /**
  * @desc Get students information
