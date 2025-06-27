@@ -133,39 +133,45 @@ const ChatCard = ({
       </div>
 
       <div className="chat-messages p-4 space-y-4 overflow-y-auto h-96">
-        {messages.length === 0 ? (
-    <div className="text-center text-gray-400 dark:text-gray-500">No messages yet</div>
-  ) : (
-    messages.map((message) => (
-      <div key={message.id} className="message flex gap-3 items-start">
-        <div className="w-9 h-9 rounded-full">
-          <AvatarIcon withHover={false} user={{"fullName":message.sender.username, avatar:message.sender.avatar}} />
-        </div>
-        <div className="message-content flex flex-col">
-          <div className="message-header flex justify-between text-sm text-gray-400 gap-3">
-            <span className="sender-name text-black dark:text-white font-bold break-words flex-grow">{message.sender.fullName}</span>
-            <span className="timestamp shrink-0">{formatDate(message.updatedAt)}</span>
-          </div>
-          <p className="message-text text-black dark:text-white">{message.content}</p>
-          <div className="reactions flex space-x-2 mt-1">
-            {["👍", "❤️", "😂"].map((emoji) => {
-              const reaction = message.reactions?.find((r) => r.emoji === emoji);
-              return (
-                <button
-                  key={emoji}
-                  onClick={() => handleReaction(message._id, emoji)}
-                  className="reaction-btn flex items-center space-x-1 text-gray-600 dark:text-gray-300"
-                >
-                  <span>{emoji}</span>
-                  <span>{reaction?.count ?? 0}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    ))
-  )}
+        {messages === null ? (
+          <>
+            <MessageSkeleton />
+            <MessageSkeleton />
+            <MessageSkeleton />
+          </>
+        ) : messages.length === 0 ? (
+          <div className="text-center text-gray-400 dark:text-gray-500">No messages yet</div>
+        ) : (
+          messages.map((message) => (
+            <div key={message.id} className="message flex gap-3 items-start">
+              <div className="w-9 h-9 rounded-full">
+                <AvatarIcon withHover={false} user={{"fullName":message.sender.username, avatar:message.sender.avatar}} />
+              </div>
+              <div className="message-content flex flex-col">
+                <div className="message-header flex justify-between text-sm text-gray-400 gap-3">
+                  <span className="sender-name text-black dark:text-white font-bold break-words flex-grow">{message.sender.fullName}</span>
+                  <span className="timestamp shrink-0">{formatDate(message.updatedAt)}</span>
+                </div>
+                <p className="message-text text-black dark:text-white">{message.content}</p>
+                <div className="reactions flex space-x-2 mt-1">
+                  {["👍", "❤️", "😂"].map((emoji) => {
+                    const reaction = message.reactions?.find((r) => r.emoji === emoji);
+                    return (
+                      <button
+                        key={emoji}
+                        onClick={() => handleReaction(message._id, emoji)}
+                        className="reaction-btn flex items-center space-x-1 text-gray-600 dark:text-gray-300"
+                      >
+                        <span>{emoji}</span>
+                        <span>{reaction?.count ?? 0}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <div className="chat-input flex items-center gap-2 p-4 bg-customLightBg2 dark:bg-gray-900">
@@ -189,5 +195,17 @@ const ChatCard = ({
     </div>
   );
 };
+
+// Loading  message skeleton 
+const MessageSkeleton = () => (
+  <div className="message flex gap-3 items-start animate-pulse">
+    <div className="w-9 h-9 rounded-full bg-gray-300 dark:bg-gray-700" />
+    <div className="flex flex-col space-y-2 flex-1">
+      <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/3" />
+      <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-2/3" />
+    </div>
+  </div>
+);
+
 
 export default ChatCard;
