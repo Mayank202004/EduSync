@@ -272,3 +272,35 @@ export const getStudentInfo = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, student, "Student info fetched successfully"));
 });
 
+/**
+ * @desc    Delete sibling info
+ * @route   DELETE /api/v1/student/sibling-details/:siblingId
+ * @access  Private (User - Self)
+ */
+export const deleteSiblingInfo = asyncHandler(async (req, res) => {
+  const siblingId = req.params.siblingId;
+  const studId  = req.student._id;
+
+  const student = await Student.findById(studId);
+  if (!student) {
+    throw new ApiError(404, "Student not found");
+  }
+
+  // Check if sibling exists
+  const sibling = student.siblingInfo.find(
+    (sibling) => sibling._id.toString() === siblingId
+  );
+  if (!sibling) {
+    throw new ApiError(404, "Sibling not found");
+  }
+
+  // Remove the sibling
+  student.siblingInfo.pull({ _id: siblingId });
+  await student.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, student.siblingInfo, "Sibling info deleted successfully"));
+});
+
+

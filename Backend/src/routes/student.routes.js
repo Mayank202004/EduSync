@@ -13,5 +13,6 @@ router.route("/details").post(verifyJWT,verifyStudent,StudentController.addStude
 router.route("/physical-details").post(verifyJWT,verifyTeacher,StudentController.addPhysicalInfo); // To Do: Later we need to add middleware for sports teacher
 router.route("/sibling-details").post(verifyJWT,verifyStudent,StudentController.addSiblingInfo);
 router.route("/me").get(verifyJWT,verifyStudent,StudentController.getStudentInfo);
+router.route("/sibling-details/:siblingId").delete(verifyJWT,verifyStudent,StudentController.deleteSiblingInfo);
 
 export default router;
