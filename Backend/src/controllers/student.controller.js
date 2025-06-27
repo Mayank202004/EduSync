@@ -336,4 +336,37 @@ export const deleteSiblingInfo = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, student.siblingInfo, "Sibling info deleted successfully"));
 });
 
+/**
+ * @desc    Delete parent contact
+ * @route   DELETE /api/v1/student/parent-contact/:contactId
+ * @access  Private (User - Self)
+ */
+export const deleteParentContact = asyncHandler(async (req, res) => {
+  const contactId = req.params.contactId;
+  const studId = req.student._id;
 
+  const student = await Student.findById(studId);
+  if (!student) {
+    throw new ApiError(404, "Student not found");
+  }
+
+  // Ensure there is more than one contact before allowing deletion
+  if (student.parentContact.length <= 1) {
+    throw new ApiError(400, "At least one parent contact must be present");
+  }
+
+  const contact = student.parentContact.find(
+    (c) => c._id.toString() === contactId
+  );
+
+  if (!contact) {
+    throw new ApiError(404, "Parent contact not found");
+  }
+
+  student.parentContact.pull({ _id: contactId });
+  await student.save();
+
+  res.status(200).json(
+    new ApiResponse(200, student.parentContact, "Parent contact deleted successfully")
+  );
+});

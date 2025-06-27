@@ -14,5 +14,6 @@ router.route("/physical-details").post(verifyJWT,verifyTeacher,StudentController
 router.route("/sibling-details").post(verifyJWT,verifyStudent,StudentController.addSiblingInfo);
 router.route("/me").get(verifyJWT,verifyStudent,StudentController.getStudentInfo);
 router.route("/sibling-details/:siblingId").delete(verifyJWT,verifyStudent,StudentController.deleteSiblingInfo);
+router.route("/parent-contact/:contactId").delete(verifyJWT,verifyStudent,StudentController.deleteParentContact);
 
 export default router;
