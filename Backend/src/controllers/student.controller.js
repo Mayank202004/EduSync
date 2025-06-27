@@ -121,6 +121,18 @@ export const addSiblingInfo = asyncHandler(async (req, res) => {
         }
     }
 
+    const student = await Student.findOne({ userId: req.user._id });
+
+    if (!student) {
+        throw new ApiError(404, "Student not found");
+    }
+
+    const nameExists = student.siblingInfo.some(sib => sib.name.trim().toLowerCase() === name.trim().toLowerCase());
+
+    if (nameExists) {
+        throw new ApiError(400, `Sibling with the name '${name}' already exists`);
+    }
+
     const siblingData = {
         name,
         age,
@@ -133,17 +145,8 @@ export const addSiblingInfo = asyncHandler(async (req, res) => {
         siblingData.div = div;
     }
 
-    const student = await Student.findOneAndUpdate(
-        { userId: req.user._id },
-        {
-            $push: { siblingInfo: siblingData }
-        },
-        { new: true, runValidators: true }
-    );
-
-    if (!student) {
-        throw new ApiError(404, "Student not found");
-    }
+    student.siblingInfo.push(siblingData);
+    await student.save();
 
     res.status(200).json({ message: "Sibling added successfully", student });
 });
