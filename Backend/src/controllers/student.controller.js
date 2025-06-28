@@ -370,3 +370,33 @@ export const deleteParentContact = asyncHandler(async (req, res) => {
     new ApiResponse(200, student.parentContact, "Parent contact deleted successfully")
   );
 });
+
+/**
+ * @desc Delete Allergy
+ * @route DELETE /api/v1/student/allergy/:allergyName
+ * @access Private (User - Self)
+ */
+export const deleteAllergy = asyncHandler(async (req, res) => {
+  const allergyName = decodeURIComponent(req.params.allergyName).trim().toLowerCase();
+  const studId = req.student._id;
+
+  const student = await Student.findById(studId);
+  if (!student) {
+    throw new ApiError(404, "Student not found");
+  }
+
+  const allergyExists = student.allergies.some(
+    (a) => a.trim().toLowerCase() === allergyName
+  );
+
+  if (!allergyExists) {
+    throw new ApiError(404, `Allergy '${allergyName}' not found`);
+  }
+
+  student.allergies.pull((a) => a.trim().toLowerCase() === allergyName);
+  await student.save();
+
+  res.status(200).json(
+    new ApiResponse(200, student.allergies, `Allergy '${allergyName}' deleted successfully`)
+  );
+});
