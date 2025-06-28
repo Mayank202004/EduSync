@@ -7,13 +7,14 @@ import { useAuth } from "@/context/AuthContext";
 import useOnlineStatus from "@/hooks/useOnlineStatus";
 import AvatarIcon from "@/components/ui/AvatarIcon";
 
-const ExpandableItemChild = React.memo(({ title, subtitle, avatar, chatId, unreadCount, userId}) => {
+const ExpandableItemChild = React.memo(({ title, subtitle, avatar, chatId, unreadCount, onUnreadReset, userId}) => {
   const isOnline = userId ? useOnlineStatus(userId) : false;
   const { socket, activeChatId,setActiveChat} = useSocket();
   const [showPopup, setShowPopup] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const { user } = useAuth();
+
 
   const CURRENT_USER = {
     _id: user?._id,
@@ -28,6 +29,11 @@ const ExpandableItemChild = React.memo(({ title, subtitle, avatar, chatId, unrea
 const handleClick = () => {
   if (socket && socket.connected) {
     socket.emit("joinChat", chatId);
+    // Reset unread count in db
+    if (unreadCount > 0) {
+      socket.emit("chatRead", { chatId, userId: CURRENT_USER._id });
+      onUnreadReset?.(chatId);
+    }
   }
   setActiveChat(chatId); 
   setShowPopup(true);
@@ -95,7 +101,7 @@ const handleClick = () => {
       {/* Popup for Chat Screen */}
       {showPopup && (
         <div className="fixed bottom-0 left-0 mb-4 ml-4 z-50">
-          <div ref={containerRef} className="bg-transparent dark:bg-transaparent p-4 w-96 relative">
+          <div ref={containerRef} className="bg-transparent dark:bg-transparent p-4 w-96 relative">
             <button
               onClick={handleClosePopup}
               className="absolute top-2 right-2 text-black dark:text-white bg-white dark:bg-gray-600 hover:bg-gray-500 p-2 rounded-full"

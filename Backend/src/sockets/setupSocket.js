@@ -56,6 +56,13 @@ export const setupSocket = (io) => {
       socket.leave(`chat-${chatId}`);
       //console.log("Left chatroom", `chat-${chatId}`);
     });
+    
+    // When user opens chat, update unread count to 0
+    socket.on("chatRead", async ({ chatId, userId }) => {
+      await Chat.findByIdAndUpdate(chatId, {
+        $set: { [`unreadCounts.${userId}`]: 0 }
+      });
+    });
 
     socket.on("disconnect", () => {
       delete onlineUsers[user._id];

@@ -1,16 +1,35 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import ExpandableItem from "../../ui/ExpandableItem";
 import ExpandableItemChild from "./ExpandableItemChild";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMessage } from "@fortawesome/free-regular-svg-icons";
 
-const directMessages = [
-  { title: "Shilpa", subtitle: "Super Admin", avatarUrl: "../avatar.png" },
-  { title: "Deepti Manish", subtitle: "Teacher", avatarUrl: "../avatar.png" },
-  { title: "Aditya Sunil", subtitle: "Student", avatarUrl: "../avatar.png" },
-];
 
 const LeftSidebar = ({ chatData }) => {
+  //Hooks
+  const [unreadCounts, setUnreadCounts] = useState({});
+  useEffect(() => {
+    if (!chatData) return;
+    const counts = {};
+    const allChats = [
+      ...(chatData?.announcements || []),
+      ...(chatData?.sectionChats || []),
+      ...(chatData?.personalChats || [])
+    ];
+
+    allChats.forEach((chat) => {
+      const chatId = chat._id;
+      if (chatId) counts[chatId] = chat.unreadMessageCount || 0;
+    });
+
+    setUnreadCounts(counts);
+  }, [chatData]);
+
+  const handleUnreadReset = (chatId) => {
+    setUnreadCounts((prev) => ({ ...prev, [chatId]: 0 }));
+  };
+
+  
   // if (!chatData) return <div>Loading Sidebar...</div>; // To do : add skeleton loading
   return (
     <div className="max-w-17/20 p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto">
@@ -29,7 +48,8 @@ const LeftSidebar = ({ chatData }) => {
             title={chatData?.announcements[0]?.name ?? "Unnamed Channel"}
             subtitle={`${chatData?.announcements[0]?.participantsCount} Members`}
             chatId={chatData?.announcements[0]?._id}
-            unreadCount={chatData?.announcements[0]?.unreadMessageCount}
+            unreadCount={unreadCounts[chatData?.announcements[0]?._id] || 0}
+            onUnreadReset={handleUnreadReset}
           />
         </ExpandableItem>
       )}
@@ -43,7 +63,8 @@ const LeftSidebar = ({ chatData }) => {
               title={item.name ?? "Unnamed Channel"}
               subtitle={`${item.participantsCount} Members`}
               chatId={item._id}
-              unreadCount={item.unreadMessageCount}
+              unreadCount={unreadCounts[item._id] || 0}
+              onUnreadReset={handleUnreadReset}
             />
           ))}
         </ExpandableItem>
@@ -70,9 +91,10 @@ const LeftSidebar = ({ chatData }) => {
                 : "Student"
             }
             avatar={person?.avatar}
-            chatId={item.chatId}
+            chatId={item._id}
             userId={person?._id}
-            unreadCount={item.unreadMessageCount}
+            unreadCount={unreadCounts[item._id] || 0}
+            onUnreadReset={handleUnreadReset}
           />
         );
       })}

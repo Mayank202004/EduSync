@@ -96,7 +96,7 @@ export const getStudentChats = async (userId,className,div) => {
         .map(sub => sub.name);
 
       return {
-        chatId: chat._id,
+        _id: chat._id,
         updatedAt: chat.updatedAt,
         unreadMessageCount, 
         teacher: {
@@ -199,7 +199,7 @@ export const getTeacherChats = async (teacher) => {
   const personalChats = personalChatsRaw.map(chat => {
     const otherUser = chat.participants[0]; // the student
     return {
-      chatId: chat._id,
+      _id: chat._id,
       updatedAt: chat.updatedAt,
       unreadMessageCount: chat.unreadCounts?.get?.(teacherUserId.toString()) || 0,
       student: {

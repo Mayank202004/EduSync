@@ -92,7 +92,6 @@ export const addParentInfo = asyncHandler(async (req, res) => {
  * @access Private (Student)
  */
 export const addSiblingInfo = asyncHandler(async (req, res) => {
-    console.log(req.body);
     const { name, age, relation, isInSameSchool, class: siblingClass, div } = req.body;
 
     if (
