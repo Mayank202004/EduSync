@@ -1,4 +1,5 @@
 import { useActionState, useState } from "react";
+import toast from "react-hot-toast";
 
 import useExpandable from "@/hooks/useExpandable";
 
@@ -16,10 +17,24 @@ import {
   DIVISIONS,
   SIBLING_RELATIONS,
 } from "./value_maps/siblingsInfoMaps";
+import { deleteSiblingApi } from "@/services/studentInfoService";
 
 const SiblingsInfo = ({ initialInfo }) => {
   const { height, setExpanded, containerRef, expanded } = useExpandable(false);
   const [info, setInfo] = useState(initialInfo);
+
+  const deleteSibling = async (siblingId, siblingName) => {
+    try {
+      toast.promise(deleteSiblingApi(siblingId), {
+        loading: `Deleting ${siblingName} details...`,
+        success: (response) => {
+          setInfo(response.data);
+          return "Deleted successfully"}
+      })
+    } catch(_) {
+      //handled by axios interceptor
+    }
+  }
 
   const [siblingInfo, formAction, isPending] = useActionState(
     (prevState, formData) => siblingInfoAction(prevState, formData, setInfo),
@@ -128,7 +143,7 @@ const SiblingsInfo = ({ initialInfo }) => {
           {isPending ? "Saving..." : "Save"}
         </SimpleButton>
       </form>
-      {info?.length > 0 && <SiblingsTable key={info} info={info} />}
+      {info?.length > 0 && <SiblingsTable key={info} info={info} onDelete={deleteSibling}/>}
     </>
   );
 };

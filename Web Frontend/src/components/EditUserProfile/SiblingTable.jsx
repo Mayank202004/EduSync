@@ -1,7 +1,7 @@
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const SiblingsTable = ({ info }) => {
+const SiblingsTable = ({ info, onDelete }) => {
   return (
     <>
       <hr className="my-6" />
@@ -21,11 +21,11 @@ const SiblingsTable = ({ info }) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {info.map((sibling, index) => (
-              <tr key={index}>
+            {info.map((sibling) => (
+              <tr key={sibling._id}>
                 <td className="text-center">
                   <button
-                    onClick={() => {}}
+                    onClick={() => onDelete(sibling._id, sibling.name)}
                     className="flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 text-red-500 hover:text-red-700 transition-colors duration-300 cursor-pointer p-1 aspect-square h-10 rounded-full"
                     title="Delete"
                   >
