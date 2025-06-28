@@ -143,7 +143,7 @@ const ChatCard = ({
           <div className="text-center text-gray-400 dark:text-gray-500">No messages yet</div>
         ) : (
           messages.map((message) => (
-            <div key={message.id} className="message flex gap-3 items-start">
+            <div key={message._id} className="message flex gap-3 items-start">
               <div className="w-9 h-9 rounded-full">
                 <AvatarIcon withHover={false} user={{"fullName":message.sender.username, avatar:message.sender.avatar}} />
               </div>
