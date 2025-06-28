@@ -377,7 +377,7 @@ export const deleteParentContact = asyncHandler(async (req, res) => {
  * @access Private (User - Self)
  */
 export const deleteAllergy = asyncHandler(async (req, res) => {
-  const allergyName = decodeURIComponent(req.params.allergyName).trim().toLowerCase();
+  const {  allergyName } = req.body;
   const studId = req.student._id;
 
   const student = await Student.findById(studId);
@@ -385,15 +385,16 @@ export const deleteAllergy = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Student not found");
   }
 
-  const allergyExists = student.allergies.some(
-    (a) => a.trim().toLowerCase() === allergyName
+  const allergyToDelete = student.allergies.find(
+    (a) => a.trim().toLowerCase() === allergyName.trim().toLowerCase()
   );
 
-  if (!allergyExists) {
+  if (!allergyToDelete) {
     throw new ApiError(404, `Allergy '${allergyName}' not found`);
   }
 
-  student.allergies.pull((a) => a.trim().toLowerCase() === allergyName);
+  student.allergies.pull(allergyToDelete);
+
   await student.save();
 
   res.status(200).json(
