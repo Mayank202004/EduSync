@@ -31,13 +31,13 @@ const TextArea = ({
   return (
     <label className={cn(labelStyle)}>
       {titleText && (
-        <span className={cn("font-semibold tracking-wide", titleStyle)}>
+        <span className={cn("font-semibold tracking-wide mb-1.5", titleStyle)}>
           {titleText}
         </span>
       )}
       <textarea
         className={cn(
-          "resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 not-focus:border p-2 w-full mt-1 mb-1.5 rounded-sm text-black dark:text-white",
+          "resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 not-focus:border p-2 w-full mt-1 rounded-sm text-black dark:text-white",
           textAreaStyle,
           error && "border border-red-500 focus:ring-red-500"
         )}

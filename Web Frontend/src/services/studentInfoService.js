@@ -74,3 +74,9 @@ export const addAllergyApi = async (data) => {
   const response = await axiosInstance.post("/student/allergy", data);
   return response.data;
 };
+
+export const deleteSiblingApi = async (siblingId) => {
+  const response = await axiosInstance.delete(`/student/sibling-details/${siblingId}`);
+
+  return response.data;
+};
