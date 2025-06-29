@@ -104,6 +104,12 @@ export const SocketProvider = ({ children }) => {
           ...prev,
           [chatId]: (prev[chatId] || 0) + 1,
         }));
+      } else {
+        // Chat is currently open → reset unread count in backend
+        socket.emit("chatRead", {
+          chatId,
+          userId: user._id,
+        });
       }
     };
 
