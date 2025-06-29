@@ -10,6 +10,7 @@ export const SocketProvider = ({ children }) => {
   const { user } = useAuth();
   const [socket, setSocket] = useState(null);
   const [globalOnlineUsers, setGlobalOnlineUsers] = useState([]);
+  const [unreadCounts, setUnreadCounts] = useState({});
   const activeChatId = useRef(null);
 
   /**
@@ -35,14 +36,14 @@ export const SocketProvider = ({ children }) => {
     });
 
     const handleNewMessage = ({ chatId, from, preview }) => {
-      setUnseen((prev) => ({
+      setUnreadCounts((prev) => ({
         ...prev,
         [chatId]: (prev[chatId] || 0) + 1,
       }));
     };
 
     const handleConnect = () => {
-      console.log("✅ Socket connected:", socketConnection.id);
+      //console.log("✅ Socket connected:", socketConnection.id);
     };
 
     const handleConnectError = (err) => {
@@ -50,7 +51,6 @@ export const SocketProvider = ({ children }) => {
     };
 
     socketConnection.on("connect", handleConnect);
-    socketConnection.on("notifyNewMessage", handleNewMessage);
     socketConnection.on("connect_error", handleConnectError);
 
     setSocket(socketConnection);
@@ -58,7 +58,6 @@ export const SocketProvider = ({ children }) => {
     return () => {
       //  Clean up listeners
       socketConnection.off("connect", handleConnect);
-      socketConnection.off("notifyNewMessage", handleNewMessage);
       socketConnection.off("connect_error", handleConnectError);
 
       //  Disconnect
@@ -67,7 +66,7 @@ export const SocketProvider = ({ children }) => {
   }, [user]);
 
 
-
+// Handle online user list
   useEffect(() => {
     if (!socket) return;
 
@@ -92,8 +91,28 @@ export const SocketProvider = ({ children }) => {
     };
   }, [socket]);
 
+
+  // Handle incoming messages globally
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNotify = ({ chatId, from, preview }) => {
+      if (from === user?._id) return; // Don't update for your own messages
+
+      if (activeChatId.current !== chatId) {
+        setUnreadCounts((prev) => ({
+          ...prev,
+          [chatId]: (prev[chatId] || 0) + 1,
+        }));
+      }
+    };
+
+    socket.on("notifyNewMessage", handleNotify);
+    return () => socket.off("notifyNewMessage", handleNotify);
+  }, [socket, user]);
+
   return (
-    <SocketContext.Provider value={{ socket, activeChatId, setActiveChat, globalOnlineUsers,}}>
+    <SocketContext.Provider value={{ socket, activeChatId, setActiveChat, globalOnlineUsers,unreadCounts,setUnreadCounts}}>
       {children}
     </SocketContext.Provider>
   );

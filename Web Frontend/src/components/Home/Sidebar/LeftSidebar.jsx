@@ -3,11 +3,12 @@ import ExpandableItem from "../../ui/ExpandableItem";
 import ExpandableItemChild from "./ExpandableItemChild";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMessage } from "@fortawesome/free-regular-svg-icons";
+import { useSocket } from "@/context/SocketContext";
 
 
 const LeftSidebar = ({ chatData }) => {
   //Hooks
-  const [unreadCounts, setUnreadCounts] = useState({});
+  const {unreadCounts,setUnreadCounts} = useSocket();
   useEffect(() => {
     if (!chatData) return;
     const counts = {};

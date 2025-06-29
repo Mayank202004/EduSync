@@ -36,7 +36,8 @@ const ChatCard = ({
   useEffect(() => {
     if (!socket) return;
     const handleIncoming = (message) => {
-      if(message.sender == currentUser._id) return;
+      console.log(message)
+      if(message.sender?._id == currentUser._id) return;
       if (message.chatId === chatId) {
         setMessages((prev) => [...prev, message]);
       }
@@ -145,7 +146,7 @@ const ChatCard = ({
           messages.map((message) => (
             <div key={message._id} className="message flex gap-3 items-start">
               <div className="w-9 h-9 rounded-full">
-                <AvatarIcon withHover={false} user={{"fullName":message.sender.username, avatar:message.sender.avatar}} />
+                <AvatarIcon withHover={false} user={{"fullName":message.sender.fullName, avatar:message.sender.avatar}} />
               </div>
               <div className="message-content flex flex-col">
                 <div className="message-header flex justify-between text-sm text-gray-400 gap-3">
