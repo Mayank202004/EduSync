@@ -2,15 +2,15 @@ import { cn } from "@/lib/cn";
 
 const BUTTON_STYLES = {
   default:
-    "bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600",
+    "bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none",
   primary:
-    "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-600",
+    "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-600 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none",
   danger:
-    "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:text-white dark:hover:bg-red-600",
+    "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:text-white dark:hover:bg-red-600 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none",
   success:
-    "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:text-white dark:hover:bg-green-600",
-  info: "bg-cyan-600 text-white hover:bg-cyan-700 dark:bg-cyan-500 dark:text-white dark:hover:bg-cyan-600",
-  custom: " ",
+    "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:text-white dark:hover:bg-green-600 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none",
+  info: "bg-cyan-600 text-white hover:bg-cyan-700 dark:bg-cyan-500 dark:text-white dark:hover:bg-cyan-600 disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none",
+  custom: "",
 };
 
 /**
@@ -35,7 +35,8 @@ const SimpleButton = ({
   predefinedColor = "primary",
   children,
 }) => {
-  const buttonColor = BUTTON_STYLES[predefinedColor] || BUTTON_STYLES["primary"];
+  const buttonColor =
+    BUTTON_STYLES[predefinedColor] || BUTTON_STYLES["primary"];
   return (
     <button
       {...buttonProps}

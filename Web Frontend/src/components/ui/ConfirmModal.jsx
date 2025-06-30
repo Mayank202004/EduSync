@@ -1,20 +1,21 @@
 import ModalWrapper from "./ModalWrapper";
 import SimpleButton from "./SimpleButton";
 import OutlinedButton from "./OutlinedButton";
-import { cn } from "@/lib/cn";
+import TitledContainer from "./TitledContainer";
 
 const ConfirmModal = ({
   modalStyle,
   containerStyle,
+  title = "Confirm",
   onConfirm,
   onCancel,
   children
 }) => {
   return (
     <ModalWrapper className={modalStyle}>
-      <div className={cn("bg-white dark:bg-customDarkFg rounded-xl p-6 max-w-md shadow-lg flex flex-col gap-4", containerStyle)}>
+      <TitledContainer title={title} titleStyle="text-xl mb-1" containerStyle={["rounded-xl p-6 max-w-md w-fit shadow-lg flex flex-col", containerStyle]}>
         {children}
-        <div className="flex w-fit ml-auto gap-3">
+        <div className="flex w-fit ml-auto gap-3 mt-4">
           <OutlinedButton buttonProps={{ onClick: onCancel }}>
             Cancel
           </OutlinedButton>
@@ -22,7 +23,7 @@ const ConfirmModal = ({
             Confirm
           </SimpleButton>
         </div>
-      </div>
+      </TitledContainer>
     </ModalWrapper>
   );
 };
