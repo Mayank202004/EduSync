@@ -1,34 +1,49 @@
 import { cn } from "@/lib/cn";
 
 const BUTTON_STYLES = {
-  blue: "bg-blue-300 dark:bg-blue-500 hover:bg-blue-400 dark:hover:bg-blue-400 disabled:opacity-50",
-  green: "bg-green-400 text-black hover:not-disabled:bg-green-600 disabled:opacity-50",
-  gray: "bg-gray-300 dark:bg-gray-600 hover:not-disabled:bg-gray-400 disabled:opacity-50",
-  custom: " "
-}
+  default:
+    "bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600",
+  primary:
+    "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-600",
+  danger:
+    "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:text-white dark:hover:bg-red-600",
+  success:
+    "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:text-white dark:hover:bg-green-600",
+  info: "bg-cyan-600 text-white hover:bg-cyan-700 dark:bg-cyan-500 dark:text-white dark:hover:bg-cyan-600",
+  custom: " ",
+};
 
 /**
  * A simple customizable button component with predefined color styles.
  *
  * @component
  * @param {Object} props.buttonProps - native properties of html buttons like onClick, type, etc..
- * @param {string} [props.className] - Additional CSS classes for custom styling. 
+ * @param {string} [props.className] - Additional CSS classes for custom styling.
  * Supports style merging using {@link https://github.com/lukeed/clsx | clsx} and {@link https://github.com/dcastil/tailwind-merge | tailwind-merge}
- * @param {string} [props.predefinedColor="blue"] - A predefined color key from BUTTON_STYLES. Defaults to "blue".
+ * @param {string} [props.predefinedColor="blue"] - A predefined color key from BUTTON_STYLES. Defaults to "primary".
  *
  * @example
  * <SimpleButton
  *   buttonProps={{ onClick: handleSave }}
  *   className="text-white"
- *   predefinedColor="blue"
+ *   predefinedColor="primary"
  * />
  */
-const SimpleButton = ({ buttonProps, className, predefinedColor="blue", children }) => {
-  const buttonColor = BUTTON_STYLES[predefinedColor] || BUTTON_STYLES["blue"]
+const SimpleButton = ({
+  buttonProps,
+  className,
+  predefinedColor = "primary",
+  children,
+}) => {
+  const buttonColor = BUTTON_STYLES[predefinedColor] || BUTTON_STYLES["primary"];
   return (
     <button
       {...buttonProps}
-      className={cn("cursor-pointer py-2 px-4 w-fit flex ml-auto rounded-sm duration-200 justify-center", buttonColor, className)}
+      className={cn(
+        "cursor-pointer py-2 px-4 w-fit flex ml-auto rounded-sm duration-200 justify-center",
+        buttonColor,
+        className
+      )}
     >
       {children}
     </button>

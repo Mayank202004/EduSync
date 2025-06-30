@@ -1,7 +1,12 @@
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
+
+import ConfirmModal from "../ui/ConfirmModal";
 
 const SiblingsTable = ({ info, onDelete }) => {
+  const [deleteStudent, setDeleteStudent] = useState(null); //store id and name of student to be deleted
+
   return (
     <>
       <hr className="my-6" />
@@ -25,7 +30,9 @@ const SiblingsTable = ({ info, onDelete }) => {
               <tr key={sibling._id}>
                 <td className="text-center">
                   <button
-                    onClick={() => onDelete(sibling._id, sibling.name)}
+                    onClick={() =>
+                      setDeleteStudent({ id: sibling._id, name: sibling.name })
+                    }
                     className="flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600 text-red-500 hover:text-red-700 transition-colors duration-300 cursor-pointer p-1 aspect-square h-10 rounded-full"
                     title="Delete"
                   >
@@ -49,6 +56,20 @@ const SiblingsTable = ({ info, onDelete }) => {
           </tbody>
         </table>
       </div>
+      {deleteStudent && (
+        <ConfirmModal
+          onCancel={() => setDeleteStudent(null)}
+          onConfirm={() => {
+            onDelete(deleteStudent.id);
+            setDeleteStudent(null);
+          }}
+        >
+          <span>
+            Are you sure you want to delete the details of{" "}
+            <strong>{deleteStudent.name}</strong>
+          </span>
+        </ConfirmModal>
+      )}
     </>
   );
 };
