@@ -5,7 +5,7 @@ import ConfirmModal from "../ui/ConfirmModal";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const ParentsContactTable = ({ contacts = [], onDelete = () => {} }) => {
+const ParentsContactTable = ({ contacts = [], onDelete }) => {
   const [deleteContact, setDeleteContact] = useState(null); //store id and name of contact to be deleted
 
   return (

@@ -80,3 +80,9 @@ export const deleteSiblingApi = async (siblingId) => {
 
   return response.data;
 };
+
+export const deleteParentContactApi = async (contactId) => {
+  const response = await axiosInstance.delete(`/student/parent-contact/${contactId}`);
+
+  return response.data;
+};

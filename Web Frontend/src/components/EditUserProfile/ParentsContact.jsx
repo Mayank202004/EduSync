@@ -1,4 +1,5 @@
 import { useActionState, useState } from "react";
+import toast from "react-hot-toast";
 
 import Input from "@/components/ui/Input";
 import SelectOption from "@/components/ui/SelectOption";
@@ -7,6 +8,8 @@ import ParentsContactTable from "./ParentsContactTable";
 
 import { PARENT_RELATIONS } from "./value_maps/parentContantMaps";
 import parentContactAction from "./form_actions/parentContactAction";
+
+import { deleteParentContactApi } from "@/services/studentInfoService";
 
 const ParentsContact = ({ initialInfo }) => {
   const [info, setInfo] = useState(initialInfo);
@@ -21,6 +24,19 @@ const ParentsContact = ({ initialInfo }) => {
       },
     }
   );
+
+  const deleteContact = async (contactId, parentName) => {
+    try {
+      toast.promise(deleteParentContactApi(contactId), {
+        loading: `Deleting ${parentName} contact details...`,
+        success: (response) => {
+          setInfo(response.data);
+          return "Deleted successfully"}
+      })
+    } catch(_) {
+      //handled by axios interceptor
+    }
+  }
 
   return (
     <>
@@ -69,7 +85,7 @@ const ParentsContact = ({ initialInfo }) => {
           {isPending ? "Saving..." : "Save"}
         </SimpleButton>
       </form>
-      {info?.length > 0 && <ParentsContactTable key={info} contacts={info} />}
+      {info?.length > 0 && <ParentsContactTable key={info} contacts={info} onDelete={deleteContact}/>}
     </>
   );
 };
