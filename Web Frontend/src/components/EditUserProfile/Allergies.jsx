@@ -1,4 +1,5 @@
 import { useActionState, useState } from "react";
+import toast from "react-hot-toast";
 
 import Input from "@/components/ui/Input";
 import SimpleButton from "@/components/ui/SimpleButton";
@@ -6,12 +7,27 @@ import AllergiesTable from "./AllergiesTable";
 
 import allergyAction from "./form_actions/allergyAction";
 
+import { deleteAllergyApi } from "@/services/studentInfoService";
+
 const Allergies = ({ initialInfo }) => {
   const [info, setInfo] = useState(initialInfo);
   const [allergy, formAction, isPending] = useActionState(
     (prevState, formData) => allergyAction(prevState, formData, setInfo),
     {error: null, inputValue: ""}
   );
+
+  const deleteAllergy = async (allergyName) => {
+    try {
+      toast.promise(deleteAllergyApi({allergyName}), {
+        loading: `Deleting allergy ${allergyName}...`,
+        success: (response) => {
+          setInfo(response.data);
+          return "Deleted successfully"}
+      })
+    } catch(_) {
+      //handled by axios interceptor
+    }
+  }
 
   return (
     <>
@@ -30,7 +46,7 @@ const Allergies = ({ initialInfo }) => {
           {isPending ? "Saving..." : "Save"}
         </SimpleButton>
       </form>
-      {info?.length > 0 && <AllergiesTable key={info} allergies={info} />}
+      {info?.length > 0 && <AllergiesTable key={info} allergies={info} onDelete={deleteAllergy}/>}
     </>
   );
 };

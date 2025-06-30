@@ -379,6 +379,8 @@ export const deleteAllergy = asyncHandler(async (req, res) => {
   const {  allergyName } = req.body;
   const studId = req.student._id;
 
+  console.log(req.body)
+
   const student = await Student.findById(studId);
   if (!student) {
     throw new ApiError(404, "Student not found");
