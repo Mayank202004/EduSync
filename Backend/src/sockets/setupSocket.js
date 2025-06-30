@@ -62,9 +62,19 @@ export const setupSocket = (io) => {
     });
 
 
-    socket.on("joinChat", (chatId) => {
+    socket.on("joinChat", async ({ chatId }) => {
       socket.join(`chat-${chatId}`);
-      //console.log("Socket joined chat room:", `chat-${chatId}`);
+      const chat = await Chat.findById(chatId).select("-name -isGroupChat -createdAt -updatedAt -__v -unreadCounts -_id");
+      
+      const online = chat.participants.filter((id) =>
+        onlineUsers[id.toString()]
+      );
+
+      // Send online users to just this socket
+      io.to(socket.id).emit("initialOnlineUsers", {
+        _id:chatId,
+        onlineUserIds: online,
+      });
     });
 
     socket.on("leaveChat", (chatId) => {

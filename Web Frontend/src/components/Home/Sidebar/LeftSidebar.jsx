@@ -47,8 +47,10 @@ const LeftSidebar = ({ chatData }) => {
         <ExpandableItem title="Announcements" defaultExpanded={true}>
           <ExpandableItemChild
             title={chatData?.announcements[0]?.name ?? "Unnamed Channel"}
-            subtitle={`${chatData?.announcements[0]?.participantsCount} Members`}
+            subtitle={`${chatData?.announcements[0]?.participants?.length} Members`}
+            memberCount={chatData?.announcements[0]?.participants?.length}
             chatId={chatData?.announcements[0]?._id}
+            participants={chatData?.announcements[0]?.participants}
             unreadCount={unreadCounts[chatData?.announcements[0]?._id] || 0}
             onUnreadReset={handleUnreadReset}
           />
@@ -62,8 +64,10 @@ const LeftSidebar = ({ chatData }) => {
             <ExpandableItemChild
               key={index}
               title={item.name ?? "Unnamed Channel"}
-              subtitle={`${item.participantsCount} Members`}
+              subtitle={`${item.participants?.length} Members`}
+              memberCount={item.participants?.length}
               chatId={item._id}
+              participants={item.participants}
               unreadCount={unreadCounts[item._id] || 0}
               onUnreadReset={handleUnreadReset}
             />
@@ -94,6 +98,7 @@ const LeftSidebar = ({ chatData }) => {
             avatar={person?.avatar}
             chatId={item._id}
             userId={person?._id}
+            participants={item.participants}
             unreadCount={unreadCounts[item._id] || 0}
             onUnreadReset={handleUnreadReset}
           />

@@ -33,13 +33,13 @@ export const addClassDetails = asyncHandler(async (req, res) => {
         // Join "School" group
         const schoolChat = await Chat.findOneAndUpdate(
           { name: "School", isGroupChat: true },
-          { $addToSet: { participants: user._id } }
+          { $addToSet: { participants: student.userId } }
         );
 
         // Join specific "Class" group (e.g., "Class 1-A")
         const classChat = await Chat.findOneAndUpdate(
           { className, div, isGroupChat: true },
-          { $addToSet: { participants: user._id } }
+          { $addToSet: { participants: student.userId } }
         );
         res.status(200).json(new ApiResponse(200,student,"Added class details successfully"));
     }catch(error){

@@ -9,8 +9,9 @@ const ChatCard = ({
   avatar = null,
   chatId=null,
   membersCount = 3,
-  onlineCount = 2,
   initialMessages = [],
+  userId=null,
+  participants=[],
   currentUser = {
     _id: null,
     fullName: "You",
@@ -26,6 +27,7 @@ const ChatCard = ({
   const [messages, setMessages] = useState(initialMessages);
   const [inputValue, setInputValue] = useState("");
   const [attachments, setAttachments] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
   // Setting initial message
   useEffect(() => {
@@ -36,7 +38,7 @@ const ChatCard = ({
   useEffect(() => {
     if (!socket) return;
     const handleIncoming = (message) => {
-      console.log(message)
+
       if(message.sender?._id == currentUser._id) return;
       if (message.chatId === chatId) {
         setMessages((prev) => [...prev, message]);
@@ -45,6 +47,41 @@ const ChatCard = ({
     socket.on("receiveMessage", handleIncoming);
     return () => socket.off("receiveMessage", handleIncoming);
   }, [socket]);
+
+  useEffect(() => {
+    if (!socket) return;
+    
+    const setInitialOnlineUsers = ({ _id, onlineUserIds }) => {
+      if(_id != chatId) return;
+      if(!onlineUserIds) return;
+      setOnlineUsers(onlineUserIds);
+    };
+  
+    const handleUserConnected = (id) => {
+      console.log(`Connected Id is : ${id}`)
+      console.log(participants);
+      const isParticipant = participants.includes(id);
+      console.log(`User ${id} is ${isParticipant ? "a participant" : "not a participant"}`);
+      if (!isParticipant) return;
+    
+      setOnlineUsers((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    };
+  
+    const handleUserDisconnected = (id) => {
+      console.log(`User ${id} disconnected`);
+      setOnlineUsers((prev) => prev.filter((uid) => uid !== id));
+    };
+  
+    socket.on("initialOnlineUsers", setInitialOnlineUsers);
+    socket.on("userConnected", handleUserConnected);
+    socket.on("userDisconnected", handleUserDisconnected);
+  
+    return () => {
+      socket.off("initialOnlineUsers", setInitialOnlineUsers);
+      socket.off("userConnected", handleUserConnected);
+      socket.off("userDisconnected", handleUserDisconnected);
+    };
+  }, [socket, chatId, participants]);
 
 
 
@@ -124,7 +161,11 @@ const ChatCard = ({
           <div className="chat-name">
             <h3 className="text-lg font-semibold text-black dark:text-white">{chatName}</h3>
             <p className="text-sm text-gray-400">
-              {membersCount} members • {onlineCount} online
+              {userId
+                ? onlineUsers.includes(userId)
+                  ? "Online"
+                  : ""
+                : `${membersCount} members • ${onlineUsers.length} online`}
             </p>
           </div>
         </div>

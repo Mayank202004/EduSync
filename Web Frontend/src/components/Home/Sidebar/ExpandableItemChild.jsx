@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import useOnlineStatus from "@/hooks/useOnlineStatus";
 import AvatarIcon from "@/components/ui/AvatarIcon";
 
-const ExpandableItemChild = React.memo(({ title, subtitle, avatar, chatId, unreadCount, onUnreadReset, userId}) => {
+const ExpandableItemChild = React.memo(({ title, subtitle,memberCount=0, avatar, chatId, unreadCount, onUnreadReset, userId, participants}) => {
   const isOnline = userId ? useOnlineStatus(userId) : false;
   const { socket, activeChatId,setActiveChat} = useSocket();
   const [showPopup, setShowPopup] = useState(false);
@@ -28,7 +28,7 @@ const ExpandableItemChild = React.memo(({ title, subtitle, avatar, chatId, unrea
  */  
 const handleClick = () => {
   if (socket && socket.connected) {
-    socket.emit("joinChat", chatId);
+    socket.emit("joinChat", { chatId });
     // Reset unread count in db
     if (unreadCount > 0) {
       socket.emit("chatRead", { chatId, userId: CURRENT_USER._id });
@@ -112,11 +112,12 @@ const handleClick = () => {
               chatName={title}
               avatar={avatar}
               chatId={activeChatId.current}
-              membersCount={1}
-              onlineCount={1}
+              membersCount={memberCount}
               initialMessages={messages}
               loading={loadingMessages}
               currentUser={CURRENT_USER}
+              userId={userId} // Recipient Id for personal chats (One to one chats)
+              participants={participants}
               className="border border-zinc-200 dark:border-zinc-700"
               onSendMessage={
                 (content,attachments) => {

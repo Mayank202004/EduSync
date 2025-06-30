@@ -25,7 +25,7 @@ export const getStudentChats = async (userId,className,div) => {
       $project: {
         name: 1,
         isGroupChat: 1,
-        participantsCount: { $size: "$participants" },
+        participants: 1,
         unreadMessageCount: {
           $ifNull: [`$unreadCounts.${userId.toString()}`, 0],
         },
@@ -47,7 +47,7 @@ export const getStudentChats = async (userId,className,div) => {
       $project: {
         name: 1,
         isGroupChat: 1,
-        participantsCount: { $size: "$participants" },
+        participants: 1,
         unreadMessageCount: {
           $ifNull: [`$unreadCounts.${userId.toString()}`, 0],
         },
@@ -98,7 +98,8 @@ export const getStudentChats = async (userId,className,div) => {
       return {
         _id: chat._id,
         updatedAt: chat.updatedAt,
-        unreadMessageCount, 
+        unreadMessageCount,
+        participants: chat.participants, 
         teacher: {
           _id: teacherUserId,
           name: teacher.userId.fullName,
@@ -140,7 +141,7 @@ export const getTeacherChats = async (teacher) => {
       $project: {
         name: 1,
         isGroupChat: 1,
-        participantsCount: { $size: "$participants" },
+        participants: 1,
         unreadMessageCount: {
           $ifNull: [`$unreadCounts.${teacherUserId.toString()}`, 0],
         },
@@ -176,7 +177,7 @@ export const getTeacherChats = async (teacher) => {
         className: 1,
         div: 1,
         isGroupChat: 1,
-        participantsCount: { $size: "$participants" },
+        participants: 1,
         unreadMessageCount: {
           $ifNull: [`$unreadCounts.${teacherUserId.toString()}`, 0],
         },
@@ -201,6 +202,7 @@ export const getTeacherChats = async (teacher) => {
     return {
       _id: chat._id,
       updatedAt: chat.updatedAt,
+      participants: chat.participants,
       unreadMessageCount: chat.unreadCounts?.get?.(teacherUserId.toString()) || 0,
       student: {
         _id: otherUser?._id,

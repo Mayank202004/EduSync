@@ -5,7 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 
 
-
+// To Do : add teacher to chat groups 
 export const verifyTeacher = asyncHandler(async (req, res) => {
     try {
         const { id } = req.params;  
