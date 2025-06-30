@@ -156,7 +156,7 @@ const ChatCard = ({
         <div className="chat-info flex gap-3 items-center">
           <div className="avatar relative w-9 h-9 rounded-full flex items-center justify-center">
             <AvatarIcon withHover={false} user={{"fullName":chatName, avatar}} />
-            <div className="status-indicator absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-customLightBg2 dark:border-gray-900"></div>
+            {onlineUsers.length == participants.length && <div className="status-indicator absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-customLightBg2 dark:border-gray-900"></div>}
           </div>
           <div className="chat-name">
             <h3 className="text-lg font-semibold text-black dark:text-white">{chatName}</h3>
