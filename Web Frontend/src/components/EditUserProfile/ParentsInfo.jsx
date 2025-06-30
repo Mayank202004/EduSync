@@ -89,7 +89,7 @@ const ParentsInfo = ({ initialInfo }) => {
         className={"disabled:opacity-60"}
         buttonProps={{ disabled: isPending }}
       >
-        {isPending ? "Saving..." : "Save"}
+        {isPending ? "Saving..." : "Save Changes"}
       </SimpleButton>
     </form>
   );

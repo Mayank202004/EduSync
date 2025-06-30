@@ -46,7 +46,7 @@ const PendingFees = ({ isPending, feesData }) => {
               type: "button",
               disabled: selectedItems.length === 0,
             }}
-            predefinedColor="green"
+            predefinedColor="success"
           >
             Proceed to pay
           </SimpleButton>
