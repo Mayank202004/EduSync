@@ -161,29 +161,32 @@ export const getTeacherChats = async (teacher) => {
   });
 
   // 4. Get class group chats for all class/div pairs
-  const classGroupChats = await Chat.aggregate([
-    {
-      $match: {
-        isGroupChat: true,
-        $or: classDivPairs.map(pair => ({
-          className: pair.class,
-          div: pair.div,
-        })),
-      },
-    },
-    {
-      $project: {
-        name: 1,
-        className: 1,
-        div: 1,
-        isGroupChat: 1,
-        participants: 1,
-        unreadMessageCount: {
-          $ifNull: [`$unreadCounts.${teacherUserId.toString()}`, 0],
+  let classGroupChats = [];
+  if (classDivPairs.length > 0) {
+    classGroupChats = await Chat.aggregate([
+      {
+        $match: {
+          isGroupChat: true,
+          $or: classDivPairs.map(pair => ({
+            className: pair.class,
+            div: pair.div,
+          })),
         },
       },
-    },
-  ]);
+      {
+        $project: {
+          name: 1,
+          className: 1,
+          div: 1,
+          isGroupChat: 1,
+          participants: 1,
+          unreadMessageCount: {
+            $ifNull: [`$unreadCounts.${teacherUserId.toString()}`, 0],
+          },
+        },
+      },
+    ]);
+  }
 
   // 5. Get all private (non-group) chats for the teacher
   const personalChatsRaw = await Chat.find({
