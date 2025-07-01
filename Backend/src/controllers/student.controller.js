@@ -3,6 +3,7 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
+import { Chat } from "../models/chat.model.js";
 
 /**
  * @desc Add class and division details
@@ -36,15 +37,33 @@ export const addClassDetails = asyncHandler(async (req, res) => {
           { $addToSet: { participants: student.userId } }
         );
 
-        // Join specific "Class" group (e.g., "Class 1-A")
-        const classChat = await Chat.findOneAndUpdate(
-          { className, div, isGroupChat: true },
-          { $addToSet: { participants: student.userId } }
-        );
+        // Join specific "Class" group (e.g., "Class 1-A") / Create new if not present
+        // Check if class chat exists
+        let classChat = await Chat.findOne({ className, div, isGroupChat: true });
+              
+        if (classChat) {
+          // Update to add participant only if not already present
+          classChat = await Chat.findByIdAndUpdate(
+            classChat._id,
+            { $addToSet: { participants: student.userId } },
+            { new: true }
+          );
+        } else {
+          // Create new class chat
+          classChat = await Chat.create({
+            name: `Class ${className}-${div}`,
+            isGroupChat: true,
+            className,
+            div,
+            participants: [student.userId],
+          });
+        }
+        
+
         res.status(200).json(new ApiResponse(200,student,"Added class details successfully"));
-    }catch(error){
+      }catch(error){
         throw new ApiError(500, error.message);
-    }
+      }
 });
 
 /**
