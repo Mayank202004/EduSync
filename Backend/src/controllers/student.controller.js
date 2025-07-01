@@ -40,7 +40,7 @@ export const addClassDetails = asyncHandler(async (req, res) => {
         // Join specific "Class" group (e.g., "Class 1-A") / Create new if not present
         // Check if class chat exists
         let classChat = await Chat.findOne({ className, div, isGroupChat: true });
-              
+
         if (classChat) {
           // Update to add participant only if not already present
           classChat = await Chat.findByIdAndUpdate(
@@ -59,7 +59,6 @@ export const addClassDetails = asyncHandler(async (req, res) => {
           });
         }
         
-
         res.status(200).json(new ApiResponse(200,student,"Added class details successfully"));
       }catch(error){
         throw new ApiError(500, error.message);
