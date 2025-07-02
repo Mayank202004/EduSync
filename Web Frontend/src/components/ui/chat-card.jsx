@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from "react";
-import { SmilePlus, Send, MoreHorizontal, Check, CheckCheck } from "lucide-react";
+import { SmilePlus, Send, MoreHorizontal, Check, CheckCheck, Paperclip } from "lucide-react";
 import { formatDate } from "@/utils/dateUtils";
 import { useSocket } from "@/context/SocketContext";
 import AvatarIcon from "./AvatarIcon";
@@ -86,11 +86,12 @@ const ChatCard = ({
 
 
   const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() && attachments.length === 0) return;
 
     const newMessage = {
       id: Date.now().toString(),
       content: inputValue,
+      attachments,
       sender: {
         _id: currentUser._id,
         fullName: currentUser.fullName,
@@ -102,24 +103,12 @@ const ChatCard = ({
       status: "sent",
     };
 
-
     setMessages((prev) => [...prev, newMessage]);
     setInputValue("");
-    onSendMessage(inputValue,attachments);
-
-    // Simulate message delivery and read status
-    setTimeout(() => {
-      setMessages((prev) =>
-        prev.map((msg) => (msg.id === newMessage.id ? { ...msg, status: "delivered" } : msg))
-      );
-    }, 1000);
-
-    setTimeout(() => {
-      setMessages((prev) =>
-        prev.map((msg) => (msg.id === newMessage.id ? { ...msg, status: "read" } : msg))
-      );
-    }, 2000);
+    setAttachments([]); 
+    onSendMessage(inputValue, attachments);
   };
+
 
   const handleReaction = (messageId, emoji) => {
     setMessages((prev) =>
@@ -174,7 +163,7 @@ const ChatCard = ({
         </button>
       </div>
 
-      <div className="chat-messages p-4 space-y-4 overflow-y-auto h-96">
+      <div className={`chat-messages p-4 space-y-4 overflow-y-auto  ${attachments.length > 0 ? "h-72" : "h-96"}`}>
         {messages === null ? (
           <>
             <MessageSkeleton />
@@ -185,23 +174,75 @@ const ChatCard = ({
           <div className="text-center text-gray-400 dark:text-gray-500">No messages yet</div>
         ) : (
           messages.map((message) => (
-            <div key={message._id} className="message flex gap-3 items-start">
+            <div key={message._id || message.id} className="message flex gap-3 items-start">
               <div className="w-9 h-9 rounded-full">
-                <AvatarIcon withHover={false} user={{"fullName":message.sender.fullName, avatar:message.sender.avatar}} />
+                <AvatarIcon
+                  withHover={false}
+                  user={{
+                    fullName: message.sender.fullName,
+                    avatar: message.sender.avatar,
+                  }}
+                />
               </div>
+                
               <div className="message-content flex flex-col">
                 <div className="message-header flex justify-between text-sm text-gray-400 gap-3">
-                  <span className="sender-name text-black dark:text-white font-bold break-words flex-grow">{message.sender.fullName}</span>
+                  <span className="sender-name text-black dark:text-white font-bold break-words flex-grow">
+                    {message.sender.fullName}
+                  </span>
                   <span className="timestamp shrink-0">{formatDate(message.updatedAt)}</span>
                 </div>
-                <p className="message-text text-black dark:text-white">{message.content}</p>
+                
+                {/* Message Content */}
+                {message.content && (
+                  <p className="message-text text-black dark:text-white whitespace-pre-line">
+                    {message.content}
+                  </p>
+                )}
+          
+                {/* Message Attachments */}
+                {message.attachments?.length > 0 && (
+                  <div className="attachments grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
+                    {message.attachments.map((file, idx) => {
+                      const isObject = typeof file !== "string";
+                      const fileType = isObject ? file.type : "";
+                      const isImage = isObject
+                        ? fileType.startsWith("image/")
+                        : file?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+                      const url = isObject ? URL.createObjectURL(file) : file.url || file;
+                    
+                      return (
+                        <div key={idx} className="attachment-item text-sm">
+                          {isImage ? (
+                            <img
+                              src={url}
+                              alt={`attachment-${idx}`}
+                              className="rounded-lg border max-h-48 w-full object-cover"
+                            />
+                          ) : (
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded"
+                            >
+                              📄 <span className="truncate">{file.name || `File-${idx + 1}`}</span>
+                            </a>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+          
+                {/* Message Reactions */}
                 <div className="reactions flex space-x-2 mt-1">
                   {["👍", "❤️", "😂"].map((emoji) => {
                     const reaction = message.reactions?.find((r) => r.emoji === emoji);
                     return (
                       <button
                         key={emoji}
-                        onClick={() => handleReaction(message._id, emoji)}
+                        onClick={() => handleReaction(message._id || message.id, emoji)}
                         className="reaction-btn flex items-center space-x-1 text-gray-600 dark:text-gray-300"
                       >
                         <span>{emoji}</span>
@@ -213,10 +254,69 @@ const ChatCard = ({
               </div>
             </div>
           ))
+
         )}
       </div>
 
+      {attachments.length > 0 && (
+        <div className="attachments-preview flex flex-wrap gap-2 mt-2 px-4">
+          {attachments.slice(0, 3).map((file, idx) => {
+            const isImage = file.type.startsWith("image/");
+            return (
+              <div
+                key={idx}
+                className={`relative p-2 border rounded bg-white dark:bg-gray-800 ${
+                  isImage ? "w-16 h-16" : "w-full"
+                }`}
+              >
+                {isImage ? (
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={file.name}
+                    className="w-full h-full object-cover rounded"
+                  />
+                ) : (
+                  <div className="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300 w-full overflow-hidden">
+                    📄
+                    <span className="truncate max-w-[80%]">{file.name}</span>
+                  </div>
+                )}
+                <button
+                  onClick={() => setAttachments((prev) => prev.filter((_, i) => i !== idx))}
+                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center"
+                >
+                  ✕
+                </button>
+              </div>
+            );
+          })}
+      
+          {/* +N More Card */}
+          {attachments.length > 3 && (
+            <div className="w-16 h-16 p-2 border rounded bg-white dark:bg-gray-800 flex items-center justify-center text-gray-700 dark:text-gray-300 font-medium text-sm">
+              +{attachments.length - 3}
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="chat-input flex items-center gap-2 p-4 bg-customLightBg2 dark:bg-gray-900">
+        {/* Attachment Button */}
+        <label className="p-2 rounded-full bg-blue-500 hover:bg-blue-400 cursor-pointer">
+          <Paperclip className="w-5 h-5 text-white" />
+          <input
+            type="file"
+            multiple
+            accept="image/*,application/pdf"
+            className="hidden"
+            onChange={(e) => {
+              const files = Array.from(e.target.files);
+              setAttachments((prev) => [...prev, ...files]);
+            }}
+          />
+        </label>
+          
+        {/* Text Input */}
         <input
           type="text"
           value={inputValue}
@@ -230,6 +330,8 @@ const ChatCard = ({
           placeholder="Write a message..."
           className="flex-grow p-2 rounded-lg bg-white dark:bg-gray-700 dark:text-white text-customDarkFg placeholder-gray-400 focus:outline-none"
         />
+
+        {/* Send Button */}
         <button onClick={handleSendMessage} className="send-btn p-2 rounded-full bg-green-500 hover:bg-green-400">
           <Send className="w-5 h-5 text-white" />
         </button>
