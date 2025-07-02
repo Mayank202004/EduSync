@@ -11,7 +11,13 @@ const chatMessageSchema = new Schema(
       type: String,
     },
     attachments: {
-      type: [String],
+      type: [
+        {
+          url: { type: String, required: true },
+          name: { type: String },
+          type: { type: String },
+        },
+      ],
       default: [],
     },
     chat: {

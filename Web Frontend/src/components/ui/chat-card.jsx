@@ -2,7 +2,9 @@ import React, { useState, useEffect} from "react";
 import { SmilePlus, Send, MoreHorizontal, Check, CheckCheck, Paperclip } from "lucide-react";
 import { formatDate } from "@/utils/dateUtils";
 import { useSocket } from "@/context/SocketContext";
+import { uploadFiles } from "@/services/chatService";
 import AvatarIcon from "./AvatarIcon";
+import toast from "react-hot-toast";
 
 const ChatCard = ({
   chatName = "Team Chat",
@@ -61,9 +63,7 @@ const ChatCard = ({
   
     const handleUserConnected = (id) => {
       console.log(`Connected Id is : ${id}`)
-      console.log(participants);
       const isParticipant = participants.includes(id);
-      console.log(`User ${id} is ${isParticipant ? "a participant" : "not a participant"}`);
       if (!isParticipant) return;
     
       setOnlineUsers((prev) => (prev.includes(id) ? prev : [...prev, id]));
@@ -100,7 +100,7 @@ const ChatCard = ({
       const newMessage = {
         id: Date.now().toString(),
         content: inputValue,
-        attachments: uploadedFiles, // use URLs not raw files
+        attachments: uploadedFiles, 
         sender: {
           _id: currentUser._id,
           fullName: currentUser.fullName,
@@ -120,6 +120,7 @@ const ChatCard = ({
       // Emit/send to backend
       onSendMessage(inputValue, uploadedFiles);
     } catch (err) {
+      console.error(err);
       alert("Failed to upload attachments. Please try again.");
     } finally {
       setIsUploading(false);
@@ -227,16 +228,18 @@ const ChatCard = ({
                       const isImage = isObject
                         ? fileType.startsWith("image/")
                         : file?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-                      const url = isObject ? URL.createObjectURL(file) : file.url || file;
+                      const url = file.url;
                     
                       return (
                         <div key={idx} className="attachment-item text-sm">
                           {isImage ? (
-                            <img
-                              src={url}
-                              alt={`attachment-${idx}`}
-                              className="rounded-lg border max-h-48 w-full object-cover"
-                            />
+                            <a href={url} target="_blank" rel="noopener noreferrer">
+                              <img
+                                src={url}
+                                alt={`attachment-${idx}`}
+                                className="rounded-lg border max-h-48 w-full object-cover hover:opacity-80 transition"
+                              />
+                            </a>
                           ) : (
                             <a
                               href={url}
@@ -244,7 +247,9 @@ const ChatCard = ({
                               rel="noopener noreferrer"
                               className="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 p-2 rounded"
                             >
-                              📄 <span className="truncate">{file.name || `File-${idx + 1}`}</span>
+                              📄 <span className="truncate max-w-[80%]">
+                              {file.name || `File-${idx + 1}`} ({Math.round(file.size / 1024)} KB)</span>
+
                             </a>
                           )}
                         </div>
@@ -335,8 +340,29 @@ const ChatCard = ({
             accept="image/*,application/pdf"
             className="hidden"
             onChange={(e) => {
-              const files = Array.from(e.target.files);
-              setAttachments((prev) => [...prev, ...files]);
+              const maxFiles = 10;
+              const maxSizeMB = 5;
+            
+              const selectedFiles = Array.from(e.target.files);
+              const validFiles = [];
+            
+              for (const file of selectedFiles) {
+                if (file.size > maxSizeMB * 1024 * 1024) {
+                  toast.error(`${file.name} exceeds the ${maxSizeMB}MB limit and was skipped.`);
+                  continue;
+                }
+                validFiles.push(file);
+              }
+            
+              setAttachments((prev) => {
+                const totalFiles = [...prev, ...validFiles];
+                if (totalFiles.length > maxFiles) {
+                  toast.error(`You can upload a maximum of ${maxFiles} files.`);
+                  return totalFiles.slice(0, maxFiles);
+                }
+                return totalFiles;
+              });
+              e.target.value = null; 
             }}
           />
         </label>

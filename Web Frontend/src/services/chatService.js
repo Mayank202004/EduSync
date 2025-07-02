@@ -20,12 +20,16 @@ export const getChatMessages = async (chatId) => {
  */
 export const uploadFiles = async (files) => {
     const formData = new FormData();
-    // Append all files with field name "files"
-    files.forEach(file => formData.append('files', file));
+    files.forEach(file => {
+        formData.append("files", file);
+    });
+
     const response = await axiosInstance.post(`${BASEURL}/chat/upload`, formData, {
         headers: {
-            'Content-Type': 'multipart/form-data',
-        }
+            "Content-Type": "multipart/form-data",
+        },
+        timeout: 30000, // increase timeout for large files
     });
+
     return response.data?.data ?? [];
-}
+};
