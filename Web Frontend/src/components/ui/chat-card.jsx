@@ -28,6 +28,8 @@ const ChatCard = ({
   const [inputValue, setInputValue] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+
 
   // Setting initial message
   useEffect(() => {
@@ -85,29 +87,45 @@ const ChatCard = ({
 
 
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputValue.trim() && attachments.length === 0) return;
+    setIsUploading(true); 
+    try {
+      let uploadedFiles = [];
 
-    const newMessage = {
-      id: Date.now().toString(),
-      content: inputValue,
-      attachments,
-      sender: {
-        _id: currentUser._id,
-        fullName: currentUser.fullName,
-        avatar: currentUser.avatar,
-        isOnline: true,
-        isCurrentUser: true,
-      },
-      updatedAt: new Date(),
-      status: "sent",
-    };
+      if (attachments.length > 0) {
+        uploadedFiles = await uploadFiles(attachments);
+      }
 
-    setMessages((prev) => [...prev, newMessage]);
-    setInputValue("");
-    setAttachments([]); 
-    onSendMessage(inputValue, attachments);
+      const newMessage = {
+        id: Date.now().toString(),
+        content: inputValue,
+        attachments: uploadedFiles, // use URLs not raw files
+        sender: {
+          _id: currentUser._id,
+          fullName: currentUser.fullName,
+          avatar: currentUser.avatar,
+          isOnline: true,
+          isCurrentUser: true,
+        },
+        updatedAt: new Date(),
+        status: "sent",
+      };
+
+      // Update local UI instantly
+      setMessages((prev) => [...prev, newMessage]);
+      setInputValue("");
+      setAttachments([]);
+
+      // Emit/send to backend
+      onSendMessage(inputValue, uploadedFiles);
+    } catch (err) {
+      alert("Failed to upload attachments. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
   };
+
 
 
   const handleReaction = (messageId, emoji) => {
@@ -299,6 +317,13 @@ const ChatCard = ({
           )}
         </div>
       )}
+
+      {!isUploading && (
+        <div className="px-4 py-2 text-sm text-blue-600 dark:text-blue-400">
+          Uploading files...
+        </div>
+      )}
+
 
       <div className="chat-input flex items-center gap-2 p-4 bg-customLightBg2 dark:bg-gray-900">
         {/* Attachment Button */}
