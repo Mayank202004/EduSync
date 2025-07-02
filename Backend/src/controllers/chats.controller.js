@@ -4,6 +4,7 @@ import { Message } from "../models/messages.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 /**
  * @desc Helper function to fetch all chats for a student
@@ -253,4 +254,34 @@ export const resetUnreadCount = asyncHandler(async (req, res) => {
   chat.unreadCounts.set(req.user._id, 0);
   await chat.save();
   res.status(200).json(new ApiResponse(200, chat, "Unread count reset successfully"));
+});
+
+
+
+
+export const uploadMultipleFiles = asyncHandler(async (req, res) => {
+  if (!req.files || req.files.length === 0) {
+    throw new ApiError(400, "No files provided");
+  }
+
+  const uploadedFiles = [];
+
+  for (const file of req.files) {
+    const localPath = file.path;
+    const uploaded = await uploadOnCloudinary(localPath);
+
+    if (uploaded?.url) {
+      uploadedFiles.push({
+        url: uploaded.url,
+        name: file.originalname,
+        type: file.mimetype,
+      });
+    } else {
+      throw new ApiError(500, `Failed to upload file: ${file.originalname}`);
+    }
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, uploadedFiles, "Files uploaded successfully"));
 });
