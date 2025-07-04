@@ -6,10 +6,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import useExpandable from "@/hooks/useExpandable";
-
 import ExpandableDiv from "@/components/ui/ExpandableDiv";
 import Tag from "./Tag";
 import FeeCard from "./FeeCard";
+import { exportFee } from "@/services/feeService";
 
 const COLOR_MAP = {
   Cash: "green",
@@ -20,6 +20,17 @@ const COLOR_MAP = {
 
 const PaidFeesCard = ({ feeData }) => {
   const { containerRef, height, expanded, setExpanded } = useExpandable(false);
+
+
+  const handleExportFeeReceipt = ({
+    transactionId,
+    structureId,
+    feeType,
+    title,
+    receiptNo,
+  }) => {
+    exportFee(transactionId, structureId, feeType, title, receiptNo);
+  };
 
   return (
     <>
@@ -38,8 +49,15 @@ const PaidFeesCard = ({ feeData }) => {
           text={feeData.mode}
           color={COLOR_MAP[feeData.mode]}
         />
-        <button className="min-w-fit ml-auto border-2 border-black dark:border-white rounded-sm p-2 cursor-pointer duration-200 hover:bg-gray-300 dark:hover:bg-customDarkFg">
-          <FontAwesomeIcon icon={faDownload} /> Receipt
+        <button 
+          onClick={() => handleExportFeeReceipt({
+            transactionId: feeData.transactionId, // Do to : Make dynamic
+            structureId: feeData.structureId,
+            feeType: feeData.feeType,
+            title: feeData.title,
+            receiptNo: "g8gheriu4hfife" // To Do : Make dynamic
+          })} className="min-w-fit ml-auto border-2 border-black dark:border-white rounded-sm p-2 cursor-pointer duration-200 hover:bg-gray-300 dark:hover:bg-customDarkFg">
+            <FontAwesomeIcon icon={faDownload} /> Receipt
         </button>
       </div>
       <ExpandableDiv containerRef={containerRef} height={height}>

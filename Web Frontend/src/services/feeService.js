@@ -30,9 +30,48 @@ export const addFeeStructure = async (data) => {
   return response.data;
 }
 
-
+// To DO : check this (by/For mayank)
 export const updateFeeStructure = async (data) => {
   console.log("Mock updateFeeStructure called with:", data);
   return { success: true };
 };
+
+/**
+ * @desc Function to export/print paid fee receipt
+ * @param {Object} - transactionId, feeId, feeType, title, receiptNo
+ * @returns {Promise} Promise resolving to success message
+ */
+export const exportFee = async (transactionId, feeId, feeType, title, receiptNo) => {
+  try {
+    const response = await axiosInstance.post(
+      `/fee/receipt`,
+      {
+        transactionId,
+        feeId,
+        feeType,
+        title,
+        receiptNo,
+      },
+      {
+        responseType: "text", // This is HTML
+      }
+    );
+
+    const blob = new Blob([response.data], { type: "text/html" });
+    const blobUrl = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = `${receiptNo}.html`; // Or `.pdf` if your backend returns PDF
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl); // Cleanup
+
+  } catch (err) {
+    console.error("Failed to download receipt:", err);
+    alert("Could not download the receipt. Please try again.");
+  }
+};
+
 
