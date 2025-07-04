@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect, useRef} from "react";
 import { SmilePlus, Send, MoreHorizontal, Check, CheckCheck, Paperclip } from "lucide-react";
 import { formatDate } from "@/utils/dateUtils";
 import { useSocket } from "@/context/SocketContext";
@@ -25,6 +25,7 @@ const ChatCard = ({
   onMoreClick=()=>{},
   className,
 }) => {
+  const messagesEndRef = useRef(null);
   const {socket} = useSocket();
   const [messages, setMessages] = useState(initialMessages);
   const [inputValue, setInputValue] = useState("");
@@ -50,7 +51,7 @@ const ChatCard = ({
     };
     socket.on("receiveMessage", handleIncoming);
     return () => socket.off("receiveMessage", handleIncoming);
-  }, [socket]);
+  }, [socket,chatId, currentUser._id]);
 
   useEffect(() => {
     if (!socket) return;
@@ -85,6 +86,9 @@ const ChatCard = ({
     };
   }, [socket, chatId, participants]);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
 
   const handleSendMessage = async () => {
@@ -98,7 +102,7 @@ const ChatCard = ({
       }
 
       const newMessage = {
-        id: Date.now().toString(),
+        _id: Date.now().toString(),
         content: inputValue,
         attachments: uploadedFiles, 
         sender: {
@@ -128,35 +132,10 @@ const ChatCard = ({
   };
 
 
-
-  const handleReaction = (messageId, emoji) => {
-    setMessages((prev) =>
-      prev.map((message) => {
-        if (message._id === messageId) {
-          const existingReaction = message.reactions?.find((r) => r.emoji === emoji);
-          const newReactions = message.reactions || [];
-
-          if (existingReaction) {
-            return {
-              ...message,
-              reactions: newReactions.map((r) =>
-                r.emoji === emoji
-                  ? { ...r, count: r.reacted ? r.count - 1 : r.count + 1, reacted: !r.reacted }
-                  : r
-              ),
-            };
-          } else {
-            return {
-              ...message,
-              reactions: [...newReactions, { emoji, count: 1, reacted: true }],
-            };
-          }
-        }
-        return message;
-      })
-    );
-    onReaction?.(messageId, emoji);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
 
   return (
     <div className={`chat-card w-full max-w-md mx-auto bg-customLightBg2 dark:bg-gray-900 text-white rounded-lg overflow-hidden ${className}`}>
@@ -257,28 +236,12 @@ const ChatCard = ({
                     })}
                   </div>
                 )}
-          
-                {/* Message Reactions */}
-                <div className="reactions flex space-x-2 mt-1">
-                  {["👍", "❤️", "😂"].map((emoji) => {
-                    const reaction = message.reactions?.find((r) => r.emoji === emoji);
-                    return (
-                      <button
-                        key={emoji}
-                        onClick={() => handleReaction(message._id || message.id, emoji)}
-                        className="reaction-btn flex items-center space-x-1 text-gray-600 dark:text-gray-300"
-                      >
-                        <span>{emoji}</span>
-                        <span>{reaction?.count ?? 0}</span>
-                      </button>
-                    );
-                  })}
-                </div>
               </div>
             </div>
           ))
 
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       {attachments.length > 0 && (
