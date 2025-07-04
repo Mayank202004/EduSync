@@ -30,6 +30,10 @@ const studentPaidFeeSchema = new Schema({
             type: String,
             enum: ['Cash', 'Online', 'UPI', 'Cheque'],
           },
+          amount : {
+            type: Number,
+            required: true,
+          }
         }
       ]
     }
