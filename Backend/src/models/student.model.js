@@ -101,6 +101,10 @@ const studentSchema = new Schema({
     schoolTransport:{
         type: Boolean,
         default:false
+    },
+    stopName:{
+        type: String,
+        default:"N.A."
     }
     
 });
