@@ -13,9 +13,9 @@ import ejs from 'ejs';
 const markFeeAsPaid = asyncHandler(async (req, res) => {
   const studentId = req.student._id;
   const className = req.student.class;
-  const { feeType, structureId, transactionId, mode } = req.body;
+  const { feeType, structureId, transactionId, mode, amount} = req.body;
 
-  if (!feeType?.trim() || !structureId?.trim() || !transactionId?.trim() || !mode?.trim()) {
+  if (!feeType?.trim() || !structureId?.trim() || !transactionId?.trim() || !mode?.trim() || !amount?.trim()) {
     throw new ApiError(400, "Missing required payment fields");
   }
 
@@ -46,6 +46,7 @@ const markFeeAsPaid = asyncHandler(async (req, res) => {
     paidOn: new Date(),
     transactionId,
     mode,
+    amount
   };
 
   const groupIndex = studentFeeStatus.paidFees.findIndex(group => group.feeType === feeType);
@@ -186,37 +187,54 @@ const getStudentFeeStatus = asyncHandler(async (req, res) => {
  * @access Private (Student)
  */
 const renderFeeReceipt = asyncHandler(async (req, res) => {
-  const {date,transactionId,title,amount,mode,feeId,stopName,feeType,receiptNo}=req.body;
+  const { transactionId, title, feeId, receiptNo, feeType } = req.body;
   const templatePath = 'src/templates/fee.template.ejs';
 
-  if(!transactionId || !title || !amount || !mode || !feeId || !feeType || !receiptNo){
-    throw new ApiError(400,"Missing required fields");
-  }
-  if(feeType === "Transport Fee" && !stopName){
-    throw new ApiError(400,"Missing stop name");
-  }
-  if(!date){
-    throw new ApiError(400,"Missing date");
+  // Validate required fields
+  if (!transactionId || !title || !feeId || !receiptNo || !feeType) {
+    throw new ApiError(400, "Missing required fields");
   }
 
+  // Fetch student's paid fee status
+  const studentFeeStatus = await StudentFeeStatus.findOne({ student: req.student._id });
+
+  if (!studentFeeStatus) {
+    throw new ApiError(403, "No fee record found for this student");
+  }
+
+  // Look only in the specific feeType group
+  const feeGroup = studentFeeStatus.paidFees.find(group => group.feeType === feeType);
+  if (!feeGroup) {
+    throw new ApiError(403, "No payments found for this fee type");
+  }
+
+  const payment = feeGroup.payments.find(
+    p => p.transactionId === transactionId && p.structureId.toString() === feeId
+  );
+
+  if (!payment) {
+    throw new ApiError(403, "Unauthorized: This payment does not belong to you");
+  }
+
+  // Prepare data
   const data = {
     academicYear: process.env.ACADEMIC_YEAR,
     name: req.user.fullName,
     standard: req.student.class + "-" + req.student.div,
     studentId: req.student._id,
-    receiptNo: receiptNo,
-    date: date,
-    stopName: stopName?? "",
-    feeItems: [,
-      { title: feeType, amount: amount }
+    receiptNo,
+    date: formatDate(payment.paidOn),
+    stopName: req.student?.stopName ?? "",
+    feeItems: [
+      { title: feeType, amount: payment.amount }
     ],
-    totalAmount: amount,
-    paymentMode: mode,
-    title: title,
-    feeId: feeId,
-    transactionId: transactionId,
-    transactionDate: date,
-    feeType: feeType
+    totalAmount: payment.amount,
+    paymentMode: payment.mode,
+    title,
+    feeId,
+    transactionId: payment.transactionId,
+    transactionDate: formatDate(payment.paidOn),
+    feeType
   };
 
   try {
@@ -224,10 +242,21 @@ const renderFeeReceipt = asyncHandler(async (req, res) => {
     res.setHeader('Content-Type', 'text/html');
     res.send(html);
   } catch (err) {
-    console.error("Error rendering fee receipt:", err);
-    res.status(500).send('Failed to render receipt');
+    throw new ApiError(err.status, err.message);
   }
 });
+
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const istDate = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+
+  const day = istDate.getDate().toString().padStart(2, '0');
+  const month = (istDate.getMonth() + 1).toString().padStart(2, '0');
+  const year = istDate.getFullYear();
+
+  return `${day}-${month}-${year}`;
+};
 
 
 export {getStudentFeeStatus,markFeeAsPaid,renderFeeReceipt};
