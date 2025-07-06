@@ -420,3 +420,27 @@ export const deleteAllergy = asyncHandler(async (req, res) => {
     new ApiResponse(200, student.allergies, `Allergy '${allergyName}' deleted successfully`)
   );
 });
+
+/**
+ * @desc Fetch unverified Students
+ * @route GET /api/v1/user/unverified-students
+ * @access Private (Super Admin)
+ */
+export const getUnverifiedStudents = asyncHandler(async (req, res) => {
+  const unverifiedStudents = await Student.find({
+    class: { $exists: true, $ne: "" }, // ✅ Only filter class here
+  })
+    .populate({
+      path: "userId",
+      match: { role: "student", verified: false }, // ✅ Filter based on user fields
+      select: "fullName email role verified",       // Select only necessary user fields
+    })
+    .select("class userId");
+
+  // ✅ Filter out where populate() failed (no match)
+  const filtered = unverifiedStudents.filter((s) => s.userId);
+
+  res.status(200).json(
+    new ApiResponse(200, filtered, "Unverified students fetched successfully")
+  );
+});

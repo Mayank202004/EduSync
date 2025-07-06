@@ -397,4 +397,7 @@ const updateUserAvatar = asyncHandler(async(req,res) => {
 });
 
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, changeUserPassword, getCurrentUser, updateUser, updateUserAvatar };
+
+
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeUserPassword, getCurrentUser, updateUser, updateUserAvatar};

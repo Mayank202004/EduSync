@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT, verifySuperAdmin } from "../middlewares/auth.middleware.js";
 import * as userController from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -15,5 +15,6 @@ router.route("/change-password").post(verifyJWT, userController.changeUserPasswo
 router.route("/me").get(verifyJWT, userController.getCurrentUser);
 router.route("/update").put(verifyJWT, userController.updateUser);
 router.route("/update-avatar").put(verifyJWT,upload.single("avatar"),userController.updateUserAvatar);
+
 
 export default router;
