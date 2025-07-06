@@ -6,7 +6,7 @@ export const isValidRole = (role) => {
 };
 
 export const validateSignUp = (values) => {
-  const { email, username, fullName, role, password } = values;
+  const { email, username, fullName, role, password, class: classValue } = values;
   const errors = new Map();
 
   if (!isNonEmptyString(email) || !isValidEmail(email)) {
@@ -27,6 +27,15 @@ export const validateSignUp = (values) => {
 
   if (!isNonEmptyString(password)) {
     errors.set("password", "Password cannot be empty.");
+  }
+
+  // ✅ Validate class only if role is student
+  if (role === "student") {
+    if (!isNonEmptyString(classValue)) {
+      errors.set("class", "Class is required for students.");
+    } else if (!/^[1-9][0-2]?$/.test(classValue.trim())) {
+      errors.set("class", "Class must be a number between 1 and 12.");
+    }
   }
 
   return errors;

@@ -5,12 +5,15 @@ import { ROLES_MAP } from "../value_maps/signupMaps";
 import { signupApi } from "@/services/authService";
 
 const signUpAction = async (prevState, formData, onSuccess) => {
+  const role = formData.get("role")?.trim() || "";
+
   const values = {
     email: formData.get("email")?.trim() || "",
     username: formData.get("username")?.trim() || "",
     fullName: formData.get("fullName")?.trim() || "",
-    role: formData.get("role")?.trim() || "",
+    role: role,
     password: formData.get("password")?.trim() || "",
+    class: role === "student" ? formData.get("class")?.trim() || "" : "",
   };
 
   try {
@@ -20,13 +23,14 @@ const signUpAction = async (prevState, formData, onSuccess) => {
     await toast.promise(signupApi(values), {
       loading: "Creating Account...",
       success: () => {
-        onSuccess(); // Swap signupcard to loginCard
+        onSuccess(); // Swap signup card to login card
         return "Account Created! Proceed to login.";
       },
     });
   } catch (err) {
-    if (err?.message) toast.error("Login failed. Please try again.");
+    if (err?.message) toast.error("Signup failed. Please try again.");
   }
+
   return { errors: null, inputValues: values };
 };
 

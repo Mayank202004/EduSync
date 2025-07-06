@@ -37,7 +37,7 @@ const generateAccessAndRefereshTokens = async (userId) => {
  * @access Public
  */ 
 const registerUser = asyncHandler(async (req, res) => {
-    const { fullName, email, username, password, role } = req.body;
+    const { fullName, email, username, password, role, class: studentClass } = req.body;
 
     if (
         [fullName, email, username, password].some(
@@ -53,6 +53,10 @@ const registerUser = asyncHandler(async (req, res) => {
         return res
             .status(400)
             .json(new ApiResponse(400, errors, "Validation error"));
+    }
+
+    if(role==="student" && !studentClass){
+        throw new ApiError(400, "Class is required");
     }
 
     // Check if user already exists
@@ -91,6 +95,7 @@ const registerUser = asyncHandler(async (req, res) => {
     if (userRole === "student") {
         const student = await Student.create({
             userId: user._id, 
+            class: studentClass.trim(),
         });
         if(!student){
             throw new ApiError(500,"Error Creating Student");
