@@ -20,3 +20,22 @@ export const fetchTeacherDashboardData = async () =>{
     const response = await axiosInstance.get(`${BASEURL}/dashboard/teacher`);
     return response.data;
 }
+
+
+/**
+ * @desc Fetch unverified Students 
+ * @returns {Promise<Object>} - promise resolving to list of unverified students
+ */
+export const fetchUnverifiedStudents = async () =>{
+    const response = await axiosInstance.get(`${BASEURL}/student/unverified`);
+    return response.data;
+}
+
+/**
+ * @desc Fetch unverified Teachers
+ * @returns {Promise<Object>} - promise resolving to list of unverified teachers
+ */
+export const fetchUnverifiedTeachers = async () =>{
+    const response = await axiosInstance.get(`${BASEURL}/teacher/unverified`);
+    return response.data;
+}
