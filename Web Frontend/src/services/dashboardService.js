@@ -39,3 +39,12 @@ export const fetchUnverifiedTeachers = async () =>{
     const response = await axiosInstance.get(`${BASEURL}/teacher/unverified`);
     return response.data;
 }
+
+/**
+ * @desc Verify Student
+ * @returns {Promise} - promise resolving to success message
+ */
+export const verifyStudent = async (studId,className,div) => {
+    const response = await axiosInstance.post(`${BASEURL}/student/class-details`, {studId,className,div});
+    return response.data;
+}

@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { fetchUnverifiedStudents } from "@/services/dashboardService";
+import VerifyStudentModal from "./VerifyStudentModal";
+import { verifyStudent } from "@/services/dashboardService";
 
 const VerifyStudents = ({ onBackPressed }) => {
   const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
 
 
   useEffect(() => {
@@ -90,7 +95,7 @@ const VerifyStudents = ({ onBackPressed }) => {
       ) : students.length === 0 ? (
         <div className="w-full text-center mt-20">
           <p className="text-gray-500 dark:text-gray-400 text-lg">
-            ✅ All students are already verified!
+            All students are already verified!
           </p>
         </div>
       ) : (
@@ -103,7 +108,11 @@ const VerifyStudents = ({ onBackPressed }) => {
               {grouped[cls].map((student) => (
                 <div
                   key={student._id}
-                  className="p-4 rounded-xl bg-white dark:bg-customDarkFg border border-gray-200 dark:border-gray-700 shadow hover:shadow-md transition"
+                  onClick={() => {
+                    setSelectedStudent(student);
+                    setShowModal(true);
+                  }}
+                  className="cursor-pointer p-4 rounded-xl bg-white dark:bg-customDarkFg border border-gray-200 dark:border-gray-700 shadow hover:shadow-md transition"
                 >
                   <h4 className="text-lg font-semibold text-gray-800 dark:text-white">
                     {student.userId?.fullName}
@@ -116,6 +125,20 @@ const VerifyStudents = ({ onBackPressed }) => {
             </div>
           </div>
         ))
+      )}
+      
+      {/* Verify Student Modal */}
+      {showModal && selectedStudent && (
+        <VerifyStudentModal
+          student={selectedStudent}
+          onClose={() => setShowModal(false)}
+          onVerify={(studId, className, div) => verifyStudent(studId, className, div)}
+          onSubmit={() => {
+            setStudents(students.filter((s) => s._id !== selectedStudent._id));
+            setSelectedStudent(null);
+            setShowModal(false)
+          }}
+        />
       )}
     </div>
   );
