@@ -79,8 +79,12 @@ export const setupSocket = (io) => {
 
     socket.on("leaveChat", (chatId) => {
       socket.leave(`chat-${chatId}`);
-      //console.log("Left chatroom", `chat-${chatId}`);
+      socket.to(`chat-${chatId}`).emit("userStoppedTyping", {
+        chatId,
+        userId: user._id,
+      });
     });
+
     
     // When user opens chat, update unread count to 0
     socket.on("chatRead", async ({ chatId, userId }) => {
@@ -88,6 +92,16 @@ export const setupSocket = (io) => {
         $set: { [`unreadCounts.${userId}`]: 0 }
       });
     });
+
+    // Typing events
+    socket.on("typing", ({ chatId, user }) => {
+      socket.to(`chat-${chatId}`).emit("userTyping", { chatId, user });
+    });
+
+    socket.on("stopTyping", ({ chatId, userId }) => {
+      socket.to(`chat-${chatId}`).emit("userStoppedTyping", { chatId, userId });
+    });
+
 
     socket.on("disconnect", () => {
       delete onlineUsers[user._id];
