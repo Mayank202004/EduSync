@@ -2,7 +2,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 
-import ConfirmModal from "../ui/ConfirmModal";
+import ConfirmModal from "../Chat/ConfirmModal";
 
 const SiblingsTable = ({ info, onDelete }) => {
   const [deleteStudent, setDeleteStudent] = useState(null); //store id and name of student to be deleted

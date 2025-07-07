@@ -7,8 +7,8 @@ import useClickOutside from "@/hooks/useClickOutside";
 import { faRightFromBracket, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import AvatarIcon from "../ui/AvatarIcon";
-import IconTextButton from "../ui/IconTextButton";
+import AvatarIcon from "../Chat/AvatarIcon";
+import IconTextButton from "../Chat/IconTextButton";
 import { useAuth } from "@/context/AuthContext";
 
 import { cn } from "@/lib/cn";

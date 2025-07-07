@@ -1,7 +1,7 @@
 import toggleLight from "@/assets/day.png";
 import toggleDark from "@/assets/night.png";
 
-import IconTextButton from "../ui/IconTextButton";
+import IconTextButton from "../Chat/IconTextButton";
 
 const ToggleTheme = ({ theme, setTheme }) => {
   const handleToggleTheme = () => {

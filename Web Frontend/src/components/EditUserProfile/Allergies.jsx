@@ -1,8 +1,8 @@
 import { useActionState, useState } from "react";
 import toast from "react-hot-toast";
 
-import Input from "@/components/ui/Input";
-import SimpleButton from "@/components/ui/SimpleButton";
+import Input from "@/components/Chat/Input";
+import SimpleButton from "@/components/Chat/SimpleButton";
 import AllergiesTable from "./AllergiesTable";
 
 import allergyAction from "./form_actions/allergyAction";

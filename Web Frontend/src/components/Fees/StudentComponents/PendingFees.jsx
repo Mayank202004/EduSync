@@ -1,7 +1,7 @@
 import { useState } from "react";
 import FeeCard from "./FeeCard";
 import FeeType from "./FeeType";
-import SimpleButton from "@/components/ui/SimpleButton";
+import SimpleButton from "@/components/Chat/SimpleButton";
 import { capitalizeFirstLetter } from "@/utils/textUtils";
 
 const PendingFees = ({ isPending, feesData }) => {

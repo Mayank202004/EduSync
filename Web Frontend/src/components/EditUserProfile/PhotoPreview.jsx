@@ -11,8 +11,8 @@ import { compressImage } from "@/utils/imageUtils";
 import { cn } from "@/lib/cn";
 import { isValidImageSize, generateCenteredCrop } from "@/utils/imageUtils";
 import userIconWhite from "@/assets/user_icon_white.png";
-import SimpleButton from "@/components/ui/SimpleButton";
-import OutlinedButton from "@/components/ui/OutlinedButton";
+import SimpleButton from "@/components/Chat/SimpleButton";
+import OutlinedButton from "@/components/Chat/OutlinedButton";
 
 import { updateAvatarApi } from "@/services/profileService";
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import ConfirmModal from "../ui/ConfirmModal";
+import ConfirmModal from "../Chat/ConfirmModal";
 
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

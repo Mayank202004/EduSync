@@ -3,13 +3,13 @@ import toast from "react-hot-toast";
 
 import useExpandable from "@/hooks/useExpandable";
 
-import Input from "@/components/ui/Input";
-import SimpleButton from "@/components/ui/SimpleButton";
-import OutlinedButton from "@/components/ui/OutlinedButton";
-import SelectOption from "@/components/ui/SelectOption";
-import Checkbox from "@/components/ui/CheckBox";
+import Input from "@/components/Chat/Input";
+import SimpleButton from "@/components/Chat/SimpleButton";
+import OutlinedButton from "@/components/Chat/OutlinedButton";
+import SelectOption from "@/components/Chat/SelectOption";
+import Checkbox from "@/components/Chat/CheckBox";
 import SiblingsTable from "./SiblingTable";
-import ExpandableDiv from "@/components/ui/ExpandableDiv";
+import ExpandableDiv from "@/components/Chat/ExpandableDiv";
 
 import siblingInfoAction from "./form_actions/siblingInfoAction";
 import {

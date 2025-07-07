@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/context/AuthContext";
 
-import AvatarIcon from "@/components/ui/AvatarIcon";
+import AvatarIcon from "@/components/Chat/AvatarIcon";
 import EditAccountDetails from "@/components/EditUserProfile/EditAccountDetails";
 import PhotoPreview from "@/components/EditUserProfile/PhotoPreview";
-import TitledContainer from "@/components/ui/TitledContainer";
+import TitledContainer from "@/components/Chat/TitledContainer";
 import ScrollSpy from "@/components/EditUserProfile/ScrollSpy";
 
 import { capitalizeFirstLetter } from "@/utils/textUtils";

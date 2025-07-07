@@ -4,9 +4,9 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "@/context/AuthContext";
 
-import Input from "../ui/Input";
-import SimpleButton from "../ui/SimpleButton";
-import LinkButton from "../ui/LinkButton";
+import Input from "../Chat/Input";
+import SimpleButton from "../Chat/SimpleButton";
+import LinkButton from "../Chat/LinkButton";
 
 import signInAction from "./form_actions/signInAction";
 

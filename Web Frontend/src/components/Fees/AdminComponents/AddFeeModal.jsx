@@ -2,11 +2,11 @@ import { useActionState, useState } from "react";
 import useClickOutside from "@/hooks/useClickOutside";
 import useExpandable from "@/hooks/useExpandable";
 
-import Input from "@/components/ui/Input";
-import SelectOption from "@/components/ui/SelectOption";
-import Checkbox from "@/components/ui/CheckBox";
-import ExpandableDiv from "@/components/ui/ExpandableDiv";
-import SimpleButton from "@/components/ui/SimpleButton";
+import Input from "@/components/Chat/Input";
+import SelectOption from "@/components/Chat/SelectOption";
+import Checkbox from "@/components/Chat/CheckBox";
+import ExpandableDiv from "@/components/Chat/ExpandableDiv";
+import SimpleButton from "@/components/Chat/SimpleButton";
 
 import { newFeeAction } from "./form_actions/newFeeAction";
 

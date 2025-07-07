@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ChatCard from "/src/components/ui/chat-card.jsx";
+import ChatCard from "/src/components/Chat/chat-card.jsx";
 
 const CalendarChild = ({ title, subtitle}) => {
 

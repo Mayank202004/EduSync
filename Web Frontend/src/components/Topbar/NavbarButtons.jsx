@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { faCircleQuestion } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import AvatarIcon from "@/components/ui/AvatarIcon";
-import IconTextButton from "@/components/ui/IconTextButton";
+import AvatarIcon from "@/components/Chat/AvatarIcon";
+import IconTextButton from "@/components/Chat/IconTextButton";
 import NotificationDropdown from "./NotificationDropdown";
 
 export const SearchBar = () => {

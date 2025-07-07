@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import ExpandableItem from "@/components/ui/ExpandableItem";
-import TitledContainer from "@/components/ui/TitledContainer";
+import ExpandableItem from "@/components/Chat/ExpandableItem";
+import TitledContainer from "@/components/Chat/TitledContainer";
 
 import { getAllFaqs } from "@/services/faqsService";
 

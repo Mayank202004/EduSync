@@ -1,5 +1,5 @@
 import notFoundImage from "@/assets/404.png";
-import LinkButton from "@/components/ui/LinkButton";
+import LinkButton from "@/components/Chat/LinkButton";
 
 const NotFound404 = () => {
   return (

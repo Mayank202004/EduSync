@@ -1,9 +1,9 @@
 import { useActionState, useState } from "react";
 import toast from "react-hot-toast";
 
-import Input from "@/components/ui/Input";
-import SelectOption from "@/components/ui/SelectOption";
-import SimpleButton from "@/components/ui/SimpleButton";
+import Input from "@/components/Chat/Input";
+import SelectOption from "@/components/Chat/SelectOption";
+import SimpleButton from "@/components/Chat/SimpleButton";
 import ParentsContactTable from "./ParentsContactTable";
 
 import { PARENT_RELATIONS } from "./value_maps/parentContantMaps";

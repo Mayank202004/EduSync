@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTicket } from "@fortawesome/free-solid-svg-icons";
-import SimpleButton from "@/components/ui/SimpleButton";
-import IconTextButton from "@/components/ui/IconTextButton";
+import SimpleButton from "@/components/Chat/SimpleButton";
+import IconTextButton from "@/components/Chat/IconTextButton";
 import { RaiseTicketModal } from "./RaiseTicketModal";
 import { useState } from "react";
 

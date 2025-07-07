@@ -6,7 +6,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import useExpandable from "@/hooks/useExpandable";
-import ExpandableDiv from "@/components/ui/ExpandableDiv";
+import ExpandableDiv from "@/components/Chat/ExpandableDiv";
 import Tag from "./Tag";
 import FeeCard from "./FeeCard";
 import { exportFee } from "@/services/feeService";

@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClipboardList } from "@fortawesome/free-solid-svg-icons";
 import { faMessage } from "@fortawesome/free-regular-svg-icons";
 
-import IconTextButton from "@/components/ui/IconTextButton";
+import IconTextButton from "@/components/Chat/IconTextButton";
 import useClickOutside from "@/hooks/useClickOutside";
 
 import { cn } from "@/lib/cn";

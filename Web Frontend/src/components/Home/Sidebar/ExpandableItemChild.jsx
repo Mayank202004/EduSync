@@ -1,11 +1,11 @@
 import React, { useState, useEffect} from "react";
-import ChatCard from "/src/components/ui/chat-card.jsx";
+import ChatCard from "/src/components/Chat/chat-card.jsx";
 import { getChatMessages } from "@/services/chatService";
 import useClickOutside from "@/hooks/useClickOutside";
 import { useSocket} from "@/context/SocketContext";
 import { useAuth } from "@/context/AuthContext";
 import useOnlineStatus from "@/hooks/useOnlineStatus";
-import AvatarIcon from "@/components/ui/AvatarIcon";
+import AvatarIcon from "@/components/Chat/AvatarIcon";
 
 const ExpandableItemChild = React.memo(({ title, subtitle,memberCount=0, avatar, chatId, unreadCount, onUnreadReset, userId, participants}) => {
   const isOnline = userId ? useOnlineStatus(userId) : false;

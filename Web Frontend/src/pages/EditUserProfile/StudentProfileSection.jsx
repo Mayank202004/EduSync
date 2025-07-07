@@ -7,7 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import SiblingsInfo from "@/components/EditUserProfile/SiblingsInfo";
 import EditAccountDetails from "@/components/EditUserProfile/EditAccountDetails";
 import PhotoPreview from "@/components/EditUserProfile/PhotoPreview";
-import TitledContainer from "@/components/ui/TitledContainer";
+import TitledContainer from "@/components/Chat/TitledContainer";
 import ScrollSpy from "@/components/EditUserProfile/ScrollSpy";
 import ParentsInfo from "@/components/EditUserProfile/ParentsInfo";
 import ParentsContact from "@/components/EditUserProfile/ParentsContact";
