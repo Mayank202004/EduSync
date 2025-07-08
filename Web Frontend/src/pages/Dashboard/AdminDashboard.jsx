@@ -3,6 +3,7 @@ import LeftSidebar from '@/components/Home/Sidebar/LeftSidebar';
 import RightSidebar from '@/components/Home/Sidebar/RightSidebar';
 import AdminHomeContent from '@/components/Home/AdminComponents/AdminHomeContent';
 import VerifyStudents from '@/components/Home/AdminComponents/Verifystudents';
+import VerifyTeachers from '@/components/Home/AdminComponents/VerifyTeachers';
 
 
 const AdminDashboard = () => {
@@ -14,6 +15,8 @@ const AdminDashboard = () => {
     switch (activeView) {
       case 'verify-students':
         return <VerifyStudents onBackPressed={onBackPressed} />;
+      case 'verify-teachers':
+        return <VerifyTeachers onBackPressed={onBackPressed} />;
       case 'home':
       default:
         return <AdminHomeContent setActiveView={setActiveView} />;

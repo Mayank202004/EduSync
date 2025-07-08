@@ -45,6 +45,7 @@ const AdminHomeContent = ({setActiveView=()=>{}}) => {
           icon={UserPlus}
           title="Verify Teachers"
           description="Approve new teachers and assign subjects/classes."
+          onClick={() => setActiveView('verify-teachers')}
         />
         <AdminHomeCard
           icon={ClipboardList}

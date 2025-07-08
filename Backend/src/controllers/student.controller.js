@@ -423,10 +423,10 @@ export const deleteAllergy = asyncHandler(async (req, res) => {
 
 /**
  * @desc Fetch unverified Students
- * @route GET /api/v1/user/unverified-students
+ * @route GET /api/v1/student/unverified
  * @access Private (Super Admin)
  */
-export const getUnverifiedStudents = asyncHandler(async (req, res) => {
+export const getUnverifiedStudents = asyncHandler(async (_, res) => {
   const unverifiedStudents = await Student.find({
     class: { $exists: true, $ne: "" }, // ✅ Only filter class here
   })
