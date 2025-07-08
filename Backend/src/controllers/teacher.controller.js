@@ -11,11 +11,7 @@ export const verifyTeacher = asyncHandler(async (req, res) => {
     try {
         const { id } = req.params;  
 
-        const teacher = await Teacher.findById(id);
-        if (!teacher) {
-            throw new ApiError(404, "Teacher not found");
-        }
-        const user = await User.findByIdAndUpdate(teacher.userId, { verified: true }, { new: true });
+        const user = await User.findByIdAndUpdate(id, { verified: true }, { new: true });
         if (!user) {
             throw new ApiError(404, "User not found");
         }
@@ -144,4 +140,16 @@ export const updateTeacherDetails = asyncHandler(async (req, res) => {
   } catch (error) {
     throw new ApiError(500, error.message);
   }
+});
+
+/**
+ * @desc Fetch unverified teachers
+ * @route GET /api/v1/teacher/unverified
+ * @access Private (Super Admin)
+ */
+export const getUnverifiedTeachers = asyncHandler(async (_, res) => {
+  const unverifiedTeachers = await User.find({ verified: false, role: "teacher" }).select("fullName email avatar");
+  res.status(200).json(
+    new ApiResponse(200, unverifiedTeachers, "Unverified teachers fetched successfully")
+  );
 });
