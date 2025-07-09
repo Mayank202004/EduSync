@@ -33,3 +33,14 @@ export const uploadFiles = async (files) => {
 
     return response.data?.data ?? [];
 };
+
+/**
+ * @desc - Fetch already existing or newly created private chat details 
+ * @param {String} id1 - _id of user 1
+ * @param {string} id2 - _id of user 2
+ * @returns {Promise<Object>} - {chatId,participants,updatedAt,user,unreadCount}
+ */
+export const getOrCreatePersonalChat = async (id1,id2) => {
+    const response = await axiosInstance.get(`${BASEURL}/chat/personal/${id1}/${id2}`);
+    return response.data;
+}
