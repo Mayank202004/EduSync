@@ -7,6 +7,7 @@ const router = Router();
 
 router.get("/:id",verifyJWT,ChatController.getMessages);
 router.post("/upload",upload.array("files", 10),verifyJWT,ChatController.uploadMultipleFiles);
+router.get("/personal/:id1/:id2",verifyJWT,ChatController.getOrCreatePersonalChat);
 
 
 export default router;
