@@ -1,5 +1,6 @@
 import { Chat } from "../models/chat.model.js";
 import { Teacher } from "../models/teacher.model.js";
+import { User } from "../models/user.model.js";
 import { Message } from "../models/messages.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
@@ -122,6 +123,8 @@ export const getStudentChats = async (userId,className,div) => {
   };
 };
 
+
+
 /**
  * @desc Helper function to fetch all chats for a teacher
  * @param {Object} - teacher details object
@@ -224,6 +227,68 @@ export const getTeacherChats = async (teacher) => {
   };
 };
 
+/**
+ * @desc Helper function to fetch all chats for a super admin
+ * @param {String} userId - _id of user (super admin) 
+ * @returns {Object} - { groupChats, personalChats }
+ */
+export const getSuperAdminChats = async (userId) => {
+
+  const schoolGroupChat = await Chat.aggregate([
+    {
+      $match: {
+        isGroupChat: true,
+        name: "School",
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        isGroupChat: 1,
+        participants: 1,
+        updatedAt: 1,
+        unreadMessageCount: {
+          $ifNull: [`$unreadCounts.${userId}`, 0],
+        },
+      },
+    },
+  ]);
+
+
+  // 3. Get private (non-group) chats
+  const personalChatsRaw = await Chat.find({
+    isGroupChat: false,
+    participants: userId,
+  })
+    .populate({
+      path: "participants",
+      select: "fullName avatar role",
+      match: { _id: { $ne: userId } },
+    })
+    .sort({ updatedAt: -1 });
+
+  const personalChats = personalChatsRaw.map(chat => {
+    const otherUser = chat.participants[0];
+    return {
+      _id: chat._id,
+      updatedAt: chat.updatedAt,
+      participants: chat.participants,
+      unreadMessageCount: chat.unreadCounts?.get?.(userId) || 0,
+      user: {
+        _id: otherUser?._id,
+        name: otherUser?.fullName,
+        avatar: otherUser?.avatar,
+        role: otherUser?.role,
+      },
+    };
+  });
+
+  return {
+    announcements: schoolGroupChat,        
+    personalChats,                      
+  };
+};
+
 
 
 /**
@@ -285,3 +350,32 @@ export const uploadMultipleFiles = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, uploadedFiles, "Files uploaded successfully"));
 });
+
+
+/**
+ * @desc Helper func to get All users (excluding current Super Admin)
+ * @route GET /api/v1/chat/all-users
+ * @access Private (Super Admin)
+ */
+export const getAllUsers = async (currentUserId) => {
+  const users = await User.find({ _id: { $ne: currentUserId } }).select("fullName role");
+  return users;
+};
+
+
+export const getOrCreatePersonalChat = asyncHandler(async (req, res) => {
+  const { id1, id2 } = req.params;
+  let chat = await Chat.findOne({
+    isGroupChat: false,
+    participants: { $all: [id1, id2], $size: 2 },
+  });
+  if (chat) {
+    return res.status(200).json(new ApiResponse(200, chat, "Personal chat found"));
+  }
+  chat = await Chat.create({
+    name: "Private Chat",
+    isGroupChat: false,
+    participants: [id1, id2],
+  });
+  return res.status(200).json(new ApiResponse(200, chat, "Personal chat created"));
+})
