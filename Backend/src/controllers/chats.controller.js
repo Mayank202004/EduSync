@@ -200,16 +200,15 @@ export const getTeacherChats = async (teacher) => {
     .populate({
       path: "participants",
       select: "fullName avatar",
-      match: { _id: { $ne: teacherUserId } }, // get the other participant only
     })
     .sort({ updatedAt: -1 });
 
   const personalChats = personalChatsRaw.map(chat => {
-    const otherUser = chat.participants[0]; // the student
+    const otherUser = chat.participants.find(p => p._id.toString() !== teacherUserId.toString());
     return {
       _id: chat._id,
       updatedAt: chat.updatedAt,
-      participants: chat.participants,
+      participants: chat.participants.map(p => p._id),
       unreadMessageCount: chat.unreadCounts?.get?.(teacherUserId.toString()) || 0,
       student: {
         _id: otherUser?._id,

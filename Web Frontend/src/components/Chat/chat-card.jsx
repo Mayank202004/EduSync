@@ -37,6 +37,9 @@ const ChatCard = ({
   const [typingUsers, setTypingUsers] = useState([]); // Used to track all users data those are typing currently
   const chatMessagesRef = useRef(null); // used to track messages scroll value
 
+  console.log(`participants are ${participants.length}`);
+  console.log(`online users length ${onlineUsers.length}`);
+
 
 
 
