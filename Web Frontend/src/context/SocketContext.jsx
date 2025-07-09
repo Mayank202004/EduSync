@@ -97,7 +97,7 @@ export const SocketProvider = ({ children }) => {
     if (!socket) return;
 
     const handleNotify = ({ chatId, from, preview }) => {
-      if (from === user?._id) return; // Don't update for your own messages
+      if (from._id === user?._id) return; // Don't update for your own messages
 
       if (activeChatId.current !== chatId) {
         setUnreadCounts((prev) => ({
