@@ -362,17 +362,42 @@ export const getAllUsers = async (currentUserId) => {
 
 export const getOrCreatePersonalChat = asyncHandler(async (req, res) => {
   const { id1, id2 } = req.params;
+
   let chat = await Chat.findOne({
     isGroupChat: false,
     participants: { $all: [id1, id2], $size: 2 },
   });
+
   if (chat) {
-    return res.status(200).json(new ApiResponse(200, chat, "Personal chat found"));
+    // Optional: populate the other user
+    const otherUser = await User.findById(id2).select("fullName avatar _id role");
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {
+        _id: chat._id,
+        participants: chat.participants,
+        updatedAt: chat.updatedAt,
+        unreadMessageCount: chat.unreadCounts?.get?.(id1) || 0,
+        user: {_id: otherUser?._id, name: otherUser?.fullName, avatar: otherUser?.avatar, role: otherUser?.role},
+      }, "Personal chat found"));
   }
+
+  // Create new chat
   chat = await Chat.create({
     name: "Private Chat",
     isGroupChat: false,
     participants: [id1, id2],
   });
-  return res.status(200).json(new ApiResponse(200, chat, "Personal chat created"));
-})
+
+  const otherUser = await User.findById(id2).select("fullName avatar _id role");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {
+      _id: chat._id,
+      participants: chat.participants,
+      updatedAt: chat.updatedAt,
+      unreadMessageCount: 0,
+      user: {_id: otherUser?._id, name: otherUser?.fullName, avatar: otherUser?.avatar, role: otherUser?.role},
+    }, "Personal chat created"));
+});

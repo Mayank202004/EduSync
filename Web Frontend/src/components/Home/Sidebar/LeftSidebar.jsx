@@ -117,6 +117,12 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
         const chat = res.data;
 
         if (chat && chat._id) {
+          console.log(chat);
+          setChatData(prev => ({
+            ...prev,
+            personalChats: [chat, ...(prev?.personalChats || [])],
+          }));
+
           handleChatOpen({
             chatId: chat._id,
             title: targetUser.fullName,
@@ -271,9 +277,9 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
             return (
               <ExpandableItemChild
                 key={index}
-                title={person?.name ?? "Unknown"}
+                title={person?.name || person?.fullName || "Unknown"}
                 subtitle={
-                  item.teacher
+                  item.teacher || item.user?.role=="teacher"
                     ? person?.subjects?.join(", ") ?? "No subjects"
                     : "Student"
                 }
