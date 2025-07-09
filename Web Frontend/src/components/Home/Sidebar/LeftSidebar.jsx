@@ -74,7 +74,8 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
       unreadMessageCount: 1,
       student: from.role === "student" ? from : undefined,
       teacher: from.role === "teacher" ? from : undefined,
-      user : from ?? undefined 
+      user : from ?? undefined, 
+      userId: from?._id
     };
 
     setChatData(prev => ({
@@ -98,7 +99,6 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
       const other = chat.teacher || chat.student;
       return other?._id === targetUser._id;
     });
-    console.log(existingChat)
     if (existingChat) {
       const person = existingChat.teacher || existingChat.student;
       handleChatOpen({
@@ -115,7 +115,6 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
         // Fetch or create new personal chat from API
         const res = await getOrCreatePersonalChat(CURRENT_USER._id, targetUser._id);
         const chat = res.data;
-        console.log(res.data);
 
         if (chat && chat._id) {
           handleChatOpen({
@@ -153,7 +152,6 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
       const res = await getChatMessages(chat.chatId);
       setMessages(res.data || []);
     } catch (err) {
-      console.error("Message fetch error:", err);
     } finally {
       setLoadingMessages(false);
     }

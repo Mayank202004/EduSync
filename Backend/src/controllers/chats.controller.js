@@ -260,19 +260,16 @@ export const getSuperAdminChats = async (userId) => {
     isGroupChat: false,
     participants: userId,
   })
-    .populate({
-      path: "participants",
-      select: "fullName avatar role",
-      match: { _id: { $ne: userId } },
-    })
-    .sort({ updatedAt: -1 });
+    .sort({ updatedAt: -1 })
+    .populate('participants', 'fullName avatar role');
 
   const personalChats = personalChatsRaw.map(chat => {
-    const otherUser = chat.participants[0];
+    const otherUser = chat.participants.find(p => p._id.toString() !== userId.toString());
+
     return {
       _id: chat._id,
       updatedAt: chat.updatedAt,
-      participants: chat.participants,
+      participants: chat.participants.map(p => p._id), // just the IDs
       unreadMessageCount: chat.unreadCounts?.get?.(userId) || 0,
       user: {
         _id: otherUser?._id,

@@ -46,7 +46,7 @@ export const setupSocket = (io) => {
             // Notify each user
             io.to(`user-${id}`).emit("notifyNewMessage", {
               chatId,
-              from: {user:user._id, name:user.fullName, avatar:user.avatar, role:user.role},
+              from: {_id:user._id, name:user.fullName, avatar:user.avatar, role:user.role},
               preview: content.slice(0, 100),
             });
           }
