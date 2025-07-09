@@ -199,22 +199,26 @@ export const getTeacherChats = async (teacher) => {
   })
     .populate({
       path: "participants",
-      select: "fullName avatar",
+      select: "fullName avatar role",
     })
     .sort({ updatedAt: -1 });
 
   const personalChats = personalChatsRaw.map(chat => {
     const otherUser = chat.participants.find(p => p._id.toString() !== teacherUserId.toString());
+
+    const baseUser = {
+      _id: otherUser?._id,
+      name: otherUser?.fullName,
+      avatar: otherUser?.avatar,
+    };
     return {
       _id: chat._id,
       updatedAt: chat.updatedAt,
       participants: chat.participants.map(p => p._id),
       unreadMessageCount: chat.unreadCounts?.get?.(teacherUserId.toString()) || 0,
-      student: {
-        _id: otherUser?._id,
-        name: otherUser?.fullName,
-        avatar: otherUser?.avatar,
-      },
+      ...(otherUser?.role === "student"
+      ? { student: baseUser }
+      : { user: { ...baseUser, role: otherUser?.role } }),
     };
   });
 

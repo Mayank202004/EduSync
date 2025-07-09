@@ -279,9 +279,13 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
                 key={index}
                 title={person?.name || person?.fullName || "Unknown"}
                 subtitle={
-                  item.teacher || item.user?.role=="teacher"
-                    ? person?.subjects?.join(", ") ?? "No subjects"
-                    : "Student"
+                  item.teacher
+                    ? person?.subjects?.join(", ") || "No subjects"
+                    : item.student
+                    ? "Student"
+                    : item.user?.role
+                    ? item.user.role
+                    : "User"
                 }
                 avatar={person?.avatar}
                 chatId={item._id}
