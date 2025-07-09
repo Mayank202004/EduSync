@@ -7,67 +7,22 @@ import { useAuth } from "@/context/AuthContext";
 import useOnlineStatus from "@/hooks/useOnlineStatus";
 import AvatarIcon from "@/components/Chat/AvatarIcon";
 
-const ExpandableItemChild = React.memo(({ title, subtitle,memberCount=0, avatar, chatId, unreadCount, onUnreadReset, userId, participants}) => {
+const ExpandableItemChild = React.memo(({ title, subtitle,memberCount=0, avatar, chatId, unreadCount, onUnreadReset, userId, participants, onClick}) => {
   const isOnline = userId ? useOnlineStatus(userId) : false;
-  const { socket, activeChatId,setActiveChat} = useSocket();
-  const [showPopup, setShowPopup] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [loadingMessages, setLoadingMessages] = useState(false);
-  const { user } = useAuth();
-
-
-  const CURRENT_USER = {
-    _id: user?._id,
-    fullName: user?.fullName,
-    username: user?.username,
-    avatar: user?.avatar,
+  
+  const handleClick = () => {
+    onClick?.({
+      chatId,
+      title,
+      subtitle,
+      memberCount,
+      avatar,
+      userId,
+      participants,
+      unreadCount
+    });
   };
 
-/**
- * @desc Opens the chat popup on click
- */  
-const handleClick = () => {
-  if (socket && socket.connected) {
-    socket.emit("joinChat", { chatId });
-    // Reset unread count in db
-    if (unreadCount > 0) {
-      socket.emit("chatRead", { chatId, userId: CURRENT_USER._id });
-      onUnreadReset?.(chatId);
-    }
-  }
-  setActiveChat(chatId); 
-  setShowPopup(true);
-};
-
-/**
- * @desc Closes the chat popup 
- */
-  const handleClosePopup = () => {
-    if (socket && socket.connected) {
-      socket.emit("leaveChat", chatId); 
-    }
-    setActiveChat(null);
-    setShowPopup(false); 
-  };
-
-  const [containerRef] = useClickOutside(handleClosePopup);
-
-  useEffect(() => {
-    const fetchMessages = async () => {
-      if (!chatId || !showPopup) return;
-      setLoadingMessages(true);
-      try {
-        const response = await getChatMessages(chatId);
-        setMessages(response.data || []);
-      } catch (err) {
-          console.error("Failed to fetch messages:", err);
-      } finally {
-        setLoadingMessages(false);
-      }
-    };
-
-    fetchMessages();
-  }, [showPopup, chatId]);
 
   return (
     <div>
@@ -98,38 +53,7 @@ const handleClick = () => {
         )}
       </div>
 
-      {/* Popup for Chat Screen */}
-      {showPopup && (
-        <div className="fixed bottom-0 left-0 mb-4 ml-4 z-50">
-          <div ref={containerRef} className="bg-transparent dark:bg-transparent p-4 w-96 relative">
-            <button
-              onClick={handleClosePopup}
-              className="absolute top-2 right-2 text-black dark:text-white bg-white dark:bg-gray-600 hover:bg-gray-500 p-2 rounded-full"
-            >
-              X
-            </button>
-            <ChatCard
-              chatName={title}
-              avatar={avatar}
-              chatId={activeChatId.current}
-              membersCount={memberCount}
-              initialMessages={messages}
-              loading={loadingMessages}
-              currentUser={CURRENT_USER}
-              userId={userId} // Recipient Id for personal chats (One to one chats)
-              participants={participants}
-              className="border border-zinc-200 dark:border-zinc-700"
-              onSendMessage={
-                (content,attachments) => {
-                  socket.emit("sendMessage", { chatId:activeChatId.current, content, attachments });
-                }
-              }
-              onReaction={(messageId, emoji) => console.log("Reaction:", messageId, emoji)}
-              onMoreClick={() => console.log("More clicked")}
-            />
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 });
