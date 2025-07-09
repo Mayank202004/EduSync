@@ -21,6 +21,15 @@ export const fetchTeacherDashboardData = async () =>{
     return response.data;
 }
 
+/**
+ * @desc Fetches super admin dashboard data from the API
+ * @returns {Promise} - Promise resolving to  the dashboard data
+ */
+export const fetchSuperAdminDashboardData = async () =>{
+    const response = await axiosInstance.get(`${BASEURL}/dashboard/super-admin`);
+    return response.data;
+}
+
 
 /**
  * @desc Fetch unverified Students 
