@@ -82,11 +82,6 @@ const AdminHomeContent = ({setActiveView=()=>{}}) => {
           title="User Management"
           description="View and manage all registered users."
         />
-        <AdminHomeCard
-          icon={Settings}
-          title="System Settings"
-          description="Manage permissions, themes and configurations."
-        />
       </div>
     </div>
   );
