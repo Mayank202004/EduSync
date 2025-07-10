@@ -16,7 +16,7 @@ const TeacherDashboard = () => {
     getDashboardData();
   }, []);
   return (
-    <div className="flex grow w-full  bg-transparent">
+    <div className="flex grow w-full h-screen  bg-transparent">
       <div className="w-[20%] border-r border-gray-200 dark:border-gray-700 h-full pb-10">
         <LeftSidebar chatData={chats} setChatData={setChats}/>
       </div>
