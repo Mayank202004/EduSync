@@ -4,6 +4,16 @@ import { ApiError } from "../utils/apiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 /**
+ * @desc Helper fun to fetch value for a given key
+ * @param {String} key
+ * @returns {String} value for the key
+ */
+const getSettingValue = async (key) => {
+    const setting = await Setting.findOne({ key });
+    return setting ? setting.value : null; 
+};
+
+/**
  * @desc Set Academic Year
  * @route PUT /api/v1/setting/academic-year
  * @access Private (Super Admin)
@@ -15,13 +25,13 @@ export const setAcademicYear = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Academic year is required");
     }
 
-    const updated = await Setting.findOneAndUpdate(
+    await Setting.findOneAndUpdate(
         { key: "academicYear" },
         { value: academicYear },
         { upsert: true, new: true }
     );
 
-    res.status(200).json(new ApiResponse(200, updated, "Academic year set successfully"));
+    res.status(200).json(new ApiResponse(200, null, "Academic year set successfully"));
 });
 
 /**
@@ -30,7 +40,7 @@ export const setAcademicYear = asyncHandler(async (req, res) => {
  * @access Private (User)
  */
 export const getAcademicYear = asyncHandler(async (req, res) => {
-    const setting = await Setting.findOne({ key: "academicYear" });
+    const setting = await getSettingValue("academicYear");
 
     if (!setting) {
         throw new ApiError(404, "Academic year not found");
@@ -51,13 +61,13 @@ export const setSchoolName = asyncHandler(async (req, res) => {
         throw new ApiError(400, "School name is required");
     }
 
-    const updated = await Setting.findOneAndUpdate(
+    await Setting.findOneAndUpdate(
         { key: "schoolName" },
         { value: schoolName },
         { upsert: true, new: true }
     );
 
-    res.status(200).json(new ApiResponse(200, updated, "School name set successfully"));
+    res.status(200).json(new ApiResponse(200, null, "School name set successfully"));
 });
 
 /**
@@ -66,7 +76,7 @@ export const setSchoolName = asyncHandler(async (req, res) => {
  * @access Private (User)
  */
 export const getSchoolName = asyncHandler(async (req, res) => {
-    const setting = await Setting.findOne({ key: "schoolName" });
+    const setting = await getSettingValue("schoolName");
 
     if (!setting) {
         throw new ApiError(404, "School name not found");
@@ -74,3 +84,4 @@ export const getSchoolName = asyncHandler(async (req, res) => {
 
     res.status(200).json(new ApiResponse(200, setting, "School name fetched successfully"));
 });
+
