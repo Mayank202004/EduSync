@@ -74,6 +74,7 @@ import dashboardRouter from "./routes/dashboard.routes.js"
 import chatRouter from "./routes/chat.routes.js"
 import faqRouter from "./routes/faq.routes.js"
 import ticketRouter from "./routes/ticket.routes.js"
+import settingRouter from "./routes/setting.routes.js"
 
 // Routes Declarations
 app.use("/api/v1/users", userRouter);
@@ -89,6 +90,7 @@ app.use("/api/v1/dashboard",dashboardRouter);
 app.use("/api/v1/chat",chatRouter);
 app.use("/api/v1/faq",faqRouter);
 app.use("/api/v1/ticket",ticketRouter);
+app.use("/api/v1/setting",settingRouter);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

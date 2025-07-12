@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import mongoose,{ Schema } from "mongoose";
 
 const settingSchema = new Schema({
     key: {
@@ -11,4 +11,4 @@ const settingSchema = new Schema({
     }
 });
 
-export default mongoose.model("Setting", settingSchema);
+export const Setting = mongoose.model("Setting", settingSchema);
