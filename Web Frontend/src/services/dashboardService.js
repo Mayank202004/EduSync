@@ -113,7 +113,7 @@ export const addDivision = async (className, div) => {
  * @returns {Promise} - promise resolving to success message
  */
 export const deleteClass = async (className) => {
-    const response = await axiosInstance.delete(`${BASEURL}/class`,{className});
+    const response = await axiosInstance.delete(`${BASEURL}/class`,{data:{className}});
     return response.data;
 }
 
@@ -124,7 +124,8 @@ export const deleteClass = async (className) => {
  * @returns {Promise} - promise resolving to success message
  */
 export const deleteDivision = async (className, div) => {
-    const response = await axiosInstance.delete(`${BASEURL}/class/div`,{className, div});
+    console.log(className, div);
+    const response = await axiosInstance.delete(`${BASEURL}/class/div`,{data: { className, div }});
     return response.data;
 }
 

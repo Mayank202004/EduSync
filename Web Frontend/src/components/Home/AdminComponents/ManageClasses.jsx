@@ -39,7 +39,7 @@ const ManageClasses = ({ onBackPressed }) => {
     }
     try {
       const response = await toast.promise(
-        addClass({ className: newClassName }),
+        addClass(newClassName),
         {
           loading: "Adding class...",
           success: "Class added successfully!",
