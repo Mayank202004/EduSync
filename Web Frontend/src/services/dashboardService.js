@@ -30,6 +30,7 @@ export const fetchSuperAdminDashboardData = async () =>{
     return response.data;
 }
 
+// = = = = = Verify Students API calls
 
 /**
  * @desc Fetch unverified Students 
@@ -40,14 +41,6 @@ export const fetchUnverifiedStudents = async () =>{
     return response.data;
 }
 
-/**
- * @desc Fetch unverified Teachers
- * @returns {Promise<Object>} - promise resolving to list of unverified teachers
- */
-export const fetchUnverifiedTeachers = async () =>{
-    const response = await axiosInstance.get(`${BASEURL}/teacher/unverified`);
-    return response.data;
-}
 
 /**
  * @desc Verify Student
@@ -55,9 +48,20 @@ export const fetchUnverifiedTeachers = async () =>{
  * @param {String} className - Class name of student
  * @param {String} div - Division of student
  * @returns {Promise} - promise resolving to success message
- */
+*/
 export const verifyStudent = async (studId,className,div) => {
     const response = await axiosInstance.post(`${BASEURL}/student/class-details`, {studId,className,div});
+    return response.data;
+}
+
+// = = = = = Verify Teachers API calls
+
+/**
+ * @desc Fetch unverified Teachers
+ * @returns {Promise<Object>} - promise resolving to list of unverified teachers
+ */
+export const fetchUnverifiedTeachers = async () =>{
+    const response = await axiosInstance.get(`${BASEURL}/teacher/unverified`);
     return response.data;
 }
 
@@ -70,3 +74,58 @@ export const verifyTeacher = async (teacherId) => {
     const response = await axiosInstance.patch(`${BASEURL}/teacher/verify/${teacherId}`);
     return;
 }
+
+// = = = = = Manage Classes API calls
+
+/**
+ * @desc Fetch all classes
+ * @returns {Promise<Object>} - promise resolving to list of classes
+ */
+export const fetchAllClasses = async () => {
+    const response = await axiosInstance.get(`${BASEURL}/class/`);
+    return response.data;
+}
+
+/**
+ * @desc Add a new class
+ * @param {String} className - Class NAme
+ * @returns {Promise} - promise resolving to success message
+ */
+export const addClass = async (className) => {
+    const response = await axiosInstance.post(`${BASEURL}/class/add`, {className});
+    return response.data;
+}
+
+/**
+ * @desc Add a new division
+ * @param {String} className - Class Name
+ * @param {String} div - Division 
+ * @returns {Promise} - promise resolving to success message
+ */
+export const addDivision = async (className, div) => {
+    const response = await axiosInstance.post(`${BASEURL}/class/add-div`, {className, div});
+    return response.data;
+}
+
+/**
+ * @desc Delete a class
+ * @param {String} className - Class Name
+ * @returns {Promise} - promise resolving to success message
+ */
+export const deleteClass = async (className) => {
+    const response = await axiosInstance.delete(`${BASEURL}/class`,{className});
+    return response.data;
+}
+
+/**
+ * @desc Delete a division
+ * @param {String} className - Class Name
+ * @param {String} div - Division 
+ * @returns {Promise} - promise resolving to success message
+ */
+export const deleteDivision = async (className, div) => {
+    const response = await axiosInstance.delete(`${BASEURL}/class/div`,{className, div});
+    return response.data;
+}
+
+// = = = = = Manage Subjects Api calls
