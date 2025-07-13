@@ -51,6 +51,7 @@ const AdminHomeContent = ({setActiveView=()=>{}}) => {
           icon={ClipboardList}
           title="Manage Classes"
           description="Create or edit classes and divisions."
+          onClick={() => setActiveView('manage-classes')}
         />
         <AdminHomeCard
           icon={BookMarked}

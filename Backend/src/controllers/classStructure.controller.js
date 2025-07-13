@@ -92,7 +92,7 @@ export const deleteClass = asyncHandler(async (req, res) => {
     if (!deleted) {
         throw new ApiError(404, "Class not found");
     }
-    res.status(200).json(new ApiResponse(200, deleted, "Class deleted successfully"));
+    res.status(200).json(new ApiResponse(200, null, "Class deleted successfully"));
 });
 
 /**
@@ -101,6 +101,6 @@ export const deleteClass = asyncHandler(async (req, res) => {
  * @access Private (Super admin)
  */
 export const getAllClasses = asyncHandler(async (req, res) => {
-    const classes = await ClassStructure.find().sort({ className: 1 }); // Optional sorting by className
+    const classes = await ClassStructure.find().sort({ className: 1 }).select("className divisions"); // Optional sorting by className
     res.status(200).json(new ApiResponse(200, classes, "Classes fetched successfully"));
 });

@@ -4,6 +4,7 @@ import RightSidebar from '@/components/Home/Sidebar/RightSidebar';
 import AdminHomeContent from '@/components/Home/AdminComponents/AdminHomeContent';
 import VerifyStudents from '@/components/Home/AdminComponents/Verifystudents';
 import VerifyTeachers from '@/components/Home/AdminComponents/VerifyTeachers';
+import ManageClasses from '@/components/Home/AdminComponents/ManageClasses';
 import { fetchSuperAdminDashboardData } from '@/services/dashboardService';
 
 
@@ -29,6 +30,8 @@ const AdminDashboard = () => {
         return <VerifyStudents onBackPressed={onBackPressed} />;
       case 'verify-teachers':
         return <VerifyTeachers onBackPressed={onBackPressed} />;
+      case 'manage-classes':
+        return <ManageClasses onBackPressed={onBackPressed} />;
       case 'home':
       default:
         return <AdminHomeContent setActiveView={setActiveView} />;
