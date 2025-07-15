@@ -16,7 +16,7 @@ const typeIcons = {
   default: "src/assets/Default.png", // To DO: Add default asset
 };
 
-const RenderResource = ({ type, url, id, imagePreviewSetter }) => {
+const RenderResource = ({ type, url, id, imagePreviewSetter, name }) => {
   const icon = typeIcons[type] || typeIcons.default;
 
   if (type === "image") {
@@ -25,6 +25,7 @@ const RenderResource = ({ type, url, id, imagePreviewSetter }) => {
         key={id}
         onClick={() =>
           imagePreviewSetter({
+            name: name,
             type: type,
             url: url,
           })
@@ -71,8 +72,6 @@ function ChapterCard({
   const termData = subject?.terms.find((t) => t.termNumber === term);
   const chapters = termData?.chapters || [];
 
-  console.log(subject);
-
   // Expand chapter to show resources belonging to a specific chapter
   const toggleExpand = (index) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -96,7 +95,11 @@ function ChapterCard({
   return (
     <>
       {previewDetails && (
-        <ImagePreview onClose={() => setPreviewDetails(null)} url={previewDetails.url} />
+        <ImagePreview
+          onClose={() => setPreviewDetails(null)}
+          url={previewDetails.url}
+          header={<h1 className="font-semibold">{previewDetails.name}</h1>}
+        />
       )}
       <div className="bg-white dark:bg-customDarkFg p-5 rounded-md w-full max-w-3xl">
         <div className="flex items-center justify-between">
@@ -184,6 +187,7 @@ function ChapterCard({
                         <RenderResource
                           type={res.type}
                           id={res._id}
+                          name={chapter.chapterName}
                           imagePreviewSetter={setPreviewDetails}
                           url={res.url}
                         />
@@ -227,7 +231,6 @@ function ChapterCard({
               addResource(className, subjectName, term, selectedChapter, files)
             }
             onSubmit={(updatedClass) => {
-              console.log(`Data sent to setUpdatedClass ${updatedClass}`);
               setUpdatedClass(updatedClass);
               setShowFileModal(false);
             }}
