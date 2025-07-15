@@ -55,8 +55,9 @@ const AdminHomeContent = ({setActiveView=()=>{}}) => {
         />
         <AdminHomeCard
           icon={BookMarked}
-          title="Manage Subjects"
+          title="Manage Teacher Subjects"
           description="Add subjects and assign to classes and teachers."
+          onClick={() => setActiveView('manage-subjects')}
         />
         <AdminHomeCard
           icon={CalendarDays}
