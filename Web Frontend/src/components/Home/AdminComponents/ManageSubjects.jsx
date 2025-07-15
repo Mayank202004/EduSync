@@ -8,7 +8,7 @@ const classOptions = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
 const subjectOptions = ["English", "Maths", "Science", "History", "Geography"];
 const divisionOptions = ["A", "B", "C", "D", "E"];
 
-const ManageTeacherSubjects = ({ onBack }) => {
+const ManageTeacherSubjects = ({ onBackPressed }) => {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -117,7 +117,7 @@ const ManageTeacherSubjects = ({ onBack }) => {
       {/* Top Bar */}
       <div className="flex justify-between items-center mb-6">
         <button
-          onClick={onBack}
+          onClick={onBackPressed}
           className="flex items-center gap-2 text-blue-600 hover:underline"
         >
           <ArrowLeft size={18} /> Back
