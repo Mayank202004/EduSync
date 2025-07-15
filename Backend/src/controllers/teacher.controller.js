@@ -155,6 +155,25 @@ export const updateTeacherDetails = asyncHandler(async (req, res) => {
   );
 });
 
+/**
+ * @desc Fetch All Verified Teachers
+ * @route GET /api/v1/teacher
+ * @access Private (Super Admin)
+ */
+export const fetchAllTeachers = asyncHandler(async (req, res) => {
+  const teachers = await Teacher.find()
+    .populate({
+      path: "userId",
+      match: { verified: true },
+      select: "verified fullName email", 
+    });
+
+  const verifiedTeachers = teachers.filter((teacher) => teacher.userId);
+
+  res.status(200).json(new ApiResponse(200, verifiedTeachers, "Teachers fetched successfully"));
+});
+
+
 
 
 
