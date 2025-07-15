@@ -32,7 +32,7 @@ const RenderResource = ({ type, url, id, imagePreviewSetter, name }) => {
         }
         className="flex items-center w-full gap-2 p-2 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition"
       >
-        <img src={icon} alt={type} className="h-10 w-10" />
+        <img src={icon} alt={type} className="size-10" />
         <span className="truncate">{type.toUpperCase()} Resource</span>
       </button>
     );
