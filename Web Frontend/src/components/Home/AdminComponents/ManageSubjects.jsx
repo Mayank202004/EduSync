@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Trash, Pencil, ArrowLeft, Save, Plus } from "lucide-react";
 import Modal from "@/components/Modals/Modal";
 import toast from "react-hot-toast";
-import { fetchAllTeachers } from "@/services/dashboardService";
+import { fetchAllTeachers, updateTeacherSubjects} from "@/services/dashboardService";
 
 const classOptions = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
 const subjectOptions = ["English", "Maths", "Science", "History", "Geography"];
@@ -39,7 +39,7 @@ const ManageTeacherSubjects = ({ onBack }) => {
     if (!subjectName) return;
     updateTeachers(teacherId, t => ({
       ...t,
-      subjects: [...t.subjects, { _id: Date.now().toString(), name: subjectName, classes: [] }],
+      subjects: [...t.subjects, {  name: subjectName, classes: [] }],
     }));
   };
 
@@ -51,7 +51,7 @@ const ManageTeacherSubjects = ({ onBack }) => {
         s.name === subjectName
           ? {
               ...s,
-              classes: [...s.classes, { _id: Date.now().toString(), class: className, div: [] }],
+              classes: [...s.classes, { class: className, div: [] }],
             }
           : s
       ),
@@ -81,6 +81,37 @@ const ManageTeacherSubjects = ({ onBack }) => {
     t.userId.fullName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  /**
+   * @desc Finalize changes and call backend 
+   * @param {String} teacherId 
+   */
+  const handleSaveTeacherChanges = async (teacherId) => {
+    const teacherToUpdate = teachers.find(teacher => teacher._id === teacherId);
+    if (!teacherToUpdate) return;
+
+    const promise = updateTeacherSubjects(
+      teacherToUpdate._id,
+      teacherToUpdate.position,
+      teacherToUpdate.subjects,
+      teacherToUpdate.classTeacher || null,
+      teacherToUpdate.classCoordinator || null
+    );
+
+    toast.promise(promise, {
+      loading: "Saving changes...",
+      success: "Changes saved successfully!",
+      error: "",
+    });
+
+    try {
+      await promise;
+      setEditTeacherId(null);
+    } catch (err) {
+      // Error handled globally
+    }
+  };
+
+
   return (
     <div className="text-gray-900 dark:text-white">
       {/* Top Bar */}
@@ -96,7 +127,7 @@ const ManageTeacherSubjects = ({ onBack }) => {
           placeholder="Search teacher..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="px-4 py-2 rounded border dark:bg-gray-800 dark:border-gray-600"
+          className="px-4 py-2 rounded border bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-600"
         />
       </div>
 
@@ -116,12 +147,110 @@ const ManageTeacherSubjects = ({ onBack }) => {
                     <h3 className="text-lg font-semibold">
                       {t.userId.fullName} ({t.position})
                     </h3>
-                    {t.classTeacher && (
-                      <p className="text-sm">📘 Class Teacher: {t.classTeacher.class} - {t.classTeacher.div}</p>
+                    {editTeacherId === t._id ? (
+                      <div className="flex flex-col gap-2 mt-2">
+                        {/* Class Teacher */}
+                        <label className="text-sm font-medium w-[120px]">Class Teacher:</label>
+                        <div className="flex gap-2 items-center">
+                          <select
+                            className="px-2 py-1 border rounded dark:bg-gray-800"
+                            value={t.classTeacher?.class || ""}
+                            onChange={(e) =>
+                              updateTeachers(t._id, tt => ({
+                                ...tt,
+                                classTeacher: {
+                                  ...(tt.classTeacher || {}),
+                                  class: e.target.value,
+                                  div: tt.classTeacher?.div || divisionOptions[0],
+                                },
+                              }))
+                            }
+                          >
+                            <option value="">Select Class</option>
+                            {classOptions.map(opt => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                          </select>
+                          
+                          <select
+                            className="px-2 py-1 border rounded dark:bg-gray-800"
+                            value={t.classTeacher?.div || ""}
+                            onChange={(e) =>
+                              updateTeachers(t._id, tt => ({
+                                ...tt,
+                                classTeacher: {
+                                  ...(tt.classTeacher || {}),
+                                  class: tt.classTeacher?.class || classOptions[0],
+                                  div: e.target.value,
+                                },
+                              }))
+                            }
+                          >
+                            <option value="">Select Division</option>
+                            {divisionOptions.map(opt => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                          </select>
+                          
+                          {/* ❌ Clear Class Teacher */}
+                          <button
+                            className="text-red-500 text-xs underline"
+                            onClick={() =>
+                              updateTeachers(t._id, tt => ({
+                                ...tt,
+                                classTeacher: null,
+                              }))
+                            }
+                          >
+                            Clear
+                          </button>
+                        </div>
+                          
+                        {/* Class Coordinator */}
+                        <label className="text-sm font-medium w-[120px]">Class Coordinator:</label>
+                        <div className="flex gap-2 items-center">
+                          <select
+                            className="px-2 py-1 border rounded dark:bg-gray-800"
+                            value={t.classCoordinator || ""}
+                            onChange={(e) =>
+                              updateTeachers(t._id, tt => ({
+                                ...tt,
+                                classCoordinator: e.target.value,
+                              }))
+                            }
+                          >
+                            <option value="">Select Class</option>
+                            {classOptions.map(opt => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                          </select>
+                          
+                          {/* ❌ Clear Coordinator */}
+                          <button
+                            className="text-red-500 text-xs underline"
+                            onClick={() =>
+                              updateTeachers(t._id, tt => ({
+                                ...tt,
+                                classCoordinator: "",
+                              }))
+                            }
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        {t.classTeacher && (
+                          <p className="text-sm"><span className="font-semibold">Class Teacher:</span> {t.classTeacher.class} - {t.classTeacher.div}</p>
+                        )}
+                        {t.classCoordinator && (
+                          <p className="text-sm"><span className="font-semibold">Class Coordinator:</span> {t.classCoordinator}</p>
+                        )}
+                      </>
                     )}
-                    {t.classCoordinator && (
-                      <p className="text-sm">🧑‍🏫 Class Coordinator: {t.classCoordinator}</p>
-                    )}
+                    
+
                   </div>
                   <button onClick={() => setEditTeacherId(t._id)} className="text-blue-600">
                     <Pencil size={18} />
@@ -237,7 +366,7 @@ const ManageTeacherSubjects = ({ onBack }) => {
                           onClick={() =>
                             setModal({ open: true, type: "class", payload: { teacherId: t._id, subjectName: subject.name } })
                           }
-                          className="mt-2 ml-4 text-green-600 text-sm px-3 py-1 border border-green-600 rounded flex items-center gap-1"
+                          className="mt-2 ml-4 text-green-600 text-sm pt-3 flex items-center gap-1"
                         >
                           <Plus size={14} /> Add Class
                         </button>
@@ -252,8 +381,7 @@ const ManageTeacherSubjects = ({ onBack }) => {
               {editTeacherId === t._id && (
                 <button
                   onClick={() => {
-                    setEditTeacherId(null);
-                    toast.success("Changes saved");
+                    handleSaveTeacherChanges(t._id);
                   }}
                   className="mt-4 w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
                 >

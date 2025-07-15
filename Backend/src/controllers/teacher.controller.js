@@ -151,7 +151,7 @@ export const updateTeacherDetails = asyncHandler(async (req, res) => {
 
   
   return res.status(200).json(
-    new ApiResponse(200, teacher, "Teacher details updated and chats synced.")
+    new ApiResponse(200, null, "Teacher details updated and chats synced.")
   );
 });
 

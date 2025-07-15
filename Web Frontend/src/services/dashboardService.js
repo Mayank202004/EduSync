@@ -135,3 +135,8 @@ export const fetchAllTeachers = async() => {
     const response = await axiosInstance.get(`${BASEURL}/teacher/all`);
     return response.data;
 }
+
+export const updateTeacherSubjects = async (Id,position,subjects,classTeacher,classCoordinator) => {
+    const response = await axiosInstance.put(`${BASEURL}/teacher/details`,{Id,subjects,position,classTeacher,classCoordinator});
+    return response.data;
+}
