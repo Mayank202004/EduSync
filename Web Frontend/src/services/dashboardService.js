@@ -129,4 +129,9 @@ export const deleteDivision = async (className, div) => {
     return response.data;
 }
 
-// = = = = = Manage Subjects Api calls
+// = = = = = Manage Teacher Subjects Api calls
+
+export const fetchAllTeachers = async() => {
+    const response = await axiosInstance.get(`${BASEURL}/teacher/all`);
+    return response.data;
+}
