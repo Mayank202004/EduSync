@@ -318,7 +318,7 @@ const ChatCard = ({
           )}
           {/* Typing Indicator UI */}
           {typingUsers.length > 0 && (
-            <div className="flex items-center gap-3 px-1 mt-1 pl-4 shrink-0">
+            <div className="flex items-center gap-3 mt-1 shrink-0">
               {/* Avatar Stack */}
               <div className="relative w-[38px] h-6">
                 {typingUsers.slice(0, 2).map((user, index) => (
