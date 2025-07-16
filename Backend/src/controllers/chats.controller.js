@@ -6,6 +6,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { decrypt } from "../utils/encryptionUtil.js";
 
 /**
  * @desc Helper function to fetch all chats for a student
@@ -290,7 +291,6 @@ export const getSuperAdminChats = async (userId) => {
 };
 
 
-
 /**
  * @desc Fetch Message for given chat id
  * @route GET /api/v1/chats/:chatId
@@ -298,12 +298,27 @@ export const getSuperAdminChats = async (userId) => {
  */
 export const getMessages = asyncHandler(async (req, res) => {
   const { id } = req.params;
+
   const messages = await Message.find({ chat: id }).populate({
-    path: "sender",
-    select: "username fullName avatar" // To Do : remove fullName if not needed (Also create a profile page to be vieweed by others)
+    path: "sender", 
+    select: "username fullName avatar",  // To Do : remove fullName if not needed (Also create a profile page to be vieweed by others)
   });
-  res.status(200).json(new ApiResponse(200, messages, "Messages fetched successfully"));
+
+  // Decrypt message content
+  const decryptedMessages = messages.map((msg) => {
+    const obj = msg.toObject();
+    // Only decrypt if content exists and is a non-empty string
+    obj.content = (typeof obj.content === "string" && obj.content.includes(":"))
+      ? decrypt(obj.content)
+      : obj.content || "";
+    return obj;
+  });
+
+  res.status(200).json(
+    new ApiResponse(200, decryptedMessages, "Messages fetched successfully")
+  );
 });
+
 
 /**
  * @desc Update unread message count to 0 for a given chatid

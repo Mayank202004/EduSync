@@ -1,5 +1,6 @@
 import { Message } from "../models/messages.model.js";
 import { Chat } from "../models/chat.model.js";
+import { encrypt } from "../utils/encryptionUtil.js";
 const onlineUsers = {}; // userId → socketId
 
 export const setupSocket = (io) => {
@@ -13,11 +14,16 @@ export const setupSocket = (io) => {
     socket.join(`user-${user._id}`); // personal notification room To Do: remove this later if not needed
 
     socket.on("sendMessage", async ({ chatId, content, attachments = [] }) => {
+      // Encrypt content
+      const encryptedContent =
+      typeof content === "string" && content.trim().length > 0
+        ? encrypt(content)
+        : "";
       // 1. Save message to DB
       await Message.create({
         chat: chatId,
         sender: user._id,
-        content,
+        content: encryptedContent,
         attachments,
       });
     
