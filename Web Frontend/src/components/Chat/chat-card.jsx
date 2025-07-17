@@ -224,6 +224,7 @@ const ChatCard = ({
         <ImagePreview
           onClose={() => setPreviewDetails(null)}
           url={previewDetails.url}
+          filename={previewDetails.filename}
           header={
             <div className="flex flex-nowrap items-center gap-2">
               <AvatarIcon
@@ -234,8 +235,10 @@ const ChatCard = ({
                 }}
               />
               <div className="flex flex-col">
-              <h1 className="font-semibold">{previewDetails.fullName}</h1>
-              <span className="opacity-60 text-xs">{formatDate(previewDetails.sentOn)}</span>
+                <h1 className="font-semibold">{previewDetails.fullName}</h1>
+                <span className="opacity-60 text-xs">
+                  {formatDate(previewDetails.sentOn)}
+                </span>
               </div>
             </div>
           }
@@ -341,12 +344,15 @@ const ChatCard = ({
                                   <button
                                     className="relative min-w-56 max-w-9/10 hover:opacity-80 flex object-cover cursor-pointer"
                                     onClick={() => {
-                                      console.log(message)
                                       setPreviewDetails({
                                         fullName: message.sender.fullName,
                                         avatar: message.sender.avatar,
                                         sentOn: message.updatedAt,
-                                        url
+                                        filename: file.name.slice(
+                                          0,
+                                          file.name.lastIndexOf(".")
+                                        ),
+                                        url,
                                       });
                                     }}
                                   >
@@ -362,13 +368,6 @@ const ChatCard = ({
                                   </button>
                                 </>
                               ) : (
-                                // <a href={url} target="_blank" rel="noopener noreferrer">
-                                // <img
-                                //   src={url}
-                                //   alt={`attachment-${idx}`}
-                                //   className="rounded-lg border max-h-48 w-full object-cover hover:opacity-80 transition"
-                                // />
-                                // </a>
                                 <a
                                   href={url}
                                   target="_blank"
