@@ -10,7 +10,7 @@ const IsoCubeAnimation = () => {
     artboard: "Artboard",
     stateMachines: [STATE_MACHINE_NAME],
     autoplay: true,
-    fit: "cover", // May be ignored by Rive, but okay to keep
+    fit: "cover", // Rive may ignore, but fine
   });
 
   const hoverInput = useStateMachineInput(rive, STATE_MACHINE_NAME, HOVER_INPUT_NAME);
@@ -29,8 +29,15 @@ const IsoCubeAnimation = () => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Force canvas to scale and center */}
-      <div className="absolute top-1/2 left-1/2 min-w-[120vw] h-screen -translate-x-1/2 -translate-y-1/2">
+      {/* Mobile (zoom in both directions), Large screens (stretch horizontal only) */}
+      <div
+        className={`
+          absolute top-1/2 left-1/2 
+          w-[200vw] h-[200vh] 
+          sm:w-[120vw] sm:h-screen 
+          -translate-x-1/2 -translate-y-1/2
+        `}
+      >
         <RiveComponent className="w-full h-full" />
       </div>
     </div>

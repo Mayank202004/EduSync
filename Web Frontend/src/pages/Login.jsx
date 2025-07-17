@@ -1,30 +1,46 @@
-import React from 'react'
-import IsoCubeAnimation from '../components/Login/isoCubeAnimation'
-import LoginCard from '../components/Login/loginCard'
+import React, { useState } from 'react';
+import IsoCubeAnimation from '../components/Login/isoCubeAnimation';
+import LoginCard from '../components/Login/loginCard';
 import SignupCard from '@/components/Login/SignupCard';
-import { useState } from 'react';
 
 function Login() {
-  // Toggle between login and signup
   const [isLogin, setIsLogin] = useState(true);
 
   return (
-    <div className="flex flex-col md:flex-row w-full min-h-screen bg-white">
-      {/* Animation only visible on md and up */}
-      <div className="hidden md:flex w-1/2 items-center justify-center">
+    <>
+      {/* Small Screen: Island layout over fullscreen animation */}
+      <div className="md:hidden relative w-full h-screen overflow-hidden">
         <IsoCubeAnimation />
+        {/* Overlay that doesn't block animation clicks outside card */}
+        <div className="absolute inset-0 flex items-center justify-center z-10 px-4 pointer-events-none">
+          <div className="w-full max-w-sm pointer-events-auto">
+            {isLogin ? (
+              <LoginCard switchToSignup={() => setIsLogin(false)} />
+            ) : (
+              <SignupCard switchToLogin={() => setIsLogin(true)} />
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-8">
-        {isLogin ? (
-          <LoginCard switchToSignup={() => setIsLogin(false)} />
-        ) : (
-          <SignupCard switchToLogin={() => setIsLogin(true)} />
-        )}
+      {/* Large Screen: Side-by-side layout */}
+      <div className="hidden md:flex w-full min-h-screen bg-white">
+        <div className="w-1/2 h-screen overflow-hidden relative">
+          <IsoCubeAnimation />
+        </div>
+
+        <div className="w-1/2 flex items-center justify-center px-8">
+          <div className="w-full max-w-md">
+            {isLogin ? (
+              <LoginCard switchToSignup={() => setIsLogin(false)} />
+            ) : (
+              <SignupCard switchToLogin={() => setIsLogin(true)} />
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
-
-export default Login
+export default Login;
