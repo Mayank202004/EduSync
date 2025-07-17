@@ -21,7 +21,7 @@ const FeeCard = ({
     <li className="w-full shrink-0 flex md:px-2 pb-6">
       <div
         className={cn(
-          "w-[95%] mx-auto p-4 border-1 bg-white dark:bg-customDarkFg rounded-md",
+          "w-full mx-auto p-4 border-1 bg-white dark:bg-customDarkFg rounded-md",
           {
             "border-2 border-blue-500 ring-blue-200 ring-2 shadow-md":
               isSelected,
@@ -50,15 +50,23 @@ const FeeCard = ({
 
         <hr className="my-3 border-t-1 border-gray-300 dark:border-gray-600" />
 
-        <div className="flex justify-between items-center w-full px-10">
-          <h3 className="font-medium">{feeData.title}</h3>
-          <h3 className="font-medium">{formatDate(feeData.dueDate)}</h3>
-          {isDueSoon && (
-            <span className="text-sm text-red-600 bg-red-100 px-3 py-1 rounded-full font-semibold">
-              Due
-            </span>
-          )}
-          <h1 className="font-bold text-xl text-gray-800 dark:text-white">
+        <div className="flex justify-between items-center w-full px-2">
+          <h3 className="font-medium w-[35%] truncate">{feeData.title}</h3>
+          <h3 className="font-medium w-[20%] text-center">
+            {formatDate(feeData.dueDate)}
+          </h3>
+          <div className="w-[15%] text-center">
+            {isDueSoon ? (
+              <span className="text-sm text-red-600 bg-red-100 px-3 py-1 rounded-full font-semibold">
+                Due
+              </span>
+            ) : (
+              <span className="invisible text-sm px-3 py-1 rounded-full font-semibold">
+                Due
+              </span>
+            )}
+          </div>
+          <h1 className="font-bold text-xl text-gray-800 dark:text-white w-[20%] text-right">
             ₹{feeData.amount.toLocaleString("en-IN")}
           </h1>
         </div>

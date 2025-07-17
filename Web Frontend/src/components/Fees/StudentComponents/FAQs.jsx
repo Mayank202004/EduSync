@@ -23,7 +23,7 @@ const PaymentFAQs = () => {
   return (
     <TitledContainer
       title="FAQs"
-      containerStyle="w-[80%] mx-auto mt-10 mb-6 p-4"
+      containerStyle="w-[90%] mx-auto mt-5 mb-6 p-4"
       titleStyle="border-b-1"
     >
       <div className="flex flex-col gap-1.5">
