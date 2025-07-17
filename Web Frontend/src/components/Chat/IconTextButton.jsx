@@ -13,7 +13,7 @@ const IconTextButton = ({
       ref={ref}
       type="button"
       className={cn(
-        "hover:bg-gray-300 dark:hover:bg-gray-700 rounded-sm p-2 cursor-pointer space-x-1.5",
+        "hover:bg-gray-200 dark:hover:bg-gray-700 rounded-sm p-2 cursor-pointer space-x-1.5",
         className
       )}
       {...buttonProps}
