@@ -448,7 +448,7 @@ export const getUnverifiedStudents = asyncHandler(async (_, res) => {
 
 /**
  * @desc Promote students to next class
- * @route POST /api/v1/student/promote
+ * @route PATCH /api/v1/student/promote
  * @access Private (Super Admin)
  */
 export const promoteStudents = asyncHandler(async (_, res) => {
@@ -508,7 +508,7 @@ export const promoteStudents = asyncHandler(async (_, res) => {
 
 /**
  * @desc Shuffle divisions
- * @route POST /api/v1/student/shuffle
+ * @route PATCH /api/v1/student/shuffle
  * @access Private (Super Admin)
  */
 export const shuffleDivisions = asyncHandler(async (_, res) => {
@@ -534,4 +534,40 @@ export const shuffleDivisions = asyncHandler(async (_, res) => {
     await Student.bulkWrite(bulkOps);
   }
   res.status(200).json(new ApiResponse(200, {}, "Divisions shuffled successfully"));
+});
+
+/**
+ * @desc Manually assign divisions
+ * @route PATCH /api/v1/student/assign-divisions
+ * @access Private (Super Admin)
+ */
+export const manuallyAssignDivisions = asyncHandler(async (req, res) => {
+  const { className, assignments } = req.body;
+
+  if (!className || !Array.isArray(assignments) || assignments.length === 0) {
+    throw new ApiError(400, "className and assignments are required");
+  }
+
+  // Ensure all students belong to the specified class
+  const studentIds = assignments.map((a) => a._id);
+  const existingStudents = await Student.find({
+    _id: { $in: studentIds },
+    class: className,
+  });
+
+  if (existingStudents.length !== assignments.length) {
+    throw new ApiError(400, "Some students do not exist or are not in the specified class");
+  }
+
+  // Prepare bulk update operations
+  const bulkOps = assignments.map(({ _id, div }) => ({
+    updateOne: {
+      filter: { _id, class: className },
+      update: { $set: { div } },
+    },
+  }));
+
+  await Student.bulkWrite(bulkOps);
+
+  res.status(200).json(new ApiResponse(200, {}, "Divisions manually assigned successfully"));
 });
