@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import useClickOutside from "@/hooks/useClickOutside";
 import IconTextButton from "./IconTextButton";
 import ModalWrapper from "./ModalWrapper";
-import triggerCloudinaryDownload from "@/lib/sample";
+import triggerCloudinaryDownload from "@/lib/triggerCloudinaryDownload";
 
 const ImagePreview = ({ onClose, url, filename, header = null }) => {
   const [containerRef] = useClickOutside(onClose);
