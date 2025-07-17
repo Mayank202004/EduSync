@@ -1,4 +1,6 @@
 import mongoose,{ Schema } from "mongoose";
+import { CLASS_ORDER, DIVISIONS, BLOOD_GROUPS, GENDERS, RELATIONS } from "../constants/student.constants.js";
+
 
 const studentSchema = new Schema({
     userId: {
@@ -8,11 +10,11 @@ const studentSchema = new Schema({
     },
     class: {
         type: String,
-        enum: ["Jr. KG","Sr. KG","1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+        enum: CLASS_ORDER,
     },
     div: {
         type: String,
-        enum: ["A", "B", "C", "D"],
+        enum: DIVISIONS,
     },
     parentContact:[
         {
@@ -35,7 +37,7 @@ const studentSchema = new Schema({
     },
     bloodGroup: {
         type: String,
-        enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+        enum: BLOOD_GROUPS,
     },
     allergies: [
         {
@@ -50,7 +52,7 @@ const studentSchema = new Schema({
     },
     gender: {
         type: String,
-        enum: ["male","female","other","unspecified"],
+        enum: GENDERS,
         default:"unspecified"
     },
     parentsInfo:{
@@ -83,18 +85,18 @@ const studentSchema = new Schema({
             },
             relation:{
                 type: String,
-                enum: ["Brother", "Sister"],
+                enum: RELATIONS,
             },
             isInSameSchool:{
                 type: Boolean,
             },
             class:{
                 type: String,
-                enum: ["Jr. KG","Sr. KG","1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+                enum: CLASS_ORDER,
             },
             div:{
                 type: String,
-                enum: ["A", "B", "C", "D"],
+                enum: DIVISIONS,
             }
         }
     ],
