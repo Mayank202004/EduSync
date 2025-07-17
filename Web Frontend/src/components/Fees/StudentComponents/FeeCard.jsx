@@ -23,11 +23,11 @@ const FeeCard = ({
         className={cn(
           "w-full mx-auto p-4 border-1 bg-white dark:bg-customDarkFg rounded-md",
           {
-            "border-2 border-blue-500 ring-blue-200 ring-2 shadow-md":
-              isSelected,
+            "border-2 border-blue-500 ring-blue-200 ring-2 shadow-md": isSelected,
           }
         )}
       >
+        {/* Title with checkbox */}
         <div className="flex items-center mb-2">
           {isSelectable && (
             <button
@@ -43,32 +43,51 @@ const FeeCard = ({
                   ? () => deselectFee(feeData._id)
                   : () => selectFee(feeData._id)
               }
-            ></button>
+            />
           )}
           <h2 className="font-bold text-lg truncate">Pay {feeData.title}</h2>
         </div>
 
         <hr className="my-3 border-t-1 border-gray-300 dark:border-gray-600" />
 
-        <div className="flex justify-between items-center w-full px-2">
-          <h3 className="font-medium w-[35%] truncate">{feeData.title}</h3>
-          <h3 className="font-medium w-[20%] text-center">
+        {/* Fee Info - Responsive Layout */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full px-2">
+          {/* Fee Name */}
+          <div className="sm:w-[35%] w-full truncate text-sm sm:text-base font-medium">
+            <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mb-1">
+              Fee Name
+            </div>
+            {feeData.title}
+          </div>
+
+          {/* Due Date */}
+          <div className="sm:w-[20%] w-full text-sm sm:text-center text-left">
+            <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mb-1">
+              Due Date
+            </div>
             {formatDate(feeData.dueDate ?? feeData.paidOn)}
-          </h3>
-          <div className="w-[15%] text-center">
+          </div>
+
+          {/* Due Status */}
+          <div className="sm:w-[15%] w-full text-sm text-left">
             {isDueSoon ? (
               <span className="text-sm text-red-600 bg-red-100 px-3 py-1 rounded-full font-semibold">
                 Due
               </span>
             ) : (
-              <span className="invisible text-sm px-3 py-1 rounded-full font-semibold">
+              <span className="hidden sm:inline-block sm:invisible text-sm px-3 py-1 rounded-full font-semibold">
                 Due
               </span>
             )}
           </div>
-          <h1 className="font-bold text-xl text-gray-800 dark:text-white w-[20%] text-right">
+
+          {/* Amount */}
+          <div className="sm:w-[20%] w-full text-sm sm:text-right text-left font-bold text-xl text-gray-800 dark:text-white">
+            <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mb-1">
+              Amount
+            </div>
             ₹{feeData.amount.toLocaleString("en-IN")}
-          </h1>
+          </div>
         </div>
       </div>
     </li>
