@@ -53,7 +53,7 @@ const FeeCard = ({
         <div className="flex justify-between items-center w-full px-2">
           <h3 className="font-medium w-[35%] truncate">{feeData.title}</h3>
           <h3 className="font-medium w-[20%] text-center">
-            {formatDate(feeData.dueDate)}
+            {formatDate(feeData.dueDate ?? feeData.paidOn)}
           </h3>
           <div className="w-[15%] text-center">
             {isDueSoon ? (
