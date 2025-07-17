@@ -18,6 +18,12 @@ const PaidFees = ({ isPaid, feesData }) => {
           ([type, fees]) =>
             fees.length !== 0 && (
               <FeeType key={"Paid" + type} type={`${capitalizeFirstLetter(type)} fees`}>
+                <div className="flex px-5 py-2 font-bold w-full border-2">
+                  <h3 className="w-[35%]">Fee Name</h3>
+                  <h3 className="w-[15%]">Date</h3>
+                  <h3 className="w-[20%]">Payment Mode</h3>
+                  <h3>Amount</h3>
+                </div>
                 {fees.map((element) => (
                   <PaidFeesCard
                     key={"Paid" + element._id}

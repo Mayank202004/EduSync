@@ -1,15 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faDownload,
-  faAngleRight,
-  faAngleDown,
-} from "@fortawesome/free-solid-svg-icons";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
-import useExpandable from "@/hooks/useExpandable";
-import ExpandableDiv from "@/components/Chat/ExpandableDiv";
 import Tag from "./Tag";
-import FeeCard from "./FeeCard";
 import { exportFee } from "@/services/feeService";
+import { formatDate } from "@/utils/dateUtils";
 
 const COLOR_MAP = {
   Cash: "green",
@@ -19,9 +13,6 @@ const COLOR_MAP = {
 };
 
 const PaidFeesCard = ({ feeData }) => {
-  const { containerRef, height, expanded, setExpanded } = useExpandable(false);
-
-
   const handleExportFeeReceipt = ({
     transactionId,
     structureId,
@@ -33,37 +24,35 @@ const PaidFeesCard = ({ feeData }) => {
   };
 
   return (
-    <>
-      <div className="w-[95%] mx-auto mb-3 flex flex-column place-items-center">
-        <button
-          className="cursor-pointer w-3 aspect-square"
-          onClick={() => setExpanded((prevIsOpen) => !prevIsOpen)}
-        >
-          <FontAwesomeIcon icon={expanded ? faAngleDown : faAngleRight} />
-        </button>
-        <h1 className="font-bold text-2xl ml-2 truncate w-fit">
-          {feeData.title}
-        </h1>
-        <Tag
-          className="mx-2"
-          text={feeData.mode}
-          color={COLOR_MAP[feeData.mode]}
-        />
-        <button 
-          onClick={() => handleExportFeeReceipt({
-            transactionId: feeData.transactionId, // Do to : Make dynamic
-            structureId: feeData.structureId,
-            feeType: feeData.feeType,
-            title: feeData.title,
-            receiptNo: "g8gheriu4hfife" // To Do : Make dynamic
-          })} className="min-w-fit ml-auto border-2 border-black dark:border-white rounded-sm p-2 cursor-pointer duration-200 hover:bg-gray-300 dark:hover:bg-customDarkFg">
+    <div className="bg-white dark:bg-customDarkFg py-3">
+      <div className="flex items-center w-full px-5 justify-between">
+        <div className="w-[29%] truncate text-lg">{feeData.title}</div>
+        <div className="w-[12%]">{formatDate(feeData.paidOn)}</div>
+        <div className="w-[13%]">
+          <Tag
+            text={feeData.mode}
+            color={COLOR_MAP[feeData.mode]}
+          />
+        </div>
+        <div className="w-[15%]">₹{feeData.amount}</div>
+        <div className="">
+          <button
+            onClick={() =>
+              handleExportFeeReceipt({
+                transactionId: feeData.transactionId,
+                structureId: feeData.structureId,
+                feeType: feeData.feeType,
+                title: feeData.title,
+                receiptNo: "g8gheriu4hfife", // TODO: Make dynamic
+              })
+            }
+            className="border border-black dark:border-white rounded-sm px-2 py-1 cursor-pointer duration-200 hover:bg-gray-300 dark:hover:bg-customDarkFg"
+          >
             <FontAwesomeIcon icon={faDownload} /> Receipt
-        </button>
+          </button>
+        </div>
       </div>
-      <ExpandableDiv containerRef={containerRef} height={height}>
-        <FeeCard feeData={feeData} isSelectable={false} />
-      </ExpandableDiv>
-    </>
+    </div>
   );
 };
 
