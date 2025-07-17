@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { Chat } from "../models/chat.model.js";
+import { CLASS_ORDER,DIVISIONS } from "../constants/student.constants.js";
 
 /**
  * @desc Add class and division details
@@ -443,4 +444,63 @@ export const getUnverifiedStudents = asyncHandler(async (_, res) => {
   res.status(200).json(
     new ApiResponse(200, filtered, "Unverified students fetched successfully")
   );
+});
+
+/**
+ * @desc Promote students to next class
+ * @route POST /api/v1/student/promote
+ * @access Private (Super Admin)
+ */
+export const promoteStudents = asyncHandler(async (_, res) => {
+  const students = await Student.find().populate("userId", "verified");
+
+  const studentBulkOps = [];
+  const userBulkOps = [];
+
+  for (const student of students) {
+    // Skip if class and div are both missing (already graduated or unverified)
+    if (!student.class && !student.div) continue;
+
+    const currentClass = student.class;
+    const index = CLASS_ORDER.indexOf(currentClass);
+
+    if (index === -1 || currentClass === "10") {
+      // Graduate: null class/div, mark user unverified
+      studentBulkOps.push({
+        updateOne: {
+          filter: { _id: student._id },
+          update: {
+            $set: {
+              class: null,
+              div: null,
+            },
+          },
+        },
+      });
+
+      if (student.userId) {
+        userBulkOps.push({
+          updateOne: {
+            filter: { _id: student.userId._id },
+            update: { $set: { verified: false } },
+          },
+        });
+      }
+    } else {
+      // Promote to next class
+      studentBulkOps.push({
+        updateOne: {
+          filter: { _id: student._id },
+          update: { $set: { class: CLASS_ORDER[index + 1] } },
+        },
+      });
+    }
+  }
+  if (studentBulkOps.length > 0) {
+    await Student.bulkWrite(studentBulkOps);
+  }
+  if (userBulkOps.length > 0) {
+    await User.bulkWrite(userBulkOps);
+  }
+  res.status(200).json(new ApiResponse(200, {}, "Students promoted successfully"));
 });

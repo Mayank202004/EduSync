@@ -17,5 +17,7 @@ router.route("/sibling-details/:siblingId").delete(verifyJWT,verifyStudent,Stude
 router.route("/parent-contact/:contactId").delete(verifyJWT,verifyStudent,StudentController.deleteParentContact);
 router.route("/allergy").delete(verifyJWT,verifyStudent,StudentController.deleteAllergy);
 router.route("/unverified").get(verifyJWT,verifySuperAdmin,StudentController.getUnverifiedStudents);
+router.route("/promote").patch(verifyJWT,verifySuperAdmin,StudentController.promoteStudents);
+// router.route("/shuffle").patch(verifyJWT,verifySuperAdmin,StudentController.shuffleDivisions);
 
 export default router;
