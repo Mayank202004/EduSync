@@ -83,3 +83,13 @@ export const verifySuperAdmin = asyncHandler(async (req, _, next) => {
     next();
 });
 
+export const verifySportsTeacher = asyncHandler(async (req, _, next) => {
+    const teacher = req.teacher;
+
+    if(!teacher || teacher.position !== "Sports Teacher"){
+        throw new ApiError(403, "Forbidden: You do not have permission to access this resource.");
+    }
+    next();
+});
+
+
