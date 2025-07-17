@@ -8,7 +8,7 @@ const modeColors = {
 
 const Tag = ({ text, color }) => (
   <span
-    className={`px-3 py-1 mx-2 text-sm rounded-full font-medium ${modeColors[color]}`}
+    className={`px-3 py-1 sm:mx-2 text-sm rounded-full font-medium ${modeColors[color]}`}
   >
     {text}
   </span>
