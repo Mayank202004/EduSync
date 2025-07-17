@@ -24,35 +24,52 @@ const PaidFeesCard = ({ feeData }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-customDarkFg py-3">
-      <div className="flex items-center w-full px-5 justify-between">
-        <div className="w-[29%] truncate text-lg">{feeData.title}</div>
-        <div className="w-[12%]">{formatDate(feeData.paidOn)}</div>
-        <div className="w-[13%]">
-          <Tag
-            text={feeData.mode}
-            color={COLOR_MAP[feeData.mode]}
-          />
-        </div>
-        <div className="w-[15%]">₹{feeData.amount}</div>
-        <div className="">
-          <button
-            onClick={() =>
-              handleExportFeeReceipt({
-                transactionId: feeData.transactionId,
-                structureId: feeData.structureId,
-                feeType: feeData.feeType,
-                title: feeData.title,
-                receiptNo: "g8gheriu4hfife", // TODO: Make dynamic
-              })
-            }
-            className="border border-black dark:border-white rounded-sm px-2 py-1 cursor-pointer duration-200 hover:bg-gray-300 dark:hover:bg-customDarkFg"
-          >
-            <FontAwesomeIcon icon={faDownload} /> Receipt
-          </button>
-        </div>
+    <div className="bg-white dark:bg-customDarkFg py-3 px-4">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      {/* Title */}
+      <div className="sm:w-[29%] w-full truncate text-base sm:text-lg font-medium">
+        <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mb-1">Fee Name</div>
+        {feeData.title}
+      </div>
+
+      {/* Paid Date */}
+      <div className="sm:w-[12%] w-full text-sm sm:text-base">
+        <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mb-1">Paid On</div>
+        {formatDate(feeData.paidOn)}
+      </div>
+
+      {/* Payment Mode */}
+      <div className="sm:w-[13%] w-full">
+        <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mb-1">Payment Mode</div>
+        <Tag text={feeData.mode} color={COLOR_MAP[feeData.mode]} />
+      </div>
+
+      {/* Amount */}
+      <div className="sm:w-[15%] w-full text-sm sm:text-base font-semibold">
+        <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mb-1">Amount</div>
+        ₹{feeData.amount}
+      </div>
+
+      {/* Download Button */}
+      <div className="w-full sm:w-auto">
+        <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mb-1">Receipt</div>
+        <button
+          onClick={() =>
+            handleExportFeeReceipt({
+              transactionId: feeData.transactionId,
+              structureId: feeData.structureId,
+              feeType: feeData.feeType,
+              title: feeData.title,
+              receiptNo: "g8gheriu4hfife", // TODO: Make dynamic
+            })
+          }
+          className="w-full sm:w-auto border border-black dark:border-white rounded-sm px-2 py-1 text-sm cursor-pointer duration-200 hover:bg-gray-300 dark:hover:bg-customDarkFg"
+        >
+          <FontAwesomeIcon icon={faDownload} /> Receipt
+        </button>
       </div>
     </div>
+  </div>
   );
 };
 
