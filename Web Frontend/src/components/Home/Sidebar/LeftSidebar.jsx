@@ -269,7 +269,7 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
         )}
       </div>
 
-      <div className="overflow-y-auto flex-grow pr-1 mt-1">
+      <div className="overflow-y-auto flex-grow pr-1 mt-1 max-h-[320px]">
         {filteredChats.length > 0 ? (
           filteredChats.map((item, index) => {
             const person = item.teacher || item.student || item.user;
