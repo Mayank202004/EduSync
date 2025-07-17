@@ -82,7 +82,7 @@ const FeeCard = ({
           </div>
 
           {/* Amount */}
-          <div className="sm:w-[20%] w-full text-sm sm:text-right text-left font-bold text-xl text-gray-800 dark:text-white">
+          <div className="sm:w-[20%] w-full text-sm sm:text-right text-left font-bold text-gray-800 dark:text-white">
             <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mb-1">
               Amount
             </div>

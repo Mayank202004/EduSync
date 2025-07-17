@@ -3,13 +3,14 @@ import animationFile from "../../assets/isoCube.riv";
 
 const IsoCubeAnimation = () => {
   const STATE_MACHINE_NAME = "State Machine 1";
-  const HOVER_INPUT_NAME = "Hovered"; 
+  const HOVER_INPUT_NAME = "Hovered";
 
   const { RiveComponent, rive } = useRive({
     src: animationFile,
     artboard: "Artboard",
     stateMachines: [STATE_MACHINE_NAME],
     autoplay: true,
+    fit: "cover", // May be ignored by Rive, but okay to keep
   });
 
   const hoverInput = useStateMachineInput(rive, STATE_MACHINE_NAME, HOVER_INPUT_NAME);
@@ -24,11 +25,14 @@ const IsoCubeAnimation = () => {
 
   return (
     <div
-      className="w-lvw h-full overflow-y-hidden"
+      className="relative w-full h-screen overflow-hidden"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <RiveComponent />
+      {/* Force canvas to scale and center */}
+      <div className="absolute top-1/2 left-1/2 min-w-[120vw] h-screen -translate-x-1/2 -translate-y-1/2">
+        <RiveComponent className="w-full h-full" />
+      </div>
     </div>
   );
 };
