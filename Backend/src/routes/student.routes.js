@@ -18,6 +18,6 @@ router.route("/parent-contact/:contactId").delete(verifyJWT,verifyStudent,Studen
 router.route("/allergy").delete(verifyJWT,verifyStudent,StudentController.deleteAllergy);
 router.route("/unverified").get(verifyJWT,verifySuperAdmin,StudentController.getUnverifiedStudents);
 router.route("/promote").patch(verifyJWT,verifySuperAdmin,StudentController.promoteStudents);
-// router.route("/shuffle").patch(verifyJWT,verifySuperAdmin,StudentController.shuffleDivisions);
+router.route("/shuffle").patch(verifyJWT,verifySuperAdmin,StudentController.shuffleDivisions);
 
 export default router;

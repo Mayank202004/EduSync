@@ -504,3 +504,34 @@ export const promoteStudents = asyncHandler(async (_, res) => {
   }
   res.status(200).json(new ApiResponse(200, {}, "Students promoted successfully"));
 });
+
+
+/**
+ * @desc Shuffle divisions
+ * @route POST /api/v1/student/shuffle
+ * @access Private (Super Admin)
+ */
+export const shuffleDivisions = asyncHandler(async (_, res) => {
+  for (const className of CLASS_ORDER) {
+    const students = await Student.find({ class: className });
+
+    if (students.length === 0) continue;
+
+    // Shuffle students randomly
+    const shuffled = students.sort(() => Math.random() - 0.5);
+
+    // Prepare bulk operations for division assignment
+    const bulkOps = shuffled.map((student, index) => ({
+      updateOne: {
+        filter: { _id: student._id },
+        update: {
+          $set: { div: DIVISIONS[index % DIVISIONS.length] },
+        },
+      },
+    }));
+
+    // Execute all updates in one go
+    await Student.bulkWrite(bulkOps);
+  }
+  res.status(200).json(new ApiResponse(200, {}, "Divisions shuffled successfully"));
+});
