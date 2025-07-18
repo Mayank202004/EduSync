@@ -3,7 +3,7 @@ import ResourcesCard from '@/components/Resources/ResourcesCard';
 import ChapterCard from '@/components/Resources/ChapterCard';
 import { getStudentsResources } from '@/services/resourcesService';
 import { toast } from 'react-hot-toast';
-import LoadingScreen from '@/components/Loading';
+import StudentResourcesSkeleton from '@/components/Resources/StudentResourceSkeleton';
 
 function StudentResources() {
   //Hooks
@@ -27,7 +27,7 @@ function StudentResources() {
     fetchData();
   }, []);
 
-  if (isLoading) return <LoadingScreen/>;
+  if (isLoading) return <StudentResourcesSkeleton/>;
 
   return (
     <div className='w-full min-h-full grow flex items-center justify-center p-4'>
