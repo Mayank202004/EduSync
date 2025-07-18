@@ -8,8 +8,10 @@ import { formatDate } from "@/utils/dateUtils";
 const COLOR_MAP = {
   Cash: "green",
   Online: "blue",
+  Offline: "green",
   UPI: "purple",
   Cheque: "orange",
+  DD:"red"
 };
 
 const PaidFeesCard = ({ feeData }) => {
@@ -24,7 +26,7 @@ const PaidFeesCard = ({ feeData }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-customDarkFg py-3 px-4">
+    <div className="bg-white dark:bg-customDarkFg py-3 px-4 border-b-1">
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       {/* Title */}
       <div className="sm:w-[29%] w-full truncate text-base sm:text-lg font-medium">

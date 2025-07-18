@@ -9,7 +9,7 @@ const RaiseTicket = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="flex flex-col justify-center max-w-[80%] w-full rounded-md p-4 mx-auto bg-amber-100">
+    <div className="flex flex-col justify-center max-w-[90%] w-full rounded-md p-4 mx-auto bg-amber-100">
       <h1 className="font-bold text-xl dark:text-black">Any Issues?</h1>
       <p className="leading-4.5 my-1 dark:text-black">
         Please let us know by raising a ticket
