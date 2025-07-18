@@ -65,7 +65,7 @@ const FeeCard = ({
             <div className="sm:hidden text-xs text-gray-500 dark:text-gray-400 mb-1">
               Due Date
             </div>
-            {formatDate(feeData.dueDate ?? feeData.paidOn)}
+            {feeData.dueDate ? formatDate(feeData.dueDate) : ""}
           </div>
 
           {/* Due Status */}
