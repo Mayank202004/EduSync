@@ -10,10 +10,13 @@ import EditUserProfile from '@/pages/EditUserProfile';
 import Attendance from '@/pages/Attendance';
 import Dashboard from '@/pages/Dashboard';
 import NotFound404 from '@/pages/NotFound404';
+import MeetingPage from '@/pages/Meeting/MeetingPage';
 
 const routes = createRoutesFromElements(
   <>
     <Route path="/login" element={<Login />} />
+
+    <Route path="/meeting" element={<ProtectedRoute><MeetingPage /></ProtectedRoute>} />
 
     {/* Protect all routes under Layout at once */}
     <Route element={<ProtectedRoute><App /></ProtectedRoute>}>
