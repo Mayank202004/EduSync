@@ -1,15 +1,17 @@
 import VideoTile from "./VideoTile";
 import ScreenShareTile from "./ScreenShareTile";
-import SidePanel from "./SidePanel";
+import SidePanel from "./SidePanel/SidePanel";
 import { useMemo, useState } from "react";
+import ParticipantPanel from "./SidePanel/ParticipantPanel";
 
 const dummyParticipants = Array.from({ length: 12 }, (_, i) => ({
   _id: `${i + 1}`,
   name: `User ${i + 1}`,
   avatar: `https://i.pravatar.cc/150?u=user${i + 1}`,
   videoEnabled: false,
-  audioEnabled: false,
+  audioEnabled: true,
   videoRef: null,
+  host: true
 }));
 
 const MAX_VISIBLE_TILES = 12;
@@ -55,6 +57,7 @@ const MeetingLayout = ({
     visibleTiles.length + (overflowCount > 0 ? 1 : 0),
     4
   ); // max 4 cols
+  
 
   return (
     <div className="relative w-full h-full bg-gray-950 flex">
@@ -92,35 +95,49 @@ const MeetingLayout = ({
       </div>
 
       {/* Side Panel */}
-      {isSidePanelOpen && (
-        <SidePanel
-          title={
-            showParticipants
-              ? "Participants"
-              : showChat
-              ? "In-call messages"
-              : "Host Controls"
-          }
-          onClose={onClosePanel}
-        >
-          {showParticipants && <div>List of participants...</div>}
-          {showChat && (
-            <div>
-              <p className="text-sm text-gray-500 mb-2">
-                You can pin a message to make it visible for people who join
-                later.
-              </p>
-              <input
-                placeholder="Send a message"
-                className="w-full border rounded px-3 py-2 mt-2"
-              />
-            </div>
-          )}
-          {showHostControls && <div>Host controls settings...</div>}
-        </SidePanel>
-      )}
+     {isSidePanelOpen && (
+      <SidePanel
+        title={
+          showParticipants
+            ? "Participants"
+            : showChat
+            ? "In-call messages"
+            : "Host Controls"
+        }
+        onClose={onClosePanel}
+      >
+        {showParticipants && (
+          <ParticipantPanel
+            participants={actualParticipants}
+            setPinned={(id) =>setPinned((prev) => (prev === id ? null : id))}/>
+        )}
+        {showChat && renderChatPanel()}
+        {showHostControls && renderHostControlsPanel()}
+      </SidePanel>
+    )}
     </div>
   );
 };
+
+// Side Panel UI Components
+
+const renderChatPanel = () => {
+  return (
+    <div>
+      <p className="text-sm text-gray-500 mb-2">
+        You can pin a message to make it visible for people who join later.
+      </p>
+      <input
+        placeholder="Send a message"
+        className="w-full border rounded px-3 py-2 mt-2"
+      />
+    </div>
+  );
+};
+
+const renderHostControlsPanel = () => {
+  return <div>Host controls settings...</div>;
+};
+
 
 export default MeetingLayout;

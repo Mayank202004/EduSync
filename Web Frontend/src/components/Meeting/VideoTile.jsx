@@ -1,4 +1,4 @@
-import { Mic, MicOff, Video, VideoOff, Pin } from "lucide-react";
+import { Mic, MicOff, Video, VideoOff, Pin ,PinOff } from "lucide-react";
 import Avatar from "./Avatar";
 import { cn } from "@/lib/cn";
 
@@ -27,8 +27,7 @@ const VideoTile = ({ participant, pinned = false, setPinned = ()=>{} }) => {
       {/* Translucent overlay + Pin icon */}
       <div
         className={cn(
-          "absolute inset-0 flex items-center justify-center bg-white/10 transition-opacity duration-300",
-          pinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          "absolute inset-0 flex items-center justify-center bg-white/10 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
         )}
       >
         <button
@@ -39,7 +38,7 @@ const VideoTile = ({ participant, pinned = false, setPinned = ()=>{} }) => {
           )}
           title={pinned ? "Pinned" : `Pin ${name}`}
         >
-          <Pin className="w-5 h-5" />
+          {!pinned ? <Pin className="w-5 h-5" /> : <PinOff className="w-5"/>}
         </button>
       </div>
 
