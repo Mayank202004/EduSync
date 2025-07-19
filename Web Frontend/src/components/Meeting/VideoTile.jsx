@@ -36,7 +36,7 @@ const VideoTile = ({ participant, pinned = false, setPinned = ()=>{} }) => {
             "bg-white/80 hover:bg-white text-black p-2 rounded-full shadow-md transition",
             pinned && "bg-white text-blue-600"
           )}
-          title={pinned ? "Pinned" : `Pin ${name}`}
+          title={pinned ? `Unpin ${name}` : `Pin ${name}`}
         >
           {!pinned ? <Pin className="w-5 h-5" /> : <PinOff className="w-5"/>}
         </button>

@@ -9,7 +9,7 @@ import {
   PinOff,
 } from "lucide-react";
 
-const ParticipantPanel = ({ participants, pinnedIds = [], setPinned }) => {
+const ParticipantPanel = ({ participants, pinned, setPinned }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -21,7 +21,7 @@ const ParticipantPanel = ({ participants, pinnedIds = [], setPinned }) => {
     );
   }, [searchTerm, participants]);
 
-  const isPinned = (id) => pinnedIds.includes(id);
+  const isPinned = (id) => pinned == id;
 
   return (
     <div className="p-4 space-y-4">
@@ -87,9 +87,9 @@ const ParticipantPanel = ({ participants, pinnedIds = [], setPinned }) => {
                     className="text-gray-500 hover:text-gray-700"
                   >
                     {isPinned(p._id) ? (
-                      <PinOff size={16} />
+                      <PinOff size={16} className="text-blue-600"/>
                     ) : (
-                      <Pin size={16} />
+                      <Pin size={16}/>
                     )}
                   </button>
 

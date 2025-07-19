@@ -3,6 +3,7 @@ import ScreenShareTile from "./ScreenShareTile";
 import SidePanel from "./SidePanel/SidePanel";
 import { useMemo, useState } from "react";
 import ParticipantPanel from "./SidePanel/ParticipantPanel";
+import ChatPanel from "./SidePanel/ChatPanel";
 
 const dummyParticipants = Array.from({ length: 12 }, (_, i) => ({
   _id: `${i + 1}`,
@@ -29,6 +30,22 @@ const MeetingLayout = ({
   const isSidePanelOpen = showParticipants || showChat || showHostControls;
 
   const [pinned, setPinned] = useState(null);
+  const [messages, setMessages] = useState([ // To Do : remove dummy later
+    {
+      _id: "1",
+      avatar: `https://i.pravatar.cc/150?u=user1`,
+      sender: "User 1",
+      content: "Hey there!",
+      time: "10:00 AM",
+    },
+    {
+      _id: "2",
+      avatar: `https://i.pravatar.cc/150?u=user2`,
+      sender: "User 2",
+      content: "Hello! All set for the meeting?",
+      time: "10:01 AM",
+    },
+  ]);
 
   const visibleTiles = useMemo(() => {
     if (isScreenSharing) {
@@ -109,9 +126,12 @@ const MeetingLayout = ({
         {showParticipants && (
           <ParticipantPanel
             participants={actualParticipants}
+            pinned={pinned}
             setPinned={(id) =>setPinned((prev) => (prev === id ? null : id))}/>
         )}
-        {showChat && renderChatPanel()}
+        {showChat && (
+          <ChatPanel messages={messages} setMessages={setMessages}/>
+        )}
         {showHostControls && renderHostControlsPanel()}
       </SidePanel>
     )}

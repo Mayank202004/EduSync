@@ -1,5 +1,5 @@
 // components/Avatar.jsx
-const Avatar = ({ name, avatar }) => {
+const Avatar = ({ name, avatar, size=16 }) => {
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -8,7 +8,7 @@ const Avatar = ({ name, avatar }) => {
     .toUpperCase();
 
   return (
-    <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-tr from-pink-500 to-violet-600 flex items-center justify-center text-white text-xl font-bold">
+    <div className={`w-${size} h-${size} rounded-full overflow-hidden bg-gradient-to-tr from-pink-500 to-violet-600 flex items-center justify-center text-white text-xl font-bold`}>
       {avatar ? (
         <img
           src={avatar}
