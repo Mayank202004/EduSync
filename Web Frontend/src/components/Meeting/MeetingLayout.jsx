@@ -1,7 +1,7 @@
 import VideoTile from "./VideoTile";
 import ScreenShareTile from "./ScreenShareTile";
 import SidePanel from "./SidePanel";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 const dummyParticipants = Array.from({ length: 12 }, (_, i) => ({
   _id: `${i + 1}`,
@@ -11,7 +11,6 @@ const dummyParticipants = Array.from({ length: 12 }, (_, i) => ({
   audioEnabled: false,
   videoRef: null,
 }));
-
 
 const MAX_VISIBLE_TILES = 12;
 
@@ -25,8 +24,9 @@ const MeetingLayout = ({
 }) => {
   const actualParticipants = participants || dummyParticipants;
   const isScreenSharing = !!screenSharerId;
-
   const isSidePanelOpen = showParticipants || showChat || showHostControls;
+
+  const [pinned, setPinned] = useState(null);
 
   const visibleTiles = useMemo(() => {
     if (isScreenSharing) {
@@ -34,18 +34,27 @@ const MeetingLayout = ({
       return sharer ? [sharer] : [];
     }
 
+    if (pinned) {
+      const pinnedUser = actualParticipants.find((p) => p._id === pinned);
+      return pinnedUser ? [pinnedUser] : [];
+    }
+
     if (actualParticipants.length > MAX_VISIBLE_TILES) {
       return actualParticipants.slice(0, MAX_VISIBLE_TILES - 1); // last tile is +N more
     }
 
     return actualParticipants.slice(0, MAX_VISIBLE_TILES);
-  }, [actualParticipants, screenSharerId, isScreenSharing]);
+  }, [actualParticipants, screenSharerId, isScreenSharing, pinned]);
 
-  const overflowCount = actualParticipants.length > MAX_VISIBLE_TILES
-    ? actualParticipants.length - (MAX_VISIBLE_TILES - 1)
-    : 0;
+  const overflowCount =
+    !pinned && actualParticipants.length > MAX_VISIBLE_TILES
+      ? actualParticipants.length - (MAX_VISIBLE_TILES - 1)
+      : 0;
 
-  const columnCount = Math.min(visibleTiles.length + (overflowCount > 0 ? 1 : 0), 4); // max 4 cols
+  const columnCount = Math.min(
+    visibleTiles.length + (overflowCount > 0 ? 1 : 0),
+    4
+  ); // max 4 cols
 
   return (
     <div className="relative w-full h-full bg-gray-950 flex">
@@ -63,7 +72,14 @@ const MeetingLayout = ({
         ) : (
           <>
             {visibleTiles.map((participant) => (
-              <VideoTile key={participant._id} participant={participant} />
+              <VideoTile
+                key={participant._id}
+                participant={participant}
+                pinned={pinned === participant._id}
+                setPinned={(id) =>
+                  setPinned((prev) => (prev === id ? null : id))
+                }
+              />
             ))}
 
             {overflowCount > 0 && (
@@ -91,7 +107,8 @@ const MeetingLayout = ({
           {showChat && (
             <div>
               <p className="text-sm text-gray-500 mb-2">
-                You can pin a message to make it visible for people who join later.
+                You can pin a message to make it visible for people who join
+                later.
               </p>
               <input
                 placeholder="Send a message"
