@@ -1,9 +1,21 @@
-import { Mic, MicOff, Video, VideoOff, Pin ,PinOff } from "lucide-react";
+import { Mic, MicOff, Video, VideoOff, Pin, PinOff } from "lucide-react";
 import Avatar from "./Avatar";
 import { cn } from "@/lib/cn";
+import { useEffect, useRef } from "react";
 
-const VideoTile = ({ participant, pinned = false, setPinned = ()=>{} }) => {
-  const { _id, name, videoEnabled, audioEnabled, videoRef, avatar } = participant;
+const VideoTile = ({ participant, pinned = false, setPinned = () => {} }) => {
+  const { _id, name, videoEnabled, audioEnabled, videoRef, avatar, isLocal } = participant;
+
+  // 🔌 Attach local MediaStream to video element
+  useEffect(() => {
+  if (videoRef?.current && participant?.stream) {
+      videoRef.current.srcObject = participant.stream;
+    }
+  }, [videoRef, participant?.stream]);
+
+  console.log(`participant participant`, participant);
+
+
 
   return (
     <div className="relative bg-gray-800 rounded-2xl overflow-hidden shadow-lg group">
@@ -11,7 +23,7 @@ const VideoTile = ({ participant, pinned = false, setPinned = ()=>{} }) => {
         ref={videoRef}
         autoPlay
         playsInline
-        muted
+        muted={isLocal}
         className={cn(
           "w-full h-full object-cover transition-all duration-300",
           !videoEnabled && "hidden"
@@ -25,11 +37,7 @@ const VideoTile = ({ participant, pinned = false, setPinned = ()=>{} }) => {
       )}
 
       {/* Translucent overlay + Pin icon */}
-      <div
-        className={cn(
-          "absolute inset-0 flex items-center justify-center bg-white/10 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
-        )}
-      >
+      <div className="absolute inset-0 flex items-center justify-center bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <button
           onClick={() => setPinned(_id)}
           className={cn(
@@ -38,7 +46,7 @@ const VideoTile = ({ participant, pinned = false, setPinned = ()=>{} }) => {
           )}
           title={pinned ? `Unpin ${name}` : `Pin ${name}`}
         >
-          {!pinned ? <Pin className="w-5 h-5" /> : <PinOff className="w-5"/>}
+          {!pinned ? <Pin className="w-5 h-5" /> : <PinOff className="w-5" />}
         </button>
       </div>
 
