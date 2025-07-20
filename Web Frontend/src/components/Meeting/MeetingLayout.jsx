@@ -4,6 +4,7 @@ import SidePanel from "./SidePanel/SidePanel";
 import { useMemo, useState } from "react";
 import ParticipantPanel from "./SidePanel/ParticipantPanel";
 import ChatPanel from "./SidePanel/ChatPanel";
+import HostControlPanel from "./SidePanel/HostControlPanel";
 
 const dummyParticipants = Array.from({ length: 12 }, (_, i) => ({
   _id: `${i + 1}`,
@@ -46,6 +47,14 @@ const MeetingLayout = ({
       time: "10:01 AM",
     },
   ]);
+
+  const [controls, setControls] = useState({
+    screenShare: true,
+    microphone: true,
+    video: true,
+    chat: true,
+    access: "open", // or "trusted"
+  });
 
   const visibleTiles = useMemo(() => {
     if (isScreenSharing) {
@@ -132,32 +141,15 @@ const MeetingLayout = ({
         {showChat && (
           <ChatPanel messages={messages} setMessages={setMessages}/>
         )}
-        {showHostControls && renderHostControlsPanel()}
+        {showHostControls && (
+          <HostControlPanel controls={controls} setControls={setControls}/>
+        )}
       </SidePanel>
     )}
     </div>
   );
 };
 
-// Side Panel UI Components
-
-const renderChatPanel = () => {
-  return (
-    <div>
-      <p className="text-sm text-gray-500 mb-2">
-        You can pin a message to make it visible for people who join later.
-      </p>
-      <input
-        placeholder="Send a message"
-        className="w-full border rounded px-3 py-2 mt-2"
-      />
-    </div>
-  );
-};
-
-const renderHostControlsPanel = () => {
-  return <div>Host controls settings...</div>;
-};
 
 
 export default MeetingLayout;
