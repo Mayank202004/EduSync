@@ -6,16 +6,6 @@ import ParticipantPanel from "./SidePanel/ParticipantPanel";
 import ChatPanel from "./SidePanel/ChatPanel";
 import HostControlPanel from "./SidePanel/HostControlPanel";
 
-const dummyParticipants = Array.from({ length: 12 }, (_, i) => ({
-  _id: `${i + 1}`,
-  name: `User ${i + 1}`,
-  avatar: `https://i.pravatar.cc/150?u=user${i + 1}`,
-  videoEnabled: false,
-  audioEnabled: true,
-  videoRef: null,
-  host: true
-}));
-
 const MAX_VISIBLE_TILES = 12;
 
 const MeetingLayout = ({
@@ -25,13 +15,13 @@ const MeetingLayout = ({
   showChat,
   showHostControls,
   onClosePanel,
+  localVideoRef, // ✅ Accept localVideoRef
 }) => {
-  const actualParticipants = participants || dummyParticipants;
   const isScreenSharing = !!screenSharerId;
   const isSidePanelOpen = showParticipants || showChat || showHostControls;
 
   const [pinned, setPinned] = useState(null);
-  const [messages, setMessages] = useState([ // To Do : remove dummy later
+  const [messages, setMessages] = useState([
     {
       _id: "1",
       avatar: `https://i.pravatar.cc/150?u=user1`,
@@ -53,37 +43,51 @@ const MeetingLayout = ({
     microphone: true,
     video: true,
     chat: true,
-    access: "open", // or "trusted"
+    access: "open",
   });
+
+  // 👤 Add a "You" tile as the first participant
+  // const allParticipants = useMemo(() => {
+  //   const localParticipant = {
+  //     _id: "local",
+  //     name: "You",
+  //     avatar: `https://i.pravatar.cc/150?u=you`,
+  //     videoEnabled: true,
+  //     audioEnabled: true,
+  //     videoRef: localVideoRef, // ✅ local video ref
+  //     isLocal: true,
+  //   };
+  //   return [localParticipant, ...(participants || [])];
+  // }, [participants, localVideoRef]);
+  const allParticipants = participants;
 
   const visibleTiles = useMemo(() => {
     if (isScreenSharing) {
-      const sharer = actualParticipants.find((p) => p._id === screenSharerId);
+      const sharer = allParticipants.find((p) => p._id === screenSharerId);
       return sharer ? [sharer] : [];
     }
 
     if (pinned) {
-      const pinnedUser = actualParticipants.find((p) => p._id === pinned);
+      const pinnedUser = allParticipants.find((p) => p._id === pinned);
       return pinnedUser ? [pinnedUser] : [];
     }
 
-    if (actualParticipants.length > MAX_VISIBLE_TILES) {
-      return actualParticipants.slice(0, MAX_VISIBLE_TILES - 1); // last tile is +N more
+    if (allParticipants.length > MAX_VISIBLE_TILES) {
+      return allParticipants.slice(0, MAX_VISIBLE_TILES - 1);
     }
 
-    return actualParticipants.slice(0, MAX_VISIBLE_TILES);
-  }, [actualParticipants, screenSharerId, isScreenSharing, pinned]);
+    return allParticipants.slice(0, MAX_VISIBLE_TILES);
+  }, [allParticipants, screenSharerId, isScreenSharing, pinned]);
 
   const overflowCount =
-    !pinned && actualParticipants.length > MAX_VISIBLE_TILES
-      ? actualParticipants.length - (MAX_VISIBLE_TILES - 1)
+    !pinned && allParticipants.length > MAX_VISIBLE_TILES
+      ? allParticipants.length - (MAX_VISIBLE_TILES - 1)
       : 0;
 
   const columnCount = Math.min(
     visibleTiles.length + (overflowCount > 0 ? 1 : 0),
     4
-  ); // max 4 cols
-  
+  );
 
   return (
     <div className="relative w-full h-full bg-gray-950 flex">
@@ -121,35 +125,36 @@ const MeetingLayout = ({
       </div>
 
       {/* Side Panel */}
-     {isSidePanelOpen && (
-      <SidePanel
-        title={
-          showParticipants
-            ? "Participants"
-            : showChat
-            ? "In-call messages"
-            : "Host Controls"
-        }
-        onClose={onClosePanel}
-      >
-        {showParticipants && (
-          <ParticipantPanel
-            participants={actualParticipants}
-            pinned={pinned}
-            setPinned={(id) =>setPinned((prev) => (prev === id ? null : id))}/>
-        )}
-        {showChat && (
-          <ChatPanel messages={messages} setMessages={setMessages}/>
-        )}
-        {showHostControls && (
-          <HostControlPanel controls={controls} setControls={setControls}/>
-        )}
-      </SidePanel>
-    )}
+      {isSidePanelOpen && (
+        <SidePanel
+          title={
+            showParticipants
+              ? "Participants"
+              : showChat
+              ? "In-call messages"
+              : "Host Controls"
+          }
+          onClose={onClosePanel}
+        >
+          {showParticipants && (
+            <ParticipantPanel
+              participants={allParticipants}
+              pinned={pinned}
+              setPinned={(id) =>
+                setPinned((prev) => (prev === id ? null : id))
+              }
+            />
+          )}
+          {showChat && (
+            <ChatPanel messages={messages} setMessages={setMessages} />
+          )}
+          {showHostControls && (
+            <HostControlPanel controls={controls} setControls={setControls} />
+          )}
+        </SidePanel>
+      )}
     </div>
   );
 };
-
-
 
 export default MeetingLayout;

@@ -1,18 +1,33 @@
+// pages/MeetingPage.jsx
 import { useState } from "react";
 import MeetingLayout from "@/components/Meeting/MeetingLayout";
 import ControlsBar from "@/components/Meeting/ControlsBar";
+import useWebRTC from "@/hooks/useWebRTC";
+import { useSocket } from "@/context/SocketContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function MeetingPage() {
-  const [mic, setMic] = useState(true);
-  const [cam, setCam] = useState(true);
-  const [screen, setScreen] = useState(false);
+  const { socket } = useSocket(); 
+  const { user} = useAuth();
+  const CurrentUser={_id:user?._id,fullName:user?.fullName,avatar:user?.avatar};
+
+  const {
+    localVideoRef,
+    participants,
+    toggleMic,
+    toggleCam,
+    toggleScreen,
+    leaveMeeting,
+    mic,
+    cam,
+    screen,
+    raiseHand,
+    handRaised
+  } = useWebRTC(socket, "your-room-id", CurrentUser);
+
   const [showParticipants, setShowParticipants] = useState(false);
   const [showHostControls, setShowHostControls] = useState(false);
   const [showChat, setShowChat] = useState(false);
-  const [handRaised, setHandRaised] = useState(false);
-
-  const handleLeave = () => console.log("Leave meeting");
-  const handleRaiseHand = () => setHandRaised((prev) => !prev);
 
   const closeSidePanel = () => {
     setShowParticipants(false);
@@ -31,17 +46,18 @@ export default function MeetingPage() {
         showChat={showChat}
         handRaised={handRaised}
         onClosePanel={closeSidePanel}
+        participants={participants}
       />
 
       <ControlsBar
         mic={mic}
         cam={cam}
         screen={screen}
-        onToggleMic={() => setMic((prev) => !prev)}
-        onToggleCam={() => setCam((prev) => !prev)}
-        onToggleScreen={() => setScreen((prev) => !prev)}
-        onLeave={handleLeave}
-        onRaiseHand={handleRaiseHand}
+        onToggleMic={toggleMic}
+        onToggleCam={toggleCam}
+        onToggleScreen={toggleScreen}
+        onLeave={leaveMeeting}
+        onRaiseHand={raiseHand}
         onToggleParticipants={() => {
           setShowParticipants((prev) => !prev);
           setShowChat(false);
