@@ -15,12 +15,14 @@ const AdminDashboard = () => {
   const [activeView, setActiveView] = useState('home');
   const [chats, setChats] = useState(null);
   const [allUsers, setAllUsers] = useState(null);
+  const [academicYear, setAcademicYear] = useState(null);
   
   useEffect(() => {
     const getDashboardData = async () => {
       const response = await fetchSuperAdminDashboardData();
       setChats(response?.data.chatData);
       setAllUsers(response?.data.allUsers);
+      setAcademicYear(response?.data.academicYear);
     };
     getDashboardData();
   }, []);
@@ -38,7 +40,7 @@ const AdminDashboard = () => {
       case 'manage-subjects':
         return <ManageTeacherSubjects onBackPressed={onBackPressed} />;
       case 'manage-academic-year':
-        return <ManageAcademicYear onBackPressed={onBackPressed} />;
+        return <ManageAcademicYear onBackPressed={onBackPressed} academicYear={academicYear} />;
       case 'home':
       default:
         return <AdminHomeContent setActiveView={setActiveView} />;

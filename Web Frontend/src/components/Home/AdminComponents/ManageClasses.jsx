@@ -7,7 +7,7 @@ import {
   deleteDivision,
 } from "@/services/dashboardService";
 import Modal from "@/components/Modals/Modal";
-import { Trash } from "lucide-react";
+import { Trash, ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 
 const ManageClasses = ({ onBackPressed }) => {
@@ -130,14 +130,14 @@ const ManageClasses = ({ onBackPressed }) => {
 
   return (
     <div className="text-gray-900 dark:text-white">
+      <button
+          onClick={onBackPressed}
+          className="flex items-center gap-2 text-blue-600 hover:underline mb-6 mt-3"
+        >
+          <ArrowLeft size={18} /> Back
+      </button>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">Manage Classes & Divisions</h2>
-        <button
-          onClick={onBackPressed}
-          className="text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-        >
-          ← Back to Dashboard
-        </button>
       </div>
 
       <div className="mb-6 flex gap-4 flex-wrap">

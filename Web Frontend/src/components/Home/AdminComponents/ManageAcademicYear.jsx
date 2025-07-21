@@ -9,6 +9,7 @@ import {
   Trash2,
   Shuffle,
   Upload,
+  ArrowLeft
 } from "lucide-react";
 import { updateAcademicYear, clearOldData, promoteStudents, shuffleDivisions} from "@/services/dashboardService";
 
@@ -97,13 +98,13 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
         <h2 className="text-3xl font-bold flex items-center gap-2">
           <CalendarDays className="w-6 h-6 text-blue-600" /> Academic Year Settings
         </h2>
-        <button
-          onClick={onBackPressed}
-          className="flex items-center gap-2 text-sm px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded"
-        >
-          <ChevronLeft className="w-4 h-4" /> Back
-        </button>
       </div>
+      <button
+          onClick={onBackPressed}
+          className="flex items-center gap-2 text-blue-600 hover:underline"
+        >
+          <ArrowLeft size={18} /> Back
+      </button>
 
       {activeSection === "dashboard" && (
         <>
