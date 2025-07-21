@@ -7,6 +7,8 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { decrypt } from "../utils/encryptionUtil.js";
+import { v2 as cloudinary } from 'cloudinary';
+
 
 /**
  * @desc Helper function to fetch all chats for a student
@@ -348,7 +350,7 @@ export const uploadMultipleFiles = asyncHandler(async (req, res) => {
 
   for (const file of req.files) {
     const localPath = file.path;
-    const uploaded = await uploadOnCloudinary(localPath);
+    const uploaded = await uploadOnCloudinary(localPath,"edusync/chats");
 
     if (uploaded?.url) {
       uploadedFiles.push({
@@ -419,3 +421,42 @@ export const getOrCreatePersonalChat = asyncHandler(async (req, res) => {
       user: {_id: otherUser?._id, name: otherUser?.fullName, avatar: otherUser?.avatar, role: otherUser?.role},
     }, "Personal chat created"));
 });
+
+
+
+
+/**
+ * @desc Delete all messages along with attachments
+ * @route /api/v1/chat/clear-data
+ * @access Private (Super Admin)
+ */
+export const deleteAllMessages = asyncHandler(async (req, res) => {
+  try {
+    clearMessages();
+    res.status(200).json(new ApiResponse(200,null,"All messages and attachments deleted."));
+  } catch (error) {
+    throw new ApiError(error.statusCode || 500, error.message || "Something went wrong");
+  }
+});
+
+/**
+ * @desc Helper function to delete all messages along with deleting attachment from cloudinary
+ * @returns {void}
+ */
+export const clearMessages = async () => {
+  const prefix = "edusync/chats/";
+
+  // Delete images
+  await cloudinary.api.delete_resources_by_prefix(prefix, { resource_type: "image" });
+
+  // Delete videos
+  await cloudinary.api.delete_resources_by_prefix(prefix, { resource_type: "video" });
+
+  // Delete raw files (e.g., PDFs, docs)
+  await cloudinary.api.delete_resources_by_prefix(prefix, { resource_type: "raw" });
+
+  // Then clear the DB
+  await Message.deleteMany({});
+};
+
+
