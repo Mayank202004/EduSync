@@ -184,7 +184,7 @@ export const addResource = asyncHandler(async (req, res) => {
         // Upload each file to Cloudinary
         const uploadedFiles = await Promise.all(
             req.files.map(async (file) => {
-                const cloudinaryResponse = await uploadOnCloudinary(file.path);
+                const cloudinaryResponse = await uploadOnCloudinary(file.path,`edusync/resource/${className}/${subjectName}/${chapterName}`);
                 if (!cloudinaryResponse) {
                     throw new ApiError(500, "Error while uploading file.");
                 }
