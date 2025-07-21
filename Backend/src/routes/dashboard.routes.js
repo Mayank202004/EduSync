@@ -7,5 +7,6 @@ const router = Router();
 router.get("/student",verifyJWT,verifyStudent,DashboardController.fetchDashboardData);
 router.get("/teacher",verifyJWT,verifyTeacher,DashboardController.fetchTeacherDashboardData);
 router.get("/super-admin",verifyJWT,verifySuperAdmin,DashboardController.fetchSuperAdminDashboardData);
+router.post("/cleanup",verifyJWT,verifySuperAdmin,DashboardController.performSelectiveCleanup);
 
 export default router;
