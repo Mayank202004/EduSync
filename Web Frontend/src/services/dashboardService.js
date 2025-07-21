@@ -142,9 +142,36 @@ export const updateTeacherSubjects = async (Id,position,subjects,classTeacher,cl
 }
 
 // = = = = = Manage Academic Year Api calls
-export const fetchAcademicYear = async () => {};
-export const updateAcademicYear = async (newYear) => {};
-export const promoteStudents = async () => {};
-export const shuffleDivisions = async () => {};
+/**
+ * @desc Update Academic Year 
+ * @param {String} newYear - updated Academic Year
+ * @returns {Promise} - promise resolving to success message
+ */
+export const updateAcademicYear = async (newYear) => {
+    await axiosInstance.put(`${BASEURL}/setting/academic-year`,{newYear});
+};
+/**
+ * @desc Promote all students to next class and unverify pass-outs
+ * @returns {Promise} - promise resolving to success message
+};
+
+/**
+ * @desc Shuffle all student's division's
+ * @returns {Promise} - promise resolving to success message
+ */
+export const shuffleDivisions = async () => {
+    await axiosInstance.patch(`${BASEURL}/student/promote`);
+};
+
+/**
+ * @desc Manually assign all students their division  // To Do:
+ */
 export const assignStudentDivision = async (studentId, division) => {};
-export const clearOldData = async () => {};
+
+/**
+ * @desc Clear old data
+ * @returns {Promise} - promise resolving to success message
+ */
+export const clearOldData = async (attendance=false,feeStatus=false,messages=false,tickets=false) => {
+    await axiosInstance.post(`${BASEURL}/dashboard/cleanup`,{attendance,feeStatus,messages,tickets});
+};
