@@ -153,6 +153,9 @@ export const updateAcademicYear = async (newYear) => {
 /**
  * @desc Promote all students to next class and unverify pass-outs
  * @returns {Promise} - promise resolving to success message
+ */
+export const promoteStudents = async () => {
+    await axiosInstance.patch(`${BASEURL}/student/promote`);
 };
 
 /**

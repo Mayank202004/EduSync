@@ -10,6 +10,7 @@ import {
   Shuffle,
   Upload,
 } from "lucide-react";
+import { updateAcademicYear, clearOldData, promoteStudents, shuffleDivisions} from "@/services/dashboardService";
 
 const dummyStudents = [
   { _id: "1", fullName: "Alice Johnson" },
@@ -17,11 +18,9 @@ const dummyStudents = [
   { _id: "3", fullName: "Charlie Brown" },
 ];
 
-const ManageAcademicYear = ({ onBackPressed }) => {
-  const [year, setYear] = useState("2024-25");
+const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
+  const [year, setYear] = useState(academicYear);
   const [editing, setEditing] = useState(false);
-  const [newYear, setNewYear] = useState("2024-25");
-
   const [showClearModal, setShowClearModal] = useState(false);
   const [clearOptions, setClearOptions] = useState({
     attendance: false,
@@ -41,10 +40,20 @@ const ManageAcademicYear = ({ onBackPressed }) => {
   const classOptions = ["Class 1", "Class 2", "Class 3"];
   const divisionOptions = ["A", "B", "C"];
 
-  const handleUpdateYear = () => {
-    if (!newYear.trim()) return toast.error("Academic year cannot be empty.");
-    setYear(newYear);
-    toast.success("Academic year updated!");
+  const handleUpdateYear = async () => {
+    if (!year.trim()) return toast.error("Academic year cannot be empty.");
+    try {
+      const response = await toast.promise(
+        updateAcademicYear(newYear),
+        {
+          loading: "Updating Acadeic Year",
+          success: "Academic Year Updated",
+          error: "",
+        }
+      );
+    } catch (err) {
+      // axios error handled by interceptor
+    }
     setEditing(false);
   };
 
@@ -104,8 +113,8 @@ const ManageAcademicYear = ({ onBackPressed }) => {
             {editing ? (
               <div className="flex gap-3 items-center">
                 <input
-                  value={newYear}
-                  onChange={(e) => setNewYear(e.target.value)}
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
                   className="border border-gray-300 dark:border-gray-600 rounded px-4 py-2 text-black w-40"
                   placeholder="e.g., 2025-26"
                 />
@@ -127,7 +136,7 @@ const ManageAcademicYear = ({ onBackPressed }) => {
                 <span>{year}</span>
                 <button
                   onClick={() => {
-                    setNewYear(year);
+                    setYear(year);
                     setEditing(true);
                   }}
                   className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"

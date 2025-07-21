@@ -8,7 +8,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
  * @param {String} key
  * @returns {String} value for the key
  */
-const getSettingValue = async (key) => {
+export const getSettingValue = async (key) => {
     const setting = await Setting.findOne({ key });
     return setting ? setting.value : null; 
 };
