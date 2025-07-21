@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import ResourcesCard from '@/components/Resources/ResourcesCard';
-import ChapterCard from '@/components/Resources/ChapterCard';
-import ClassesCard from '@/components/Resources/ClassesCard';
-import { getTeacherResources } from '@/services/resourcesService';
-import { toast } from 'react-hot-toast';
-import LoadingScreen from '@/components/Loading';
+import React, { useState, useEffect } from "react";
+import ResourcesCard from "@/components/Resources/ResourcesCard";
+import ChapterCard from "@/components/Resources/ChapterCard";
+import ClassesCard from "@/components/Resources/ClassesCard";
+import { getTeacherResources } from "@/services/resourcesService";
+import { toast } from "react-hot-toast";
+import LoadingScreen from "@/components/Loading";
+import ClassesSkeleton from "@/components/Resources/ClassesSkeleton";
 
 function TeacherResources() {
   //Hooks
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
-  const [selectedTerm, setSelectedTerm] = useState('1');
+  const [selectedTerm, setSelectedTerm] = useState("1");
   const [allClasses, setAllClasses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -32,7 +33,7 @@ function TeacherResources() {
   // On back pressed from selected class
   const handleBackFromClass = () => {
     setSelectedClass(null);
-    setSelectedTerm('1');
+    setSelectedTerm("1");
   };
 
   // On back pressed from selected subject
@@ -40,7 +41,7 @@ function TeacherResources() {
     setSelectedSubject(null);
   };
 
-  if (isLoading) return <LoadingScreen/>;
+  if (isLoading) return <ClassesSkeleton />;
 
   return (
     <div className="w-full min-h-full grow flex items-center justify-center p-4">
@@ -48,7 +49,7 @@ function TeacherResources() {
         <ClassesCard
           classes={allClasses}
           onClassSelect={(cls) => setSelectedClass(cls)}
-          role='teacher'
+          role="teacher"
         />
       ) : !selectedSubject ? (
         <ResourcesCard
@@ -67,11 +68,11 @@ function TeacherResources() {
           term={selectedTerm}
           allSubjects={selectedClass.subjects || []}
           goBack={handleBackFromSubject}
-          role='teacher'
+          role="teacher"
         />
       )}
     </div>
   );
-};
+}
 
 export default TeacherResources;
