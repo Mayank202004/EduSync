@@ -4,7 +4,7 @@ import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { validateRegisterInput, validateUpdateUserInput} from "../validators/user.validator.js";
 import jwt from "jsonwebtoken";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadOnCloudinary,deleteFromCloudinary } from "../utils/cloudinary.js";
 import { Student } from "../models/student.model.js"; 
 import { Teacher } from "../models/teacher.model.js";
 
@@ -361,43 +361,46 @@ const updateUser = asyncHandler(async(req,res) => {
  * @route  PUT /api/v1/auth/update-avatar
  * @access Private (User)
  */ 
-const updateUserAvatar = asyncHandler(async(req,res) => {
-    if (!req.file || !req.file.path) {
-        throw new ApiError(400, "Avatar file is missing");
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  if (!req.file || !req.file.path) {
+    throw new ApiError(400, "Avatar file is missing");
+  }
+
+  const user = await User.findById(req.user?._id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  // Delete old avatar if exists
+  if (user.avatar) {
+    try {
+      await deleteFromCloudinary(user.avatar,"edusync/avatars");
+    } catch (error) {
+      // Continue execution even if deletion fails
     }
-    const avatarLocalPath = req.file.path;
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
-    
+  }
 
-    if (!avatar.url) {
-        throw new ApiError(500, "Error while uploading avatar");
-    }
+  // Upload new avatar
+  const avatarLocalPath = req.file.path;
+  const avatar = await uploadOnCloudinary(avatarLocalPath, "edusync/avatars");
 
-    const user = await User.findByIdAndUpdate(
-        req.user?._id,
-        {
-            $set:{
-                avatar: avatar.url
-            }
-        },
-        {new: true}
-    ).select("-password -refreshToken")
+  if (!avatar?.url) {
+    throw new ApiError(500, "Error while uploading avatar");
+  }
 
-    if(!user){
-        throw new ApiError(500, "User not found");
-    }
+  // Update avatar in DB
+  user.avatar = avatar.url;
+  await user.save();
 
-    return res
+  const updatedUser = user.toObject();
+  delete updatedUser.password;
+  delete updatedUser.refreshToken;
+
+  return res
     .status(200)
-    .json(
-        new ApiResponse(200, user, "Avatar image updated successfully")
-    )
-
-    
+    .json(new ApiResponse(200, updatedUser, "Avatar image updated successfully"));
 });
-
-
-
 
 
 export { registerUser, loginUser, logoutUser, refreshAccessToken, changeUserPassword, getCurrentUser, updateUser, updateUserAvatar};

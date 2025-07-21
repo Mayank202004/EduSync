@@ -8,12 +8,13 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadOnCloudinary = async (localFilePath) => {
+const uploadOnCloudinary = async (localFilePath,folder="uploads") => {
     try {
         if (!localFilePath) return null;
         //upload the file on cloudinary
         const response = await cloudinary.uploader.upload(localFilePath, {
             resource_type: "auto",
+            folder: folder,
         });
         fs.unlinkSync(localFilePath);
         return response;
@@ -24,25 +25,30 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 };
 
-const deleteFromCloudinary = async (url) => {
-    try {
-        if (!url) {
-            throw new Error("URL is required to delete a file from Cloudinary");
-        }
-        // Extract the public ID from the Cloudinary URL
-        const urlParts = url.split("/");
-        const publicIdWithExtension = urlParts[urlParts.length - 1]; // Get the last part of the URL
-        const publicId = publicIdWithExtension.split(".")[0]; // Remove the file extension
-
-        if (!publicId) {
-            throw new Error("Unable to extract public ID from the URL");
-        }
-        await cloudinary.uploader.destroy(publicId);
-    } catch (error) {
-        // No catch (Proceed without deleting)
-        console.log(error);
-        throw new Error("Failed to delete file from Cloudinary");
+const deleteFromCloudinary = async (url, folderPath = "") => {
+  try {
+    if (!url) {
+      throw new Error("URL is required to delete a file from Cloudinary");
     }
+
+    // Extract the public ID from the Cloudinary URL
+    const urlParts = url.split("/");
+    const publicIdWithExtension = urlParts[urlParts.length - 1]; // last part
+    const publicIdOnly = publicIdWithExtension.split(".")[0]; // without extension
+
+    if (!publicIdOnly) {
+      throw new Error("Unable to extract public ID from the URL");
+    }
+
+    // Construct full public ID
+    const fullPublicId = folderPath ? `${folderPath}/${publicIdOnly}` : publicIdOnly;
+
+    // Delete from Cloudinary
+    await cloudinary.uploader.destroy(fullPublicId);
+  } catch (error) {
+    console.error("Cloudinary deletion error:", error.message || error);
+    throw new Error("Failed to delete file from Cloudinary");
+  }
 };
 
 export { uploadOnCloudinary, deleteFromCloudinary };
