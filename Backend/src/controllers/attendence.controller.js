@@ -1193,3 +1193,15 @@ const getVerifiedStudentCount = async () => {
     throw error;
   }
 };
+
+
+/**
+ * @desc Helper to delete all attendance records
+ */
+export const deleteAllAttendance = async () => {
+  try {
+    ClassAttendance.deleteMany({});
+  } catch (error) {
+    throw error;
+  }
+};

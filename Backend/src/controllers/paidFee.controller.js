@@ -247,6 +247,18 @@ const renderFeeReceipt = asyncHandler(async (req, res) => {
 });
 
 
+/**
+ * @desc Helper function to delete all StudentFeeStatus records
+ */
+const deleteAllStudentFeeStatuses = async () => {
+  try {
+    await StudentFeeStatus.deleteMany({});
+  } catch (error) {
+    throw error;
+  }
+};
+
+// To DO : Move to utils or remove if redundant with utils
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   const istDate = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
@@ -259,4 +271,4 @@ const formatDate = (dateString) => {
 };
 
 
-export {getStudentFeeStatus,markFeeAsPaid,renderFeeReceipt};
+export {getStudentFeeStatus,markFeeAsPaid,renderFeeReceipt, deleteAllStudentFeeStatuses};

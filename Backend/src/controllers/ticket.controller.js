@@ -65,3 +65,15 @@ export const getClosedTickets = asyncHandler(async (_, res) => {
     .status(200)
     .json(new ApiResponse(200, tickets, "Closed/resolved tickets sorted by last update"));
 });
+
+
+/**
+ * @desc Helper function to Delete all tickets
+ */
+export const deleteAllTickets = async () => {
+  try {
+    await Ticket.deleteMany({});
+  } catch (error) {
+    throw error;
+  }
+};
