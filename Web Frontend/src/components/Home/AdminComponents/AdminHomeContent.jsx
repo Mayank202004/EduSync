@@ -66,6 +66,7 @@ const AdminHomeContent = ({setActiveView=()=>{}}) => {
           icon={CalendarDays}
           title="Academic Year"
           description="Set academic year dates and term structure."
+          onClick={() => setActiveView('manage-academic-year')}
         />
         <AdminHomeCard
           icon={MessageSquareWarning}

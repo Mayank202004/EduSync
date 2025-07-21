@@ -6,7 +6,9 @@ import VerifyStudents from '@/components/Home/AdminComponents/Verifystudents';
 import VerifyTeachers from '@/components/Home/AdminComponents/VerifyTeachers';
 import ManageClasses from '@/components/Home/AdminComponents/ManageClasses';
 import ManageTeacherSubjects from '@/components/Home/AdminComponents/ManageSubjects';
+import ManageAcademicYear from '@/components/Home/AdminComponents/ManageAcademicYear';
 import { fetchSuperAdminDashboardData } from '@/services/dashboardService';
+
 
 
 const AdminDashboard = () => {
@@ -35,6 +37,8 @@ const AdminDashboard = () => {
         return <ManageClasses onBackPressed={onBackPressed} />;
       case 'manage-subjects':
         return <ManageTeacherSubjects onBackPressed={onBackPressed} />;
+      case 'manage-academic-year':
+        return <ManageAcademicYear onBackPressed={onBackPressed} />;
       case 'home':
       default:
         return <AdminHomeContent setActiveView={setActiveView} />;

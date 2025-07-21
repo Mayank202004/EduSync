@@ -140,3 +140,11 @@ export const updateTeacherSubjects = async (Id,position,subjects,classTeacher,cl
     const response = await axiosInstance.put(`${BASEURL}/teacher/details`,{Id,subjects,position,classTeacher,classCoordinator});
     return response.data;
 }
+
+// = = = = = Manage Academic Year Api calls
+export const fetchAcademicYear = async () => {};
+export const updateAcademicYear = async (newYear) => {};
+export const promoteStudents = async () => {};
+export const shuffleDivisions = async () => {};
+export const assignStudentDivision = async (studentId, division) => {};
+export const clearOldData = async () => {};
