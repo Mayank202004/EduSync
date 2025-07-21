@@ -1,164 +1,314 @@
 import React, { useEffect, useState } from "react";
-import {
-  fetchAcademicYear,
-  updateAcademicYear,
-  promoteStudents,
-  shuffleDivisions,
-  clearOldData,
-} from "@/services/dashboardService";
-import Modal from "@/components/Modals/Modal";
 import toast from "react-hot-toast";
+import Modal from "@/components/Modals/Modal";
+import ConfirmActionModal from "@/components/Modals/ConfirmationActionModal";
+import {
+  CalendarDays,
+  ChevronLeft,
+  Pencil,
+  Trash2,
+  Shuffle,
+  Upload,
+} from "lucide-react";
+
+const dummyStudents = [
+  { _id: "1", fullName: "Alice Johnson" },
+  { _id: "2", fullName: "Bob Smith" },
+  { _id: "3", fullName: "Charlie Brown" },
+];
 
 const ManageAcademicYear = ({ onBackPressed }) => {
-  const [year, setYear] = useState("");
+  const [year, setYear] = useState("2024-25");
   const [editing, setEditing] = useState(false);
-  const [newYear, setNewYear] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [newYear, setNewYear] = useState("2024-25");
+
+  const [showClearModal, setShowClearModal] = useState(false);
+  const [clearOptions, setClearOptions] = useState({
+    attendance: false,
+    marks: false,
+    messages: false,
+  });
+
+  const [selectedClass, setSelectedClass] = useState("");
+  const [students, setStudents] = useState([]);
+  const [divisionMap, setDivisionMap] = useState({});
+
+  const [activeSection, setActiveSection] = useState("dashboard");
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmType, setConfirmType] = useState(null); // 'promote' | 'shuffle'
+
+  const classOptions = ["Class 1", "Class 2", "Class 3"];
+  const divisionOptions = ["A", "B", "C"];
+
+  const handleUpdateYear = () => {
+    if (!newYear.trim()) return toast.error("Academic year cannot be empty.");
+    setYear(newYear);
+    toast.success("Academic year updated!");
+    setEditing(false);
+  };
+
+  const handleClearData = () => {
+    const selected = Object.keys(clearOptions).filter((k) => clearOptions[k]);
+    if (!selected.length) return toast.error("Select something to clear");
+    toast.success("Data cleared: " + selected.join(", "));
+    setShowClearModal(false);
+  };
+
+  const handleDivisionChange = (id, division) => {
+    setDivisionMap((prev) => ({ ...prev, [id]: division }));
+  };
+
+  const handleConfirm = () => {
+    if (confirmType === "promote") {
+      toast.success("Students promoted!");
+    } else if (confirmType === "shuffle") {
+      toast.success("Divisions shuffled!");
+    }
+    setShowConfirm(false);
+    setConfirmType(null);
+  };
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetchAcademicYear();
-        setYear(res.data?.year || "2024-25");
-      } catch {}
-      setLoading(false);
-    };
-    load();
-  }, []);
-
-  const handleUpdateYear = async () => {
-    if (!newYear.trim()) {
-      toast.error("Academic year cannot be empty.");
-      return;
+    if (selectedClass) {
+      setStudents(dummyStudents);
     }
-    try {
-      await toast.promise(updateAcademicYear(newYear), {
-        loading: "Updating year...",
-        success: "Academic year updated!",
-        error: "",
-      });
-      setYear(newYear);
-      setEditing(false);
-    } catch {}
-  };
+  }, [selectedClass]);
 
-  const handlePromote = async () => {
-    try {
-      await toast.promise(promoteStudents(), {
-        loading: "Promoting students...",
-        success: "Promotion complete!",
-        error: "",
-      });
-    } catch {}
-  };
-
-  const handleShuffle = async () => {
-    try {
-      await toast.promise(shuffleDivisions(), {
-        loading: "Shuffling divisions...",
-        success: "Divisions shuffled!",
-        error: "",
-      });
-    } catch {}
-  };
-
-  const handleClearData = async () => {
-    try {
-      await toast.promise(clearOldData(), {
-        loading: "Clearing old data...",
-        success: "Old data cleared!",
-        error: "",
-      });
-    } catch {}
+  const goBack = () => {
+    setActiveSection("dashboard");
+    setSelectedClass("");
+    setStudents([]);
+    setDivisionMap({});
   };
 
   return (
-    <div className="text-gray-900 dark:text-white">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold">Manage Academic Year</h2>
+    <div className="p-6 space-y-8 max-w-5xl mx-auto text-gray-900 dark:text-gray-100">
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-bold flex items-center gap-2">
+          <CalendarDays className="w-6 h-6 text-blue-600" /> Academic Year Settings
+        </h2>
         <button
           onClick={onBackPressed}
-          className="text-sm px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          className="flex items-center gap-2 text-sm px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded"
         >
-          ← Back to Dashboard
+          <ChevronLeft className="w-4 h-4" /> Back
         </button>
       </div>
 
-      {loading ? (
-        <p>Loading academic year...</p>
-      ) : (
-        <div className="mb-6 p-5 rounded-xl bg-white dark:bg-customDarkFg">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-green-700 dark:text-green-300">
-              Current Academic Year:
-            </h3>
+      {activeSection === "dashboard" && (
+        <>
+          {/* Year section */}
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-sm">
+            <h3 className="text-xl font-semibold mb-4">📅 Current Academic Year</h3>
             {editing ? (
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-3 items-center">
                 <input
                   value={newYear}
                   onChange={(e) => setNewYear(e.target.value)}
-                  className="px-3 py-1 border rounded text-black"
+                  className="border border-gray-300 dark:border-gray-600 rounded px-4 py-2 text-black w-40"
                   placeholder="e.g., 2025-26"
                 />
                 <button
                   onClick={handleUpdateYear}
-                  className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
                 >
                   Save
                 </button>
                 <button
                   onClick={() => setEditing(false)}
-                  className="text-red-500 hover:underline text-sm"
+                  className="text-red-500 text-sm hover:underline"
                 >
                   Cancel
                 </button>
               </div>
             ) : (
-              <div className="flex gap-4 items-center">
-                <span className="text-lg">{year}</span>
+              <div className="flex gap-4 items-center text-xl">
+                <span>{year}</span>
                 <button
                   onClick={() => {
                     setNewYear(year);
                     setEditing(true);
                   }}
-                  className="text-blue-600 hover:underline text-sm"
+                  className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
                 >
-                  Edit
+                  <Pencil size={16} /> Edit
                 </button>
               </div>
             )}
           </div>
+
+          {/* Action Sections */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <div
+              onClick={() => {
+                setConfirmType("promote");
+                setShowConfirm(true);
+              }}
+              className="cursor-pointer h-full bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-6 rounded-xl shadow hover:bg-blue-100 dark:hover:bg-blue-900 transition flex flex-col justify-between"
+            >
+              <h4 className="text-lg font-semibold flex items-center gap-2 text-blue-700">
+                <Upload size={20} /> Promote Students
+              </h4>
+              <p className="text-sm mt-2 text-gray-600 dark:text-gray-300">
+                Move students to the next class for the new academic year.
+              </p>
+            </div>
+
+            <div
+              onClick={() => {
+                setConfirmType("shuffle");
+                setShowConfirm(true);
+              }}
+              className="cursor-pointer h-full bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 p-6 rounded-xl shadow hover:bg-purple-100 dark:hover:bg-purple-900 transition flex flex-col justify-between"
+            >
+              <h4 className="text-lg font-semibold flex items-center gap-2 text-purple-700">
+                <Shuffle size={20} /> Shuffle Divisions
+              </h4>
+              <p className="text-sm mt-2 text-gray-600 dark:text-gray-300">
+                Automatically shuffle students into new divisions.
+              </p>
+            </div>
+
+            <div
+              onClick={() => setShowClearModal(true)}
+              className="cursor-pointer h-full bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-6 rounded-xl shadow hover:bg-red-100 dark:hover:bg-red-900 transition flex flex-col justify-between"
+            >
+              <h4 className="text-lg font-semibold flex items-center gap-2 text-red-700">
+                <Trash2 size={20} /> Clear Old Data
+              </h4>
+              <p className="text-sm mt-2 text-gray-600 dark:text-gray-300">
+                Wipe attendance, marks, or messages from last year.
+              </p>
+            </div>
+
+            <div
+              onClick={() => setActiveSection("manual")}
+              className="cursor-pointer h-full bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 p-6 rounded-xl shadow hover:bg-green-100 dark:hover:bg-green-900 transition flex flex-col justify-between"
+            >
+              <h4 className="text-lg font-semibold flex items-center gap-2 text-green-700">
+                🧑‍🏫 Manual Division Allotment
+              </h4>
+              <p className="text-sm mt-2 text-gray-600 dark:text-gray-300">
+                Manually assign students to divisions for each class.
+              </p>
+            </div>
+          </div>
+        </>
+      )}
+
+      {activeSection === "manual" && (
+        <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-sm">
+          <h3 className="text-xl font-semibold mb-4">🧑‍🏫 Manual Division Allotment</h3>
+          <div className="mb-4">
+            <label className="block mb-1 text-sm font-medium">Select Class</label>
+            <select
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+              className="border border-gray-300 dark:border-gray-600 px-3 py-2 rounded w-full text-black"
+            >
+              <option value="">-- Select --</option>
+              {classOptions.map((cls) => (
+                <option key={cls} value={cls}>
+                  {cls}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {students.length > 0 && (
+            <table className="w-full text-left mt-4 border-t border-gray-300 dark:border-gray-700">
+              <thead>
+                <tr className="bg-gray-100 dark:bg-gray-700">
+                  <th className="py-2 px-3">Student</th>
+                  <th className="py-2 px-3">Division</th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.map((stu) => (
+                  <tr key={stu._id} className="border-t border-gray-200 dark:border-gray-600">
+                    <td className="py-2 px-3">{stu.fullName}</td>
+                    <td className="py-2 px-3">
+                      <select
+                        value={divisionMap[stu._id] || ""}
+                        onChange={(e) =>
+                          handleDivisionChange(stu._id, e.target.value)
+                        }
+                        className="border px-2 py-1 rounded text-black w-full"
+                      >
+                        <option value="">-- Select --</option>
+                        {divisionOptions.map((div) => (
+                          <option key={div} value={div}>
+                            {div}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          <button onClick={goBack} className="mt-6 text-sm underline text-gray-600">
+            Back
+          </button>
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <button
-          onClick={handlePromote}
-          className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition"
-        >
-          Promote All Students
-        </button>
-        <button
-          onClick={handleShuffle}
-          className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition"
-        >
-          Shuffle Divisions
-        </button>
-        <button
-          onClick={handleClearData}
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
-        >
-          Clear Old Data
-        </button>
-      </div>
+      {showClearModal && (
+        <Modal title="🧹 Clear Data Options" onClose={() => setShowClearModal(false)}>
+          <div className="space-y-4">
+            {Object.keys(clearOptions).map((key) => (
+              <label key={key} className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={clearOptions[key]}
+                  onChange={(e) =>
+                    setClearOptions((prev) => ({
+                      ...prev,
+                      [key]: e.target.checked,
+                    }))
+                  }
+                  className="form-checkbox h-4 w-4 text-blue-600"
+                />
+                <span className="capitalize">{key}</span>
+              </label>
+            ))}
+            <div className="flex justify-end gap-3 pt-4">
+              <button
+                onClick={handleClearData}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+              >
+                Clear
+              </button>
+              <button
+                onClick={() => setShowClearModal(false)}
+                className="border px-4 py-2 rounded text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
-      <div className="mt-8 text-sm text-gray-600 dark:text-gray-400">
-        <p>
-          <strong>Note:</strong> These actions impact the structure of your
-          academic data. Promotion will move all students to the next class, and
-          old class records will be retained unless cleared manually.
-        </p>
-      </div>
+      {showConfirm && (
+        <ConfirmActionModal
+          title={
+            confirmType === "promote"
+              ? "Confirm Promotion"
+              : "Confirm Division Shuffle"
+          }
+          message={
+            confirmType === "promote"
+              ? "Are you sure you want to promote all students? This action is final."
+              : "Are you sure you want to shuffle divisions? This action is final."
+          }
+          onConfirm={handleConfirm}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
     </div>
   );
 };
