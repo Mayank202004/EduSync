@@ -342,6 +342,12 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
                   attachments,
                 });
               }}
+              onSendMeetingInvitation={(meetingId) =>{
+                socket.emit("sendMessage",{
+                  chatId: selectedChat.chatId,
+                  meetingId
+                })
+              }}
               onMoreClick={() => console.log("More clicked")}
             />
           </div>

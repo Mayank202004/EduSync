@@ -52,8 +52,6 @@ const ChatCard = ({
   const [previewDetails, setPreviewDetails] = useState(null);
   const [showMeetingOptions, setShowMeetingOptions] = useState(false);
 
-  console.log(`participants are ${participants.length}`);
-  console.log(`online users length ${onlineUsers.length}`);
 
   // Setting initial message
   useEffect(() => {

@@ -13,7 +13,7 @@ export const setupChatSocket = (io, socket, user) => {
 
     socket.join(`user-${user._id}`); // personal notification room To Do: remove this later if not needed
 
-    socket.on("sendMessage", async ({ chatId, content, attachments = [] }) => {
+    socket.on("sendMessage", async ({ chatId, content, attachments = [], meetingId}) => {
       // Encrypt content
       const encryptedContent =
       typeof content === "string" && content.trim().length > 0
@@ -25,6 +25,7 @@ export const setupChatSocket = (io, socket, user) => {
         sender: user._id,
         content: encryptedContent,
         attachments,
+        meetingId
       });
     
       // 2. Emit message to chat room
