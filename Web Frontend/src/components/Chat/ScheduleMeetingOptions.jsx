@@ -21,7 +21,7 @@ function ScheduleMeetingOptions({ onSubmit, onClose }) {
 
 
   return (
-    <div className="px-4 pt-2 pb-3">
+    <div className="px-4 pt-2 pb-3 shrink-0">
       <div className="rounded-lg bg-white dark:bg-gray-800 p-4 shadow-lg border w-full">
         <div className="flex justify-between items-center mb-2">
           <p className="font-medium text-gray-800 dark:text-gray-200">Schedule a Meeting</p>
@@ -51,7 +51,7 @@ function ScheduleMeetingOptions({ onSubmit, onClose }) {
               type="datetime-local"
               value={scheduledTime}
               onChange={(e) => setScheduledTime(e.target.value)}
-              className="border rounded p-2 dark:bg-gray-700 dark:text-white"
+              className="border rounded p-2 dark:bg-gray-700 dark:text-white text-black"
               min={new Date().toISOString().slice(0, 16)} // restrict to future time
             />
             <div className="flex gap-2">

@@ -20,6 +20,7 @@ import toast from "react-hot-toast";
 import useDebouncedTyping from "@/hooks/useDebouncedTyping";
 import ImagePreview from "./ImagePreview";
 import ScheduleMeetingOptions from "./ScheduleMeetingOptions";
+import { useNavigate } from "react-router-dom";
 
 const ChatCard = ({
   chatName = "Team Chat",
@@ -41,6 +42,7 @@ const ChatCard = ({
 }) => {
   const messagesEndRef = useRef(null);
   const { socket } = useSocket();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState(initialMessages);
   const [inputValue, setInputValue] = useState(""); // Used to track input value (Message typed)
   const [attachments, setAttachments] = useState([]); // Used to track/set attachments
@@ -74,7 +76,7 @@ const ChatCard = ({
         message.type === "now" &&
         message.sender?._id === currentUser._id
       ) {
-        navigate(`/meeting/${message.meeting}`); // Instantly open meeting if (sender is the receiver and type is now)
+        navigate(`/meeting/${message.meetingId}`); // Instantly open meeting if (sender is the receiver and type is now)
       }
     };
     socket.on("receiveMessage", handleIncoming);

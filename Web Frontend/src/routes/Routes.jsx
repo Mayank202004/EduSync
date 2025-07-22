@@ -16,7 +16,7 @@ const routes = createRoutesFromElements(
   <>
     <Route path="/login" element={<Login />} />
 
-    <Route path="/meeting" element={<ProtectedRoute><MeetingPage /></ProtectedRoute>} />
+    <Route path="/meeting/:meetingId" element={<ProtectedRoute><MeetingPage /></ProtectedRoute>} />
 
     {/* Protect all routes under Layout at once */}
     <Route element={<ProtectedRoute><App /></ProtectedRoute>}>

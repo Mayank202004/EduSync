@@ -5,10 +5,12 @@ import ControlsBar from "@/components/Meeting/ControlsBar";
 import useWebRTC from "@/hooks/useWebRTC";
 import { useSocket } from "@/context/SocketContext";
 import { useAuth } from "@/context/AuthContext";
+import { useParams } from "react-router-dom";
 
 export default function MeetingPage() {
   const { socket } = useSocket(); 
   const { user} = useAuth();
+  const { meetingId } = useParams();
   const CurrentUser={_id:user?._id,fullName:user?.fullName,avatar:user?.avatar};
 
   const {
@@ -23,7 +25,7 @@ export default function MeetingPage() {
     screen,
     raiseHand,
     handRaised
-  } = useWebRTC(socket, "your-room-id", CurrentUser);
+  } = useWebRTC(socket, meetingId, CurrentUser);
 
   const [showParticipants, setShowParticipants] = useState(false);
   const [showHostControls, setShowHostControls] = useState(false);
