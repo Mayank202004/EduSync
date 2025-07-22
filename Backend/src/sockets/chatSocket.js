@@ -2,6 +2,7 @@
 import { Message } from "../models/messages.model.js";
 import { Chat } from "../models/chat.model.js";
 import { encrypt } from "../utils/encryptionUtil.js";
+import { generateMeetingId } from "../utils/meetingUtil.js";
 
 const onlineUsers = {};  // userId → socketId
 
@@ -13,7 +14,7 @@ export const setupChatSocket = (io, socket, user) => {
 
     socket.join(`user-${user._id}`); // personal notification room To Do: remove this later if not needed
 
-    socket.on("sendMessage", async ({ chatId, content, attachments = [], meetingId}) => {
+    socket.on("sendMessage", async ({ chatId, content, attachments = []}) => {
       // Encrypt content
       const encryptedContent =
       typeof content === "string" && content.trim().length > 0
@@ -24,8 +25,7 @@ export const setupChatSocket = (io, socket, user) => {
         chat: chatId,
         sender: user._id,
         content: encryptedContent,
-        attachments,
-        meetingId
+        attachments
       });
     
       // 2. Emit message to chat room
@@ -67,6 +67,74 @@ export const setupChatSocket = (io, socket, user) => {
         }
       }
     });
+
+
+    socket.on("sendMeetingInvitation", async ({ chatId, content, type }) => {
+      try {
+        const encryptedContent = typeof content === "string" && content.trim().length > 0
+            ? encrypt(content)
+            : "";
+
+        const meetingId = generateMeetingId();
+        console.log(`Generated MEetingId : ${meetingId}}`)
+      
+        // Save meeting message to DB
+        const newMessage = await Message.create({
+          chat: chatId,
+          sender: user._id,
+          content: encryptedContent,
+          meetingId
+        });
+        console.log(newMessage)
+      
+        // 3. Emit message to chat room
+        io.to(`chat-${chatId}`).emit("receiveMeetingInvitation", {
+          chatId,
+          content, // decrypted version for frontend
+          sender: user,
+          updatedAt: Date.now(),
+          meetingId,
+          type: type,
+        });
+      
+        // 4. Fetch chat participants
+        const chat = await Chat.findById(chatId).populate("participants", "_id");
+      
+        if (chat && Array.isArray(chat.participants)) {
+          const updates = {};
+        
+          for (const participant of chat.participants) {
+            const id = participant._id.toString();
+          
+            if (id !== user._id.toString()) {
+              updates[`unreadCounts.${id}`] = 1;
+            
+              io.to(`user-${id}`).emit("notifyNewMessage", {
+                chatId,
+                from: {
+                  _id: user._id,
+                  name: user.fullName,
+                  avatar: user.avatar,
+                  role: user.role,
+                },
+                preview: content.slice(0, 100),
+                type: "meeting",
+              });
+            }
+          }
+        
+          // 5. Update unread counts
+          if (Object.keys(updates).length > 0) {
+            await Chat.findByIdAndUpdate(chatId, {
+              $inc: updates,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error handling sendMeetingInvitation:", error);
+      }
+    });
+
 
 
     socket.on("joinChat", async ({ chatId }) => {
