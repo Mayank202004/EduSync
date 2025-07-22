@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import useClickOutside from "@/hooks/useClickOutside";
 import ChatCard from "@/components/Chat/chat-card";
 import { getOrCreatePersonalChat } from "@/services/chatService";
+import toast from "react-hot-toast";
 
 const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
   const { unreadCounts, setUnreadCounts, socket, activeChatId, setActiveChat } = useSocket();
@@ -342,13 +343,18 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
                   attachments,
                 });
               }}
-              onSendMeetingInvitation={(meetingId) =>{
-                socket.emit("sendMessage",{
-                  chatId: selectedChat.chatId,
-                  meetingId
-                })
+              onSendMeetingInvitation={(type,content) =>{
+                try {
+                  console.log("Emmiting meeting invitation send");
+                  socket.emit("sendMeetingInvitation", {
+                    chatId: selectedChat.chatId,
+                    content,
+                    type, // "now" or "later"
+                  });
+                } catch (err) {
+                  toast.error(err.message);
+                }
               }}
-              onMoreClick={() => console.log("More clicked")}
             />
           </div>
         </div>

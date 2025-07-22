@@ -8,7 +8,6 @@ import {
   Paperclip,
   VideoIcon,
   Video,
-  X
 } from "lucide-react";
 import { faEye } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,6 +19,7 @@ import Typing from "./Typing";
 import toast from "react-hot-toast";
 import useDebouncedTyping from "@/hooks/useDebouncedTyping";
 import ImagePreview from "./ImagePreview";
+import ScheduleMeetingOptions from "./ScheduleMeetingOptions";
 
 const ChatCard = ({
   chatName = "Team Chat",
@@ -36,8 +36,7 @@ const ChatCard = ({
     avatar: null,
   },
   onSendMessage = () => {},
-  onReaction = () => {},
-  onMoreClick = () => {},
+  onSendMeetingInvitation = () => {},
   className,
 }) => {
   const messagesEndRef = useRef(null);
@@ -50,7 +49,7 @@ const ChatCard = ({
   const [typingUsers, setTypingUsers] = useState([]); // Used to track all users data those are typing currently
   const chatMessagesRef = useRef(null); // used to track messages scroll value
   const [previewDetails, setPreviewDetails] = useState(null);
-  const [showMeetingOptions, setShowMeetingOptions] = useState(false);
+  const [showScheduleMeetingOptions, setShowScheduleMeetingOptions] = useState(false);
 
 
   // Setting initial message
@@ -67,8 +66,23 @@ const ChatCard = ({
         setMessages((prev) => [...prev, message]);
       }
     };
+
+    const handleIncomingMeetingInvitation = (message) => {
+      if (message.chatId !== chatId) return;
+      setMessages((prev) => [...prev, message]);
+      if (
+        message.type === "now" &&
+        message.sender?._id === currentUser._id
+      ) {
+        navigate(`/meeting/${message.meeting}`); // Instantly open meeting if (sender is the receiver and type is now)
+      }
+    };
     socket.on("receiveMessage", handleIncoming);
-    return () => socket.off("receiveMessage", handleIncoming);
+    socket.on("receiveMeetingInvitation", handleIncomingMeetingInvitation);
+    return () => {
+      socket.off("receiveMessage", handleIncoming);
+      socket.off("receiveMeetingInvitation", handleIncomingMeetingInvitation);
+    }
   }, [socket, chatId, currentUser._id]);
 
   // Listen to socket events
@@ -186,6 +200,11 @@ const ChatCard = ({
     }
   };
 
+  const handleSendMeetingInvitation = async (type,content) => {
+    onSendMeetingInvitation(type, content);
+  };
+
+
   const handleTypingDebounced = useDebouncedTyping(socket, chatId, {
     _id: currentUser._id,
     fullName: currentUser.fullName,
@@ -275,8 +294,8 @@ const ChatCard = ({
               </p>
             </div>
           </div>
-          <button className="more-btn p-2" onClick={() => setShowMeetingOptions(!showMeetingOptions)}>
-            <Video className="w-5 h-5 text-gray-300" />
+          <button className="more-btn p-2" onClick={() => setShowScheduleMeetingOptions(!showScheduleMeetingOptions)}>
+            <Video className="w-5 h-5 text-gray-500 dark:text-gray-300" />
           </button>
         </div>
         <div className="flex flex-col flex-grow min-h-0">
@@ -326,6 +345,25 @@ const ChatCard = ({
                         {message.content}
                       </p>
                     )}
+
+                    {/* Meeting Invitation */}
+                    {message.meetingId && (
+                      <div className="mt-2 p-3 bg-blue-100 dark:bg-blue-900 rounded-lg shadow border dark:border-blue-700 sm:items-center sm:justify-between gap-3">
+                        <h3 className="text-sm font-semibold mb-2 text-black dark:text-white">Invitation for Video Meeting</h3>
+                        <div className="flex flex-col sm:flex-row">
+                          <div className="text-sm text-gray-900 dark:text-blue-100 font-medium">
+                            Meeting ID: <span className="font-mono">{message.meetingId}</span>
+                          </div>
+                          <button
+                            onClick={() => navigate(`/meeting/${message.meetingId}`)}
+                            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-md text-sm font-medium transition"
+                            >
+                            Join Meeting
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
 
                     {/* Message Attachments */}
                     {message.attachments?.length > 0 && (
@@ -484,39 +522,10 @@ const ChatCard = ({
               </div>
             )}
 
-            {/* Show meeting Options */}
-                {showMeetingOptions && (
-                  <div className="px-4 pt-2 pb-3 ">
-                    <div className="rounded-lg bg-white dark:bg-gray-800 p-4 shadow-lg border w-full">
-                      <div className="flex justify-between items-center mb-2">
-                        <p className="font-medium text-gray-800 dark:text-gray-200">Schedule a Meeting</p>
-                        <button onClick={()=>setShowMeetingOptions(false)}>
-                          <X className="w-5 h-5 text-gray-800 dark:text-gray-200" />
-                        </button>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <button
-                          onClick={() => {
-                            handleSendMeetingInvitation("now");
-                            setShowMeetingOptions(false);
-                          }}
-                          className="bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded"
-                        >
-                          Start Instantly
-                        </button>
-                        <button
-                          onClick={() => {
-                            handleSendMeetingInvitation("later", scheduledMeeting);
-                            setShowMeetingOptions(false);
-                          }}
-                          className="mt-2 bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded w-full"
-                        >
-                          Schedule for Later
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+            {/* Schedule meeting Options */}
+            {showScheduleMeetingOptions && (
+              <ScheduleMeetingOptions onSubmit={handleSendMeetingInvitation} onClose={() => setShowScheduleMeetingOptions(false)}/>
+            )}
           </div>
         </div>
 
