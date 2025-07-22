@@ -49,13 +49,13 @@ const AdminDashboard = () => {
 
   return (
     <div className="flex grow w-full h-screen bg-transparent">
-      <div className="w-[20%] border-r border-gray-200 dark:border-gray-700 h-full pb-10">
+      <div className="md:w-[30%] lg:w-[20%] border-r border-gray-200 dark:border-gray-700 h-full pb-10 hidden md:block">
         <LeftSidebar chatData={chats} setChatData={setChats} searchUsers={allUsers}/>
       </div>
-      <div className="w-[60%] p-4 overflow-y-auto">
+      <div className="w-full md:w-[70%] lg:w-[60%] p-4 overflow-y-auto">
         {renderMainContent()}
       </div>
-      <div className="w-[20%] border-l border-gray-200 dark:border-gray-700">
+      <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden lg:block">
         <RightSidebar />
       </div>
     </div>

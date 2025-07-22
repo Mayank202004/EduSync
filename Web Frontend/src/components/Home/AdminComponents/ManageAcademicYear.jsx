@@ -95,7 +95,7 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
   return (
     <div className="p-6 space-y-8 max-w-5xl mx-auto text-gray-900 dark:text-gray-100">
       <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-bold flex items-center gap-2">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
           <CalendarDays className="w-6 h-6 text-blue-600" /> Academic Year Settings
         </h2>
       </div>
@@ -109,7 +109,7 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
       {activeSection === "dashboard" && (
         <>
           {/* Year section */}
-          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-sm">
+          <div className="bg-gray-50 dark:bg-customDarkFg border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-sm">
             <h3 className="text-xl font-semibold mb-4">📅 Current Academic Year</h3>
             {editing ? (
               <div className="flex gap-3 items-center">
@@ -149,13 +149,13 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
           </div>
 
           {/* Action Sections */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-6 h-full">
             <div
               onClick={() => {
                 setConfirmType("promote");
                 setShowConfirm(true);
               }}
-              className="cursor-pointer h-full bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-6 rounded-xl shadow hover:bg-blue-100 dark:hover:bg-blue-900 transition flex flex-col justify-between"
+              className="cursor-pointer bg-blue-50 h-full min-h-30 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-6 rounded-xl shadow hover:bg-blue-100 dark:hover:bg-blue-900 transition flex flex-col justify-between"
             >
               <h4 className="text-lg font-semibold flex items-center gap-2 text-blue-700">
                 <Upload size={20} /> Promote Students
@@ -170,7 +170,7 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
                 setConfirmType("shuffle");
                 setShowConfirm(true);
               }}
-              className="cursor-pointer h-full bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 p-6 rounded-xl shadow hover:bg-purple-100 dark:hover:bg-purple-900 transition flex flex-col justify-between"
+              className="cursor-pointer h-full min-h-30 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 p-6 rounded-xl shadow hover:bg-purple-100 dark:hover:bg-purple-900 transition flex flex-col justify-between"
             >
               <h4 className="text-lg font-semibold flex items-center gap-2 text-purple-700">
                 <Shuffle size={20} /> Shuffle Divisions
@@ -182,7 +182,7 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
 
             <div
               onClick={() => setShowClearModal(true)}
-              className="cursor-pointer h-full bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-6 rounded-xl shadow hover:bg-red-100 dark:hover:bg-red-900 transition flex flex-col justify-between"
+              className="cursor-pointer h-full min-h-30 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-6 rounded-xl shadow hover:bg-red-100 dark:hover:bg-red-900 transition flex flex-col justify-between"
             >
               <h4 className="text-lg font-semibold flex items-center gap-2 text-red-700">
                 <Trash2 size={20} /> Clear Old Data
@@ -194,7 +194,7 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
 
             <div
               onClick={() => setActiveSection("manual")}
-              className="cursor-pointer h-full bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 p-6 rounded-xl shadow hover:bg-green-100 dark:hover:bg-green-900 transition flex flex-col justify-between"
+              className="cursor-pointer h-full min-h-30 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 p-6 rounded-xl shadow hover:bg-green-100 dark:hover:bg-green-900 transition flex flex-col justify-between"
             >
               <h4 className="text-lg font-semibold flex items-center gap-2 text-green-700">
                 🧑‍🏫 Manual Division Allotment
