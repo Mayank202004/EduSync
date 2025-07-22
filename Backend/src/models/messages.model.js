@@ -24,6 +24,14 @@ const chatMessageSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Chat",
     },
+    meeting: {
+      type: {
+        meetingId: { type: String, required: true },
+        createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+      default: null,
+    },
   },
   { timestamps: true }
 );
