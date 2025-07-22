@@ -6,6 +6,9 @@ import {
   Check,
   CheckCheck,
   Paperclip,
+  VideoIcon,
+  Video,
+  X
 } from "lucide-react";
 import { faEye } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -47,6 +50,7 @@ const ChatCard = ({
   const [typingUsers, setTypingUsers] = useState([]); // Used to track all users data those are typing currently
   const chatMessagesRef = useRef(null); // used to track messages scroll value
   const [previewDetails, setPreviewDetails] = useState(null);
+  const [showMeetingOptions, setShowMeetingOptions] = useState(false);
 
   console.log(`participants are ${participants.length}`);
   console.log(`online users length ${onlineUsers.length}`);
@@ -220,6 +224,7 @@ const ChatCard = ({
   // UI
   return (
     <>
+        {/* Image preview Modal */}
       {previewDetails && (
         <ImagePreview
           onClose={() => setPreviewDetails(null)}
@@ -244,6 +249,7 @@ const ChatCard = ({
           }
         />
       )}
+      {/* Actual Chat-Card Ui */}
       <div
         className={`chat-card w-full max-w-md mx-auto bg-customLightBg2 dark:bg-gray-900 text-white rounded-lg overflow-hidden h-135 flex flex-col ${className}`}
       >
@@ -271,8 +277,8 @@ const ChatCard = ({
               </p>
             </div>
           </div>
-          <button className="more-btn p-2" onClick={onMoreClick}>
-            <MoreHorizontal className="w-5 h-5 text-gray-300" />
+          <button className="more-btn p-2" onClick={() => setShowMeetingOptions(!showMeetingOptions)}>
+            <Video className="w-5 h-5 text-gray-300" />
           </button>
         </div>
         <div className="flex flex-col flex-grow min-h-0">
@@ -479,6 +485,40 @@ const ChatCard = ({
                 Uploading files...
               </div>
             )}
+
+            {/* Show meeting Options */}
+                {showMeetingOptions && (
+                  <div className="px-4 pt-2 pb-3 ">
+                    <div className="rounded-lg bg-white dark:bg-gray-800 p-4 shadow-lg border w-full">
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="font-medium text-gray-800 dark:text-gray-200">Schedule a Meeting</p>
+                        <button onClick={()=>setShowMeetingOptions(false)}>
+                          <X className="w-5 h-5 text-gray-800 dark:text-gray-200" />
+                        </button>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <button
+                          onClick={() => {
+                            handleSendMeetingInvitation("now");
+                            setShowMeetingOptions(false);
+                          }}
+                          className="bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded"
+                        >
+                          Start Instantly
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleSendMeetingInvitation("later", scheduledMeeting);
+                            setShowMeetingOptions(false);
+                          }}
+                          className="mt-2 bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded w-full"
+                        >
+                          Schedule for Later
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
           </div>
         </div>
 
