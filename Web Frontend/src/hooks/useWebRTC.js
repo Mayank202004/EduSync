@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { mediaConstraints } from "@/lib/webrtc/constraints";
 
 export default function useWebRTC(socket, roomId, currentUser) {
   const [participants, setParticipants] = useState([]);
@@ -16,10 +17,7 @@ export default function useWebRTC(socket, roomId, currentUser) {
 
     const startMedia = async () => {
       try {
-        localStream.current = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: true,
-        });
+        localStream.current = await navigator.mediaDevices.getUserMedia(mediaConstraints);
 
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = localStream.current;
@@ -41,12 +39,17 @@ export default function useWebRTC(socket, roomId, currentUser) {
         socket.emit("join-room", { roomId });
 
         socket.on("all-users", (users) => {
-          users.forEach(({ socketId, user }) => {
-            if (!peerConnections.current[socketId]) {
-              callUser(socketId, user);
-            }
-          });
+          console.log("Received all-users:", users.length);
+          if (users.length === 0) return;
+          setTimeout(() => {
+            users.forEach(({ socketId, user }) => {
+              if (!peerConnections.current[socketId]) {
+                callUser(socketId, user);
+              }
+            });
+          }, 500); // small delay gives browser time to stabilize
         });
+
 
         // DO NOT callUser here
         socket.on("user-joined", ({ socketId, user }) => {

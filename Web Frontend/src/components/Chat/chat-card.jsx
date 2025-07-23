@@ -357,22 +357,21 @@ const ChatCard = ({
                             Meeting ID: <span className="font-mono">{message.meeting?.meetingId}</span>
                           </div>
                           {/* Time Expiry Logic */}
-      {Date.now() - new Date(message.meeting.meetingTime).getTime() <= 24 * 60 * 60 * 1000 ? (
-        <button
-          onClick={() => navigate(`/meeting/${message.meeting.meetingId}`)}
-          className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-md text-sm font-medium transition"
-        >
-          Join Meeting
-        </button>
-      ) : (
-        <span className="text-sm text-red-600 dark:text-red-400 font-medium">
-          Meeting ID has expired
-        </span>
-      )}
+                          {Date.now() - new Date(message.meeting.meetingTime).getTime() <= 24 * 60 * 60 * 1000 ? (
+                            <button
+                              onClick={() => navigate(`/meeting/${message.meeting.meetingId}`)}
+                              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-md text-sm font-medium transition"
+                            >
+                              Join Meeting
+                            </button>
+                          ) : (
+                            <span className="text-sm text-red-600 dark:text-red-400 font-medium">
+                              Meeting ID has expired
+                            </span>
+                          )}
                         </div>
                       </div>
                     )}
-
 
                     {/* Message Attachments */}
                     {message.attachments?.length > 0 && (

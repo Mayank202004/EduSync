@@ -13,7 +13,6 @@ const VideoTile = ({ participant, pinned = false, setPinned = () => {} }) => {
     }
   }, [videoRef, participant?.stream]);
 
-  console.log(`participant participant`, participant);
 
 
 
