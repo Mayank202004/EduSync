@@ -343,13 +343,13 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
                   attachments,
                 });
               }}
-              onSendMeetingInvitation={(type,content) =>{
+              onSendMeetingInvitation={(type,content,meetingTime) =>{
                 try {
-                  console.log("Emmiting meeting invitation send");
                   socket.emit("sendMeetingInvitation", {
                     chatId: selectedChat.chatId,
                     content,
                     type, // "now" or "later"
+                    time:meetingTime
                   });
                 } catch (err) {
                   toast.error(err.message);

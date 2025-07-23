@@ -202,8 +202,8 @@ const ChatCard = ({
     }
   };
 
-  const handleSendMeetingInvitation = async (type,content) => {
-    onSendMeetingInvitation(type, content);
+  const handleSendMeetingInvitation = async (type,content, meetingTime) => {
+    onSendMeetingInvitation(type, content,meetingTime);
   };
 
 
@@ -349,19 +349,26 @@ const ChatCard = ({
                     )}
 
                     {/* Meeting Invitation */}
-                    {message.meetingId && (
+                    {message.meeting?.meetingId && (
                       <div className="mt-2 p-3 bg-blue-100 dark:bg-blue-900 rounded-lg shadow border dark:border-blue-700 sm:items-center sm:justify-between gap-3">
                         <h3 className="text-sm font-semibold mb-2 text-black dark:text-white">Invitation for Video Meeting</h3>
                         <div className="flex flex-col sm:flex-row">
                           <div className="text-sm text-gray-900 dark:text-blue-100 font-medium">
-                            Meeting ID: <span className="font-mono">{message.meetingId}</span>
+                            Meeting ID: <span className="font-mono">{message.meeting?.meetingId}</span>
                           </div>
-                          <button
-                            onClick={() => navigate(`/meeting/${message.meetingId}`)}
-                            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-md text-sm font-medium transition"
-                            >
-                            Join Meeting
-                          </button>
+                          {/* Time Expiry Logic */}
+      {Date.now() - new Date(message.meeting.meetingTime).getTime() <= 24 * 60 * 60 * 1000 ? (
+        <button
+          onClick={() => navigate(`/meeting/${message.meeting.meetingId}`)}
+          className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-md text-sm font-medium transition"
+        >
+          Join Meeting
+        </button>
+      ) : (
+        <span className="text-sm text-red-600 dark:text-red-400 font-medium">
+          Meeting ID has expired
+        </span>
+      )}
                         </div>
                       </div>
                     )}

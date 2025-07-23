@@ -24,9 +24,11 @@ const chatMessageSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Chat",
     },
-    meetingId:{
-      type: String,
-      default: null
+    meeting:{
+      type: {
+        meetingId: {type : String, required: true},
+        meetingTime: {type : Date, default: Date.now}
+      }
     }
   },
   { timestamps: true }

@@ -69,23 +69,25 @@ export const setupChatSocket = (io, socket, user) => {
     });
 
 
-    socket.on("sendMeetingInvitation", async ({ chatId, content, type }) => {
+    socket.on("sendMeetingInvitation", async ({ chatId, content, type, time=null}) => {
       try {
         const encryptedContent = typeof content === "string" && content.trim().length > 0
             ? encrypt(content)
             : "";
 
         const meetingId = generateMeetingId();
-        console.log(`Generated MEetingId : ${meetingId}}`)
+        const meetingTime = time ?? Date.now();
       
         // Save meeting message to DB
         const newMessage = await Message.create({
           chat: chatId,
           sender: user._id,
           content: encryptedContent,
-          meetingId
+          meeting:{
+            meetingId,
+            meetingTime: meetingTime
+          }
         });
-        console.log(newMessage)
       
         // 3. Emit message to chat room
         io.to(`chat-${chatId}`).emit("receiveMeetingInvitation", {

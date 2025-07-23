@@ -15,7 +15,7 @@ function ScheduleMeetingOptions({ onSubmit, onClose }) {
       const formattedDateTime = formatDateTime(meetingTime)
       messageContent = `Meeting scheduled on ${formattedDateTime}.`;
     }
-    onSubmit(type, messageContent); 
+    onSubmit(type, messageContent, meetingTime); 
     onClose();
   };
 
