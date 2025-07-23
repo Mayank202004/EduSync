@@ -1,4 +1,3 @@
-// pages/MeetingPage.jsx
 import { useState } from "react";
 import MeetingLayout from "@/components/Meeting/MeetingLayout";
 import ControlsBar from "@/components/Meeting/ControlsBar";
@@ -6,12 +5,16 @@ import useWebRTC from "@/hooks/useWebRTC";
 import { useSocket } from "@/context/SocketContext";
 import { useAuth } from "@/context/AuthContext";
 import { useParams } from "react-router-dom";
+import PreJoinScreen from "@/components/Meeting/PreJoiningScreen";
 
 export default function MeetingPage() {
   const { socket } = useSocket(); 
-  const { user} = useAuth();
+  const { user } = useAuth();
   const { meetingId } = useParams();
-  const CurrentUser={_id:user?._id,fullName:user?.fullName,avatar:user?.avatar};
+  const CurrentUser = { _id: user?._id, fullName: user?.fullName, avatar: user?.avatar };
+
+  // Manage hasJoined
+  const [hasJoined, setHasJoined] = useState(false);
 
   const {
     localVideoRef,
@@ -24,8 +27,8 @@ export default function MeetingPage() {
     cam,
     screen,
     raiseHand,
-    handRaised
-  } = useWebRTC(socket, meetingId, CurrentUser);
+    handRaised,
+  } = useWebRTC(socket, meetingId, CurrentUser, hasJoined); // pass hasJoined here
 
   const [showParticipants, setShowParticipants] = useState(false);
   const [showHostControls, setShowHostControls] = useState(false);
@@ -36,6 +39,21 @@ export default function MeetingPage() {
     setShowHostControls(false);
     setShowChat(false);
   };
+
+  // Pre-Joining Screen // To Do : Check on multi device (same device camera clash error)
+  // if (!hasJoined) {
+  //   return (
+  //     <PreJoinScreen
+  //       mic={mic}
+  //       cam={cam}
+  //       toggleMic={toggleMic}
+  //       toggleCam={toggleCam}
+  //       localVideoRef={localVideoRef}
+  //       onJoin={() => setHasJoined(true)}
+  //     />
+        
+  //   );
+  // }
 
   return (
     <div className="h-screen w-full bg-black text-white flex flex-col">
