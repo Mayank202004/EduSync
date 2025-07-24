@@ -142,14 +142,25 @@ export const updateTeacherSubjects = async (Id,position,subjects,classTeacher,cl
 }
 
 // = = = = = Manage Academic Year Api calls
+
 /**
- * @desc Update Academic Year 
- * @param {String} newYear - updated Academic Year
+ * @desc Fetch Manage acdemic year data
+ * @returns {Promise<Object<String<Academic Year>, Object<classesAndDiv>, Object<Students>>>}
+ */
+export const fetchManageAcademicYearData = async () => {
+    const response = await axiosInstance.get(`${BASEURL}/dashboard/academic-year`);
+    return response.data;
+}
+
+/**
+ * @desc Update academic year
+ * @param {String} newYear 
  * @returns {Promise} - promise resolving to success message
  */
 export const updateAcademicYear = async (newYear) => {
-    await axiosInstance.put(`${BASEURL}/setting/academic-year`,{newYear});
-};
+    await axiosInstance.put(`${BASEURL}/academic-year`,{newYear});
+}
+
 /**
  * @desc Promote all students to next class and unverify pass-outs
  * @returns {Promise} - promise resolving to success message

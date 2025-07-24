@@ -4,23 +4,23 @@ import Modal from "@/components/Modals/Modal";
 import ConfirmActionModal from "@/components/Modals/ConfirmationActionModal";
 import {
   CalendarDays,
-  ChevronLeft,
   Pencil,
   Trash2,
   Shuffle,
   Upload,
-  ArrowLeft
+  ArrowLeft,
 } from "lucide-react";
-import { updateAcademicYear, clearOldData, promoteStudents, shuffleDivisions} from "@/services/dashboardService";
+import {
+  fetchManageAcademicYearData,
+  updateAcademicYear,
+  clearOldData,
+  promoteStudents,
+  shuffleDivisions,
+} from "@/services/dashboardService";
 
-const dummyStudents = [
-  { _id: "1", fullName: "Alice Johnson" },
-  { _id: "2", fullName: "Bob Smith" },
-  { _id: "3", fullName: "Charlie Brown" },
-];
-
-const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
-  const [year, setYear] = useState(academicYear);
+const ManageAcademicYear = ({ onBackPressed }) => {
+  const [year, setYear] = useState(null);
+  const [newYear, setNewYear] = useState("");
   const [editing, setEditing] = useState(false);
   const [showClearModal, setShowClearModal] = useState(false);
   const [clearOptions, setClearOptions] = useState({
@@ -28,62 +28,115 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
     marks: false,
     messages: false,
   });
-
   const [selectedClass, setSelectedClass] = useState("");
+  const [allStudents, setAllStudents] = useState([]);
   const [students, setStudents] = useState([]);
   const [divisionMap, setDivisionMap] = useState({});
-
   const [activeSection, setActiveSection] = useState("dashboard");
-
   const [showConfirm, setShowConfirm] = useState(false);
-  const [confirmType, setConfirmType] = useState(null); // 'promote' | 'shuffle'
+  const [confirmType, setConfirmType] = useState(null);
+  const [classes, setClasses] = useState([]);
+  const [divisionOptions, setDivisionOptions] = useState([]);
 
-  const classOptions = ["Class 1", "Class 2", "Class 3"];
-  const divisionOptions = ["A", "B", "C"];
+  const classOptions = classes.map((cls) => cls.className);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const response = await fetchManageAcademicYearData();
+        setYear(response.data?.academicYear);
+        setNewYear(response.data?.academicYear);
+        setClasses(response.data?.classesAndDivs || []);
+        setAllStudents(response.data?.students || []);
+      } catch (err) {
+        // Handled by interceptor
+      }
+    };
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedClass) {
+      setDivisionOptions([]);
+      setStudents([]);
+      return;
+    }
+
+    const filteredStudents = allStudents.filter(
+      (stu) => stu.class === selectedClass
+    );
+    setStudents(filteredStudents);
+    console.log(filteredStudents);
+
+    const matchedClass = classes.find(
+      (cls) => cls.className === selectedClass
+    );
+    setDivisionOptions(matchedClass?.divisions || []);
+  }, [selectedClass, allStudents, classes]);
 
   const handleUpdateYear = async () => {
-    if (!year.trim()) return toast.error("Academic year cannot be empty.");
+    if (!newYear.trim()) return toast.error("Academic year cannot be empty.");
     try {
-      const response = await toast.promise(
-        updateAcademicYear(newYear),
-        {
-          loading: "Updating Acadeic Year",
-          success: "Academic Year Updated",
-          error: "",
-        }
-      );
+      await toast.promise(updateAcademicYear(newYear), {
+        loading: "Updating Academic Year...",
+        success: "Academic Year Updated",
+        error: "Failed to update year",
+      });
+      setYear(newYear);
+      setEditing(false);
     } catch (err) {
-      // axios error handled by interceptor
+      // Handled by interceptor
     }
-    setEditing(false);
   };
 
-  const handleClearData = () => {
+  const handleClearData = async () => {
     const selected = Object.keys(clearOptions).filter((k) => clearOptions[k]);
     if (!selected.length) return toast.error("Select something to clear");
-    toast.success("Data cleared: " + selected.join(", "));
-    setShowClearModal(false);
+    try {
+      await toast.promise(clearOldData(selected), {
+        loading: "Clearing Data...",
+        success: `Data cleared: ${selected.join(", ")}`,
+        error: "Failed to clear data",
+      });
+      setShowClearModal(false);
+    } catch (err) {
+      // axios interceptor handles errors
+    }
   };
 
   const handleDivisionChange = (id, division) => {
     setDivisionMap((prev) => ({ ...prev, [id]: division }));
   };
 
-  const handleConfirm = () => {
+  const handlePromoteStudents = async () => {
+    try {
+      await toast.promise(promoteStudents(), {
+        loading: "Promoting Students...",
+        success: "Students promoted",
+        error: "Promotion failed",
+      });
+    } catch (err) {}
+  };
+
+  const handleShuffleDivisions = async () => {
+    try {
+      await toast.promise(shuffleDivisions(), {
+        loading: "Shuffling Divisions...",
+        success: "Divisions shuffled",
+        error: "Shuffle failed",
+      });
+    } catch (err) {}
+  };
+
+  const handleConfirm = async () => {
     if (confirmType === "promote") {
-      toast.success("Students promoted!");
+      await handlePromoteStudents();
     } else if (confirmType === "shuffle") {
-      toast.success("Divisions shuffled!");
+      await handleShuffleDivisions();
     }
     setShowConfirm(false);
     setConfirmType(null);
   };
-
-  useEffect(() => {
-    if (selectedClass) {
-      setStudents(dummyStudents);
-    }
-  }, [selectedClass]);
 
   const goBack = () => {
     setActiveSection("dashboard");
@@ -96,26 +149,27 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
     <div className="p-6 space-y-8 max-w-5xl mx-auto text-gray-900 dark:text-gray-100">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold flex items-center gap-2">
-          <CalendarDays className="w-6 h-6 text-blue-600" /> Academic Year Settings
+          <CalendarDays className="w-6 h-6 text-blue-600" />
+          Academic Year Settings
         </h2>
       </div>
+
       <button
-          onClick={onBackPressed}
-          className="flex items-center gap-2 text-blue-600 hover:underline"
-        >
-          <ArrowLeft size={18} /> Back
+        onClick={onBackPressed}
+        className="flex items-center gap-2 text-blue-600 hover:underline"
+      >
+        <ArrowLeft size={18} /> Back
       </button>
 
       {activeSection === "dashboard" && (
         <>
-          {/* Year section */}
           <div className="bg-gray-50 dark:bg-customDarkFg border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-sm">
             <h3 className="text-xl font-semibold mb-4">📅 Current Academic Year</h3>
             {editing ? (
               <div className="flex gap-3 items-center">
                 <input
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
+                  value={newYear}
+                  onChange={(e) => setNewYear(e.target.value)}
                   className="border border-gray-300 dark:border-gray-600 rounded px-4 py-2 text-black w-40"
                   placeholder="e.g., 2025-26"
                 />
@@ -136,10 +190,7 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
               <div className="flex gap-4 items-center text-xl">
                 <span>{year}</span>
                 <button
-                  onClick={() => {
-                    setYear(year);
-                    setEditing(true);
-                  }}
+                  onClick={() => setEditing(true)}
                   className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
                 >
                   <Pencil size={16} /> Edit
@@ -148,14 +199,14 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
             )}
           </div>
 
-          {/* Action Sections */}
-          <div className="grid md:grid-cols-2 gap-6 h-full">
+          {/* Action Boxes */}
+          <div className="grid md:grid-cols-2 gap-6">
             <div
               onClick={() => {
                 setConfirmType("promote");
                 setShowConfirm(true);
               }}
-              className="cursor-pointer bg-blue-50 h-full min-h-30 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-6 rounded-xl shadow hover:bg-blue-100 dark:hover:bg-blue-900 transition flex flex-col justify-between"
+              className="cursor-pointer bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 p-6 rounded-xl shadow hover:bg-blue-100 dark:hover:bg-blue-900 transition"
             >
               <h4 className="text-lg font-semibold flex items-center gap-2 text-blue-700">
                 <Upload size={20} /> Promote Students
@@ -170,7 +221,7 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
                 setConfirmType("shuffle");
                 setShowConfirm(true);
               }}
-              className="cursor-pointer h-full min-h-30 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 p-6 rounded-xl shadow hover:bg-purple-100 dark:hover:bg-purple-900 transition flex flex-col justify-between"
+              className="cursor-pointer bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-800 p-6 rounded-xl shadow hover:bg-purple-100 dark:hover:bg-purple-900 transition"
             >
               <h4 className="text-lg font-semibold flex items-center gap-2 text-purple-700">
                 <Shuffle size={20} /> Shuffle Divisions
@@ -182,7 +233,7 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
 
             <div
               onClick={() => setShowClearModal(true)}
-              className="cursor-pointer h-full min-h-30 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-6 rounded-xl shadow hover:bg-red-100 dark:hover:bg-red-900 transition flex flex-col justify-between"
+              className="cursor-pointer bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-6 rounded-xl shadow hover:bg-red-100 dark:hover:bg-red-900 transition"
             >
               <h4 className="text-lg font-semibold flex items-center gap-2 text-red-700">
                 <Trash2 size={20} /> Clear Old Data
@@ -194,7 +245,7 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
 
             <div
               onClick={() => setActiveSection("manual")}
-              className="cursor-pointer h-full min-h-30 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 p-6 rounded-xl shadow hover:bg-green-100 dark:hover:bg-green-900 transition flex flex-col justify-between"
+              className="cursor-pointer bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 p-6 rounded-xl shadow hover:bg-green-100 dark:hover:bg-green-900 transition"
             >
               <h4 className="text-lg font-semibold flex items-center gap-2 text-green-700">
                 🧑‍🏫 Manual Division Allotment
@@ -220,7 +271,7 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
               <option value="">-- Select --</option>
               {classOptions.map((cls) => (
                 <option key={cls} value={cls}>
-                  {cls}
+                  Class {cls}
                 </option>
               ))}
             </select>
@@ -237,7 +288,7 @@ const ManageAcademicYear = ({ onBackPressed, academicYear="Not Set"}) => {
               <tbody>
                 {students.map((stu) => (
                   <tr key={stu._id} className="border-t border-gray-200 dark:border-gray-600">
-                    <td className="py-2 px-3">{stu.fullName}</td>
+                    <td className="py-2 px-3">{stu.userId?.fullName || "N/A"}</td>
                     <td className="py-2 px-3">
                       <select
                         value={divisionMap[stu._id] || ""}

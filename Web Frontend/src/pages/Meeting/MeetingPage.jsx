@@ -41,19 +41,19 @@ export default function MeetingPage() {
   };
 
   // Pre-Joining Screen // To Do : Check on multi device (same device camera clash error)
-  // if (!hasJoined) {
-  //   return (
-  //     <PreJoinScreen
-  //       mic={mic}
-  //       cam={cam}
-  //       toggleMic={toggleMic}
-  //       toggleCam={toggleCam}
-  //       localVideoRef={localVideoRef}
-  //       onJoin={() => setHasJoined(true)}
-  //     />
+  if (!hasJoined) {
+    return (
+      <PreJoinScreen
+        mic={mic}
+        cam={cam}
+        toggleMic={toggleMic}
+        toggleCam={toggleCam}
+        localVideoRef={localVideoRef}
+        onJoin={() => setHasJoined(true)}
+      />
         
-  //   );
-  // }
+    );
+  }
 
   return (
     <div className="h-screen w-full bg-black text-white flex flex-col">
