@@ -8,5 +8,6 @@ router.get("/student",verifyJWT,verifyStudent,DashboardController.fetchDashboard
 router.get("/teacher",verifyJWT,verifyTeacher,DashboardController.fetchTeacherDashboardData);
 router.get("/super-admin",verifyJWT,verifySuperAdmin,DashboardController.fetchSuperAdminDashboardData);
 router.post("/cleanup",verifyJWT,verifySuperAdmin,DashboardController.performSelectiveCleanup);
+router.get("/academic-year",verifyJWT,verifySuperAdmin,DashboardController.manageAcademicYearData);
 
 export default router;

@@ -8,7 +8,8 @@ import { clearMessages } from "./chats.controller.js";
 import { deleteAllTickets } from "./ticket.controller.js";
 import { deleteAllStudentFeeStatuses } from "./paidFee.controller.js";
 import { getSettingValue } from "./setting.controller.js";
-
+import { ClassStructure } from "../models/classStructure.model.js";
+import { Student } from "../models/student.model.js";
 
 export const fetchDashboardData = asyncHandler(async (req, res) => {
     const user = req.user;
@@ -64,4 +65,19 @@ export const performSelectiveCleanup = asyncHandler(async (req, res) => {
   }catch(error){
     throw new ApiError(error.statusCode || 500, error.message || "Something went wrong");
   }
+});
+
+/**
+ * @desc Fetch academic year data for the dashboard
+ * @route GET /api/v1/dashboard/academic-year
+ * @access Private (Super Admin)
+ */
+export const manageAcademicYearData = asyncHandler(async (_, res) => {
+  const academicYear = await getSettingValue("academicYear");
+  const classesAndDivs = await ClassStructure.find().select("className divisions");  // <-- FIXED
+  const students = await Student.find().select("_id userId class div").populate("userId", "fullName");
+  
+  return res.status(200).json(
+    new ApiResponse(200, { academicYear, classesAndDivs, students }, "Academic Year Data Fetched")
+  );
 });
