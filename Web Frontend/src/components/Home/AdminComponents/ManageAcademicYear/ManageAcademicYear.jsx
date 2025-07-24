@@ -26,9 +26,11 @@ const ManageAcademicYear = ({ onBackPressed }) => {
   const [showClearModal, setShowClearModal] = useState(false);
   const [clearOptions, setClearOptions] = useState({
     attendance: false,
-    marks: false,
+    feeStatus: false,
     messages: false,
+    tickets: false,
   });
+  
   const [activeSection, setActiveSection] = useState("dashboard");
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmType, setConfirmType] = useState(null);
@@ -68,19 +70,27 @@ const ManageAcademicYear = ({ onBackPressed }) => {
   };
 
   const handleClearData = async () => {
-    const selected = Object.keys(clearOptions).filter((k) => clearOptions[k]);
-    if (!selected.length) return toast.error("Select something to clear");
+    const { attendance, feeStatus, messages, tickets } = clearOptions;
+
+    if (!attendance && !feeStatus && !messages && !tickets) {
+      return toast.error("Select something to clear");
+    }
+
     try {
-      await toast.promise(clearOldData(selected), {
-        loading: "Clearing Data...",
-        success: `Data cleared: ${selected.join(", ")}`,
-        error: "Failed to clear data",
-      });
+      await toast.promise(
+        clearOldData(attendance, feeStatus, messages, tickets),
+        {
+          loading: "Clearing Data...",
+          success: "Selected data cleared successfully",
+          error: "Failed to clear data",
+        }
+      );
       setShowClearModal(false);
     } catch (err) {
-      // axios interceptor handles errors
+      // handled by interceptor
     }
   };
+
 
   const handlePromoteStudents = async () => {
     try {
