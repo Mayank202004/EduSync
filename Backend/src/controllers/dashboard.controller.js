@@ -74,8 +74,14 @@ export const performSelectiveCleanup = asyncHandler(async (req, res) => {
  */
 export const manageAcademicYearData = asyncHandler(async (_, res) => {
   const academicYear = await getSettingValue("academicYear");
-  const classesAndDivs = await ClassStructure.find().select("className divisions");  // <-- FIXED
-  const students = await Student.find().select("_id userId class div").populate("userId", "fullName");
+  const classesAndDivs = await ClassStructure.find().select("className divisions"); 
+  const students = await Student.find()
+    .select("_id userId class div")
+    .populate({
+      path: "userId",
+      select: "fullName",
+      match: { verified: true },
+    });
   
   return res.status(200).json(
     new ApiResponse(200, { academicYear, classesAndDivs, students }, "Academic Year Data Fetched")
