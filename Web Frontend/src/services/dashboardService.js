@@ -174,7 +174,7 @@ export const promoteStudents = async () => {
  * @returns {Promise} - promise resolving to success message
  */
 export const shuffleDivisions = async () => {
-    await axiosInstance.patch(`${BASEURL}/student/promote`);
+    await axiosInstance.patch(`${BASEURL}/student/shuffle`);
 };
 
 /**
