@@ -17,6 +17,7 @@ import {
   promoteStudents,
   shuffleDivisions,
 } from "@/services/dashboardService";
+import ManualDivisionAllotment from "./ManualDivisionAllotment";
 
 const ManageAcademicYear = ({ onBackPressed }) => {
   const [year, setYear] = useState(null);
@@ -28,15 +29,11 @@ const ManageAcademicYear = ({ onBackPressed }) => {
     marks: false,
     messages: false,
   });
-  const [selectedClass, setSelectedClass] = useState("");
-  const [allStudents, setAllStudents] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [divisionMap, setDivisionMap] = useState({});
   const [activeSection, setActiveSection] = useState("dashboard");
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmType, setConfirmType] = useState(null);
   const [classes, setClasses] = useState([]);
-  const [divisionOptions, setDivisionOptions] = useState([]);
+  const [allStudents, setAllStudents] = useState([]);
 
   const classOptions = classes.map((cls) => cls.className);
 
@@ -54,25 +51,6 @@ const ManageAcademicYear = ({ onBackPressed }) => {
     };
     loadData();
   }, []);
-
-  useEffect(() => {
-    if (!selectedClass) {
-      setDivisionOptions([]);
-      setStudents([]);
-      return;
-    }
-
-    const filteredStudents = allStudents.filter(
-      (stu) => stu.class === selectedClass
-    );
-    setStudents(filteredStudents);
-    console.log(filteredStudents);
-
-    const matchedClass = classes.find(
-      (cls) => cls.className === selectedClass
-    );
-    setDivisionOptions(matchedClass?.divisions || []);
-  }, [selectedClass, allStudents, classes]);
 
   const handleUpdateYear = async () => {
     if (!newYear.trim()) return toast.error("Academic year cannot be empty.");
@@ -104,10 +82,6 @@ const ManageAcademicYear = ({ onBackPressed }) => {
     }
   };
 
-  const handleDivisionChange = (id, division) => {
-    setDivisionMap((prev) => ({ ...prev, [id]: division }));
-  };
-
   const handlePromoteStudents = async () => {
     try {
       await toast.promise(promoteStudents(), {
@@ -136,13 +110,6 @@ const ManageAcademicYear = ({ onBackPressed }) => {
     }
     setShowConfirm(false);
     setConfirmType(null);
-  };
-
-  const goBack = () => {
-    setActiveSection("dashboard");
-    setSelectedClass("");
-    setStudents([]);
-    setDivisionMap({});
   };
 
   return (
@@ -259,62 +226,11 @@ const ManageAcademicYear = ({ onBackPressed }) => {
       )}
 
       {activeSection === "manual" && (
-        <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-sm">
-          <h3 className="text-xl font-semibold mb-4">🧑‍🏫 Manual Division Allotment</h3>
-          <div className="mb-4">
-            <label className="block mb-1 text-sm font-medium">Select Class</label>
-            <select
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
-              className="border border-gray-300 dark:border-gray-600 px-3 py-2 rounded w-full text-black"
-            >
-              <option value="">-- Select --</option>
-              {classOptions.map((cls) => (
-                <option key={cls} value={cls}>
-                  Class {cls}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {students.length > 0 && (
-            <table className="w-full text-left mt-4 border-t border-gray-300 dark:border-gray-700">
-              <thead>
-                <tr className="bg-gray-100 dark:bg-gray-700">
-                  <th className="py-2 px-3">Student</th>
-                  <th className="py-2 px-3">Division</th>
-                </tr>
-              </thead>
-              <tbody>
-                {students.map((stu) => (
-                  <tr key={stu._id} className="border-t border-gray-200 dark:border-gray-600">
-                    <td className="py-2 px-3">{stu.userId?.fullName || "N/A"}</td>
-                    <td className="py-2 px-3">
-                      <select
-                        value={divisionMap[stu._id] || ""}
-                        onChange={(e) =>
-                          handleDivisionChange(stu._id, e.target.value)
-                        }
-                        className="border px-2 py-1 rounded text-black w-full"
-                      >
-                        <option value="">-- Select --</option>
-                        {divisionOptions.map((div) => (
-                          <option key={div} value={div}>
-                            {div}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-
-          <button onClick={goBack} className="mt-6 text-sm underline text-gray-600">
-            Back
-          </button>
-        </div>
+        <ManualDivisionAllotment
+          classes={classes}
+          allStudents={allStudents}
+          onBack={() => setActiveSection("dashboard")}
+        />
       )}
 
       {showClearModal && (

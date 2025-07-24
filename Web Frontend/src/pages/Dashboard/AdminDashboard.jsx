@@ -6,7 +6,7 @@ import VerifyStudents from '@/components/Home/AdminComponents/Verifystudents';
 import VerifyTeachers from '@/components/Home/AdminComponents/VerifyTeachers';
 import ManageClasses from '@/components/Home/AdminComponents/ManageClasses';
 import ManageTeacherSubjects from '@/components/Home/AdminComponents/ManageSubjects';
-import ManageAcademicYear from '@/components/Home/AdminComponents/ManageAcademicYear';
+import ManageAcademicYear from '@/components/Home/AdminComponents/ManageAcademicYear/ManageAcademicYear';
 import { fetchSuperAdminDashboardData } from '@/services/dashboardService';
 
 
