@@ -72,6 +72,7 @@ const AdminHomeContent = ({setActiveView=()=>{}}) => {
           icon={MessageSquareWarning}
           title="Complaints & Feedback"
           description="Review complaints or suggestions submitted."
+          onClick={() => setActiveView('ticket-inbox')}
         />
         <AdminHomeCard
           icon={Megaphone}

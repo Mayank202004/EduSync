@@ -8,6 +8,7 @@ import ManageClasses from '@/components/Home/AdminComponents/ManageClasses';
 import ManageTeacherSubjects from '@/components/Home/AdminComponents/ManageSubjects';
 import ManageAcademicYear from '@/components/Home/AdminComponents/ManageAcademicYear/ManageAcademicYear';
 import { fetchSuperAdminDashboardData } from '@/services/dashboardService';
+import TicketInbox from '@/components/Home/AdminComponents/TicketInbox';
 
 
 
@@ -40,7 +41,9 @@ const AdminDashboard = () => {
       case 'manage-subjects':
         return <ManageTeacherSubjects onBackPressed={onBackPressed} />;
       case 'manage-academic-year':
-        return <ManageAcademicYear onBackPressed={onBackPressed} academicYear={academicYear} />;
+        return <ManageAcademicYear onBackPressed={onBackPressed} academicYear={academicYear} />; // To Do remove academic year here and from backend no need
+      case 'ticket-inbox':
+        return <TicketInbox onBackPressed={onBackPressed}/>
       case 'home':
       default:
         return <AdminHomeContent setActiveView={setActiveView} />;
