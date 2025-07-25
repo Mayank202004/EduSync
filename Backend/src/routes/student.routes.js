@@ -19,6 +19,6 @@ router.route("/allergy").delete(verifyJWT,verifyStudent,StudentController.delete
 router.route("/unverified").get(verifyJWT,verifySuperAdmin,StudentController.getUnverifiedStudents);
 router.route("/promote").patch(verifyJWT,verifySuperAdmin,StudentController.promoteStudents);
 router.route("/shuffle").patch(verifyJWT,verifySuperAdmin,StudentController.shuffleDivisions);
-router.route("/assign-divisions").patch(verifyJWT,verifySuperAdmin,StudentController.manuallyAssignDivisions); // To Do : Test
+router.route("/assign-divisions").patch(verifyJWT,verifySuperAdmin,StudentController.manuallyAssignDivisions); 
 
 export default router;

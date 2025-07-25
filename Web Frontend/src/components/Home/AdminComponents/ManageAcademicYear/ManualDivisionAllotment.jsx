@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { ArrowLeft } from "lucide-react";
+import { assignStudentDivisions } from "@/services/dashboardService";
 
 const ManualDivisionAllotment = ({ onBack, classes, allStudents }) => {
   const [selectedClass, setSelectedClass] = useState("1");
@@ -15,29 +16,52 @@ const ManualDivisionAllotment = ({ onBack, classes, allStudents }) => {
       setDivisionMap({});
       return;
     }
+  
     const filtered = allStudents.filter((stu) => stu.class === selectedClass);
     setStudents(filtered);
-
+  
     const matchedClass = classes.find((cls) => cls.className === selectedClass);
     setDivisionOptions(matchedClass?.divisions || []);
+  
+    // Initialize division map based on existing student divisions
+    const initialMap = {};
+    filtered.forEach((stu) => {
+      if (stu.div) initialMap[stu._id] = stu.div;
+    });
+    setDivisionMap(initialMap);
   }, [selectedClass, allStudents, classes]);
+  
 
   const handleDivisionChange = (id, division) => {
     setDivisionMap((prev) => ({ ...prev, [id]: division }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedClass) return toast.error("Select a class first");
-    const assignments = students.map((stu) => ({ id: stu._id, div: divisionMap[stu._id] || "" }));
+
+    const assignments = students.map((stu) => ({
+      _id: stu._id,
+      div: divisionMap[stu._id] || ""
+    }));
+
     const hasUnassigned = assignments.some((a) => !a.div);
     if (hasUnassigned) return toast.error("All students must be assigned a division");
 
-    const payload = { className: selectedClass, students: assignments };
-    console.log("Submitting:", payload);
-
-    // TODO: Call actual API here
-    toast.success("Division assignments submitted");
+    try {
+      await toast.promise(
+        assignStudentDivisions(selectedClass,assignments), 
+        {
+          loading: "Assigning divisions...",
+          success: "Divisions assigned successfully",
+          error: "",
+        }
+      );
+    } catch (err) {
+      // Handled by axios interceptor
+    }
   };
+
+
 
   return (
     <div className="bg-gray-50 dark:bg-customDarkFg border border-gray-200 dark:border-none p-6 rounded-xl shadow-sm">

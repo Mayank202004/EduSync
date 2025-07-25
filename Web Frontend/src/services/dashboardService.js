@@ -178,9 +178,11 @@ export const shuffleDivisions = async () => {
 };
 
 /**
- * @desc Manually assign all students their division  // To Do:
+ * @desc Manually assign all students their division
  */
-export const assignStudentDivision = async (studentId, division) => {};
+export const assignStudentDivisions = async (className, assignments) => {
+    await axiosInstance.patch(`${BASEURL}/student/assign-divisions`, {className,assignments});
+};
 
 /**
  * @desc Clear old data
