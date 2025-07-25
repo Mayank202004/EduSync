@@ -191,3 +191,12 @@ export const assignStudentDivisions = async (className, assignments) => {
 export const clearOldData = async (attendance=false,feeStatus=false,messages=false,tickets=false) => {
     await axiosInstance.post(`${BASEURL}/dashboard/cleanup`,{attendance,feeStatus,messages,tickets});
 };
+
+/**
+ * @desc Fetch open tickets
+ * @returns {Promise<Object>} - promise resolving to list of open tickets
+ */
+export const fetchOpenTickets = async () => {
+    const response = await axiosInstance.get(`${BASEURL}/ticket/open`);
+    return response.data;
+}
