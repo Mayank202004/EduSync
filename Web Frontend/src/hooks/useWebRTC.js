@@ -25,11 +25,11 @@ export default function useWebRTC(socket, roomId, currentUser) {
 
         setParticipants([
           {
-            _id: currentUser._id,
+            _id: socket.id,
             name: `${currentUser.fullName} (You)`,
             avatar: currentUser.avatar,
-            videoEnabled: true,
-            audioEnabled: true,
+            videoEnabled: cam,
+            audioEnabled: mic,
             videoRef: localVideoRef,
             stream: localStream.current,
             isLocal: true,
@@ -39,7 +39,7 @@ export default function useWebRTC(socket, roomId, currentUser) {
         socket.emit("join-room", { roomId });
 
         socket.on("all-users", (users) => {
-          console.log("Received all-users:", users.length);
+          //console.log("Received all-users:", users.length);
           if (users.length === 0) return;
           setTimeout(() => {
             users.forEach(({ socketId, user }) => {
@@ -53,13 +53,21 @@ export default function useWebRTC(socket, roomId, currentUser) {
 
         // DO NOT callUser here
         socket.on("user-joined", ({ socketId, user }) => {
-          // Let the joining user initiate the offer
+          // Emit initial state
+          console.log(`${user.fullName} is sending initial data as cam : ${cam} mic : ${mic}`);
+          socket.emit("update-media-state", {
+            roomId,
+            videoEnabled: cam,
+            audioEnabled: mic,
+            screenSharing: false,
+          });
         });
 
         socket.on("offer", handleReceiveOffer);
         socket.on("answer", handleReceiveAnswer);
         socket.on("ice-candidate", handleNewICECandidateMsg);
         socket.on("user-left", handleUserLeft);
+        socket.on("remote-media-updated", handleRemoteMediaUpdated);
       } catch (err) {
         console.error("Failed to access media devices:", err);
       }
@@ -75,6 +83,7 @@ export default function useWebRTC(socket, roomId, currentUser) {
       socket.off("answer");
       socket.off("ice-candidate");
       socket.off("user-left");
+      socket.off("remote-media-updated");
     };
   }, [socket]);
 
@@ -190,14 +199,21 @@ export default function useWebRTC(socket, roomId, currentUser) {
       const enabled = !audioTrack.enabled;
       audioTrack.enabled = enabled;
       setMic(enabled);
-  
+
       setParticipants((prev) =>
         prev.map((p) =>
           p.isLocal ? { ...p, audioEnabled: enabled } : p
         )
       );
+
+      socket.emit("update-media-state", {
+        roomId,
+        videoEnabled: cam, 
+        audioEnabled: enabled,
+      });
     }
   };
+
   
   const toggleCam = () => {
     const videoTrack = localStream.current?.getVideoTracks()?.[0];
@@ -205,15 +221,22 @@ export default function useWebRTC(socket, roomId, currentUser) {
       const enabled = !videoTrack.enabled;
       videoTrack.enabled = enabled;
       setCam(enabled);
-  
+
       setParticipants((prev) =>
         prev.map((p) =>
           p.isLocal ? { ...p, videoEnabled: enabled } : p
         )
       );
+
+      socket.emit("update-media-state", {
+        roomId,
+        videoEnabled: enabled,
+        audioEnabled: mic,
+      });
     }
   };
-  
+
+
 
   const toggleScreen = async () => {
     try {
@@ -227,14 +250,28 @@ export default function useWebRTC(socket, roomId, currentUser) {
 
       setScreen(true);
 
+      socket.emit("update-media-state", {
+        roomId,
+        videoEnabled: true,
+        audioEnabled: mic,
+        screenSharing: true,
+      });
+
       screenTrack.onended = () => {
         setScreen(false);
-        toggleCam(); // fallback to webcam
+        toggleCam(); 
+
+        socket.emit("update-media-state", {
+          videoEnabled: true,
+          audioEnabled: mic,
+          screenSharing: false,
+        });
       };
     } catch (err) {
-      console.error("Screen share error:", err);
+      toast.error("Failed to share screen.");
     }
   };
+
 
   const raiseHand = () => {
     setHandRaised((prev) => !prev);
@@ -253,6 +290,22 @@ export default function useWebRTC(socket, roomId, currentUser) {
 
     setParticipants([]);
   };
+
+  const handleRemoteMediaUpdated = ({ socketId, videoEnabled, audioEnabled, screenSharing }) => {
+    setParticipants((prev) =>
+      prev.map((p) =>
+        p._id === socketId
+          ? {
+              ...p,
+              videoEnabled: videoEnabled ?? p.videoEnabled,
+              audioEnabled: audioEnabled ?? p.audioEnabled,
+              screenSharing: screenSharing ?? p.screenSharing,
+            }
+          : p
+      )
+    );
+  };
+  
 
   return {
     localVideoRef,
