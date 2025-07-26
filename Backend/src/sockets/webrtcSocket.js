@@ -91,4 +91,16 @@ export const setupWebRTC = (io, socket, user) => {
       delete roomUsersMap[roomKey];
     }
   });
+
+  // Toggles to schare screen / video / audio 
+  socket.on("update-media-state", ({ roomId,videoEnabled, audioEnabled, screenSharing }) => {
+    if (!roomId) return;
+
+    socket.to(`webrtc-${roomId}`).emit("remote-media-updated", {
+      socketId: socket.id,
+      videoEnabled,
+      audioEnabled,
+      screenSharing: !!screenSharing,
+    });
+  });
 };
