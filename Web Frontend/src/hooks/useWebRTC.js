@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { mediaConstraints } from "@/lib/webrtc/constraints";
 
 export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initialMic = true, initialCam = true) {
@@ -13,7 +14,15 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
   const peerConnections = useRef({});
   const joinedRoom = useRef(false);
 
-  // 1. Always start media (camera/mic)
+  useEffect(() => {
+  console.log("🔄 Participants list updated:");
+  participants.forEach((p) => {
+    console.log(`- ${p.fullName || p._id} | mic: ${p.audioEnabled}, cam: ${p.videoEnabled}, screen: ${p.screenSharing}`);
+  });
+}, [participants]);
+
+
+  // Start media pre-joining (camera/mic)
   useEffect(() => {
     const startMedia = async () => {
       try {
@@ -21,8 +30,6 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = localStream.current;
         }
-        // setMic(initialMic);
-        // setCam(initialCam);
 
         setParticipants([
           {
@@ -37,7 +44,7 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
           },
         ]);
       } catch (err) {
-        console.error("Failed to access media devices:", err);
+        toast.error("Failed to start media. Please rejoin.");
       }
     };
 
@@ -45,13 +52,22 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
   }, []); // only run once
   
 
-  // 2. Join socket room and set up WebRTC only if shouldJoin === true
+  // Join socket room and set up WebRTC only if shouldJoin === true
   useEffect(() => {
     if (!socket || !shouldJoin || joinedRoom.current) return;
 
     joinedRoom.current = true;
 
     socket.emit("join-room", { roomId });
+    setTimeout(() => { 
+      socket.emit("update-media-state", {
+        roomId,
+        videoEnabled: cam,
+        audioEnabled: mic,
+        screenSharing: false,
+      });
+    }, 1000);
+
 
     socket.on("all-users", (users) => {
       if (users.length === 0) return;
@@ -65,12 +81,15 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
     });
 
     socket.on("user-joined", ({ socketId, user }) => {
-      socket.emit("update-media-state", {
+      console.log(`User ${currentUser.fullName} shared his state to ${user.fullName} with mic ${mic} and cam ${cam}`);
+      setTimeout(() => {
+       socket.emit("update-media-state", {
         roomId,
         videoEnabled: cam,
         audioEnabled: mic,
         screenSharing: false,
       });
+      }, 500);
     });
 
     socket.on("offer", handleReceiveOffer);
@@ -229,10 +248,8 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
       setParticipants((prev) =>
         prev.map((p) =>
           p.isLocal ? { ...p, videoEnabled: enabled } : p
-    )
-  );
-  console.log(`toggle cam ${enabled} ${localStream.current}`);
-
+        )
+      );
       socket.emit("update-media-state", {
         roomId,
         videoEnabled: enabled,
@@ -297,6 +314,7 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
   };
 
   const handleRemoteMediaUpdated = ({ socketId, videoEnabled, audioEnabled, screenSharing }) => {
+    console.log("Remote media updated:", socketId, videoEnabled, audioEnabled, screenSharing);
     setParticipants((prev) =>
       prev.map((p) =>
         p._id === socketId
