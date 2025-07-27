@@ -118,6 +118,8 @@ const getStudentFeeStatus = asyncHandler(async (req, res) => {
 
   // Build the paidMap and paid response
   let skipTuitionFee = false;
+  let skipFullYearTuitionFee = false;
+
 
   if (studentFeeStatus) {
     for (const group of studentFeeStatus.paidFees) {
@@ -132,9 +134,15 @@ const getStudentFeeStatus = asyncHandler(async (req, res) => {
         paidMap[feeType].add(idStr);
       
         // Check if Tuition Fee full-year discount is already paid
-        if (feeType === "Tuition Fee" && structure.title === "Full Year Fees with Discount") {
-          skipTuitionFee = true;
+        if (feeType === "Tuition Fee") {
+          if (structure.title === "Full Year Fees with Discount") {
+            skipTuitionFee = true; // If full-year is paid, skip all term fees
+          } else {
+            // If even a term fee is paid, hide full-year from pending
+            skipFullYearTuitionFee = true;
+          }
         }
+
       
         const paidEntry = {
           structureId: idStr,
@@ -159,7 +167,12 @@ const getStudentFeeStatus = asyncHandler(async (req, res) => {
     for (const item of group.structure) {
       const idStr = item._id?.toString();
       // Skip all Tuition Fee pending items if full-year is paid
-      if (feeType === "Tuition Fee" && skipTuitionFee) continue;
+      if (feeType === "Tuition Fee") {
+        if (skipTuitionFee) continue; // Full year paid — skip all term-wise fees
+        if (skipFullYearTuitionFee && item.title === "Full Year Fees with Discount") continue; // Some term paid — skip full-year
+      }
+
+
     
       if (!paidMap[feeType].has(idStr)) {
         const pendingEntry = {
