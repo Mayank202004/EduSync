@@ -14,5 +14,6 @@ router.get('/me',verifyJWT, ResourceController.getMyResources);
 router.route("/add-resource").post(verifyJWT,verifySuperAdmin, upload.array("files", 10), ResourceController.addResource);
 router.delete('/classes/:classNumber',verifySuperAdmin, ResourceController.deleteClass);
 router.route('/teacher').get(verifyJWT,verifyTeacher,ResourceController.getTeacherResources);
+router.delete('/delete-resource',verifyJWT,verifySuperAdmin, ResourceController.deleteResource);
 
 export default router;

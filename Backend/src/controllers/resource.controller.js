@@ -4,7 +4,7 @@ import { ApiError}  from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { Student } from '../models/student.model.js';
 import { Teacher } from '../models/teacher.model.js';
-import { uploadOnCloudinary } from '../utils/cloudinary.js';
+import { uploadOnCloudinary, deleteFromCloudinary} from '../utils/cloudinary.js';
 
 /**
  * @desc Add a new class
@@ -224,7 +224,59 @@ export const addResource = asyncHandler(async (req, res) => {
     }
 });
 
-// Delete a class
+/**
+ * @desc Delete a resource from a chapter and Cloudinary
+ * @route DELETE /api/resource/delete-resource
+ * @access Private (Super Admin)
+ */
+export const deleteResource = asyncHandler(async (req, res) => {
+    try {
+        const { className, subjectName, termNumber, chapterName, resourceUrl } = req.body;
+
+        if ([className, subjectName, termNumber, chapterName, resourceUrl].some(field => !field?.trim())) {
+            throw new ApiError(400, "All fields are required.");
+        }
+
+        // Delete from Cloudinary
+        const cloudinaryFolderPath = `edusync/resource/${className}/${subjectName}/${chapterName}`;
+        await deleteFromCloudinary(resourceUrl, cloudinaryFolderPath);
+
+        const updatedClass = await SchoolResource.findOneAndUpdate(
+            {
+                class: className,
+                "subjects.subjectName": subjectName,
+                "subjects.terms.termNumber": termNumber,
+                "subjects.terms.chapters.chapterName": chapterName
+            },
+            {
+                $pull: {
+                    "subjects.$[subject].terms.$[term].chapters.$[chapter].resources": {
+                        url: resourceUrl
+                    }
+                }
+            },
+            {
+                arrayFilters: [
+                    { "subject.subjectName": subjectName },
+                    { "term.termNumber": termNumber },
+                    { "chapter.chapterName": chapterName }
+                ],
+                new: true
+            }
+        );
+
+        if (!updatedClass) {
+            throw new ApiError(404, "Class, subject, term, or chapter not found.");
+        }
+
+        res.status(200).json(new ApiResponse(200, updatedClass, "Resource deleted successfully"));
+    } catch (error) {
+        throw new ApiError(error.statusCode ?? 400, error.message ?? "Something went wrong");
+    }
+});
+
+
+// Delete a class To Do test
 export const deleteClass = async (req, res, next) => {
     try {
         const { classNumber } = req.params;
