@@ -85,7 +85,15 @@ export const addResource = async (className, subjectName, termNumber, chapterNam
     headers: {
       'Content-Type': 'multipart/form-data',
     }
-  });
+  },{timeout:1000});
   return response.data;
 };
 
+/**
+ * @desc Delete resource
+ * @returns {Promise}  - Promise resolving to success message
+ */
+export const deleteResource = async(className,subjectName,termNumber,chapterName,resourceUrl) =>{
+  const response = await axiosInstance.delete(`${BASEURL}/resource/delete-resource`,{data:{className,subjectName,termNumber,chapterName,resourceUrl}},{timeout:1000});
+  return response.data;
+}

@@ -4,6 +4,9 @@ import { addChapter, addResource } from "@/services/resourcesService";
 import SingleInputModal from "./SingleInputModal";
 import FileUploadModal from "../Modals/FileUploadModal";
 import ImagePreview from "../Chat/ImagePreview";
+import { Trash2 } from "lucide-react";
+import { deleteResource } from "@/services/resourcesService";
+import toast from "react-hot-toast";
 
 // Simple icon mapping based on type (replace with PNG <img src> if needed)
 const typeIcons = {
@@ -80,6 +83,23 @@ function ChapterCard({
   const handleAddResource = (chapterName) => {
     setSelectedChapter(chapterName);
     setShowFileModal(true);
+  };
+
+  const handleDeleteResource = async (chapterName,resourceUrl) => {
+    try{
+      console.log(className,subjectName,term,chapterName,resourceUrl);
+      const resposne = await toast.promise(
+        deleteResource(className,subjectName,term,chapterName,resourceUrl),
+        {
+          loading: "Deleting resource...",
+          success: "Resource deleted successfully",
+          error: "",
+        }
+      )
+      setUpdatedClass(resposne.data);
+    } catch(err){
+      // Handled by axios interceptor
+    }
   };
 
   const handleChapterSubmit = (data) => {
@@ -181,9 +201,9 @@ function ChapterCard({
                   }
                 `}
                 >
-                  {chapter.resources?.length > 0 ? (
-                    chapter.resources.map((res) => {
-                      return (
+                  {chapter.resources.map((res) => {
+                    return (
+                      <div key={res._id} className="flex justify-between items-center">
                         <RenderResource
                           type={res.type}
                           id={res._id}
@@ -191,13 +211,18 @@ function ChapterCard({
                           imagePreviewSetter={setPreviewDetails}
                           url={res.url}
                         />
-                      );
-                    })
-                  ) : (
-                    <p className="italic text-gray-500 dark:text-gray-400">
-                      No resources available.
-                    </p>
-                  )}
+                        {role === "super admin" && (
+                          <button
+                            onClick={() => handleDeleteResource(chapter.chapterName, res.url)}
+                            className="p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900 text-red-600"
+                            title="Delete Resource"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </li>
             ))}
