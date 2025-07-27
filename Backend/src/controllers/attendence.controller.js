@@ -1205,3 +1205,140 @@ export const deleteAllAttendance = async () => {
     throw error;
   }
 };
+
+/**
+ * @desc Helper function to return attendance count for a month for a student
+ */
+export const getAttendanceForTheMonth = async (studentId,className,div) => {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    const result = await ClassAttendance.aggregate([
+        {
+            $match: {
+                class: className,
+                div,
+                date: { $gte: startOfMonth, $lte: endOfMonth }
+            }
+        },
+        { $unwind: "$attendance" },
+        {
+            $match: {
+                "attendance.studentId": studentId
+            }
+        },
+        {
+            $group: {
+                _id: "$attendance.status",
+                count: { $sum: 1 }
+            }
+        }
+    ]);
+    const counts = result.reduce((acc, curr) => {
+        acc[curr._id] = curr.count;
+        return acc;
+    }, { Present: 0, Absent: 0 }); 
+
+    return counts;
+};
+
+/**
+ * @desc Returns attendance percentage over all months for a student
+ * @returns Object like: { "2025-03": 83.33, "2025-04": 100 }
+ */
+export const getAttendancePercentageByMonth = async (studentId,className,div) => {
+    const result = await ClassAttendance.aggregate([
+        {
+            $match: {
+                class: className,
+                div
+            }
+        },
+        { $unwind: "$attendance" },
+        {
+            $match: {
+                "attendance.studentId": studentId
+            }
+        },
+        {
+            $addFields: {
+                month: {
+                    $dateToString: { format: "%Y-%m", date: "$date" }
+                }
+            }
+        },
+        {
+            $group: {
+                _id: { month: "$month", status: "$attendance.status" },
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $group: {
+                _id: "$_id.month",
+                counts: {
+                    $push: {
+                        status: "$_id.status",
+                        count: "$count"
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                month: "$_id",
+                percentage: {
+                    $let: {
+                        vars: {
+                            presentCount: {
+                                $sum: {
+                                    $map: {
+                                        input: "$counts",
+                                        as: "c",
+                                        in: {
+                                            $cond: [
+                                                { $eq: ["$$c.status", "Present"] },
+                                                "$$c.count",
+                                                0
+                                            ]
+                                        }
+                                    }
+                                }
+                            },
+                            totalCount: {
+                                $sum: "$counts.count"
+                            }
+                        },
+                        in: {
+                            $cond: [
+                                { $eq: ["$$totalCount", 0] },
+                                0,
+                                {
+                                    $round: [
+                                        {
+                                            $multiply: [
+                                                { $divide: ["$$presentCount", "$$totalCount"] },
+                                                100
+                                            ]
+                                        },
+                                        2
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ]);
+
+    // Convert to { "2025-03": 83.33, "2025-04": 100, ... }
+    const attendanceByMonth = {};
+    for (const doc of result) {
+        attendanceByMonth[doc.month] = doc.percentage;
+    }
+
+    return attendanceByMonth;
+};
