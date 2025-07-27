@@ -300,6 +300,21 @@ export const getSuperAdminChats = async (userId) => {
  */
 export const getMessages = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  const userId = req.user._id;
+
+  // Ensure user is a participant
+  const chat = await Chat.findById(id);
+  if (!chat) {
+    return res.status(404).json({ message: "Chat not found" });
+  }
+
+  const isParticipant = chat.participants.some(
+    (participantId) => participantId.toString() === userId.toString()
+  );
+
+  if (!isParticipant) {
+    throw new ApiError(403, "You are not a participant in this chat");
+  }
 
   const messages = await Message.find({ chat: id }).populate({
     path: "sender", 
