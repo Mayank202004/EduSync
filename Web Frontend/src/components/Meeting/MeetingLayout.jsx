@@ -1,7 +1,7 @@
 import VideoTile from "./VideoTile";
 import ScreenShareTile from "./ScreenShareTile";
 import SidePanel from "./SidePanel/SidePanel";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import ParticipantPanel from "./SidePanel/ParticipantPanel";
 import ChatPanel from "./SidePanel/ChatPanel";
 import HostControlPanel from "./SidePanel/HostControlPanel";
@@ -15,28 +15,17 @@ const MeetingLayout = ({
   showChat,
   showHostControls,
   onClosePanel,
-  localVideoRef, // 
+  localVideoRef, 
+  CurrentUser,
+  messages,
+  setMessages,
+  roomId
 }) => {
   const isScreenSharing = !!screenSharerId;
   const isSidePanelOpen = showParticipants || showChat || showHostControls;
 
   const [pinned, setPinned] = useState(null);
-  const [messages, setMessages] = useState([
-    {
-      _id: "1",
-      avatar: `https://i.pravatar.cc/150?u=user1`,
-      sender: "User 1",
-      content: "Hey there!",
-      time: "10:00 AM",
-    },
-    {
-      _id: "2",
-      avatar: `https://i.pravatar.cc/150?u=user2`,
-      sender: "User 2",
-      content: "Hello! All set for the meeting?",
-      time: "10:01 AM",
-    },
-  ]);
+  
 
   const [controls, setControls] = useState({
     screenShare: true,
@@ -46,20 +35,8 @@ const MeetingLayout = ({
     access: "open",
   });
 
-  // 👤 Add a "You" tile as the first participant
-  // const allParticipants = useMemo(() => {
-  //   const localParticipant = {
-  //     _id: "local",
-  //     name: "You",
-  //     avatar: `https://i.pravatar.cc/150?u=you`,
-  //     videoEnabled: true,
-  //     audioEnabled: true,
-  //     videoRef: localVideoRef, // ✅ local video ref
-  //     isLocal: true,
-  //   };
-  //   return [localParticipant, ...(participants || [])];
-  // }, [participants, localVideoRef]);
   const allParticipants = participants;
+
 
   const visibleTiles = useMemo(() => {
     if (isScreenSharing) {
@@ -146,7 +123,7 @@ const MeetingLayout = ({
             />
           )}
           {showChat && (
-            <ChatPanel messages={messages} setMessages={setMessages} />
+            <ChatPanel messages={messages} setMessages={setMessages} CurrentUser={CurrentUser} roomId={roomId} />
           )}
           {showHostControls && (
             <HostControlPanel controls={controls} setControls={setControls} />

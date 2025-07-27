@@ -9,18 +9,11 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
   const [participants, setParticipants] = useState([]);
   const [screen, setScreen] = useState(false);
   const [handRaised, setHandRaised] = useState(false);
+  const [messages, setMessages] = useState([]);
 
   const localStream = useRef(null);
   const peerConnections = useRef({});
   const joinedRoom = useRef(false);
-
-  useEffect(() => {
-  console.log("🔄 Participants list updated:");
-  participants.forEach((p) => {
-    console.log(`- ${p.fullName || p._id} | mic: ${p.audioEnabled}, cam: ${p.videoEnabled}, screen: ${p.screenSharing}`);
-  });
-}, [participants]);
-
 
   // Start media pre-joining (camera/mic)
   useEffect(() => {
@@ -81,7 +74,6 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
     });
 
     socket.on("user-joined", ({ socketId, user }) => {
-      console.log(`User ${currentUser.fullName} shared his state to ${user.fullName} with mic ${mic} and cam ${cam}`);
       setTimeout(() => {
        socket.emit("update-media-state", {
         roomId,
@@ -97,6 +89,9 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
     socket.on("ice-candidate", handleNewICECandidateMsg);
     socket.on("user-left", handleUserLeft);
     socket.on("remote-media-updated", handleRemoteMediaUpdated);
+    socket.on("meeting-message", (msg) => {
+      setMessages((prev) => [...prev, msg]);
+    });
 
     return () => {
       leaveMeeting();
@@ -107,6 +102,7 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
       socket.off("ice-candidate");
       socket.off("user-left");
       socket.off("remote-media-updated");
+      socket.off("meeting-message");
     };
   }, [shouldJoin, socket]);
 
@@ -314,7 +310,6 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
   };
 
   const handleRemoteMediaUpdated = ({ socketId, videoEnabled, audioEnabled, screenSharing }) => {
-    console.log("Remote media updated:", socketId, videoEnabled, audioEnabled, screenSharing);
     setParticipants((prev) =>
       prev.map((p) =>
         p._id === socketId
@@ -342,5 +337,7 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
     toggleScreen,
     raiseHand,
     leaveMeeting,
+    messages,
+    setMessages,
   };
 }

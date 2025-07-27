@@ -103,4 +103,9 @@ export const setupWebRTC = (io, socket, user) => {
       screenSharing: !!screenSharing,
     });
   });
+
+  socket.on("meeting-message", ({ roomId, message }) => {
+    socket.to(`webrtc-${roomId}`).emit("meeting-message", message);
+  });
+
 };

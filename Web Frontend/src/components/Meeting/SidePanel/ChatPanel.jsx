@@ -1,30 +1,37 @@
 import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import Avatar from "../Avatar";
+import { useSocket } from "@/context/SocketContext";
 
-const ChatPanel = ({ messages, setMessages }) => {
+const ChatPanel = ({ messages, setMessages, CurrentUser, roomId}) => {
+  const { socket } = useSocket();
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
 
   const handleSend = () => {
     const trimmed = input.trim();
-    if (trimmed) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          _id: `${Date.now()}`,
-          sender: "You",
-          avatar: null,
-          content: trimmed,
-          time: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        },
-      ]);
-      setInput("");
-    }
+    if (!trimmed) return;
+
+    const newMsg = {
+      _id: `${Date.now()}`,
+      sender: CurrentUser?.fullName ?? "Anonymous",
+      avatar: CurrentUser?.avatar,
+      content: trimmed,
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    setMessages((prev) => [...prev, newMsg]);
+    setInput("");
+
+    socket.emit("meeting-message", {
+      roomId,
+      message: newMsg
+    });
   };
+
 
   // Scroll to bottom whenever messages change
   useEffect(() => {

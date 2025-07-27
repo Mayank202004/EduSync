@@ -34,6 +34,8 @@ export default function MeetingPage() {
     screen,
     raiseHand,
     handRaised,
+    messages,
+    setMessages
   } = useWebRTC(socket, meetingId, CurrentUser, hasJoined, preJoinMic, preJoinCam); 
 
   const [showParticipants, setShowParticipants] = useState(false);
@@ -72,6 +74,10 @@ export default function MeetingPage() {
         showHostControls={showHostControls}
         showChat={showChat}
         onClosePanel={closeSidePanel}
+        CurrentUser={CurrentUser}
+        messages={messages}
+        setMessages={setMessages}
+        roomId={meetingId}
       />
 
       <ControlsBar
