@@ -296,9 +296,9 @@ const ChatCard = ({
               </p>
             </div>
           </div>
-          <button className="more-btn p-2" onClick={() => setShowScheduleMeetingOptions(!showScheduleMeetingOptions)}>
+          {currentUser.role !="student" && <button className="more-btn p-2" onClick={() => setShowScheduleMeetingOptions(!showScheduleMeetingOptions)}>
             <Video className="w-5 h-5 text-gray-500 dark:text-gray-300" />
-          </button>
+          </button>}
         </div>
         <div className="flex flex-col flex-grow min-h-0">
           <div

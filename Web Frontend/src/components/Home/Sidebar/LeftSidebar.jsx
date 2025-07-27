@@ -28,6 +28,7 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
     fullName: user?.fullName,
     username: user?.username,
     avatar: user?.avatar,
+    role: user.role,
   };
 
   useEffect(() => {

@@ -48,10 +48,10 @@ const HomeContent = () => {
 
           <div className="text-center md:text-left">
             <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">
-              Study Materials
+              Get Started With Your Study
             </h2>
             <p className="text-gray-500 dark:text-gray-400 mb-4">
-              Explore all uploaded chapters and resources by your teachers.
+              Explore all uploaded chapters and resources.
             </p>
             <button
               onClick={() => navigate("/resources")}
