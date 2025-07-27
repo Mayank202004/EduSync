@@ -199,7 +199,7 @@ export const addPhysicalInfo = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Student not found");
     }
 
-    res.status(200).json({ message: "Physical information updated successfully", student });
+    res.status(200).json(new ApiResponse(200,null,"Physical information added successfully"));
 });
 
 // Add other details
