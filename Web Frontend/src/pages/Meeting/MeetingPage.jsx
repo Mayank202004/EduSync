@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import MeetingLayout from "@/components/Meeting/MeetingLayout";
 import ControlsBar from "@/components/Meeting/ControlsBar";
 import useWebRTC from "@/hooks/useWebRTC";
@@ -11,47 +11,52 @@ export default function MeetingPage() {
   const { socket } = useSocket(); 
   const { user } = useAuth();
   const { meetingId } = useParams();
-  const CurrentUser = { _id: user?._id, fullName: user?.fullName, avatar: user?.avatar };
 
-  // Manage hasJoined
+  const CurrentUser = {
+    _id: user?._id,
+    fullName: user?.fullName,
+    avatar: user?.avatar,
+  };
+
   const [hasJoined, setHasJoined] = useState(false);
+  const [preJoinMic, setPreJoinMic] = useState(true);
+  const [preJoinCam, setPreJoinCam] = useState(true);
 
   const {
+    mic,
+    cam,
     localVideoRef,
     participants,
     toggleMic,
     toggleCam,
     toggleScreen,
     leaveMeeting,
-    mic,
-    cam,
     screen,
     raiseHand,
     handRaised,
-  } = useWebRTC(socket, meetingId, CurrentUser, hasJoined); // pass hasJoined here
+  } = useWebRTC(socket, meetingId, CurrentUser, hasJoined, preJoinMic, preJoinCam); 
 
   const [showParticipants, setShowParticipants] = useState(false);
-  const [showHostControls, setShowHostControls] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showHostControls, setShowHostControls] = useState(false);
 
   const closeSidePanel = () => {
     setShowParticipants(false);
-    setShowHostControls(false);
     setShowChat(false);
+    setShowHostControls(false);
   };
 
-  // Pre-Joining Screen // To Do : Check on multi device (same device camera clash error)
   if (!hasJoined) {
     return (
       <PreJoinScreen
         mic={mic}
         cam={cam}
+        //screen={screen}
         toggleMic={toggleMic}
         toggleCam={toggleCam}
         localVideoRef={localVideoRef}
         onJoin={() => setHasJoined(true)}
       />
-        
     );
   }
 
@@ -61,12 +66,12 @@ export default function MeetingPage() {
         mic={mic}
         cam={cam}
         screen={screen}
+        handRaised={handRaised}
+        participants={participants}
         showParticipants={showParticipants}
         showHostControls={showHostControls}
         showChat={showChat}
-        handRaised={handRaised}
         onClosePanel={closeSidePanel}
-        participants={participants}
       />
 
       <ControlsBar

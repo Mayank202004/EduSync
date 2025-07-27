@@ -14,8 +14,6 @@ const VideoTile = ({ participant, pinned = false, setPinned = () => {} }) => {
   }, [videoRef, participant?.stream]);
 
 
-
-
   return (
     <div className="relative bg-gray-800 rounded-2xl overflow-hidden shadow-lg group">
       <video

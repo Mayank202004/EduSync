@@ -15,7 +15,7 @@ const MeetingLayout = ({
   showChat,
   showHostControls,
   onClosePanel,
-  localVideoRef, // ✅ Accept localVideoRef
+  localVideoRef, // 
 }) => {
   const isScreenSharing = !!screenSharerId;
   const isSidePanelOpen = showParticipants || showChat || showHostControls;
