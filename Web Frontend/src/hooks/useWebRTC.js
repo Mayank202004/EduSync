@@ -135,40 +135,30 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
     };
 
     pc.ontrack = (event) => {
-      const stream = event.streams[0];
-
-      const isScreenTrack = stream.getVideoTracks()[0]?.label.includes("screen") || stream.id.includes("screen");
-
-      const participantId = isScreenTrack ? `screen-${socketId}` : socketId;
-      const participantName = isScreenTrack
-        ? `${userInfo.fullName || `User ${socketId}`} (Screen)`
-        : userInfo.fullName || `User ${socketId}`;
-
       setParticipants((prev) => {
-        const exists = prev.find((p) => p._id === participantId);
+        const exists = prev.find((p) => p._id === socketId);
         if (exists) return prev;
-      
+
         const remoteVideoRef = { current: document.createElement("video") };
         remoteVideoRef.current.autoplay = true;
         remoteVideoRef.current.playsInline = true;
-      
+
         return [
           ...prev,
           {
-            _id: participantId,
-            name: participantName,
+            _id: socketId,
+            name: userInfo.fullName || `User ${socketId}`,
             videoEnabled: true,
-            audioEnabled: !isScreenTrack,
+            audioEnabled: true,
             videoRef: remoteVideoRef,
-            stream,
+            stream: event.streams[0],
             isLocal: false,
             avatar: userInfo.avatar || null,
-            isScreen: isScreenTrack,
           },
         ];
       });
     };
-    
+
     return pc;
   };
 
@@ -254,7 +244,7 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
       
       setParticipants((prev) =>
         prev.map((p) =>
-          p.isLocal ? { ...p, videoEnabled: enabled } : p
+          p.isLocal && !p.isScreen ? { ...p, videoEnabled: enabled } : p
         )
       );
       socket.emit("update-media-state", {
