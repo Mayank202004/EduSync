@@ -60,8 +60,6 @@ const MeetingLayout = ({
     4
   );
 
-  console.log(participants);
-
   return (
     <div className="relative w-full h-full bg-gray-950 flex">
       {/* Video Grid */}

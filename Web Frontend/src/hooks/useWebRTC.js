@@ -119,7 +119,7 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
 
-    socket.emit("offer", { target: socketId, offer ,isScreen: false });
+    socket.emit("offer", { target: socketId, offer ,user:currentUser,isScreen: false });
   };
 
   const createPeerConnection = (socketId, userInfo = {}, isScreen = false) => {
@@ -140,17 +140,18 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
   peerMetadata.current[socketId] = { user: userInfo, isScreen };
 
   pc.ontrack = (event) => {
-    console.log("🔔 ontrack called from:", socketId);
-
     const stream = event.streams[0];
     const videoTrack = stream.getVideoTracks()[0];
     const audioTrack = stream.getAudioTracks()[0];
     const isScreenTrack = peerMetadata.current[socketId]?.isScreen || false;
+    
 
     const participantId = isScreenTrack ? `screen-${socketId}` : socketId;
-    const participantName = isScreenTrack
-      ? `${userInfo.fullName || `User ${socketId}`} (Screen)`
-      : userInfo.fullName || `User ${socketId}`;
+    const userMeta = peerMetadata.current[socketId]?.user || {};
+const participantName = isScreenTrack
+  ? `${userMeta.fullName || `User ${socketId}`} (Screen)`
+  : userMeta.fullName || `User ${socketId}`;
+
 
     const videoRef = { current: document.createElement("video") };
     videoRef.current.autoplay = true;
@@ -351,7 +352,7 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
         );
 
         socket.emit("update-media-state", {
-          videoEnabled: true,
+          videoEnabled: cam,
           audioEnabled: mic,
           screenSharing: false,
         });
