@@ -1,7 +1,6 @@
 import { Route, createRoutesFromElements } from 'react-router-dom';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Login from '@/pages/Login';
-import Home from '@/components/Home/Home';
 import Fees from '@/pages/Fees';
 import CalendarPage from '@/pages/Calendar';
 import Resources from '@/pages/Resources';

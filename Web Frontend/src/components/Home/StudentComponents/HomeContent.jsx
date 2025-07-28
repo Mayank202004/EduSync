@@ -15,25 +15,29 @@ import {
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 
-const HomeContent = () => {
+const HomeContent = ({monthlyAttendance,attendanceOverMonths}) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const attendanceData = [
-    { name: "Present", value: 18 },
-    { name: "Absent", value: 2 },
-  ];
-
+  
   const COLORS = ["#10b981", "#ef4444"]; // Green and Red
 
-  const monthlyAttendanceData = [
-    { month: "Jan", present: 18 },
-    { month: "Feb", present: 16 },
-    { month: "Mar", present: 19 },
-    { month: "Apr", present: 17 },
-    { month: "May", present: 20 },
-    { month: "Jun", present: 18 },
-  ];
+  // Convert attendanceForTheMonth object to pie chart array
+  const attendanceData = Object.entries(monthlyAttendance || {}).map(([name, value]) => ({
+    name,
+    value,
+  }));
+
+  // Convert monthlyAttendancePercentage object to array for line chart
+  const monthlyAttendanceData = Object.entries(attendanceOverMonths || {})
+    .sort(([a], [b]) => new Date(a) - new Date(b)) // Sort by date
+    .map(([month, present]) => ({
+      month: new Date(month).toLocaleString('default', { month: 'short' }), // "2025-05" => "May"
+      present,
+    }));
+
+    console.log(attendanceData,monthlyAttendanceData);
+
 
   return (
     <div className="w-full min-h-screen py-2 bg-customLightFg rounded-md dark:bg-customDarkFg">
