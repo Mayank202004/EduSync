@@ -21,7 +21,6 @@ const MeetingLayout = ({
   setMessages,
   roomId
 }) => {
-  const isScreenSharing = !!screenSharerId;
   const isSidePanelOpen = showParticipants || showChat || showHostControls;
 
   const [pinned, setPinned] = useState(null);
@@ -39,11 +38,6 @@ const MeetingLayout = ({
 
 
   const visibleTiles = useMemo(() => {
-    if (isScreenSharing) {
-      const sharer = allParticipants.find((p) => p._id === screenSharerId);
-      return sharer ? [sharer] : [];
-    }
-
     if (pinned) {
       const pinnedUser = allParticipants.find((p) => p._id === pinned);
       return pinnedUser ? [pinnedUser] : [];
@@ -54,7 +48,7 @@ const MeetingLayout = ({
     }
 
     return allParticipants.slice(0, MAX_VISIBLE_TILES);
-  }, [allParticipants, screenSharerId, isScreenSharing, pinned]);
+  }, [allParticipants, pinned]);
 
   const overflowCount =
     !pinned && allParticipants.length > MAX_VISIBLE_TILES
@@ -65,6 +59,8 @@ const MeetingLayout = ({
     visibleTiles.length + (overflowCount > 0 ? 1 : 0),
     4
   );
+
+  console.log(participants);
 
   return (
     <div className="relative w-full h-full bg-gray-950 flex">
@@ -77,11 +73,17 @@ const MeetingLayout = ({
           gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
         }}
       >
-        {isScreenSharing ? (
-          <ScreenShareTile participant={visibleTiles[0]} />
-        ) : (
-          <>
             {visibleTiles.map((participant) => (
+              participant.isScreen ? (
+                <ScreenShareTile 
+                  key={participant._id} 
+                  participant={participant} 
+                  pinned={pinned === participant._id}
+                  setPinned={(id) =>
+                    setPinned((prev) => (prev === id ? null : id))
+                  } 
+                />
+              ) : (
               <VideoTile
                 key={participant._id}
                 participant={participant}
@@ -90,15 +92,13 @@ const MeetingLayout = ({
                   setPinned((prev) => (prev === id ? null : id))
                 }
               />
-            ))}
+            )))}
 
             {overflowCount > 0 && (
               <div className="flex items-center justify-center text-white text-xl font-semibold bg-gray-800 rounded-xl">
                 +{overflowCount} more
               </div>
             )}
-          </>
-        )}
       </div>
 
       {/* Side Panel */}

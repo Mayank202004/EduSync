@@ -31,10 +31,10 @@ export default function MeetingPage() {
     toggleCam,
     toggleScreen,
     leaveMeeting,
-    screen,
     raiseHand,
     handRaised,
     messages,
+    screen,
     setMessages
   } = useWebRTC(socket, meetingId, CurrentUser, hasJoined, preJoinMic, preJoinCam); 
 
@@ -67,7 +67,6 @@ export default function MeetingPage() {
       <MeetingLayout
         mic={mic}
         cam={cam}
-        screen={screen}
         handRaised={handRaised}
         participants={participants}
         showParticipants={showParticipants}

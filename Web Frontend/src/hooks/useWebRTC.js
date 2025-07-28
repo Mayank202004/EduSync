@@ -5,9 +5,9 @@ import { mediaConstraints } from "@/lib/webrtc/constraints";
 export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initialMic = true, initialCam = true) {
   const [mic, setMic] = useState(true);
   const [cam, setCam] = useState(true);
+  const [screen, setScreen] = useState(false);
   const localVideoRef = useRef(null);
   const [participants, setParticipants] = useState([]);
-  const [screen, setScreen] = useState(false);
   const [handRaised, setHandRaised] = useState(false);
   const [messages, setMessages] = useState([]);
 
@@ -135,32 +135,43 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
     };
 
     pc.ontrack = (event) => {
-      setParticipants((prev) => {
-        const exists = prev.find((p) => p._id === socketId);
-        if (exists) return prev;
+      const stream = event.streams[0];
 
+      const isScreenTrack = stream.getVideoTracks()[0]?.label.includes("screen") || stream.id.includes("screen");
+
+      const participantId = isScreenTrack ? `screen-${socketId}` : socketId;
+      const participantName = isScreenTrack
+        ? `${userInfo.fullName || `User ${socketId}`} (Screen)`
+        : userInfo.fullName || `User ${socketId}`;
+
+      setParticipants((prev) => {
+        const exists = prev.find((p) => p._id === participantId);
+        if (exists) return prev;
+      
         const remoteVideoRef = { current: document.createElement("video") };
         remoteVideoRef.current.autoplay = true;
         remoteVideoRef.current.playsInline = true;
-
+      
         return [
           ...prev,
           {
-            _id: socketId,
-            name: userInfo.fullName || `User ${socketId}`,
+            _id: participantId,
+            name: participantName,
             videoEnabled: true,
-            audioEnabled: true,
+            audioEnabled: !isScreenTrack,
             videoRef: remoteVideoRef,
-            stream: event.streams[0],
+            stream,
             isLocal: false,
             avatar: userInfo.avatar || null,
+            isScreen: isScreenTrack,
           },
         ];
       });
     };
-
+    
     return pc;
   };
+
 
   const handleReceiveOffer = async ({ from, user: userInfo, offer }) => {
     let pc = peerConnections.current[from];
@@ -261,13 +272,34 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
       const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
       const screenTrack = screenStream.getVideoTracks()[0];
 
+      // Send screen track to peers
       Object.values(peerConnections.current).forEach((pc) => {
-        const sender = pc.getSenders().find((s) => s.track.kind === "video");
-        if (sender) sender.replaceTrack(screenTrack);
+        pc.addTrack(screenTrack, screenStream); // Don't replace camera
       });
 
+      // Create a screen ref
+      const screenVideoRef = { current: document.createElement("video") };
+      screenVideoRef.current.autoplay = true;
+      screenVideoRef.current.playsInline = true;
+      screenVideoRef.current.muted = true;
+      screenVideoRef.current.srcObject = screenStream;
+
+      const screenParticipant = {
+        _id: `screen-${socket.id}`,
+        name: `${currentUser.fullName} (Screen)`,
+        avatar: currentUser.avatar,
+        videoEnabled: true,
+        audioEnabled: false,
+        stream: screenStream,
+        isLocal: true,
+        isScreen: true, // custom flag
+      };
+
+      setParticipants((prev) => [...prev, screenParticipant]);
+      //setScreenSharerId(`screen-${socket.id}`);
       setScreen(true);
 
+      // Notify others
       socket.emit("update-media-state", {
         roomId,
         videoEnabled: true,
@@ -275,9 +307,14 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
         screenSharing: true,
       });
 
+      // Remove on end
       screenTrack.onended = () => {
         setScreen(false);
-        toggleCam(); 
+        //setScreenSharerId(null);
+
+        setParticipants((prev) =>
+          prev.filter((p) => p._id !== `screen-${socket.id}`)
+        );
 
         socket.emit("update-media-state", {
           videoEnabled: true,
@@ -287,6 +324,7 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
       };
     } catch (err) {
       toast.error("Failed to share screen.");
+      console.error("Error sharing screen:", err);
     }
   };
 
@@ -330,7 +368,6 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
     participants,
     mic,
     cam,
-    screen,
     handRaised,
     toggleMic,
     toggleCam,
@@ -339,5 +376,6 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
     leaveMeeting,
     messages,
     setMessages,
+    screen
   };
 }
