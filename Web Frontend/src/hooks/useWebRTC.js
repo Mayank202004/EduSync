@@ -10,6 +10,8 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
   const [participants, setParticipants] = useState([]);
   const [handRaised, setHandRaised] = useState(false);
   const [messages, setMessages] = useState([]);
+  const peerMetadata = useRef({});
+
 
   const localStream = useRef(null);
   const peerConnections = useRef({});
@@ -117,10 +119,10 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
 
-    socket.emit("offer", { target: socketId, offer });
+    socket.emit("offer", { target: socketId, offer ,isScreen: false });
   };
 
-  const createPeerConnection = (socketId, userInfo = {}) => {
+  const createPeerConnection = (socketId, userInfo = {}, isScreen = false) => {
     const pc = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
@@ -134,40 +136,59 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
       }
     };
 
-    pc.ontrack = (event) => {
-      setParticipants((prev) => {
-        const exists = prev.find((p) => p._id === socketId);
-        if (exists) return prev;
+  // store metadata for this connection
+  peerMetadata.current[socketId] = { user: userInfo, isScreen };
 
-        const remoteVideoRef = { current: document.createElement("video") };
-        remoteVideoRef.current.autoplay = true;
-        remoteVideoRef.current.playsInline = true;
+  pc.ontrack = (event) => {
+    console.log("🔔 ontrack called from:", socketId);
 
-        return [
-          ...prev,
-          {
-            _id: socketId,
-            name: userInfo.fullName || `User ${socketId}`,
-            videoEnabled: true,
-            audioEnabled: true,
-            videoRef: remoteVideoRef,
-            stream: event.streams[0],
-            isLocal: false,
-            avatar: userInfo.avatar || null,
-          },
-        ];
-      });
-    };
+    const stream = event.streams[0];
+    const videoTrack = stream.getVideoTracks()[0];
+    const audioTrack = stream.getAudioTracks()[0];
+    const isScreenTrack = peerMetadata.current[socketId]?.isScreen || false;
 
-    return pc;
+    const participantId = isScreenTrack ? `screen-${socketId}` : socketId;
+    const participantName = isScreenTrack
+      ? `${userInfo.fullName || `User ${socketId}`} (Screen)`
+      : userInfo.fullName || `User ${socketId}`;
+
+    const videoRef = { current: document.createElement("video") };
+    videoRef.current.autoplay = true;
+    videoRef.current.playsInline = true;
+    videoRef.current.srcObject = stream;
+
+    setParticipants((prev) => {
+      const alreadyExists = prev.some((p) => p._id === participantId);
+      if (alreadyExists) {
+        console.warn("⚠️ Participant already exists:", participantId);
+        return prev;
+      }
+
+      return [
+        ...prev,
+        {
+          _id: participantId,
+          name: participantName,
+          avatar: userInfo.avatar || null,
+          videoEnabled: isScreenTrack ? true : videoTrack?.enabled === true,
+          audioEnabled: isScreenTrack ? true : audioTrack?.enabled === true,
+          stream,
+          videoRef,
+          isLocal: false,
+          isScreen: isScreenTrack,
+        },
+      ];
+    });
   };
+  return pc;
+};
 
 
-  const handleReceiveOffer = async ({ from, user: userInfo, offer }) => {
+  const handleReceiveOffer = async ({ from, user: userInfo, offer, isScreen = false }) => {
     let pc = peerConnections.current[from];
 
     if (!pc) {
-      pc = createPeerConnection(from, userInfo);
+      pc = createPeerConnection(from, userInfo, isScreen);
       peerConnections.current[from] = pc;
 
       localStream.current.getTracks().forEach((track) => {
@@ -175,15 +196,22 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
       });
     }
 
+    peerMetadata.current[from] = {
+      isScreen,
+      user: userInfo,
+    };
+
     try {
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
-      socket.emit("answer", { target: from, answer });
+
+      socket.emit("answer", { target: from, answer, isScreen });
     } catch (err) {
       console.error("Error handling offer:", err);
     }
   };
+
 
   const handleReceiveAnswer = async ({ from, answer }) => {
     const pc = peerConnections.current[from];
@@ -263,9 +291,25 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
       const screenTrack = screenStream.getVideoTracks()[0];
 
       // Send screen track to peers
-      Object.values(peerConnections.current).forEach((pc) => {
-        pc.addTrack(screenTrack, screenStream); // Don't replace camera
+      Object.entries(peerConnections.current).forEach(async ([peerId, pc]) => {
+        try {
+          pc.addTrack(screenTrack, screenStream);
+        
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+        
+          socket.emit("offer", {
+            target: peerId,
+            offer,
+            user: currentUser,
+            isScreen: true, // pass metadata manually
+          });
+
+        } catch (err) {
+          console.error(`Error renegotiating with ${peerId}:`, err);
+        }
       });
+
 
       // Create a screen ref
       const screenVideoRef = { current: document.createElement("video") };

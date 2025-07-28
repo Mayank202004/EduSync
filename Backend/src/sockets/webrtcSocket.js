@@ -51,21 +51,25 @@ export const setupWebRTC = (io, socket, user) => {
     
   });
 
-  socket.on("offer", ({ target, offer }) => {
+  socket.on("offer", ({ target, offer, user, isScreen=false }) => {
     io.to(target).emit("offer", {
       from: socket.id,
       user,
       offer,
+      isScreen, 
     });
   });
 
-  socket.on("answer", ({ target, answer }) => {
-    io.to(target).emit("answer", {
-      from: socket.id,
-      user,
-      answer,
-    });
+
+  socket.on("answer", ({ target, answer, isScreen = false }) => {
+  io.to(target).emit("answer", {
+    from: socket.id,
+    user,
+    answer,
+    isScreen, // ✅ propagate this metadata
   });
+});
+
 
   socket.on("ice-candidate", ({ target, candidate }) => {
     io.to(target).emit("ice-candidate", {
