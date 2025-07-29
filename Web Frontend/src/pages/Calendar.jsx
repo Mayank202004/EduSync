@@ -6,20 +6,9 @@ import EventDetails from "@/components/Calendar/EventDetails";
 import UpcomingEvents from "@/components/Calendar/UpcommingEvents";
 import Legend from "@/components/Calendar/Legend";
 import LoadingScreen from "@/components/Loading";
+import { formatEvents } from "@/utils/calendarUtil";
+import getEventColor from "@/utils/calendarUtil";
 
-/**
- * @desc Return colour codes for different event types
- */
-const getEventColor = (type) => {
-  switch (type?.toLowerCase()) {
-    case "national holiday": return { bg: "#e0f2fe", border: "#3b82f6" };
-    case "local holiday": return { bg: "#e0e7ff", border: "#6366f1" };
-    case "academic event": return { bg: "#d1fae5", border: "#10b981" };
-    case "exam": return { bg: "#fef3c7", border: "#f59e0b" };
-    case "other": return { bg: "#fce7f3", border: "#db2777" };
-    default: return { bg: "#f3f4f6", border: "#9ca3af" };
-  }
-};
 
 const CalendarPage = () => {
 //Hooks
@@ -33,30 +22,7 @@ const CalendarPage = () => {
         const response = await getCalendarEvents();
         const rawEvents = response.data;
 
-        const formattedEvents = rawEvents.map((event) => {
-          const startDate = event.start.split("T")[0];
-          let endDate = event.end ? event.end.split("T")[0] : startDate;
-                
-          // If start != end, add 1 day to endDate for FullCalendar display (Because end date is exclusive)
-          if (startDate !== endDate) {
-            const adjustedEnd = new Date(new Date(endDate).getTime() + 24 * 60 * 60 * 1000);
-            endDate = adjustedEnd.toISOString().split("T")[0];
-          }
-        
-          return {
-            title: event.title,
-            start: startDate,
-            end: endDate,
-            allDay: true,
-            extendedProps: {
-              description: event.extendedProps?.description,
-              eventType: event.eventType,
-            },
-            backgroundColor: getEventColor(event.eventType).bg,
-            borderColor: getEventColor(event.eventType).border,
-          };
-        });
-
+        const formattedEvents = formatEvents(rawEvents);
         setEvents(formattedEvents);
       } catch {
         toast.error("Failed to load events.");
@@ -102,8 +68,8 @@ const CalendarPage = () => {
 
       {/* Right Sidebar */}
       <div className="w-full md:w-80 bg-white dark:bg-customDarkFg border-l rounded-lg p-4 flex flex-col h-full">
-        <EventDetails event={selectedEvent} formatDate={formatDate} />
-        <UpcomingEvents events={events} isLoading={isLoading} formatDate={formatDate} />
+        <EventDetails event={selectedEvent} />
+        <UpcomingEvents events={events} isLoading={isLoading}/>
       </div>
     </div>
   );

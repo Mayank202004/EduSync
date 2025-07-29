@@ -1,4 +1,6 @@
-const EventDetails = ({ event, formatDate }) => {
+import { formatDate } from "@/utils/dateUtils";
+
+const EventDetails = ({ event }) => {
   return (
     <div className="mb-4 border-b border-gray-300 dark:border-gray-600 pb-2 min-h-[105px]">
       <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">Event Details</h3>
