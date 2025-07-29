@@ -166,7 +166,6 @@ const participantName = isScreenTrack
       }
 
       return [
-        ...prev,
         {
           _id: participantId,
           name: participantName,
@@ -178,6 +177,7 @@ const participantName = isScreenTrack
           isLocal: false,
           isScreen: isScreenTrack,
         },
+        ...prev,
       ];
     });
   };
@@ -330,14 +330,14 @@ const participantName = isScreenTrack
         isScreen: true, // custom flag
       };
 
-      setParticipants((prev) => [...prev, screenParticipant]);
-      //setScreenSharerId(`screen-${socket.id}`);
+      setParticipants((prev) => [screenParticipant, ...prev]);
+
       setScreen(true);
 
       // Notify others
       socket.emit("update-media-state", {
         roomId,
-        videoEnabled: true,
+        videoEnabled: cam,
         audioEnabled: mic,
         screenSharing: true,
       });
@@ -345,13 +345,13 @@ const participantName = isScreenTrack
       // Remove on end
       screenTrack.onended = () => {
         setScreen(false);
-        //setScreenSharerId(null);
 
         setParticipants((prev) =>
           prev.filter((p) => p._id !== `screen-${socket.id}`)
         );
 
         socket.emit("update-media-state", {
+          roomId,
           videoEnabled: cam,
           audioEnabled: mic,
           screenSharing: false,
@@ -384,18 +384,25 @@ const participantName = isScreenTrack
 
   const handleRemoteMediaUpdated = ({ socketId, videoEnabled, audioEnabled, screenSharing }) => {
     setParticipants((prev) =>
-      prev.map((p) =>
-        p._id === socketId
-          ? {
+      prev
+        .map((p) => {
+          if (p._id === `screen-${socketId}` && screenSharing === false) { // Remove if screen shar eoff
+            return null;
+          }
+          if (p._id === socketId) { // Cam or mic toggle 
+            return {
               ...p,
               videoEnabled: videoEnabled ?? p.videoEnabled,
               audioEnabled: audioEnabled ?? p.audioEnabled,
               screenSharing: screenSharing ?? p.screenSharing,
-            }
-          : p
-      )
+            };
+          }
+          return p; // No change
+        })
+        .filter(Boolean) 
     );
   };
+
   
 
   return {

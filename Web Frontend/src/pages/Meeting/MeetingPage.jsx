@@ -42,6 +42,7 @@ export default function MeetingPage() {
   const [showChat, setShowChat] = useState(false);
   const [showHostControls, setShowHostControls] = useState(false);
 
+
   const closeSidePanel = () => {
     setShowParticipants(false);
     setShowChat(false);

@@ -66,7 +66,7 @@ export const setupWebRTC = (io, socket, user) => {
     from: socket.id,
     user,
     answer,
-    isScreen, // ✅ propagate this metadata
+    isScreen, 
   });
 });
 
@@ -98,6 +98,7 @@ export const setupWebRTC = (io, socket, user) => {
 
   // Toggles to schare screen / video / audio 
   socket.on("update-media-state", ({ roomId,videoEnabled, audioEnabled, screenSharing }) => {
+    console.log("update-media-state",videoEnabled, audioEnabled, screenSharing, roomId);
     if (!roomId) return;
 
     socket.to(`webrtc-${roomId}`).emit("remote-media-updated", {
