@@ -40,7 +40,7 @@ const HomeContent = ({monthlyAttendance,attendanceOverMonths}) => {
 
 
   return (
-    <div className="w-full min-h-screen py-2 bg-customLightFg rounded-md dark:bg-customDarkFg">
+    <div className="w-full min-h-screen py-2 bg-customLightFg rounded-md dark:bg-customDarkBg">
       <div className="max-w-5xl mx-auto space-y-5">
         {/* Study Materials CTA */}
         <div className="flex flex-col md:flex-row items-center gap-6 bg-white dark:bg-customDarkFg p-6 rounded-2xl shadow-md">

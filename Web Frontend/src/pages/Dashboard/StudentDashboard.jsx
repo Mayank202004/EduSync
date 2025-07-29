@@ -26,13 +26,13 @@ const StudentDashboard = () => {
 
   return (
     <div className="flex grow w-full min-h-full bg-transparent">
-      <div className="w-[20%] border-r border-gray-200 dark:border-gray-700 h-full pb-10">
+      <div className="md:w-[30%] lg:w-[20%] border-r border-gray-200 dark:border-gray-700 h-full pb-10 hidden md:block">
         <LeftSidebar chatData={chats}/>
       </div>
-      <div className="w-[60%] p-4 overflow-y-auto">
+      <div className="w-full md:w-[70%] lg:w-[60%] p-4 overflow-y-auto">
         <HomeContent monthlyAttendance={monthlyAttendance} attendanceOverMonths={attendanceOverMonths}/>
       </div>
-      <div className="w-[20%] border-l border-gray-200 dark:border-gray-700">
+      <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden pb-10 md:block">
         <RightSidebar events={events}/>
       </div>
     </div>
