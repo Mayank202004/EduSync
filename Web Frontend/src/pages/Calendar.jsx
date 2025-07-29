@@ -7,7 +7,7 @@ import UpcomingEvents from "@/components/Calendar/UpcommingEvents";
 import Legend from "@/components/Calendar/Legend";
 import LoadingScreen from "@/components/Loading";
 import { formatEvents } from "@/utils/calendarUtil";
-import getEventColor from "@/utils/calendarUtil";
+import { getEventColor } from "@/utils/calendarUtil";
 
 
 const CalendarPage = () => {
@@ -34,12 +34,6 @@ const CalendarPage = () => {
     fetchData();
   }, []);
 
-  const formatDate = (dateStr) =>
-    new Date(dateStr).toLocaleDateString("en-IN", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
 
   const legend = [
     { label: "National Holiday", color: getEventColor("national holiday") },

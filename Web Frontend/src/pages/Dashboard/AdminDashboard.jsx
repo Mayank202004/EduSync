@@ -59,7 +59,7 @@ const AdminDashboard = () => {
       <div className="w-full md:w-[70%] lg:w-[60%] p-4 overflow-y-auto">
         {renderMainContent()}
       </div>
-      <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden lg:block">
+      <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden pb-10 md:block">
         <RightSidebar events={events}/>
       </div>
     </div>

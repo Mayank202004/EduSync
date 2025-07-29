@@ -12,7 +12,6 @@ import {
   Megaphone,
 } from 'lucide-react';
 
-import { useNavigate } from 'react-router-dom'; // Remove later To Do:
 
 const AdminHomeCard = ({ icon: Icon, title, description, onClick }) => {
   return (
@@ -30,7 +29,6 @@ const AdminHomeCard = ({ icon: Icon, title, description, onClick }) => {
 };
 
 const AdminHomeContent = ({setActiveView=()=>{}}) => {
-  const navigate = useNavigate(); // To Do : Remove after testng of meeting 
   return (
     <div className="w-full px-6 py-4">
       <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
@@ -88,7 +86,6 @@ const AdminHomeContent = ({setActiveView=()=>{}}) => {
           icon={Users}
           title="User Management"
           description="View and manage all registered users."
-          onClick={() => navigate('/meeting')} // TO Do : Remove after testing of meeting (This is jus tfor testing purpose)
         />
       </div>
     </div>

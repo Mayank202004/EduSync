@@ -18,13 +18,15 @@ export const fetchDashboardData = asyncHandler(async (req, res) => {
     const chatData = await getStudentChats(user._id,student.class,student.div);
     const monthlyAttendancePercentage = await getAttendancePercentageByMonth(student._id,student.class,student.div);
     const attendanceForTheMonth = await getAttendanceForTheMonth(student._id,student.class,student.div);
-    return res.status(200).json(new ApiResponse(200, {chatData,monthlyAttendancePercentage,attendanceForTheMonth}, "Dashboard data fetched successfully"));
+    const events = await returnAllEvents();
+    return res.status(200).json(new ApiResponse(200, {chatData,monthlyAttendancePercentage,attendanceForTheMonth,events}, "Dashboard data fetched successfully"));
 });
 
 export const fetchTeacherDashboardData = asyncHandler(async (req, res) => {
     const teacher = req.teacher;
     const chatData = await getTeacherChats(teacher);
-    return res.status(200).json(new ApiResponse(200, {chatData}, "Teacher Dashboard data fetched successfully"));
+    const events = await returnAllEvents();
+    return res.status(200).json(new ApiResponse(200, {chatData,events}, "Teacher Dashboard data fetched successfully"));
 });
 
 export const fetchSuperAdminDashboardData = asyncHandler(async (req, res) => {

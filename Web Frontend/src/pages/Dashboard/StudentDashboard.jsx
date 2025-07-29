@@ -4,12 +4,14 @@ import RightSidebar from '@/components/Home/Sidebar/RightSidebar';
 import HomeContent from '@/components/Home/StudentComponents/HomeContent';
 import { useState, useEffect} from 'react';
 import { fetchStudentDashboardData } from '@/services/dashboardService';
+import { formatEvents } from '@/utils/calendarUtil';
 
 
 const StudentDashboard = () => {
   const [chats, setChats] = useState(null);
   const [monthlyAttendance, setMonthlyAttendance] = useState(null);
   const [attendanceOverMonths, setAttendanceOverMonths] = useState(null);
+  const [events,setEvents] = useState([]);
 
   useEffect(() => {
     const getDashboardData = async () => {
@@ -17,6 +19,7 @@ const StudentDashboard = () => {
       setChats(response?.data.chatData);
       setAttendanceOverMonths(response?.data?.monthlyAttendancePercentage);
       setMonthlyAttendance(response?.data?.attendanceForTheMonth);
+      setEvents(formatEvents(response?.data.events));
     };
     getDashboardData();
   }, []);
@@ -30,7 +33,7 @@ const StudentDashboard = () => {
         <HomeContent monthlyAttendance={monthlyAttendance} attendanceOverMonths={attendanceOverMonths}/>
       </div>
       <div className="w-[20%] border-l border-gray-200 dark:border-gray-700">
-        <RightSidebar />
+        <RightSidebar events={events}/>
       </div>
     </div>
   );

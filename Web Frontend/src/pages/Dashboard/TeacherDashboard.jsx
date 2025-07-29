@@ -4,14 +4,17 @@ import RightSidebar from '@/components/Home/Sidebar/RightSidebar';
 import TeacherHomeContent from '@/components/Home/TeacherComponents/TeacherHomeContent';
 import { fetchTeacherDashboardData } from '@/services/dashboardService';
 import { useState, useEffect } from 'react';
+import { formatEvents } from '@/utils/calendarUtil';
 
 const TeacherDashboard = () => {
   const [chats, setChats] = useState(null);
+  const [events,setEvents] = useState([]);
 
   useEffect(() => {
     const getDashboardData = async () => {
       const response = await fetchTeacherDashboardData();
       setChats(response?.data.chatData);
+      setEvents(formatEvents(response?.data.events));
     };
     getDashboardData();
   }, []);
@@ -24,7 +27,7 @@ const TeacherDashboard = () => {
         <TeacherHomeContent />
       </div>
       <div className="w-[20%] border-l border-gray-200 dark:border-gray-700">
-        <RightSidebar />
+        <RightSidebar events={events}/>
       </div>
     </div>
   );
