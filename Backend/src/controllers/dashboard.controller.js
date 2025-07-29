@@ -10,6 +10,7 @@ import { deleteAllStudentFeeStatuses } from "./paidFee.controller.js";
 import { getSettingValue } from "./setting.controller.js";
 import { ClassStructure } from "../models/classStructure.model.js";
 import { Student } from "../models/student.model.js";
+import { returnAllEvents } from "./calendar.controller.js";
 
 export const fetchDashboardData = asyncHandler(async (req, res) => {
     const user = req.user;
@@ -29,8 +30,8 @@ export const fetchTeacherDashboardData = asyncHandler(async (req, res) => {
 export const fetchSuperAdminDashboardData = asyncHandler(async (req, res) => {
     const allUsers = await getAllUsers(req.user._id);
     const chatData = await getSuperAdminChats(req.user._id);
-    const academicYear = await getSettingValue("academicYear");
-    return res.status(200).json(new ApiResponse(200, {chatData,allUsers,academicYear}, "Super Admin Dashboard data fetched successfully"));
+    const events = await returnAllEvents();
+    return res.status(200).json(new ApiResponse(200, {chatData,allUsers,events}, "Super Admin Dashboard data fetched successfully"));
 });
 
 

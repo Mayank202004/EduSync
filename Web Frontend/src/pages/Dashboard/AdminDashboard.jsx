@@ -9,6 +9,7 @@ import ManageTeacherSubjects from '@/components/Home/AdminComponents/ManageSubje
 import ManageAcademicYear from '@/components/Home/AdminComponents/ManageAcademicYear/ManageAcademicYear';
 import { fetchSuperAdminDashboardData } from '@/services/dashboardService';
 import TicketInbox from '@/components/Home/AdminComponents/TicketInbox';
+import { formatEvents } from '@/utils/calendarUtil';
 
 
 
@@ -16,14 +17,14 @@ const AdminDashboard = () => {
   const [activeView, setActiveView] = useState('home');
   const [chats, setChats] = useState(null);
   const [allUsers, setAllUsers] = useState(null);
-  const [academicYear, setAcademicYear] = useState(null);
+  const [events,setEvents] = useState([]);
   
   useEffect(() => {
     const getDashboardData = async () => {
       const response = await fetchSuperAdminDashboardData();
       setChats(response?.data.chatData);
       setAllUsers(response?.data.allUsers);
-      setAcademicYear(response?.data.academicYear);
+      setEvents(formatEvents(response?.data.events));
     };
     getDashboardData();
   }, []);
@@ -59,7 +60,7 @@ const AdminDashboard = () => {
         {renderMainContent()}
       </div>
       <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden lg:block">
-        <RightSidebar />
+        <RightSidebar events={events}/>
       </div>
     </div>
   );

@@ -40,10 +40,18 @@ export const createEvent = asyncHandler(async (req, res) => {
  * @route GET /api/calendar/events
  * @access Private (Authenticated User)
  */
-export const getAllEvents = asyncHandler(async (req, res) => {
-  const events = await CalendarEvent.find().select('-__v -_id');
+export const getAllEvents = asyncHandler(async (_, res) => {
+  const events = await returnAllEvents();
   res.status(200).json(new ApiResponse(200, events, 'Events fetched successfully.'));
 });
+
+/**
+ * @desc - Helper function to get all events 
+ */
+export const returnAllEvents = async() => {
+  const events = await CalendarEvent.find().select('-__v -_id');
+  return events
+}
 
 
 /**
