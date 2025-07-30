@@ -61,10 +61,6 @@ const ScreenShareTile = ({ participant, pinned = false, setPinned = () => {} }) 
       </div>
 
       {/* Screen Sharing Label */}
-      <div className="absolute top-2 left-2 bg-red-600 text-white px-3 py-1 text-sm rounded-lg shadow">
-        Screen Sharing – {name}
-      </div>
-
       {/* Name Label */}
       <div className="absolute bottom-2 right-2 text-white text-sm bg-black/50 px-2 py-0.5 rounded-full">
         {name}
