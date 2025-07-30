@@ -1,7 +1,7 @@
 const SidePanel = ({ title, children, onClose }) => {
   return (
     <div
-      className="absolute top-4 right-4 bottom-22 w-[25%] bg-white text-black rounded-xl shadow-xl border border-gray-300 flex flex-col transition-all duration-500 ease-in-out"
+      className="absolute top-4 right-4 bottom-22 w-[90%] md:w-[40%] lg:w-[25%] bg-white text-black rounded-xl shadow-xl border border-gray-300 flex flex-col transition-all duration-500 ease-in-out"
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex justify-between items-center font-semibold text-lg rounded-t-xl">
