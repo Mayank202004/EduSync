@@ -340,7 +340,7 @@ export const exportAttendanceExcel = asyncHandler(async (req, res) => {
 
     if (!records.length) throw new ApiError(404, "No attendance records found");
 
-    const students = await Student.find().populate("userId", "fullName");
+    const students = await Student.find(query).populate("userId", "fullName");
     const studentNames = students
         .map(s => s.userId.fullName)
         .filter(Boolean)
