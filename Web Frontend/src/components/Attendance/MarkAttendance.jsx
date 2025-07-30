@@ -42,7 +42,7 @@ function MarkAttendance({ className, div, goBack = () => {} }) {
   const handleSubmit = async () => {
     try {
       await toast.promise(
-        markAttendance(absentStudents, plStudents, date),
+        markAttendance(className, div, absentStudents, plStudents, date),
         {
           loading: "Marking Attendance...",
           success: "Attendance marked successfully",

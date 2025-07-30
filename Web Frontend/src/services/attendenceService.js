@@ -62,8 +62,8 @@ export const getStudentList = async (className, div) => {
  * @param {Date} date - Date for which attendance to mark
  * @returns {Promise} promise resolving to mark attendance status
  */
-export const markAttendance = async (absentStudents,permittedLeaveStudents, date) => {
-    const response = await axiosInstance.post(`${BASEURL}/attendence/mark`,{date,absentStudents,permittedLeaveStudents});
+export const markAttendance = async (className,div,absentStudents,permittedLeaveStudents, date) => {
+    const response = await axiosInstance.post(`${BASEURL}/attendence/mark`,{className,div,date,absentStudents,permittedLeaveStudents});
     return response.data;
 }
 

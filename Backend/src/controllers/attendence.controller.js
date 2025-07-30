@@ -14,7 +14,7 @@ import moment from "moment-timezone";
  */
 export const markAttendance = asyncHandler(async (req, res) => {
     try {
-        const { date, class: classNameFromBody, div: divFromBody, absentStudents, permittedLeaveStudents} = req.body;
+        const { date, className:classNameFromBody, div:divFromBody, absentStudents, permittedLeaveStudents} = req.body;
 
         if (req.user.role !== "teacher") {
             throw new ApiError(403, "You are not authorized to mark attendance");
@@ -600,7 +600,9 @@ const getTopAttendees = async (className = null, div = null) => {
                 { $unwind: "$attendance" },
                 {
                     $match: {
-                        "attendance.status": "Present"
+                        "attendance.status": "Present",
+                        ...(className && { class: className }),
+                        ...(div && { div: div })
                     }
                 },
                 {
