@@ -548,7 +548,7 @@ const getGenderDistribution = async (className = null, div = null) => {
     pipeline.push(
         {
             $group: {
-                _id: "$gender",
+                _id: { $toLower: "$gender" },
                 count: { $sum: 1 }
             }
         },
