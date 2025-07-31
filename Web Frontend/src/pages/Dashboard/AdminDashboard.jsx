@@ -42,7 +42,7 @@ const AdminDashboard = () => {
       case 'manage-subjects':
         return <ManageTeacherSubjects onBackPressed={onBackPressed} />;
       case 'manage-academic-year':
-        return <ManageAcademicYear onBackPressed={onBackPressed} academicYear={academicYear} />; // To Do remove academic year here and from backend no need
+        return <ManageAcademicYear onBackPressed={onBackPressed} />;
       case 'ticket-inbox':
         return <TicketInbox onBackPressed={onBackPressed}/>
       case 'home':
