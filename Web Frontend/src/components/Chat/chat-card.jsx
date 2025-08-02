@@ -359,7 +359,11 @@ const ChatCard = ({
                           {/* Time Expiry Logic */}
                           {Date.now() - new Date(message.meeting.meetingTime).getTime() <= 24 * 60 * 60 * 1000 ? (
                             <button
-                              onClick={() => navigate(`/meeting/${message.meeting.meetingId}`)}
+                              onClick={() => navigate(`/meeting/${message.meeting.meetingId}`, {
+                                state: {
+                                  hostId: message.sender._id,
+                                },
+                              })}
                               className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-md text-sm font-medium transition"
                             >
                               Join Meeting

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { mediaConstraints } from "@/lib/webrtc/constraints";
 
-export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initialMic = true, initialCam = true) {
+export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin, initialMic = true, initialCam = true) {
   const [mic, setMic] = useState(true);
   const [cam, setCam] = useState(true);
   const [screen, setScreen] = useState(false);
@@ -11,6 +11,14 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
   const [handRaised, setHandRaised] = useState(false);
   const [messages, setMessages] = useState([]);
   const peerMetadata = useRef({});
+
+  const [hostControls, setHostControls] = useState({
+    microphoneEnableAllowed: true,
+    videoEnableAllowed: true,
+    screenShareAllowed: true,
+    chatAllowed: true,
+  });
+
 
 
   const localStream = useRef(null);
@@ -39,7 +47,7 @@ export default function useWebRTC(socket, roomId, currentUser, shouldJoin, initi
           },
         ]);
       } catch (err) {
-        toast.error("Failed to start media. Please rejoin.");
+        toast.error(`Media start failed: ${err.message}`);
       }
     };
 
@@ -406,6 +414,7 @@ const participantName = isScreenTrack
   
 
   return {
+    hostControls,
     localVideoRef,
     participants,
     mic,

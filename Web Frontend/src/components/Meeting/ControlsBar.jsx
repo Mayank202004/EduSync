@@ -18,6 +18,7 @@ const ControlsBar = ({
   mic,
   cam,
   screen,
+  isHost,
   onToggleMic,
   onToggleCam,
   onToggleScreen,
@@ -64,9 +65,9 @@ const ControlsBar = ({
           <button onClick={onToggleParticipants} title="Toggle Participants" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
             <Users />
           </button>
-          <button onClick={onToggleHostControls} title="Toggle Host Controls" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
+          {isHost && <button onClick={onToggleHostControls} title="Toggle Host Controls" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
             <Shield />
-          </button>
+          </button>}
         </div>
       </div>
 
