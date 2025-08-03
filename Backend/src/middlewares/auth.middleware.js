@@ -34,6 +34,20 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
     }
 });
 
+/**
+ * @desc Verify System Administrator (Platform-level Admin)
+ * @access Private (System Admin only)
+ */
+export const verifySystemAdmin = asyncHandler(async (req, _, next) => {
+  const user = req.user;
+
+  if (!user || user.role !== "system-admin") {
+    throw new ApiError(403, "Access denied: System Administrator only");
+  }
+  next();
+});
+
+
 export const verifyStudent = asyncHandler(async(req,_,next) =>{
     const user = req.user;
 
