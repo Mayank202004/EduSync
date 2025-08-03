@@ -4,7 +4,8 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { Chat } from "../models/chat.model.js";
-import { CLASS_ORDER,DIVISIONS } from "../constants/student.constants.js";
+import { CLASS_ORDER} from "../constants/student.constants.js";
+import { ClassStructure } from "../models/classStructure.model.js";
 
 /**
  * @desc Add class and division details
@@ -23,29 +24,29 @@ export const addClassDetails = asyncHandler(async (req, res) => {
     }
 
     try{
-        const student = await Student.findByIdAndUpdate(studId, {
+        const student = await Student.findOneAndUpdate({_id:studId, schoolId: req.school?._id}, {
             class: className,
             div: div
         }, { new: true });
         if (!student) {
             throw new ApiError(404, "Student not found");
         }
-        await User.findByIdAndUpdate(student.userId, { verified: true });
+        await User.findOneAndUpdate({_id:student.userId,schoolId: req.school?._id}, { verified: true });
         
         // Join "School" group
         const schoolChat = await Chat.findOneAndUpdate(
-          { name: "School", isGroupChat: true },
+          { name: "School", isGroupChat: true, schoolId: req.school?._id },
           { $addToSet: { participants: student.userId } }
         );
 
         // Join specific "Class" group (e.g., "Class 1-A") / Create new if not present
         // Check if class chat exists
-        let classChat = await Chat.findOne({ className, div, isGroupChat: true });
+        let classChat = await Chat.findOne({ className, div, isGroupChat: true, schoolId: req.school?._id });
 
         if (classChat) {
           // Update to add participant only if not already present
-          classChat = await Chat.findByIdAndUpdate(
-            classChat._id,
+          classChat = await Chat.findOneAndUpdate(
+            {_id:classChat._id ,schoolId: req.school?._id},
             { $addToSet: { participants: student.userId } },
             { new: true }
           );
@@ -56,6 +57,7 @@ export const addClassDetails = asyncHandler(async (req, res) => {
             isGroupChat: true,
             className,
             div,
+            schoolId: req.school?._id,
             participants: [student.userId],
           });
         }
@@ -512,31 +514,46 @@ export const promoteStudents = asyncHandler(async (req, res) => {
  */
 export const shuffleDivisions = asyncHandler(async (req, res) => {
   for (const className of CLASS_ORDER) {
-    const students = await Student.find({ class: className, schoolId: req.school?._id })
-    .populate({
-      path: "userId",
-      match: { verified: true }, 
-      select: "verified ",
+    // Get the class structure with divisions for this class
+    const classStructure = await ClassStructure.findOne({
+      className,
+      schoolId: req.school?._id,
     });
 
-    if (students.length === 0) continue;
+    if (!classStructure || classStructure.divisions.length === 0) continue;
+
+    const divisions = classStructure.divisions;
+
+    // Get verified students only
+    const students = await Student.find({ class: className, schoolId: req.school?._id })
+      .populate({
+        path: "userId",
+        match: { verified: true },
+        select: "verified",
+      });
+
+    // Filter out unverified (populate match may not remove them)
+    const verifiedStudents = students.filter((s) => s.userId);
+
+    if (verifiedStudents.length === 0) continue;
 
     // Shuffle students randomly
-    const shuffled = students.sort(() => Math.random() - 0.5);
+    const shuffled = verifiedStudents.sort(() => Math.random() - 0.5);
 
     // Prepare bulk operations for division assignment
     const bulkOps = shuffled.map((student, index) => ({
       updateOne: {
         filter: { _id: student._id },
         update: {
-          $set: { div: DIVISIONS[index % DIVISIONS.length] },
+          $set: { div: divisions[index % divisions.length] },
         },
       },
     }));
 
-    // Execute all updates in one go
+    // Execute all updates
     await Student.bulkWrite(bulkOps);
   }
+
   res.status(200).json(new ApiResponse(200, {}, "Divisions shuffled successfully"));
 });
 
