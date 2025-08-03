@@ -513,8 +513,10 @@ export const promoteStudents = asyncHandler(async (req, res) => {
  * @access Private (Super Admin)
  */
 export const shuffleDivisions = asyncHandler(async (req, res) => {
+  const updatedChatParticipants = {}; // { "1-A": [userId1, userId2], ... }
+
   for (const className of CLASS_ORDER) {
-    // Get the class structure with divisions for this class
+    // Fetch class structure
     const classStructure = await ClassStructure.findOne({
       className,
       schoolId: req.school?._id,
@@ -524,38 +526,71 @@ export const shuffleDivisions = asyncHandler(async (req, res) => {
 
     const divisions = classStructure.divisions;
 
-    // Get verified students only
+    // Get verified students
     const students = await Student.find({ class: className, schoolId: req.school?._id })
       .populate({
         path: "userId",
         match: { verified: true },
-        select: "verified",
+        select: "_id verified",
       });
 
-    // Filter out unverified (populate match may not remove them)
     const verifiedStudents = students.filter((s) => s.userId);
-
     if (verifiedStudents.length === 0) continue;
 
-    // Shuffle students randomly
     const shuffled = verifiedStudents.sort(() => Math.random() - 0.5);
 
-    // Prepare bulk operations for division assignment
-    const bulkOps = shuffled.map((student, index) => ({
-      updateOne: {
-        filter: { _id: student._id },
-        update: {
-          $set: { div: divisions[index % divisions.length] },
-        },
-      },
-    }));
+    const bulkOps = [];
 
-    // Execute all updates
+    for (let i = 0; i < shuffled.length; i++) {
+      const student = shuffled[i];
+      const assignedDiv = divisions[i % divisions.length];
+
+      // Collect for chat update
+      const key = `${className}-${assignedDiv}`;
+      if (!updatedChatParticipants[key]) updatedChatParticipants[key] = [];
+      updatedChatParticipants[key].push(student.userId._id);
+
+      // Add to student bulk update
+      bulkOps.push({
+        updateOne: {
+          filter: { _id: student._id },
+          update: { $set: { div: assignedDiv } },
+        },
+      });
+    }
+
     await Student.bulkWrite(bulkOps);
   }
 
-  res.status(200).json(new ApiResponse(200, {}, "Divisions shuffled successfully"));
+  // Update Chat participants for each class-division chat
+  const chatBulkOps = [];
+
+  for (const key in updatedChatParticipants) {
+    const [className, div] = key.split("-");
+    chatBulkOps.push({
+      updateOne: {
+        filter: {
+          className,
+          div,
+          isGroupChat: true,
+          schoolId: req.school?._id,
+        },
+        update: {
+          $set: {
+            participants: updatedChatParticipants[key],
+          },
+        },
+      },
+    });
+  }
+
+  if (chatBulkOps.length > 0) {
+    await Chat.bulkWrite(chatBulkOps);
+  }
+
+  res.status(200).json(new ApiResponse(200, {}, "Divisions shuffled and chat participants updated successfully"));
 });
+
 
 /**
  * @desc Manually assign divisions
