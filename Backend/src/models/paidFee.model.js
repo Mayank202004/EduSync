@@ -5,7 +5,6 @@ const studentPaidFeeSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Student",
     required: true,
-    unique: true,
   },
   paidFees: [
     {
@@ -37,7 +36,12 @@ const studentPaidFeeSchema = new Schema({
         }
       ]
     }
-  ]
+  ],
+  schoolId: {
+    type: Schema.Types.ObjectId,
+    ref: "School",
+    required: true,
+  },
 });
 
 

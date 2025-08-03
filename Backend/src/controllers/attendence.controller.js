@@ -55,13 +55,13 @@ export const markAttendance = asyncHandler(async (req, res) => {
         const markedBy = req.teacher._id;
 
         // Check for duplicate attendance
-        const alreadyExists = await ClassAttendance.findOne({ date: parsedDate, class: className, div });
+        const alreadyExists = await ClassAttendance.findOne({ date: parsedDate, class: className, div, schoolId: req.school?._id});
         if (alreadyExists) {
             return res.status(400).json({ message: "Attendance already marked for this class on this date." });
         }
 
         // Get all students of that class/div
-        const allStudents = await Student.find({ class: className, div }).select("_id");
+        const allStudents = await Student.find({ class: className, div, schoolId: req.school?._id}).select("_id");
 
         const attendance = allStudents.map(student => {
             const sid = student._id.toString();
@@ -85,6 +85,7 @@ export const markAttendance = asyncHandler(async (req, res) => {
 
         // Save attendance
         const saved = await ClassAttendance.create({
+            schoolId: req.school?._id,
             date: parsedDate,
             class: className,
             div,
@@ -114,7 +115,7 @@ export const getDailyAttendance = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Date, class, and div are required");
     }
 
-    const attendance = await ClassAttendance.findOne({ date, class: className, div })
+    const attendance = await ClassAttendance.findOne({ date, class: className, div, schoolId: req.school?._id})
     .populate({
         path: "attendance.studentId",
         select: "userId", 
@@ -183,6 +184,7 @@ export const getMyAttendance = asyncHandler(async (req, res) => {
 
     const attendanceRecords = await ClassAttendance.find({
         "attendance.studentId": student._id,
+        schoolId: req.school?._id,
         ...dateFilter,
     });
 
@@ -237,7 +239,7 @@ export const getAttendance = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Class and div are required");
     }
 
-    const filter = { class: className, div };
+    const filter = { class: className, div, schoolId: req.school?._id };
 
     if (!isNaN(parseInt(month)) && month >= 1 && month <= 12) {
         const selectedYear = parseInt(year) || new Date().getFullYear();
@@ -483,7 +485,7 @@ export const getStudentList = asyncHandler(async (req, res) => {
   }
 
   const students = await Student.aggregate([
-    { $match: { class: className, div: div } },
+    { $match: { class: className, div: div, schoolId: req.school?._id } },
     {
       $lookup: {
         from: 'users',           
@@ -511,11 +513,12 @@ export const getStudentList = asyncHandler(async (req, res) => {
  * @param {String} div - Division (Optional)
  * @returns {Array} - Array of objects containing gender with their counts
  */
-const getGenderDistribution = async (className = null, div = null) => {
+const getGenderDistribution = async (className = null, div = null, schoolId) => {
     const matchStage = {};
 
     if (className) matchStage.class = className;
     if (div) matchStage.div = div;
+    matchStage.schoolId = schoolId;
 
     const pipeline = [];
 
@@ -577,10 +580,11 @@ const getGenderDistribution = async (className = null, div = null) => {
  * @param {String} div - Division (Optional)
  * @returns {Object} - Object containing total working days and top student attendance summary
  */
-const getTopAttendees = async (className = null, div = null) => {
+const getTopAttendees = async (className = null, div = null, schoolId) => {
     const matchStage = {};
     if (className) matchStage.class = className;
     if (div) matchStage.div = div;
+    matchStage.schoolId = schoolId;
 
     const pipeline = [];
 
@@ -666,7 +670,7 @@ const getTopAttendees = async (className = null, div = null) => {
  * @param {String} className - The class name (e.g., "6", "7", etc.)
  * @returns {Object} - { month: "May, 2025", data: [{ div: "A", percentage: 87.5 }, ...] }
  */
-const getDivisionWisePresenteePercentage = async (className) => {
+const getDivisionWisePresenteePercentage = async (className, schoolId) => {
     const now = moment().tz("Asia/Kolkata");
 
     const getMonthRange = (mDate) => {
@@ -677,7 +681,7 @@ const getDivisionWisePresenteePercentage = async (className) => {
 
     // Try current month first
     let { start: startOfMonth, end: endOfMonth } = getMonthRange(now);
-    let data = await aggregateDivisionPresentee(className, startOfMonth, endOfMonth);
+    let data = await aggregateDivisionPresentee(className, startOfMonth, endOfMonth, schoolId);
 
     let usedDate = now;
 
@@ -685,7 +689,7 @@ const getDivisionWisePresenteePercentage = async (className) => {
     if (data.length === 0) {
         const previousMonth = now.clone().subtract(1, "month");
         const { start, end } = getMonthRange(previousMonth);
-        data = await aggregateDivisionPresentee(className, start, end);
+        data = await aggregateDivisionPresentee(className, start, end, schoolId);
         usedDate = previousMonth;
     }
 
@@ -701,7 +705,7 @@ const getDivisionWisePresenteePercentage = async (className) => {
  * @desc Helper function to fetch classwise present percentage
  * @returns {Object} - { month: "May, 2025", data: [{ div: "A", percentage: 87.5 }, ...] } 
  */
-const getClassWisePresenteePercentage = async () => {
+const getClassWisePresenteePercentage = async (schoolId) => {
     const now = moment().tz("Asia/Kolkata");
 
     const getMonthRange = (mDate) => {
@@ -711,7 +715,7 @@ const getClassWisePresenteePercentage = async () => {
     };
     // Try current month first
     let { start: startOfMonth, end: endOfMonth } = getMonthRange(now);
-    let data = await aggregateClassPresentee(startOfMonth, endOfMonth);
+    let data = await aggregateClassPresentee(startOfMonth, endOfMonth, schoolId);
 
     let usedDate = now;
 
@@ -719,7 +723,7 @@ const getClassWisePresenteePercentage = async () => {
     if (data.length === 0) {
         const previousMonth = now.clone().subtract(1, "month");
         const { start, end } = getMonthRange(previousMonth);
-        data = await aggregateClassPresentee(start, end);
+        data = await aggregateClassPresentee(start, end,schoolId);
         usedDate = previousMonth;
     }
     const formattedMonth = usedDate.format("MMMM, YYYY"); // e.g., "May, 2025"
@@ -751,10 +755,11 @@ const getClassWisePresenteePercentage = async () => {
  * @param {Date} endDate - End date of the range
  * @returns {Array} - Array of the objects with division and percentage
  */
-async function aggregateDivisionPresentee(className, startDate, endDate) {
+async function aggregateDivisionPresentee(className, startDate, endDate,schoolId) {
     return await ClassAttendance.aggregate([
         {
             $match: {
+                schoolId: schoolId,
                 class: className,
                 date: { $gte: startDate, $lte: endDate }
             }
@@ -806,10 +811,11 @@ async function aggregateDivisionPresentee(className, startDate, endDate) {
  * @param {Date} endDate - End date of the range
  * @returns {Array} - Array of the objects with division and percentage
  */
-const aggregateClassPresentee = async (startDate, endDate) => {
+const aggregateClassPresentee = async (startDate, endDate,schoolId) => {
     return await ClassAttendance.aggregate([
         {
             $match: {
+                schoolId: schoolId,
                 date: { $gte: startDate, $lte: endDate }
             }
         },
@@ -881,13 +887,14 @@ const aggregateClassPresentee = async (startDate, endDate) => {
  * @param {String} div - Division (Optional)
  * @returns {Array} - Array of objects with day and absent count
  */
-const getWeeklyAbsenteeCount = async (className = null, div = null) => {
+const getWeeklyAbsenteeCount = async (className = null, div = null,schoolId) => {
     const now = new Date();
     const startOfWeek = new Date(now);
     startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
     startOfWeek.setHours(0, 0, 0, 0);
 
     const matchConditions = {
+        schoolId: schoolId,
         date: { $gte: startOfWeek, $lte: now }
     };
 
@@ -945,7 +952,7 @@ const getWeeklyAbsenteeCount = async (className = null, div = null) => {
  * @param {String} div - Division (Optional)
  * @returns {Object} - Array of date and count of present student and total number of students
  */
-const getDailyPresentee = async (className = null, div = null) => {
+const getDailyPresentee = async (className = null, div = null, schoolId) => {
   const now = new Date();
 
   const getMonthRange = (date) => {
@@ -956,17 +963,17 @@ const getDailyPresentee = async (className = null, div = null) => {
 
   const { start: startOfMonth, end: endOfMonth } = getMonthRange(now);
 
-  let data = await aggregateDailyPresentee(className, div, startOfMonth, endOfMonth);
+  let data = await aggregateDailyPresentee(className, div, startOfMonth, endOfMonth, schoolId);
 
   // If no attendance in current month, fallback to previous month
   if (data.length === 0) {
     const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const { start, end } = getMonthRange(previousMonth);
-    data = await aggregateDailyPresentee(className, div, start, end);
+    data = await aggregateDailyPresentee(className, div, start, end, schoolId);
   }
 
   // Total students match condition
-  const studentMatch = {};
+  const studentMatch = {schoolId: schoolId};
   if (className) studentMatch.class = className;
   if (div) studentMatch.div = div;
 
@@ -987,9 +994,10 @@ const getDailyPresentee = async (className = null, div = null) => {
  * @param {Date} endDate - End date of the range
  * @returns {Array} - Array of objects with date and total presentee count
  */
-const aggregateDailyPresentee = async (className, div, startDate, endDate) => {
+const aggregateDailyPresentee = async (className, div, startDate, endDate, schoolId) => {
   const matchConditions = {
     date: { $gte: startDate, $lte: endDate },
+    schoolId: schoolId
   };
   if (className) matchConditions.class = className;
   if (div) matchConditions.div = div;
@@ -1058,11 +1066,11 @@ export const getTeacherDashboardData = asyncHandler(async (req, res) => {
         divisionPresenteePercentage,
         dailyTotalPresentee
     ] = await Promise.all([
-        getTopAttendees(className, div),
-        getGenderDistribution(className, div),
-        getWeeklyAbsenteeCount(className, div),
-        getDivisionWisePresenteePercentage(className),
-        getDailyPresentee(className,div)
+        getTopAttendees(className, div,req.school?._id),
+        getGenderDistribution(className, div,req.school?._id),
+        getWeeklyAbsenteeCount(className, div,req.school?._id),
+        getDivisionWisePresenteePercentage(className,req.school?._id),
+        getDailyPresentee(className,div,req.school?._id)
     ]);
 
     res.status(200).json(new ApiResponse(
@@ -1096,13 +1104,13 @@ export const getTopLevelAdminDashboardData = asyncHandler(async (req, res) => {
         classStructure,
         totalStudents
     ] = await Promise.all([
-        getTopAttendees(),
-        getGenderDistribution(),
-        getWeeklyAbsenteeCount(),
-        getClassWisePresenteePercentage(),
-        getDailyPresentee(),
-        ClassStructure.find().sort({ className: 1 }).select("-createdAt -updatedAt -__v -_id"),
-        getVerifiedStudentCount()
+        getTopAttendees(req.school?._id),
+        getGenderDistribution(req.school?._id),
+        getWeeklyAbsenteeCount(req.school?._id),
+        getClassWisePresenteePercentage(req.school?._id),
+        getDailyPresentee(req.school?._id),
+        ClassStructure.find({schoolId: req.school?._id}).sort({ className: 1 }).select("-createdAt -updatedAt -__v -_id"),
+        getVerifiedStudentCount(req.school?._id)
     ]);
 
     res.status(200).json(new ApiResponse(
@@ -1140,13 +1148,13 @@ export const getClassLevelAdminDashboardData = asyncHandler(async (req, res) => 
         classStructure,
         totalStudents
     ] = await Promise.all([
-        getTopAttendees(className),
-        getGenderDistribution(className),
-        getWeeklyAbsenteeCount(className),
-        getDivisionWisePresenteePercentage(className),
-        getDailyPresentee(className),
-        ClassStructure.find({className}).sort({ className: 1 }).select("-createdAt -updatedAt -__v -_id"),
-        Student.countDocuments({ class: className })
+        getTopAttendees(className,req.school?._id),
+        getGenderDistribution(className,req.school?._id),
+        getWeeklyAbsenteeCount(className,req.school?._id),
+        getDivisionWisePresenteePercentage(className,req.school?._id),
+        getDailyPresentee(className,req.school?._id),
+        ClassStructure.find({className,schoolId: req.school?._id}).sort({ className: 1 }).select("-createdAt -updatedAt -__v -_id"),
+        Student.countDocuments({ class: className,schoolId: req.school?._id })
     ]);
 
     res.status(200).json(new ApiResponse(
@@ -1168,7 +1176,7 @@ export const getClassLevelAdminDashboardData = asyncHandler(async (req, res) => 
  * @desc Helper function get total verified student count
  * @returns {Number} - Number of verified students
  */
-const getVerifiedStudentCount = async () => {
+const getVerifiedStudentCount = async (schoolId) => {
   try {
     const result = await Student.aggregate([
       {
@@ -1182,7 +1190,8 @@ const getVerifiedStudentCount = async () => {
       { $unwind: "$user" },
       {
         $match: {
-          "user.verified": true
+            "user.schoolId": schoolId,
+            "user.verified": true
         }
       },
       {
@@ -1200,9 +1209,9 @@ const getVerifiedStudentCount = async () => {
 /**
  * @desc Helper to delete all attendance records
  */
-export const deleteAllAttendance = async () => {
+export const deleteAllAttendance = async (schoolId) => {
   try {
-    ClassAttendance.deleteMany({});
+    ClassAttendance.deleteMany({schoolId});
   } catch (error) {
     throw error;
   }
@@ -1211,7 +1220,7 @@ export const deleteAllAttendance = async () => {
 /**
  * @desc Helper function to return attendance count for a month for a student
  */
-export const getAttendanceForTheMonth = async (studentId,className,div) => {
+export const getAttendanceForTheMonth = async (studentId,className,div,schoolId) => {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
@@ -1219,6 +1228,7 @@ export const getAttendanceForTheMonth = async (studentId,className,div) => {
     const result = await ClassAttendance.aggregate([
         {
             $match: {
+                schoolId,
                 class: className,
                 div,
                 date: { $gte: startOfMonth, $lte: endOfMonth }
@@ -1249,10 +1259,11 @@ export const getAttendanceForTheMonth = async (studentId,className,div) => {
  * @desc Returns attendance percentage over all months for a student
  * @returns Object like: { "2025-03": 83.33, "2025-04": 100 }
  */
-export const getAttendancePercentageByMonth = async (studentId,className,div) => {
+export const getAttendancePercentageByMonth = async (studentId,className,div,schoolId) => {
     const result = await ClassAttendance.aggregate([
         {
             $match: {
+                schoolId,
                 class: className,
                 div
             }

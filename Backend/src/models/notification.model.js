@@ -1,5 +1,4 @@
-import mongoose from "mongoose";
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const notificationSchema = new Schema(
     {
@@ -21,6 +20,12 @@ const notificationSchema = new Schema(
             type: String,
             required: true
         },
+        schoolId: {
+            type: Schema.Types.ObjectId,
+            ref: "School",
+            required: true,
+        },
+        
     },
     {timestamps: true}
 );

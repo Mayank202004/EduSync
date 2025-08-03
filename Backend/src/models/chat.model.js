@@ -18,6 +18,11 @@ const chatSchema = new Schema(
       of: Number, // key: userId, value: unreadCount
       default: {},
     },
+    schoolId: {
+      type: Schema.Types.ObjectId,
+      ref: "School",
+      required: true,
+    },
   },
   { timestamps: true }
 );

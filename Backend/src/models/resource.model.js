@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema } from "mongoose";
 
 //  classes → subjects → terms → chapters → resources
 // The following schema represents a class structure for educational resources like ppts,videosetc.
@@ -26,7 +26,12 @@ const subjectSchema = new mongoose.Schema({
 
 const classSchema = new mongoose.Schema({
     class: { type: String, required: true },  
-    subjects: [subjectSchema]
+    subjects: [subjectSchema],
+    schoolId: {
+        type: Schema.Types.ObjectId,
+        ref: "School",
+        required: true,
+    },
 });
 
 export const SchoolResource = mongoose.model('Resource', classSchema);

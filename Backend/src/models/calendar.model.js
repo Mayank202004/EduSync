@@ -27,7 +27,12 @@ const calendarSchema = new Schema({
   anuallyRepeat:{
     type: Boolean,
     default:false,
-  }
+  },
+  schoolId: {
+    type: Schema.Types.ObjectId,
+    ref: "School",
+    required: true,
+  },
 });
 
 export default mongoose.model("CalendarEvent", calendarSchema);

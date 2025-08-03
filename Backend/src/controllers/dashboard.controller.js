@@ -15,24 +15,24 @@ import { returnAllEvents } from "./calendar.controller.js";
 export const fetchDashboardData = asyncHandler(async (req, res) => {
     const user = req.user;
     const student = req.student;
-    const chatData = await getStudentChats(user._id,student.class,student.div);
-    const monthlyAttendancePercentage = await getAttendancePercentageByMonth(student._id,student.class,student.div);
-    const attendanceForTheMonth = await getAttendanceForTheMonth(student._id,student.class,student.div);
-    const events = await returnAllEvents();
+    const chatData = await getStudentChats(user._id,student.class,student.div,req.school?._id);
+    const monthlyAttendancePercentage = await getAttendancePercentageByMonth(student._id,student.class,student.div,req.school?._id);
+    const attendanceForTheMonth = await getAttendanceForTheMonth(student._id,student.class,student.div,req.school?._id);
+    const events = await returnAllEvents(req.school?._id);
     return res.status(200).json(new ApiResponse(200, {chatData,monthlyAttendancePercentage,attendanceForTheMonth,events}, "Dashboard data fetched successfully"));
 });
 
 export const fetchTeacherDashboardData = asyncHandler(async (req, res) => {
     const teacher = req.teacher;
-    const chatData = await getTeacherChats(teacher);
-    const events = await returnAllEvents();
+    const chatData = await getTeacherChats(teacher,req.school?._id);
+    const events = await returnAllEvents(req.school?._id);
     return res.status(200).json(new ApiResponse(200, {chatData,events}, "Teacher Dashboard data fetched successfully"));
 });
 
 export const fetchSuperAdminDashboardData = asyncHandler(async (req, res) => {
-    const allUsers = await getAllUsers(req.user._id);
-    const chatData = await getSuperAdminChats(req.user._id);
-    const events = await returnAllEvents();
+    const allUsers = await getAllUsers(req.user._id,req.school?._id);
+    const chatData = await getSuperAdminChats(req.user._id,req.school?._id);
+    const events = await returnAllEvents(req.school?._id);
     return res.status(200).json(new ApiResponse(200, {chatData,allUsers,events}, "Super Admin Dashboard data fetched successfully"));
 });
 
@@ -52,18 +52,18 @@ export const performSelectiveCleanup = asyncHandler(async (req, res) => {
 
   try{    
     if (toBool(attendance)) {
-        await deleteAllAttendance();
+        await deleteAllAttendance(req.school?._id);
     }
     if (toBool(feeStatus)) {
-        await deleteAllStudentFeeStatuses();
+        await deleteAllStudentFeeStatuses(req.school?._id);
       }
       
     if (toBool(messages)) {
-        await clearMessages();
+        await clearMessages(req.school?._id);
     }
   
     if (toBool(tickets)) {
-        await deleteAllTickets();
+        await deleteAllTickets(req.school?._id);
     }
   
     return res.status(200).json(new ApiResponse(200, null, "Selective cleanup completed."));
@@ -77,10 +77,10 @@ export const performSelectiveCleanup = asyncHandler(async (req, res) => {
  * @route GET /api/v1/dashboard/academic-year
  * @access Private (Super Admin)
  */
-export const manageAcademicYearData = asyncHandler(async (_, res) => {
-  const academicYear = await getSettingValue("academicYear");
-  const classesAndDivs = await ClassStructure.find().select("className divisions"); 
-  const students = await Student.find()
+export const manageAcademicYearData = asyncHandler(async (req, res) => {
+  const academicYear = await getSettingValue("academicYear", req.school?._id);
+  const classesAndDivs = await ClassStructure.find({schoolId:req.school?._id}).select("className divisions"); 
+  const students = await Student.find({schoolId:req.school?._id})
     .select("_id userId class div")
     .populate({
       path: "userId",

@@ -46,6 +46,11 @@ const TeacherSchema = Schema({
   address: {
     type: String
   },
+  schoolId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "School",
+    required: true,
+  },
 }, { timestamps: true });
 
 export const Teacher = mongoose.model("Teacher", TeacherSchema);

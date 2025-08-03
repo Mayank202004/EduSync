@@ -37,11 +37,16 @@ const classAttendanceSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Teacher", // Class Teacher/ Scondary Class Teacher ID
     },
+    schoolId: {
+      type: Schema.Types.ObjectId,
+      ref: "School",
+      required: true,
+    },
 }, {
     timestamps: true
 });
 
 // Optional index to prevent duplicate attendance records for same class/div and date
-classAttendanceSchema.index({ date: 1, class: 1, div: 1 }, { unique: true });
+classAttendanceSchema.index({ schoolId: 1, class: 1, div: 1, date: 1 }, { unique: true });
 
 export const ClassAttendance = mongoose.model("ClassAttendance", classAttendanceSchema);

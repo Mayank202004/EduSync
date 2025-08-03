@@ -11,8 +11,13 @@ const feeStructureSchema = new Schema({
       enum: ['Tuition Fee', 'Transport Fee', 'Other Fee'],
       required: true
     },
-    structure: [{ type: Schema.Types.ObjectId, ref: 'FeeItem' }]
-}]
+    structure: [{ type: Schema.Types.ObjectId, ref: 'FeeItem' }],
+  }],
+  schoolId: {
+      type: Schema.Types.ObjectId,
+      ref: "School",
+      required: true,
+    },
 });
 
 
@@ -21,7 +26,12 @@ const feeItemSchema = new Schema({
   dueDate: Date,
   compulsory: { type: Boolean, default: true },
   amount: { type: Number, required: true },
-  discount: { type: Number, default: 0 }
+  discount: { type: Number, default: 0 },
+  schoolId: {
+    type: Schema.Types.ObjectId,
+    ref: "School",
+    required: true,
+  },
 });
 
 export const FeeItem = mongoose.model('FeeItem', feeItemSchema);

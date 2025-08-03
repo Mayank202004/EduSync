@@ -398,8 +398,6 @@ export const deleteAllergy = asyncHandler(async (req, res) => {
   const {  allergyName } = req.body;
   const studId = req.student._id;
 
-  console.log(req.body)
-
   const student = await Student.findById(studId);
   if (!student) {
     throw new ApiError(404, "Student not found");
@@ -427,18 +425,19 @@ export const deleteAllergy = asyncHandler(async (req, res) => {
  * @route GET /api/v1/student/unverified
  * @access Private (Super Admin)
  */
-export const getUnverifiedStudents = asyncHandler(async (_, res) => {
+export const getUnverifiedStudents = asyncHandler(async (req, res) => {
   const unverifiedStudents = await Student.find({
-    class: { $exists: true, $ne: "" }, // ✅ Only filter class here
+    class: { $exists: true, $ne: "" }, // Only filter class here
+    schoolId: req.school?._id
   })
     .populate({
       path: "userId",
-      match: { role: "student", verified: false }, // ✅ Filter based on user fields
+      match: { role: "student", verified: false }, // Filter based on user fields
       select: "fullName email role verified",       // Select only necessary user fields
     })
     .select("class userId");
 
-  // ✅ Filter out where populate() failed (no match)
+  // Filter out where populate() failed (no match)
   const filtered = unverifiedStudents.filter((s) => s.userId);
 
   res.status(200).json(
@@ -451,8 +450,8 @@ export const getUnverifiedStudents = asyncHandler(async (_, res) => {
  * @route PATCH /api/v1/student/promote
  * @access Private (Super Admin)
  */
-export const promoteStudents = asyncHandler(async (_, res) => {
-  const students = await Student.find().populate("userId", "verified");
+export const promoteStudents = asyncHandler(async (req, res) => {
+  const students = await Student.find({schoolId: req.school?._id}).populate("userId", "verified");
 
   const studentBulkOps = [];
   const userBulkOps = [];
@@ -511,9 +510,9 @@ export const promoteStudents = asyncHandler(async (_, res) => {
  * @route PATCH /api/v1/student/shuffle
  * @access Private (Super Admin)
  */
-export const shuffleDivisions = asyncHandler(async (_, res) => {
+export const shuffleDivisions = asyncHandler(async (req, res) => {
   for (const className of CLASS_ORDER) {
-    const students = await Student.find({ class: className });
+    const students = await Student.find({ class: className, schoolId: req.school?._id });
 
     if (students.length === 0) continue;
 
@@ -553,6 +552,7 @@ export const manuallyAssignDivisions = asyncHandler(async (req, res) => {
   const existingStudents = await Student.find({
     _id: { $in: studentIds },
     class: className,
+    schoolId: req.school?._id
   });
 
   if (existingStudents.length !== assignments.length) {

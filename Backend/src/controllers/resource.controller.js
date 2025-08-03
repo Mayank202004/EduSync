@@ -19,12 +19,12 @@ export const addClass = asyncHandler(async (req, res) => {
             throw new ApiError(400, "Class Name is required.");
         }
 
-        const existingClass = await SchoolResource.findOne({ className });
+        const existingClass = await SchoolResource.findOne({ class:className, schoolId:req.school?._id});
         if (existingClass) {
             throw new ApiError(400, "Class already exists.");
         }
 
-        const newClass = new SchoolResource({ class:className });
+        const newClass = new SchoolResource({ class:className, schoolId: req.school._id });
         await newClass.save();
 
         res.status(201).json(new ApiResponse(201,newClass,"Class created successfully"));
@@ -39,9 +39,9 @@ export const addClass = asyncHandler(async (req, res) => {
  * @route GET /api/resource/classes
  * @access Private (Super Admin)
  */
-export const getAllClasses = asyncHandler(async (_, res) => {
+export const getAllClasses = asyncHandler(async (req, res) => {
     try {
-        const classes = await SchoolResource.find();
+        const classes = await SchoolResource.find({schoolId: req.school?._id});
         res.json(new ApiResponse(200,classes,"All classes fetched successfully"));
     } catch (error) {
         throw new ApiError(500, error.message);
@@ -52,7 +52,7 @@ export const getAllClasses = asyncHandler(async (_, res) => {
 export const getClassByNumber = asyncHandler(async (req, res) => {
     try {
         const { classNumber } = req.params;
-        const schoolClass = await SchoolResource.findOne({ classNumber });
+        const schoolClass = await SchoolResource.findOne({ classNumber, schoolId: req.school?._id });
 
         if (!schoolClass) {
             throw new ApiError(404, 'Class not found');
@@ -69,7 +69,7 @@ export const getClassByNumber = asyncHandler(async (req, res) => {
  * @route POST /api/resource/addSubject
  * @access Private (Super Admin)
  */
-export const addSubject = asyncHandler(async (req, res, next) => {
+export const addSubject = asyncHandler(async (req, res) => {
     try {
         const { className,classId,subjectName } = req.body;
 
@@ -81,6 +81,7 @@ export const addSubject = asyncHandler(async (req, res, next) => {
         }
 
         const schoolClass = await SchoolResource.findOne({
+            schoolId: req.school?._id,
             $or: [{ class: className }, { _id: classId }]
         });
         
@@ -130,6 +131,7 @@ export const addChapter = asyncHandler(async (req, res) => {
         }
 
         const schoolClass = await SchoolResource.findOne({
+            schoolId: req.school?._id,
             $or: [{ class: className }, { _id: classId }],
             "subjects.subjectName": subjectName,
             "subjects.terms.termNumber": termNumber
@@ -194,6 +196,7 @@ export const addResource = asyncHandler(async (req, res) => {
 
         const updatedClass = await SchoolResource.findOneAndUpdate(
             { 
+                schoolId: req.school?._id,
                 class: className, 
                 "subjects.subjectName": subjectName,  
                 "subjects.terms.termNumber": termNumber,  
@@ -243,6 +246,7 @@ export const deleteResource = asyncHandler(async (req, res) => {
 
         const updatedClass = await SchoolResource.findOneAndUpdate(
             {
+                schoolId: req.school?._id,
                 class: className,
                 "subjects.subjectName": subjectName,
                 "subjects.terms.termNumber": termNumber,
@@ -277,20 +281,20 @@ export const deleteResource = asyncHandler(async (req, res) => {
 
 
 // Delete a class To Do test
-export const deleteClass = async (req, res, next) => {
+export const deleteClass = asyncHandler(async (req, res) => {
     try {
         const { classNumber } = req.params;
-        const deletedClass = await SchoolResource.findOneAndDelete({ classNumber });
+        const deletedClass = await SchoolResource.findOneAndDelete({ classNumber, schoolId: req.school?._id });
 
         if (!deletedClass) {
-            return next(new ApiError('Class not found', 404));
+            throw new ApiError(404,'Class not found');
         }
 
         res.json(new ApiResponse(true, 'Class deleted successfully', deletedClass, 200));
     } catch (error) {
-        next(new ApiError(error.message, 500));
+        throw new ApiError(error.statusCode ?? 500, error.message ?? "Something went wrong");
     }
-};
+});
 
 /**
  * @desc Get Students Resources (based on his class)
@@ -311,7 +315,7 @@ export const getMyResources = asyncHandler(async (req, res) => {
 
         const className = student.class;
 
-        const resource = await SchoolResource.findOne({ class: className });
+        const resource = await SchoolResource.findOne({ class: className, schoolId: req.school?._id });
         if (!resource) {
             throw new ApiError(404, "Resource not found for this class.");
         }
@@ -349,7 +353,7 @@ export const getTeacherResources = asyncHandler(async (req, res) => {
         for (const subject of teacher.subjects) {
             for (const cls of subject.classes) {
                 // Find the class in SchoolResource
-                const resource = await SchoolResource.findOne({ class: cls.class });
+                const resource = await SchoolResource.findOne({ class: cls.class, schoolId: req.school?._id });
 
                 let subjectData = {
                     subjectName: subject.name,
@@ -378,7 +382,7 @@ export const getTeacherResources = asyncHandler(async (req, res) => {
                     teacherResources.push({
                         _id: cls._id,
                         class: cls.class,
-                        subjects: [subjectData]
+                        subjects: [subjectData],
                     });
                 } else {
                     // If class exists, add the subject to that class

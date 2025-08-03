@@ -15,13 +15,18 @@ export const verifyTeacher = asyncHandler(async (req, res) => {
     try {
         const { id } = req.params;  
 
-        const user = await User.findByIdAndUpdate(id, { verified: true }, { new: true });
+        const user = await User.findOneAndUpdate(
+          { _id: id, schoolId: req.school?._id },
+          { verified: true },
+          { new: true }
+        );
+
         if (!user) {
             throw new ApiError(404, "User not found");
         }
         // Join "School" group ---
         await Chat.findOneAndUpdate(
-          { name: "School", isGroupChat: true },
+          { name: "School", isGroupChat: true, schoolId: req.school?._id },
           { $addToSet: { participants: user._id } }
         );
       
@@ -48,7 +53,7 @@ export const updateTeacherDetails = asyncHandler(async (req, res) => {
     address,
   } = req.body;
 
-  const teacher = await Teacher.findById(Id);
+  const teacher = await Teacher.findOne({ _id:Id, schoolId: req.school?._id });
   if (!teacher) throw new ApiError(404, "Teacher not found");
 
   const userId = teacher.userId;
@@ -98,6 +103,7 @@ export const updateTeacherDetails = asyncHandler(async (req, res) => {
     const divisionChats = await Chat.find({
       className: teacher.classCoordinator,
       isGroupChat: true,
+      schoolId: req.school?._id,
     });
 
     divisionChats.forEach((chat) => {
@@ -112,11 +118,12 @@ export const updateTeacherDetails = asyncHandler(async (req, res) => {
   // --- 5. Leave chats ---
   for (const key of toLeave) {
     const [className, div] = key.split("-");
-    const chat = await Chat.findOne({ className, div, isGroupChat: true });
+    const chat = await Chat.findOne({ className, div, isGroupChat: true , schoolId: req.school?._id});
     if (chat) {
-      await Chat.findByIdAndUpdate(chat._id, {
-        $pull: { participants: userId },
-      });
+      await Chat.findOneAndUpdate(
+        { _id: chat._id, schoolId: req.school?._id },
+        { $pull: { participants: userId } }
+      );
     }
   }
 
@@ -128,9 +135,9 @@ export const updateTeacherDetails = asyncHandler(async (req, res) => {
     if (joinedSections.has(key)) return;
     joinedSections.add(key);
 
-    let chat = await Chat.findOne({ className, div, isGroupChat: true });
+    let chat = await Chat.findOne({ className, div, isGroupChat: true, schoolId: req.school?._id });
     if (chat) {
-      await Chat.findByIdAndUpdate(chat._id, {
+      await Chat.findOneAndUpdate({_id:chat._id, schoolId: req.school?._id}, {
         $addToSet: { participants: userId },
       });
     } else {
@@ -140,6 +147,7 @@ export const updateTeacherDetails = asyncHandler(async (req, res) => {
         className,
         div,
         participants: [userId],
+        schoolId: req.school?._id
       });
     }
   };
@@ -161,7 +169,7 @@ export const updateTeacherDetails = asyncHandler(async (req, res) => {
  * @access Private (Super Admin)
  */
 export const fetchAllTeachers = asyncHandler(async (req, res) => {
-  const teachers = await Teacher.find()
+  const teachers = await Teacher.find({schoolId: req.school?._id})
     .populate({
       path: "userId",
       match: { verified: true },
@@ -175,16 +183,13 @@ export const fetchAllTeachers = asyncHandler(async (req, res) => {
 
 
 
-
-
-
 /**
  * @desc Fetch unverified teachers
  * @route GET /api/v1/teacher/unverified
  * @access Private (Super Admin)
  */
-export const getUnverifiedTeachers = asyncHandler(async (_, res) => {
-  const unverifiedTeachers = await User.find({ verified: false, role: "teacher" }).select("fullName email avatar");
+export const getUnverifiedTeachers = asyncHandler(async (req, res) => {
+  const unverifiedTeachers = await User.find({ verified: false, role: "teacher", schoolId: req.school?._id }).select("fullName email avatar");
   res.status(200).json(
     new ApiResponse(200, unverifiedTeachers, "Unverified teachers fetched successfully")
   );

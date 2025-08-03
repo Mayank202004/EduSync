@@ -8,8 +8,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
  * @param {String} key
  * @returns {String} value for the key
  */
-export const getSettingValue = async (key) => {
-    const setting = await Setting.findOne({ key });
+export const getSettingValue = async (key,schoolId) => {
+    const setting = await Setting.findOne({ key, schoolId: schoolId });
     return setting ? setting.value : null; 
 };
 
@@ -26,7 +26,7 @@ export const setAcademicYear = asyncHandler(async (req, res) => {
     }
 
     await Setting.findOneAndUpdate(
-        { key: "academicYear" },
+        { key: "academicYear", schoolId: req.school?._id },
         { value: academicYear },
         { upsert: true, new: true }
     );
@@ -40,7 +40,7 @@ export const setAcademicYear = asyncHandler(async (req, res) => {
  * @access Private (User)
  */
 export const getAcademicYear = asyncHandler(async (req, res) => {
-    const setting = await getSettingValue("academicYear");
+    const setting = await getSettingValue("academicYear", req.school?._id);
 
     if (!setting) {
         throw new ApiError(404, "Academic year not found");
@@ -62,7 +62,7 @@ export const setSchoolName = asyncHandler(async (req, res) => {
     }
 
     await Setting.findOneAndUpdate(
-        { key: "schoolName" },
+        { key: "schoolName", schoolId: req.school?._id },
         { value: schoolName },
         { upsert: true, new: true }
     );
@@ -76,7 +76,7 @@ export const setSchoolName = asyncHandler(async (req, res) => {
  * @access Private (User)
  */
 export const getSchoolName = asyncHandler(async (req, res) => {
-    const setting = await getSettingValue("schoolName");
+    const setting = await getSettingValue("schoolName", req.school?._id);
 
     if (!setting) {
         throw new ApiError(404, "School name not found");

@@ -4,6 +4,7 @@ import { Teacher } from "../models/teacher.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { Student } from "../models/student.model.js";
+import School from "../models/school.model.js";
 
 /**
  * @desc Verify JWT token
@@ -22,12 +23,20 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
         // Find user based on token id
         const user = await User.findById(decodedToken._id).select(
-            "-password -refreshToken"
+            "-password -refreshToken -__v"
         );
+
         if (!user) {
-            throw new ApiError(401, "Invalid Access Token");
+          throw new ApiError(401, "Unauthorized: User not found");
+        }
+
+        const school = await School.findOne({ _id: user?.schoolId }).select("-createdAt -updatedAt -__v");
+
+        if (!school && user.role !== "system-admin") {
+          throw new ApiError(401, "Unauthorized: School not found or inactive");
         }
         req.user = user; // Attach user to request object
+        req.school = school ?? null; // Attach tenent school
         next();
     } catch (error) {
         throw new ApiError(401, error?.message || "Unauthorized Request");

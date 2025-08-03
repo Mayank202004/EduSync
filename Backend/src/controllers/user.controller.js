@@ -37,10 +37,10 @@ const generateAccessAndRefereshTokens = async (userId) => {
  * @access Public
  */ 
 const registerUser = asyncHandler(async (req, res) => {
-    const { fullName, email, username, password, role, class: studentClass } = req.body;
+    const { fullName, email, username, password, role, class: studentClass, schoolId} = req.body;
 
     if (
-        [fullName, email, username, password].some(
+        [fullName, email, username, password, schoolId].some(
             (field) => field?.trim() === ""
         )
     ) {
@@ -80,7 +80,8 @@ const registerUser = asyncHandler(async (req, res) => {
         username,
         password,
         role: userRole,
-        verified:false
+        verified:false,
+        schoolId
     });
 
     const createdUser = await User.findById(user._id).select(
@@ -96,6 +97,7 @@ const registerUser = asyncHandler(async (req, res) => {
         const student = await Student.create({
             userId: user._id, 
             class: studentClass.trim(),
+            schoolId
         });
         if(!student){
             throw new ApiError(500,"Error Creating Student");
@@ -103,7 +105,8 @@ const registerUser = asyncHandler(async (req, res) => {
     }
     else if(userRole ==="teacher"){
         const teacher = await Teacher.create({
-            userId: user._id
+            userId: user._id,
+            schoolId
         });
         if(!teacher){
             throw new ApiError(500,"Error Creating Teacher");
@@ -142,6 +145,10 @@ const loginUser = asyncHandler(async (req, res) => {
 
     if(!user.verified){
         throw new ApiError(403,"You are not verified. Contact super admin");
+    }
+
+    if(!user.schooId && !user.role === "system-admin"){
+        throw new ApiError(403,"School not found or inactive");
     }
 
     const isPasswordValid = await user.verifyPassword(password);

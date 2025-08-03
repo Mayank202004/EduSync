@@ -21,7 +21,8 @@ export const createTicket = asyncHandler(async (req, res) => {
     category,
     subCategory: subCategory ?? "Other",
     title,
-    description
+    description,
+    schoolId: req.school._id
   });
 
   res
@@ -34,10 +35,10 @@ export const createTicket = asyncHandler(async (req, res) => {
  * @route   GET /api/tickets/open
  * @access  Private/Admin
  */
-export const getOpenTickets = asyncHandler(async (_, res) => {
+export const getOpenTickets = asyncHandler(async (req, res) => {
   const priorityOrder = { high: 3, medium: 2, low: 1 };
 
-  const tickets = await Ticket.find({ status: "open" }).select("-__v").lean();
+  const tickets = await Ticket.find({ status: "open", schoolId: req.school?._id }).select("-__v").lean();
 
   const sorted = tickets.sort((a, b) => {
     const priorityDiff =
@@ -56,23 +57,27 @@ export const getOpenTickets = asyncHandler(async (_, res) => {
  * @route   GET /api/tickets/closed
  * @access  Private/Admin
  */
-export const getClosedTickets = asyncHandler(async (_, res) => {
+export const getClosedTickets = asyncHandler(async (req, res) => {
   const tickets = await Ticket.find({
     status: { $in: ["closed", "resolved"] },
-  }).sort({ updatedAt: -1 }).select("-__v");
+    schoolId: req.school?._id,
+  })
+    .sort({ updatedAt: -1 })
+    .select("-__v");
 
-  res
-    .status(200)
-    .json(new ApiResponse(200, tickets, "Closed/resolved tickets sorted by last update"));
+  res.status(200).json(
+    new ApiResponse(200, tickets, "Closed/resolved tickets sorted by last update")
+  );
 });
+
 
 
 /**
  * @desc Helper function to Delete all tickets
  */
-export const deleteAllTickets = async () => {
+export const deleteAllTickets = async (schoolId) => {
   try {
-    await Ticket.deleteMany({});
+    await Ticket.deleteMany({schoolId});
   } catch (error) {
     throw error;
   }

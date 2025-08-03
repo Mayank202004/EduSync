@@ -2,7 +2,8 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/apiError.js';
 import { ApiResponse } from '../utils/apiResponse.js';
 import { StudentFeeStatus } from '../models/paidFee.model.js';
-import { FeeStructure } from '../models/feeStructure.model.js';
+import { FeeItem, FeeStructure } from '../models/feeStructure.model.js';
+import { getSettingValue } from './setting.controller.js'; 
 import ejs from 'ejs';
 
 /**
@@ -24,7 +25,7 @@ const markFeeAsPaid = asyncHandler(async (req, res) => {
   }
 
   // Verify feeType and structureId are valid in FeeStructure
-  const feeStructure = await FeeStructure.findOne({ class: className });
+  const feeStructure = await FeeStructure.findOne({ class: className, schoolId: req.school?._id });
   if (!feeStructure) throw new ApiError(404, "Fee structure not found");
 
   const feeGroup = feeStructure.fee.find(group => group.feeType === feeType);
@@ -32,12 +33,17 @@ const markFeeAsPaid = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid structureId or feeType");
   }
 
+  const structureItem = await FeeItem.findById(structureId);
+  if (!structureItem) throw new ApiError(404, "Fee item not found");
+  if(number(structureItem.amount) !== number(amount)) throw new ApiError(400, "Invalid amount");
+
   // Find or create student's fee status
   let studentFeeStatus = await StudentFeeStatus.findOne({ student: studentId });
   if (!studentFeeStatus) {
     studentFeeStatus = await StudentFeeStatus.create({
       student: studentId,
       paidFees: [],
+      schoolId: req.school?._id
     });
   }
 
@@ -86,7 +92,7 @@ const getStudentFeeStatus = asyncHandler(async (req, res) => {
   }
 
   // Fetch fee structure for the given class
-  const feeStructure = await FeeStructure.findOne({ class: className }).populate('fee.structure');
+  const feeStructure = await FeeStructure.findOne({ class: className, schoolId: req.school?._id }).populate('fee.structure');
   if (!feeStructure) {
     throw new ApiError(404, "Fee structure not found for this class");
   }
@@ -228,10 +234,11 @@ const renderFeeReceipt = asyncHandler(async (req, res) => {
   if (!payment) {
     throw new ApiError(403, "Unauthorized: This payment does not belong to you");
   }
+  academicYear = await getSettingValue("academicYear", req.school?._id);
 
   // Prepare data
-  const data = {
-    academicYear: process.env.ACADEMIC_YEAR,
+  const data = { // To Do add school name
+    academicYear: academicYear ?? "20xx-20xx",
     name: req.user.fullName,
     standard: req.student.class + "-" + req.student.div,
     studentId: req.student._id,
@@ -263,9 +270,9 @@ const renderFeeReceipt = asyncHandler(async (req, res) => {
 /**
  * @desc Helper function to delete all StudentFeeStatus records
  */
-const deleteAllStudentFeeStatuses = async () => {
+const deleteAllStudentFeeStatuses = async (schoolId) => {
   try {
-    await StudentFeeStatus.deleteMany({});
+    await StudentFeeStatus.deleteMany({schoolId: schoolId});
   } catch (error) {
     throw error;
   }

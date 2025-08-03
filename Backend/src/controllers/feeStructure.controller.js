@@ -33,7 +33,7 @@ const addFeeStructure = asyncHandler(async (req, res) => {
   let classList = [];
 
   if (addToAllClasses) {
-    const allClasses = await ClassStructure.find({}, "className");
+    const allClasses = await ClassStructure.find({ schoolId: req.school?._id }, "className");
     classList = allClasses.map(c => c.className);
   } else {
     if (!className?.trim()) {
@@ -43,7 +43,7 @@ const addFeeStructure = asyncHandler(async (req, res) => {
   }
 
   for (const currentClass of classList) {
-    let feeStructure = await FeeStructure.findOne({ class: currentClass });
+    let feeStructure = await FeeStructure.findOne({ class: currentClass , schoolId: req.school?._id });
 
     if (!feeStructure) {
       feeStructure = await FeeStructure.create({
@@ -52,7 +52,8 @@ const addFeeStructure = asyncHandler(async (req, res) => {
           { feeType: "Tuition Fee", structure: [] },
           { feeType: "Transport Fee", structure: [] },
           { feeType: "Other Fee", structure: [] }
-        ]
+        ],
+        schoolId: req.school?._id
       });
     }
 
@@ -84,7 +85,8 @@ const addFeeStructure = asyncHandler(async (req, res) => {
         amount,
         dueDate,
         compulsory,
-        discount
+        discount,
+        schoolId: req.school?._id
       });
       feeTypeBlock.structure.push(newFeeItem._id);
     }
@@ -109,6 +111,7 @@ const setDueDate = asyncHandler(async(req,res)=>{
     // Update due date for all classes where feeType and title match
     await FeeStructure.updateMany(
     { 
+      schoolId: req.school?._id,
       "fee.feeType": feeType, 
       "fee.structure.title": title 
     },
@@ -141,7 +144,7 @@ const deleteFeeType = asyncHandler(async (req, res) => {
 
   if (className) {
     // Delete from a specific class
-    const feeStructure = await FeeStructure.findOne({ class: className });
+    const feeStructure = await FeeStructure.findOne({ class: className, schoolId: req.school?._id });
     if (!feeStructure) {
       throw new ApiError(404, "Fee structure not found for the class");
     }
@@ -159,12 +162,12 @@ const deleteFeeType = asyncHandler(async (req, res) => {
     }
 
     await feeStructure.save();
-    return res.status(200).json(new ApiResponse200(null, "Fee structure deleted successfully"));
+    return res.status(200).json(new ApiResponse(200,null, "Fee structure deleted successfully"));
 
   } else {
     // Delete from all classes
     const result = await FeeStructure.updateMany(
-      { "fee.feeType": feeType, "fee.structure.title": title },
+      { schoolId: req.school?._id, "fee.feeType": feeType, "fee.structure.title": title },
       {
         $pull: {
           "fee.$[f].structure": { title: title }
@@ -197,7 +200,7 @@ const getClassFeeStructure = asyncHandler(async(req,res)=>{
     if(!className.trim()){
         throw new ApiError(400,"Class Name is required");
     }
-    const feeStructure = await FeeStructure.findOne({class:className}).populate("fee.structure");;
+    const feeStructure = await FeeStructure.findOne({class:className,schoolId: req.school?._id}).populate("fee.structure");;
     if(!feeStructure){
         throw new ApiError(404,"Fee structure not found");
     }
@@ -210,10 +213,7 @@ const getClassFeeStructure = asyncHandler(async(req,res)=>{
  * @access Private (Super Admin)
  */
 const getAllFeeStructures = asyncHandler(async(req,res)=>{
-    const feeStructures = await FeeStructure.find().populate("fee.structure");
-    if(!feeStructures || feeStructures.length==0){
-        throw new ApiError(404,"Fee structures not found");
-    }
+    const feeStructures = await FeeStructure.find({schoolId: req.school?._id}).populate("fee.structure");
     return res.status(200).json(new ApiResponse(200,feeStructures,"Fee structures fetched sucessfully"));
 });
 
@@ -260,7 +260,7 @@ const updateFeeStructure = asyncHandler(async (req, res) => {
 
   if (updateAllClasses) {
     const result = await FeeItem.updateMany(
-      { title: title },
+      { title: title, schoolId: req.school?._id },
       { $set: updatePayload }
     );
 

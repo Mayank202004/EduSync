@@ -107,7 +107,12 @@ const studentSchema = new Schema({
     stopName:{
         type: String,
         default:"N.A."
-    }
+    },
+    schoolId: {
+        type: Schema.Types.ObjectId,
+        ref: "School",
+        required: true,
+    },
     
 });
 

@@ -25,6 +25,7 @@ export const createEvent = asyncHandler(async (req, res) => {
     end,
     eventType,
     extendedProps:{description: endDescription},
+    schoolId: req.school?._id
   });
 
   await newEvent.save();
@@ -40,16 +41,16 @@ export const createEvent = asyncHandler(async (req, res) => {
  * @route GET /api/calendar/events
  * @access Private (Authenticated User)
  */
-export const getAllEvents = asyncHandler(async (_, res) => {
-  const events = await returnAllEvents();
+export const getAllEvents = asyncHandler(async (req, res) => {
+  const events = await returnAllEvents(req.school?._id);
   res.status(200).json(new ApiResponse(200, events, 'Events fetched successfully.'));
 });
 
 /**
  * @desc - Helper function to get all events 
  */
-export const returnAllEvents = async() => {
-  const events = await CalendarEvent.find().select('-__v -_id');
+export const returnAllEvents = async(schoolId) => {
+  const events = await CalendarEvent.find({schoolId}).select('-__v -_id');
   return events
 }
 
@@ -63,10 +64,12 @@ export const updateEvent = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const updatedData = req.body;
 
-  const updatedEvent = await CalendarEvent.findByIdAndUpdate(id, updatedData, {
-    new: true,
-    runValidators: true,
-  });
+  const updatedEvent = await CalendarEvent.findOneAndUpdate(
+    { _id: id, schoolId: req.school?._id },
+    updatedData,
+    { new: true, runValidators: true }
+  );
+
 
   if (!updatedEvent) {
     throw new ApiError(404, 'Event not found.');
@@ -83,7 +86,11 @@ export const updateEvent = asyncHandler(async (req, res) => {
  */
 export const deleteEvent = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const deletedEvent = await CalendarEvent.findByIdAndDelete(id);
+  const deletedEvent = await CalendarEvent.findOneAndDelete({
+    _id: id,
+    schoolId: req.school?._id,
+  });
+  
 
   if (!deletedEvent) {
     throw new ApiError(404, 'Event not found.');

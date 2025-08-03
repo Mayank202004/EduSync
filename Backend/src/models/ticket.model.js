@@ -36,6 +36,11 @@ const ticketSchema = new Schema({
         type: String,
         enum: ['low', 'medium', 'high'],
         default: 'low'
+    },
+    schoolId: {
+        type: Schema.Types.ObjectId,
+        ref: "School",
+        required: true
     }
 },{
     timestamps: true

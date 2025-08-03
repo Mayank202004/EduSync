@@ -15,12 +15,12 @@ export const addClass = asyncHandler(async (req, res) => {
         throw new ApiError(400,"Class is required");
     }
 
-    const exists = await ClassStructure.findOne({ className });
+    const exists = await ClassStructure.findOne({ className, schoolId: req.school?._id });
     if (exists) {
         throw new ApiError(400, "Class already exists");
     }
 
-    const newClass = await ClassStructure.create({ className, divisions:[] });
+    const newClass = await ClassStructure.create({ className, divisions:[], schoolId: req.school?._id });
     res.status(201).json(new ApiResponse(201, newClass, "Class created successfully"));
 });
 
@@ -35,7 +35,7 @@ export const addDivision = asyncHandler(async (req, res) => {
         throw new ApiError(400,"Class and div are required");
     }
 
-    const classDoc = await ClassStructure.findOne({ className });
+    const classDoc = await ClassStructure.findOne({ className, schoolId: req.school?._id });
     if (!classDoc) {
         throw new ApiError(404, "Class not found");
     }
@@ -61,7 +61,7 @@ export const removeDivision = asyncHandler(async (req, res) => {
         throw new ApiError(400,"Class and div are required");
     }
 
-    const classDoc = await ClassStructure.findOne({ className });
+    const classDoc = await ClassStructure.findOne({ className, schoolId: req.school?._id });
     if (!classDoc) {
         throw new ApiError(404, "Class not found");
     }
@@ -88,7 +88,7 @@ export const deleteClass = asyncHandler(async (req, res) => {
         throw new ApiError(400,"Class is required");
     }
 
-    const deleted = await ClassStructure.findOneAndDelete({ className });
+    const deleted = await ClassStructure.findOneAndDelete({ className, schoolId: req.school?._id });
     if (!deleted) {
         throw new ApiError(404, "Class not found");
     }
@@ -101,6 +101,6 @@ export const deleteClass = asyncHandler(async (req, res) => {
  * @access Private (Super admin)
  */
 export const getAllClasses = asyncHandler(async (req, res) => {
-    const classes = await ClassStructure.find().sort({ className: 1 }).select("className divisions"); // Optional sorting by className
+    const classes = await ClassStructure.find({schoolId: req.school?._id}).sort({ className: 1 }).select("className divisions"); // Optional sorting by className
     res.status(200).json(new ApiResponse(200, classes, "Classes fetched successfully"));
 });

@@ -8,7 +8,12 @@ const settingSchema = new Schema({
     value: {
         type: String,
         required: true
-    }
+    },
+    schoolId: {
+        type: Schema.Types.ObjectId,
+        ref: "School",
+        required: true,
+    },
 });
 
 export const Setting = mongoose.model("Setting", settingSchema);

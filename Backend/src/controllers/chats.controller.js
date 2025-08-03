@@ -17,13 +17,14 @@ import { v2 as cloudinary } from 'cloudinary';
  * @param {String} div 
  * @returns {Object} - { groupChats, personalChats }
  */
-export const getStudentChats = async (userId,className,div) => {
+export const getStudentChats = async (userId,className,div, schoolId) => {
   // 1. Fetch School Group Chat
   const schoolGroupChat = await Chat.aggregate([
     {
       $match: {
         isGroupChat: true,
         name: "School",
+        schoolId: schoolId
       },
     },
     {
@@ -45,7 +46,8 @@ export const getStudentChats = async (userId,className,div) => {
       $match: {
         isGroupChat: true,
         className,
-        div
+        div,
+        schoolId: schoolId
       },
     },
     {
@@ -63,6 +65,7 @@ export const getStudentChats = async (userId,className,div) => {
 
   // 3. Get All Teachers teaching this student’s class/div
   const teachers = await Teacher.find({
+    schoolId: schoolId,
     "subjects.classes": {
       $elemMatch: {
         class: className,
@@ -78,6 +81,7 @@ export const getStudentChats = async (userId,className,div) => {
 
       // Check if chat exists
       let chat = await Chat.findOne({
+        schoolId: schoolId,
         isGroupChat: false,
         participants: { $all: [userId, teacherUserId] },
       });
@@ -86,6 +90,7 @@ export const getStudentChats = async (userId,className,div) => {
       if (!chat) {
         chat = await Chat.create({
           name: "Private Chat",
+          schoolId: schoolId,
           isGroupChat: false,
           participants: [userId, teacherUserId],
         });
@@ -133,13 +138,14 @@ export const getStudentChats = async (userId,className,div) => {
  * @param {Object} - teacher details object
  * @returns {Object} - { groupChats, personalChats }
  */
-export const getTeacherChats = async (teacher) => {
+export const getTeacherChats = async (teacher, schoolId) => {
   const teacherId = teacher?._id;
   const teacherUserId = teacher?.userId;
   // 1. Fetch School Group Chat
   const schoolGroupChat = await Chat.aggregate([
     {
       $match: {
+        schoolId: schoolId,
         isGroupChat: true,
         name: "School",
       },
@@ -173,6 +179,7 @@ export const getTeacherChats = async (teacher) => {
     classGroupChats = await Chat.aggregate([
       {
         $match: {
+          schoolId: schoolId,
           isGroupChat: true,
           $or: classDivPairs.map(pair => ({
             className: pair.class,
@@ -197,6 +204,7 @@ export const getTeacherChats = async (teacher) => {
 
   // 5. Get all private (non-group) chats for the teacher
   const personalChatsRaw = await Chat.find({
+    schoolId: schoolId,
     isGroupChat: false,
     participants: teacherUserId,
   })
@@ -238,11 +246,12 @@ export const getTeacherChats = async (teacher) => {
  * @param {String} userId - _id of user (super admin) 
  * @returns {Object} - { groupChats, personalChats }
  */
-export const getSuperAdminChats = async (userId) => {
+export const getSuperAdminChats = async (userId, schoolId) => {
 
   const schoolGroupChat = await Chat.aggregate([
     {
       $match: {
+        schoolId: schoolId,
         isGroupChat: true,
         name: "School",
       },
@@ -263,6 +272,7 @@ export const getSuperAdminChats = async (userId) => {
 
   // 3. Get private (non-group) chats
   const personalChatsRaw = await Chat.find({
+    schoolId: schoolId,
     isGroupChat: false,
     participants: userId,
   })
@@ -389,8 +399,8 @@ export const uploadMultipleFiles = asyncHandler(async (req, res) => {
  * @route GET /api/v1/chat/all-users
  * @access Private (Super Admin)
  */
-export const getAllUsers = async (currentUserId) => {
-  const users = await User.find({ _id: { $ne: currentUserId } }).select("fullName role");
+export const getAllUsers = async (currentUserId,schoolId) => {
+  const users = await User.find({ _id: { $ne: currentUserId },schoolId }).select("fullName role");
   return users;
 };
 
@@ -399,6 +409,7 @@ export const getOrCreatePersonalChat = asyncHandler(async (req, res) => {
   const { id1, id2 } = req.params;
 
   let chat = await Chat.findOne({
+    schoolId: req.school?._id,
     isGroupChat: false,
     participants: { $all: [id1, id2], $size: 2 },
   });
@@ -420,6 +431,7 @@ export const getOrCreatePersonalChat = asyncHandler(async (req, res) => {
   // Create new chat
   chat = await Chat.create({
     name: "Private Chat",
+    schoolId: req.school?._id,
     isGroupChat: false,
     participants: [id1, id2],
   });
@@ -447,7 +459,7 @@ export const getOrCreatePersonalChat = asyncHandler(async (req, res) => {
  */
 export const deleteAllMessages = asyncHandler(async (req, res) => {
   try {
-    clearMessages();
+    clearMessages(req.school?._id);
     res.status(200).json(new ApiResponse(200,null,"All messages and attachments deleted."));
   } catch (error) {
     throw new ApiError(error.statusCode || 500, error.message || "Something went wrong");
@@ -458,7 +470,7 @@ export const deleteAllMessages = asyncHandler(async (req, res) => {
  * @desc Helper function to delete all messages along with deleting attachment from cloudinary
  * @returns {void}
  */
-export const clearMessages = async () => {
+export const clearMessages = async (schoolId) => {
   const prefix = "edusync/chats/";
 
   // Delete images
@@ -471,7 +483,7 @@ export const clearMessages = async () => {
   await cloudinary.api.delete_resources_by_prefix(prefix, { resource_type: "raw" });
 
   // Then clear the DB
-  await Message.deleteMany({});
+  await Message.deleteMany({schoolId: schoolId});
 };
 
 
