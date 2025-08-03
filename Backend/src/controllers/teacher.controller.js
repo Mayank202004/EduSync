@@ -25,10 +25,25 @@ export const verifyTeacher = asyncHandler(async (req, res) => {
             throw new ApiError(404, "User not found");
         }
         // Join "School" group ---
-        await Chat.findOneAndUpdate(
-          { name: "School", isGroupChat: true, schoolId: req.school?._id },
-          { $addToSet: { participants: user._id } }
-        );
+        let chat = await Chat.findOne({
+         name: "School",
+         isGroupChat: true,
+         schoolId: req.school?._id,
+       });
+       if (!chat) {
+         chat = await Chat.create({
+           name: "School",
+           isGroupChat: true,
+           schoolId: req.school?._id,
+           participants: [user._id], 
+         });
+       } else {
+         await Chat.findOneAndUpdate(
+           { _id: chat._id, schoolId: req.school?._id },
+           { $addToSet: { participants: user._id } }
+         );
+       }
+       
       
         return res.status(200).json(new ApiResponse(200, user, "Teacher verified successfully"));
     } catch (error) {

@@ -1,3 +1,4 @@
+import { Chat } from "../models/chat.model.js";
 import School from "../models/school.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
@@ -25,6 +26,13 @@ export const createSchool = asyncHandler(async (req, res) => {
   }
 
   const school = await School.create({ name, slug: finalSlug, address, logo });
+
+  await Chat.create({
+    name: "School",
+    isGroupChat: true,
+    schoolId: req.school?._id,
+    participants: [],
+  });
 
   res.status(201).json(new ApiResponse(201, school, "School created successfully"));
 });
@@ -90,6 +98,8 @@ export const updateSchool = asyncHandler(async (req, res) => {
 export const deleteSchool = asyncHandler(async (req, res) => {
   const { schoolId } = req.params;
   const deleted = await School.findOneAndDelete({ _id: schoolId });
+
+  await Chat.findOneAndDelete({ schoolId: schoolId, isGroupChat: true , name: "School"});
 
   if (!deleted) {
     throw new ApiError(404, "School not found");
