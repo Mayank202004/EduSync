@@ -20,7 +20,7 @@ const NotificationDropdown = () => {
   const [containerRef, ignoreContainerRef] = useClickOutside(() => setIsOpen(false));
 
   return (
-    <div className="sm:relative">
+    <div className="block md:hidden sm:relative">
       <IconTextButton
         ref={ignoreContainerRef}
         buttonProps={{ onClick: () => setIsOpen(prev => !prev) }}

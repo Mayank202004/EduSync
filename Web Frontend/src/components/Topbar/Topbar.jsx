@@ -63,7 +63,6 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
 
           <SearchBar />
           <div className="flex items-center gap-1">
-            <NotificationDropdown />
             <ToggleTheme theme={theme} setTheme={setTheme} />
             <Avatar />
           </div>

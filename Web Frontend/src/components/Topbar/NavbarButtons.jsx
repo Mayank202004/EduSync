@@ -9,7 +9,7 @@ import NotificationDropdown from "./NotificationDropdown";
 
 export const SearchBar = () => {
   return (
-    <div className="tablet:mx-4 w-fit search-box flex font-medium items-center px-4 py-2 rounded-full bg-black dark:bg-white shadow-md">
+    <div className="tablet:mx-2 w-fit search-box flex font-medium items-center px-4 py-2 rounded-full bg-black dark:bg-white shadow-md">
       <input
         type="text"
         placeholder="Search"
