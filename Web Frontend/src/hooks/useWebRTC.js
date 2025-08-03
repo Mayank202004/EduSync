@@ -169,7 +169,7 @@ const participantName = isScreenTrack
     setParticipants((prev) => {
       const alreadyExists = prev.some((p) => p._id === participantId);
       if (alreadyExists) {
-        console.warn("⚠️ Participant already exists:", participantId);
+        //console.warn("⚠️ Participant already exists:", participantId);
         return prev;
       }
 

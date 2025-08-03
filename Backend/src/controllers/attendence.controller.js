@@ -324,6 +324,7 @@ export const exportAttendanceExcel = asyncHandler(async (req, res) => {
     const query = {};
     if (className) query.class = className;
     if (div) query.div = div;
+    query.schoolId = req.school?._id
 
     let records = [];
 

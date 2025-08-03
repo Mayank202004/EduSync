@@ -458,7 +458,7 @@ export const promoteStudents = asyncHandler(async (req, res) => {
 
   for (const student of students) {
     // Skip if class and div are both missing (already graduated or unverified)
-    if (!student.class && !student.div) continue;
+    if ((!student.class && !student.div ) || !student.userId.verified) continue;
 
     const currentClass = student.class;
     const index = CLASS_ORDER.indexOf(currentClass);
@@ -512,7 +512,12 @@ export const promoteStudents = asyncHandler(async (req, res) => {
  */
 export const shuffleDivisions = asyncHandler(async (req, res) => {
   for (const className of CLASS_ORDER) {
-    const students = await Student.find({ class: className, schoolId: req.school?._id });
+    const students = await Student.find({ class: className, schoolId: req.school?._id })
+    .populate({
+      path: "userId",
+      match: { verified: true }, 
+      select: "verified ",
+    });
 
     if (students.length === 0) continue;
 
