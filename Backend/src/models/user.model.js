@@ -44,6 +44,10 @@ const userSchema = new Schema(
             type: Boolean,
             default: false,
         },
+        schoolId:{
+            type: Schema.Types.ObjectId,
+            ref: "School",
+        }
         refreshToken: {
             type: String,
         },
@@ -81,6 +85,8 @@ userSchema.methods.generateAccessToken = function () {
                 email: this.email,
                 username: this.username,
                 fullName: this.fullName,
+                role: this.role,
+                schoolId: this.schoolId
             },
             process.env.ACCESS_TOKEN_SECRET,
             {
