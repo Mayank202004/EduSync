@@ -604,27 +604,69 @@ export const manuallyAssignDivisions = asyncHandler(async (req, res) => {
     throw new ApiError(400, "className and assignments are required");
   }
 
-  // Ensure all students belong to the specified class
+  // Verify students
   const studentIds = assignments.map((a) => a._id);
   const existingStudents = await Student.find({
     _id: { $in: studentIds },
     class: className,
-    schoolId: req.school?._id
+    schoolId: req.school?._id,
+  }).populate({
+    path: "userId",
+    match: { verified: true },
+    select: "_id verified",
   });
 
   if (existingStudents.length !== assignments.length) {
     throw new ApiError(400, "Some students do not exist or are not in the specified class");
   }
 
-  // Prepare bulk update operations
-  const bulkOps = assignments.map(({ _id, div }) => ({
-    updateOne: {
-      filter: { _id, class: className },
-      update: { $set: { div } },
-    },
-  }));
+  // Map studentId to userId for chat updates
+  const userMap = {};
+  for (const student of existingStudents) {
+    if (student.userId) {
+      userMap[student._id.toString()] = student.userId._id;
+    }
+  }
 
+  const bulkOps = [];
+  const chatParticipants = {}; // { "A": [userId1, userId2], ... }
+
+  for (const { _id, div } of assignments) {
+    bulkOps.push({
+      updateOne: {
+        filter: { _id, class: className },
+        update: { $set: { div } },
+      },
+    });
+
+    const userId = userMap[_id];
+    if (userId) {
+      if (!chatParticipants[div]) chatParticipants[div] = [];
+      chatParticipants[div].push(userId);
+    }
+  }
+
+  // Apply student updates
   await Student.bulkWrite(bulkOps);
 
-  res.status(200).json(new ApiResponse(200, {}, "Divisions manually assigned successfully"));
+  // Update or create chat for each division
+  for (const [div, userIds] of Object.entries(chatParticipants)) {
+    await Chat.findOneAndUpdate(
+      {
+        className,
+        div,
+        isGroupChat: true,
+        schoolId: req.school?._id,
+      },
+      {
+        $set: {
+          participants: userIds,
+          name: `Class ${className}-${div}`,
+        },
+      },
+      { upsert: true, new: true }
+    );
+  }
+
+  res.status(200).json(new ApiResponse(200, {}, "Divisions manually assigned and chats updated successfully"));
 });
