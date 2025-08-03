@@ -21,7 +21,7 @@ export const createSchool = asyncHandler(async (req, res) => {
     $or: [{ slug: finalSlug }, { name: name.trim() }],
   });
   if (existing) {
-    throw new ApiError(400, "School with this slug already exists");
+    throw new ApiError(400, "School with this name or slug already exists");
   }
 
   const school = await School.create({ name, slug: finalSlug, address, logo });
@@ -36,7 +36,7 @@ export const createSchool = asyncHandler(async (req, res) => {
  */
 export const getAllSchools = asyncHandler(async (req, res) => {
   const schools = await School.find().sort({ createdAt: -1 });
-  res.status(200).json(new ApiResponse(200, schools));
+  res.status(200).json(new ApiResponse(200, schools,"Schools fetched successfully"));
 });
 
 /**
@@ -52,7 +52,7 @@ export const getSchoolBySlug = asyncHandler(async (req, res) => {
     throw new ApiError(404, "School not found");
   }
 
-  res.status(200).json(new ApiResponse(200, school));
+  res.status(200).json(new ApiResponse(200, school,"School fetched successfully"));
 });
 
 /**
@@ -61,16 +61,17 @@ export const getSchoolBySlug = asyncHandler(async (req, res) => {
  * @access Private (System Administrator)
  */
 export const updateSchool = asyncHandler(async (req, res) => {
-  const { slug } = req.params;
-  const { name, address, logo } = req.body;
+  const { schoolId } = req.params;
+  const { name, slug, address, logo } = req.body;
 
   const updatedFields = {
-    ...(name && { name, slug: slugify(name, { lower: true }) }),
+    ...(name && { name }),
+    ...(slug && { slug }),
     ...(address && { address }),
     ...(logo && { logo }),
   };
 
-  const updated = await School.findOneAndUpdate({ slug }, updatedFields, {
+  const updated = await School.findOneAndUpdate({ _id: schoolId }, updatedFields, {
     new: true,
   });
 
@@ -78,7 +79,7 @@ export const updateSchool = asyncHandler(async (req, res) => {
     throw new ApiError(404, "School not found");
   }
 
-  res.status(200).json(new ApiResponse(200, updated, "School updated successfully"));
+  res.status(200).json(new ApiResponse(200, null, "School updated successfully"));
 });
 
 /**
@@ -94,5 +95,5 @@ export const deleteSchool = asyncHandler(async (req, res) => {
     throw new ApiError(404, "School not found");
   }
 
-  res.status(200).json(new ApiResponse(200, {}, "School deleted successfully"));
+  res.status(200).json(new ApiResponse(200, null, "School deleted successfully"));
 });

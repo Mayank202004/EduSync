@@ -2,6 +2,8 @@ import School from "../models/school.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 
+// To DO : If not required Remove his file
+
 /**
  * @desc Set school context for each request 
  */

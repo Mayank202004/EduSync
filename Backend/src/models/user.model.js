@@ -47,7 +47,7 @@ const userSchema = new Schema(
         schoolId:{
             type: Schema.Types.ObjectId,
             ref: "School",
-        }
+        },
         refreshToken: {
             type: String,
         },
