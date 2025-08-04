@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { ArrowLeft } from "lucide-react";
 import { assignStudentDivisions } from "@/services/dashboardService";
+import ConfirmActionModal from "@/components/Modals/ConfirmationActionModal";
 
 const ManualDivisionAllotment = ({ onBack, classes, allStudents }) => {
   const [selectedClass, setSelectedClass] = useState("1");
   const [students, setStudents] = useState([]);
   const [divisionMap, setDivisionMap] = useState({});
   const [divisionOptions, setDivisionOptions] = useState([]);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   useEffect(() => {
     if (!selectedClass) {
@@ -16,65 +18,72 @@ const ManualDivisionAllotment = ({ onBack, classes, allStudents }) => {
       setDivisionMap({});
       return;
     }
-  
+
     const filtered = allStudents.filter((stu) => stu.class === selectedClass);
     setStudents(filtered);
-  
+
     const matchedClass = classes.find((cls) => cls.className === selectedClass);
     setDivisionOptions(matchedClass?.divisions || []);
-  
-    // Initialize division map based on existing student divisions
+
     const initialMap = {};
     filtered.forEach((stu) => {
       if (stu.div) initialMap[stu._id] = stu.div;
     });
     setDivisionMap(initialMap);
   }, [selectedClass, allStudents, classes]);
-  
 
   const handleDivisionChange = (id, division) => {
     setDivisionMap((prev) => ({ ...prev, [id]: division }));
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!selectedClass) return toast.error("Select a class first");
 
     const assignments = students.map((stu) => ({
       _id: stu._id,
-      div: divisionMap[stu._id] || ""
+      div: divisionMap[stu._id] || "",
     }));
 
     const hasUnassigned = assignments.some((a) => !a.div);
     if (hasUnassigned) return toast.error("All students must be assigned a division");
 
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmAssignment = async () => {
+    setShowConfirmModal(false);
+
+    const assignments = students.map((stu) => ({
+      _id: stu._id,
+      div: divisionMap[stu._id] || "",
+    }));
+
     try {
       await toast.promise(
-        assignStudentDivisions(selectedClass,assignments), 
+        assignStudentDivisions(selectedClass, assignments),
         {
           loading: "Assigning divisions...",
           success: "Divisions assigned successfully",
-          error: "",
+          error: "Failed to assign divisions",
         }
       );
     } catch (err) {
-      // Handled by axios interceptor
+      // Axios interceptor handles errors
     }
   };
 
-
-
   return (
     <div className="bg-gray-50 dark:bg-customDarkFg border border-gray-200 dark:border-none p-6 rounded-xl shadow-sm">
-       <button
-         onClick={onBack}
-         className="flex items-center gap-2 text-blue-600 hover:underline mb-2"
-       >
-         <ArrowLeft size={18} /> Back to Manage Academic Year
-       </button>
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 text-blue-600 hover:underline mb-2"
+      >
+        <ArrowLeft size={18} /> Back to Manage Academic Year
+      </button>
       <h3 className="text-xl font-semibold mb-4">🧑‍🏫 Manual Division Allotment</h3>
 
       <div className="mb-4">
-        <label className="block mb-1 text-sm font-medium ">Select Class</label>
+        <label className="block mb-1 text-sm font-medium">Select Class</label>
         <select
           value={selectedClass}
           onChange={(e) => setSelectedClass(e.target.value)}
@@ -126,6 +135,15 @@ const ManualDivisionAllotment = ({ onBack, classes, allStudents }) => {
         >
           Submit Division Assignments
         </button>
+      )}
+
+      {showConfirmModal && (
+        <ConfirmActionModal
+          title="Confirm Division Change"
+          message={`Changing divisions will delete all existing attendance records for Class ${selectedClass}. Are you sure you want to continue?`}
+          onConfirm={handleConfirmAssignment}
+          onCancel={() => setShowConfirmModal(false)}
+        />
       )}
     </div>
   );

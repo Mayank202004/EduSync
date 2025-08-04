@@ -6,6 +6,7 @@ import { User } from "../models/user.model.js";
 import { Chat } from "../models/chat.model.js";
 import { CLASS_ORDER} from "../constants/student.constants.js";
 import { ClassStructure } from "../models/classStructure.model.js";
+import { deleteAllAttendance } from "./attendence.controller.js";
 
 /**
  * @desc Add class and division details
@@ -503,6 +504,7 @@ export const promoteStudents = asyncHandler(async (req, res) => {
   if (userBulkOps.length > 0) {
     await User.bulkWrite(userBulkOps);
   }
+  deleteAllAttendance(req.school?._id);
   res.status(200).json(new ApiResponse(200, {}, "Students promoted successfully"));
 });
 
@@ -587,6 +589,7 @@ export const shuffleDivisions = asyncHandler(async (req, res) => {
   if (chatBulkOps.length > 0) {
     await Chat.bulkWrite(chatBulkOps);
   }
+  deleteAllAttendance(req.school?._id);
 
   res.status(200).json(new ApiResponse(200, {}, "Divisions shuffled and chat participants updated successfully"));
 });
@@ -667,6 +670,7 @@ export const manuallyAssignDivisions = asyncHandler(async (req, res) => {
       { upsert: true, new: true }
     );
   }
+  deleteAllAttendance(req.school?._id,className);
 
   res.status(200).json(new ApiResponse(200, {}, "Divisions manually assigned and chats updated successfully"));
 });

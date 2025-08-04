@@ -289,13 +289,14 @@ const ManageAcademicYear = ({ onBackPressed }) => {
           }
           message={
             confirmType === "promote"
-              ? "Are you sure you want to promote all students? This action is final."
-              : "Are you sure you want to shuffle divisions? This action is final."
+              ? "Are you sure you want to promote all students? This action is irreversible and will delete all attendance data from the previous academic year."
+              : "Are you sure you want to shuffle student divisions? This will delete all existing attendance records and cannot be undone."
           }
           onConfirm={handleConfirm}
           onCancel={() => setShowConfirm(false)}
         />
       )}
+      
     </div>
   );
 };

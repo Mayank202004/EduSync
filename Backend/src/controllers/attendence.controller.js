@@ -1105,11 +1105,11 @@ export const getTopLevelAdminDashboardData = asyncHandler(async (req, res) => {
         classStructure,
         totalStudents
     ] = await Promise.all([
-        getTopAttendees(req.school?._id),
-        getGenderDistribution(req.school?._id),
-        getWeeklyAbsenteeCount(req.school?._id),
+        getTopAttendees(null,null,req.school?._id),
+        getGenderDistribution(null,null,req.school?._id),
+        getWeeklyAbsenteeCount(null,null,req.school?._id),
         getClassWisePresenteePercentage(req.school?._id),
-        getDailyPresentee(req.school?._id),
+        getDailyPresentee(null,null,req.school?._id),
         ClassStructure.find({schoolId: req.school?._id}).sort({ className: 1 }).select("-createdAt -updatedAt -__v -_id"),
         getVerifiedStudentCount(req.school?._id)
     ]);
@@ -1210,13 +1210,19 @@ const getVerifiedStudentCount = async (schoolId) => {
 /**
  * @desc Helper to delete all attendance records
  */
-export const deleteAllAttendance = async (schoolId) => {
+export const deleteAllAttendance = async (schoolId, className = null) => {
   try {
-    ClassAttendance.deleteMany({schoolId});
+    const query = { schoolId };
+    if (className) {
+      query.className = className;
+    }
+
+    await ClassAttendance.deleteMany(query);
   } catch (error) {
     throw error;
   }
 };
+
 
 /**
  * @desc Helper function to return attendance count for a month for a student
