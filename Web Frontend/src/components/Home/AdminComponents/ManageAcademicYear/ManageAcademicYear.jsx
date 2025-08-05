@@ -147,7 +147,7 @@ const ManageAcademicYear = ({ onBackPressed }) => {
                 <input
                   value={newYear}
                   onChange={(e) => setNewYear(e.target.value)}
-                  className="border border-gray-300 dark:border-gray-600 rounded px-4 py-2 text-black w-40"
+                  className="border border-gray-300 dark:border-gray-600 rounded px-4 py-2 text-black dark:text-white w-40"
                   placeholder="e.g., 2025-26"
                 />
                 <button

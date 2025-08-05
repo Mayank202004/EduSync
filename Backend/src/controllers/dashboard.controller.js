@@ -87,8 +87,11 @@ export const manageAcademicYearData = asyncHandler(async (req, res) => {
       select: "fullName",
       match: { verified: true },
     });
+
+    // Filter out unverified studnets (userId will be null)
+    const verifiedStudents = students.filter(s => s.userId !== null);
   
   return res.status(200).json(
-    new ApiResponse(200, { academicYear, classesAndDivs, students }, "Academic Year Data Fetched")
+    new ApiResponse(200, { academicYear, classesAndDivs, students: verifiedStudents }, "Academic Year Data Fetched")
   );
 });

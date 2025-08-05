@@ -30,7 +30,7 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
           throw new ApiError(401, "Unauthorized: User not found");
         }
 
-        const school = await School.findOne({ _id: user?.schoolId }).select("-createdAt -updatedAt -__v");
+        const school = await School.findOne({ _id: user?.schoolId }).select("-createdAt -updatedAt -__v -classOrder -address");
 
         if (!school && user.role !== "system-admin") {
           throw new ApiError(401, "Unauthorized: School not found or inactive");

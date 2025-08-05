@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 import { Chat } from "../models/chat.model.js";
-import { CLASS_ORDER} from "../constants/student.constants.js";
+import School from "../models/school.model.js";
 import { ClassStructure } from "../models/classStructure.model.js";
 import { deleteAllAttendance } from "./attendence.controller.js";
 
@@ -459,14 +459,18 @@ export const promoteStudents = asyncHandler(async (req, res) => {
   const studentBulkOps = [];
   const userBulkOps = [];
 
+  const school = await School.findById(req.school?._id).select("classOrder").lean();
+  const classOrder = school.classOrder;
+
+
   for (const student of students) {
     // Skip if class and div are both missing (already graduated or unverified)
     if ((!student.class && !student.div ) || !student.userId.verified) continue;
 
     const currentClass = student.class;
-    const index = CLASS_ORDER.indexOf(currentClass);
+    const index = classOrder.indexOf(currentClass);
 
-    if (index === -1 || currentClass === "10") {
+    if (index === -1 || index === classOrder.length - 1) {
       // Graduate: null class/div, mark user unverified
       studentBulkOps.push({
         updateOne: {
@@ -493,7 +497,7 @@ export const promoteStudents = asyncHandler(async (req, res) => {
       studentBulkOps.push({
         updateOne: {
           filter: { _id: student._id },
-          update: { $set: { class: CLASS_ORDER[index + 1] } },
+          update: { $set: { class: classOrder[index + 1] } },
         },
       });
     }
@@ -517,7 +521,10 @@ export const promoteStudents = asyncHandler(async (req, res) => {
 export const shuffleDivisions = asyncHandler(async (req, res) => {
   const updatedChatParticipants = {}; // { "1-A": [userId1, userId2], ... }
 
-  for (const className of CLASS_ORDER) {
+  const school = await School.findById(req.school?._id).select("classOrder").lean();
+  const classOrder = school.classOrder;
+
+  for (const className of classOrder) {
     // Fetch class structure
     const classStructure = await ClassStructure.findOne({
       className,
@@ -534,7 +541,7 @@ export const shuffleDivisions = asyncHandler(async (req, res) => {
         path: "userId",
         match: { verified: true },
         select: "_id verified",
-      });
+      }).lean();
 
     const verifiedStudents = students.filter((s) => s.userId);
     if (verifiedStudents.length === 0) continue;

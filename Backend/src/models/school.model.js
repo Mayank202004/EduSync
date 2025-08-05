@@ -18,6 +18,11 @@ const schoolSchema = new mongoose.Schema({
   address: {
     type: String,
   },
+  classOrder: {
+    type: [String],
+    required: true,
+    default: ["Jr. KG", "Sr. KG", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"], 
+  },
 },{timestamps: true}
 );
 

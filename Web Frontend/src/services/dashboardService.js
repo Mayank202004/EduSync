@@ -158,7 +158,7 @@ export const fetchManageAcademicYearData = async () => {
  * @returns {Promise} - promise resolving to success message
  */
 export const updateAcademicYear = async (newYear) => {
-    await axiosInstance.put(`${BASEURL}/academic-year`,{newYear});
+    await axiosInstance.put(`${BASEURL}/setting/academic-year`,{academicYear:newYear});
 }
 
 /**
