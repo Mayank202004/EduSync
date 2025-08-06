@@ -10,6 +10,7 @@ import Attendance from '@/pages/Attendance';
 import Dashboard from '@/pages/Dashboard';
 import NotFound404 from '@/pages/NotFound404';
 import MeetingPage from '@/pages/Meeting/MeetingPage';
+import AdminControl from '@/pages/AdminControl';
 
 const routes = createRoutesFromElements(
   <>
@@ -24,6 +25,7 @@ const routes = createRoutesFromElements(
       <Route path="/calendar" element={<CalendarPage />} />
       <Route path="/resources" element={<Resources />} />
       <Route path="/attendance" element={<Attendance />} />
+      <Route path="/adminControls" element={<AdminControl />}/>
       <Route path="/user/edit" element={<EditUserProfile />}/>
     </Route>
 

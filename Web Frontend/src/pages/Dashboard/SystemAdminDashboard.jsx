@@ -49,7 +49,7 @@ const Card = ({ className, children }) => (
 
 const SystemAdminDashboard = () => {
   return (
-    <div className="w-full h-screen overflow-y-auto bg-gray-100 dark:bg-black p-6 space-y-6">
+    <div className="w-full h-screen overflow-y-auto bg-gray-100 dark:bg-customDarkFg p-6 space-y-6">
 
       {/* Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
