@@ -13,7 +13,7 @@ import { formatEvents } from '@/utils/calendarUtil';
 
 
 
-const AdminDashboard = () => {
+const SuperAdminDashboard = () => {
   const [activeView, setActiveView] = useState('home');
   const [chats, setChats] = useState(null);
   const [allUsers, setAllUsers] = useState(null);
@@ -66,4 +66,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default SuperAdminDashboard;

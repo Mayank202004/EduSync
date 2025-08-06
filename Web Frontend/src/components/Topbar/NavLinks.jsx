@@ -43,24 +43,39 @@ const NavLinks = ({ closeMenuCallback }) => {
           </NavLink>
         </li>
       )}
-      <li>
-        <NavLink
-          to="/resources"
-          className={navLinkClass}
-          onClick={closeMenuCallback}
-        >
-          Resources
-        </NavLink>
-      </li>
-      <li>
-        <NavLink
-          to="/calendar"
-          className={navLinkClass}
-          onClick={closeMenuCallback}
-        >
-          Calendar
-        </NavLink>
-      </li>
+      {(role !== "system admin") && (
+        <li>
+          <NavLink
+            to="/resources"
+            className={navLinkClass}
+            onClick={closeMenuCallback}
+          >
+            Resources
+          </NavLink>
+        </li>
+      )}
+      {(role !== "system admin") && (
+        <li>
+          <NavLink
+            to="/calendar"
+            className={navLinkClass}
+            onClick={closeMenuCallback}
+          >
+            Calendar
+          </NavLink>
+        </li>
+      )}
+      {(role === "system admin") && (
+        <li>
+          <NavLink
+            to="/adminControls"
+            className={navLinkClass}
+            onClick={closeMenuCallback}
+          >
+            Admin Controls
+          </NavLink>
+        </li>
+      )}
     </>
   );
 };

@@ -3,7 +3,8 @@ import { useAuth } from '@/context/AuthContext';
 import LoadingScreen from '@/components/Loading';
 import Unauthorized401 from '../Unauthorized401';
 
-const AdminDashboard = lazy(() => import('./AdminDashboard'));
+const SystemAdminDashboard = lazy(() => import('./SystemAdminDashboard'));
+const SuperAdminDashboard = lazy(() => import('./SuperAdminDashboard'));
 const TeacherDashboard = lazy(() => import('./TeacherDashboard'));
 const StudentDashboard = lazy(() => import('./StudentDashboard'));
 
@@ -22,7 +23,10 @@ export default function Resources() {
       Component = TeacherDashboard;
       break;
     case 'super admin':
-      Component = AdminDashboard;
+      Component = SuperAdminDashboard;
+      break;
+    case 'system admin':
+      Component = SystemAdminDashboard;
       break;
     default:
       return <Unauthorized401 />; 
