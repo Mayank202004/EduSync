@@ -1,24 +1,29 @@
-import React, { useState, useEffect} from 'react';
-import LeftSidebar from '@/components/Home/Sidebar/LeftSidebar';
-import RightSidebar from '@/components/Home/Sidebar/RightSidebar';
-import AdminHomeContent from '@/components/Home/AdminComponents/AdminHomeContent';
-import VerifyStudents from '@/components/Home/AdminComponents/Verifystudents';
-import VerifyTeachers from '@/components/Home/AdminComponents/VerifyTeachers';
-import ManageClasses from '@/components/Home/AdminComponents/ManageClasses';
-import ManageTeacherSubjects from '@/components/Home/AdminComponents/ManageSubjects';
-import ManageAcademicYear from '@/components/Home/AdminComponents/ManageAcademicYear/ManageAcademicYear';
-import { fetchSuperAdminDashboardData } from '@/services/dashboardService';
-import TicketInbox from '@/components/Home/AdminComponents/TicketInbox';
-import { formatEvents } from '@/utils/calendarUtil';
-
-
+import React, { useState, useEffect, useRef } from "react";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import LeftSidebar from "@/components/Home/Sidebar/LeftSidebar";
+import RightSidebar from "@/components/Home/Sidebar/RightSidebar";
+import AdminHomeContent from "@/components/Home/AdminComponents/AdminHomeContent";
+import VerifyStudents from "@/components/Home/AdminComponents/Verifystudents";
+import VerifyTeachers from "@/components/Home/AdminComponents/VerifyTeachers";
+import ManageClasses from "@/components/Home/AdminComponents/ManageClasses";
+import ManageTeacherSubjects from "@/components/Home/AdminComponents/ManageSubjects";
+import ManageAcademicYear from "@/components/Home/AdminComponents/ManageAcademicYear/ManageAcademicYear";
+import { fetchSuperAdminDashboardData } from "@/services/dashboardService";
+import TicketInbox from "@/components/Home/AdminComponents/TicketInbox";
+import ShowChatsButton from "@/components/Home/ShowChatsButton";
+import IconTextButton from "@/components/Chat/IconTextButton";
+import { formatEvents } from "@/utils/calendarUtil";
 
 const SuperAdminDashboard = () => {
   const [activeView, setActiveView] = useState('home');
   const [chats, setChats] = useState(null);
   const [allUsers, setAllUsers] = useState(null);
-  const [events,setEvents] = useState([]);
-  
+  const [events, setEvents] = useState([]);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [showChatButton, setShowChatButton] = useState(true);
+  const lastScrollY = useRef(0);
+
   useEffect(() => {
     const getDashboardData = async () => {
       const response = await fetchSuperAdminDashboardData();
@@ -29,39 +34,90 @@ const SuperAdminDashboard = () => {
     getDashboardData();
   }, []);
 
-  const onBackPressed = () => setActiveView('home');
+  // Scroll direction detection for hiding/showing chat button
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY.current) {
+        setShowChatButton(false); // Scrolling down
+      } else {
+        setShowChatButton(true); // Scrolling up
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const onBackPressed = () => setActiveView("home");
 
   const renderMainContent = () => {
     switch (activeView) {
-      case 'verify-students':
+      case "verify-students":
         return <VerifyStudents onBackPressed={onBackPressed} />;
-      case 'verify-teachers':
+      case "verify-teachers":
         return <VerifyTeachers onBackPressed={onBackPressed} />;
-      case 'manage-classes':
+      case "manage-classes":
         return <ManageClasses onBackPressed={onBackPressed} />;
-      case 'manage-subjects':
+      case "manage-subjects":
         return <ManageTeacherSubjects onBackPressed={onBackPressed} />;
-      case 'manage-academic-year':
+      case "manage-academic-year":
         return <ManageAcademicYear onBackPressed={onBackPressed} />;
-      case 'ticket-inbox':
-        return <TicketInbox onBackPressed={onBackPressed}/>
-      case 'home':
+      case "ticket-inbox":
+        return <TicketInbox onBackPressed={onBackPressed} />;
+      case "home":
       default:
         return <AdminHomeContent setActiveView={setActiveView} />;
     }
   };
 
   return (
-    <div className="flex grow w-full h-screen bg-transparent">
+    <div className="relative flex grow w-full h-screen bg-transparent">
+      {/* Left Sidebar - Desktop only */}
       <div className="md:w-[30%] lg:w-[20%] border-r border-gray-200 dark:border-gray-700 h-full pb-10 hidden md:block">
-        <LeftSidebar chatData={chats} setChatData={setChats} searchUsers={allUsers}/>
+        <LeftSidebar
+          chatData={chats}
+          setChatData={setChats}
+          searchUsers={allUsers}
+        />
       </div>
+
+      {/* Main Content */}
       <div className="w-full md:w-[70%] lg:w-[60%] p-4 overflow-y-auto">
         {renderMainContent()}
       </div>
+
+      {/* Right Sidebar - Desktop only */}
       <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden pb-10 md:block">
-        <RightSidebar events={events}/>
+        <RightSidebar events={events} />
       </div>
+
+      {/* Floating Chat Button - Mobile only */}
+      {setShowChatButton && (
+        <ShowChatsButton isShown={showChatButton} onClick={() => setIsChatOpen(true)} />
+      )}
+
+      {/* Mobile Chat Drawer/Modal */}
+      {isChatOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end md:hidden">
+          <div className="w-[80%] h-full relative overflow-y-auto rounded-md overflow-hidden">
+            <IconTextButton
+              buttonProps={{ onClick: () => setIsChatOpen(false) }}
+              className="absolute top-7 right-3 size-8 p-0 rounded-full"
+              icon={<FontAwesomeIcon icon={faXmark} className="fa-lg" />}
+            />
+            <div className="h-full bg-white dark:bg-gray-900">
+              <LeftSidebar
+                chatData={chats}
+                setChatData={setChats}
+                searchUsers={allUsers}
+                isMobile
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import AvatarIcon from "@/components/Chat/AvatarIcon";
 import IconTextButton from "@/components/Chat/IconTextButton";
-import NotificationDropdown from "./NotificationDropdown";
 
 export const SearchBar = () => {
   return (
