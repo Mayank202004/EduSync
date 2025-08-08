@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useChatsPanel } from "@/hooks/useChatsPanel";
 import LeftSidebar from "@/components/Home/Sidebar/LeftSidebar";
 import RightSidebar from "@/components/Home/Sidebar/RightSidebar";
 import AdminHomeContent from "@/components/Home/AdminComponents/AdminHomeContent";
@@ -21,8 +22,7 @@ const SuperAdminDashboard = () => {
   const [allUsers, setAllUsers] = useState(null);
   const [events, setEvents] = useState([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [showChatButton, setShowChatButton] = useState(true);
-  const lastScrollY = useRef(0);
+  const { showChatButton } = useChatsPanel();
 
   useEffect(() => {
     const getDashboardData = async () => {
@@ -34,21 +34,13 @@ const SuperAdminDashboard = () => {
     getDashboardData();
   }, []);
 
-  // Scroll direction detection for hiding/showing chat button
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY.current) {
-        setShowChatButton(false); // Scrolling down
-      } else {
-        setShowChatButton(true); // Scrolling up
-      }
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    if (isChatOpen) {
+      document.body.style.overflow = "hidden"; // Prevent scrolling
+    } else {
+      document.body.style.overflow = ""; // Restore scroll
+    }
+  }, [isChatOpen]);
 
   const onBackPressed = () => setActiveView("home");
 
@@ -94,20 +86,23 @@ const SuperAdminDashboard = () => {
       </div>
 
       {/* Floating Chat Button - Mobile only */}
-      {setShowChatButton && (
-        <ShowChatsButton isShown={showChatButton} onClick={() => setIsChatOpen(true)} />
+      {!isChatOpen && (
+        <ShowChatsButton
+          isShown={showChatButton}
+          onClick={() => setIsChatOpen(true)}
+        />
       )}
 
       {/* Mobile Chat Drawer/Modal */}
       {isChatOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end md:hidden">
-          <div className="w-[80%] h-full relative overflow-y-auto rounded-md overflow-hidden">
+        <div className="fixed tablet:hidden inset-0 top-15 z-20 bg-transparent w-full h-full">
+          <div className="w-full h-full relative overflow-y-auto">
             <IconTextButton
               buttonProps={{ onClick: () => setIsChatOpen(false) }}
-              className="absolute top-7 right-3 size-8 p-0 rounded-full"
-              icon={<FontAwesomeIcon icon={faXmark} className="fa-lg" />}
+              className="absolute top-5 right-3 size-8 p-0 rounded-full"
+              icon={<FontAwesomeIcon icon={faXmark} className="text-lg" />}
             />
-            <div className="h-full bg-white dark:bg-gray-900">
+            <div className="h-full bg-transparent rounded-md shadow-md">
               <LeftSidebar
                 chatData={chats}
                 setChatData={setChats}

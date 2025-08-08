@@ -11,7 +11,7 @@ const ShowChatsButton = ({ onClick, isShown }) => {
       icon={
         <FontAwesomeIcon
           icon={faMessage}
-          className="text-black dark:text-white size-6.5 text-2xl box-content p-1.5 translate-y-1"
+          className="text-white size-6.5 text-2xl box-content p-1.5 translate-y-1"
         />
       }
       className={cn(
