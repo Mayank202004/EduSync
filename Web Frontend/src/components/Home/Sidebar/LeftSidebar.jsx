@@ -10,8 +10,9 @@ import useClickOutside from "@/hooks/useClickOutside";
 import ChatCard from "@/components/Chat/chat-card";
 import { getOrCreatePersonalChat } from "@/services/chatService";
 import toast from "react-hot-toast";
+import { cn } from "@/lib/cn";
 
-const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
+const LeftSidebar = ({ chatData, setChatData, isMobile = false, searchUsers = [] }) => {
   const { unreadCounts, setUnreadCounts, socket, activeChatId, setActiveChat } = useSocket();
   const { user } = useAuth();
 
@@ -178,7 +179,7 @@ const LeftSidebar = ({ chatData, setChatData, searchUsers = [] }) => {
   const [containerRef] = useClickOutside(handleChatClose);
 
   return (
-    <div className="max-w-17/20 p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto h-full flex flex-col">
+    <div className={cn("p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto h-full flex flex-col", isMobile ? "w-full my-0 h-full" :  "max-w-17/20")}>
       <div className="flex items-center justify-center gap-2 mb-3 px-3">
         <FontAwesomeIcon icon={faMessage} className="dark:text-white text-black text-1.5xl" />
         <h2 className="font-semibold text-1.5xl">Channels</h2>

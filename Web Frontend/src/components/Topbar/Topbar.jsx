@@ -8,7 +8,6 @@ import NavLinks from "./NavLinks";
 import { SearchBar, Question } from "./NavbarButtons";
 import Avatar from "./Avatar";
 import ToggleTheme from "./ToggleTheme";
-import NotificationDropdown from "./NotificationDropdown";
 
 import { cn } from "@/lib/cn";
 
@@ -43,7 +42,6 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
         </h1>
         {/* Mobile Topbar */}
         <div className="tablet:hidden ml-auto flex items-center gap-1.5 sm:gap-2">
-          <NotificationDropdown />
           <Avatar />
           <button
             className="tablet:hidden size-fit p-2 rounded-sm hover:bg-gray-300 dark:hover:bg-gray-700 cursor-pointer"
@@ -63,7 +61,6 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
 
           <SearchBar />
           <div className="flex items-center gap-1">
-            <NotificationDropdown />
             <ToggleTheme theme={theme} setTheme={setTheme} />
             <Avatar />
           </div>
