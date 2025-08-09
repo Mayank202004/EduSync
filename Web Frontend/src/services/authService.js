@@ -27,6 +27,33 @@ export const loginApi = async (data) => {
 };
 
 /**
+ * @desc Function to verify OTP
+ * @param {String} otp - OTP
+ * @param {String} tempToken - Temp token
+ * @returns {Promise<Object>} - Promise resolving to the response data
+ */
+export const verifyOtpApi = async (otp, tempToken) => {
+  const response = await axiosInstance.post("/users/verify-otp", { otp }, {
+    headers: { "x-temp-token": tempToken }
+  });
+  return response.data;
+};
+
+/**
+ * @desc Function to resend OTP
+ * @param {String} email - Email
+ * @param {String} tempToken - Temp token
+ * @returns {Promise} - Promise resolving to the resend success message
+ */
+export const resendOtpApi = async (email, tempToken) => {
+  const response = await axiosInstance.post("/users/resend-otp", { email },{
+    headers: { "x-temp-token": tempToken }
+  });
+  return response.data;
+};
+
+
+/**
  * @desc Function to handle user signup
  * @param {object} data - User's data to be sent to API
  * @param {string} data.fullName - User's full name
