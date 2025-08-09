@@ -17,3 +17,9 @@ export const isValidNumber = (value: any): boolean =>
 export function capitalizeFirstLetter(input: String) {
   return `${input.at(0).toUpperCase()}${input.slice(1)}`
 }
+
+export function maskEmail(email) {
+  const [name, domain] = email.split("@");
+  if (name.length <= 2) return `${name[0]}***@${domain}`;
+  return `${name[0]}${"*".repeat(name.length - 2)}${name[name.length - 1]}@${domain}`;
+}
