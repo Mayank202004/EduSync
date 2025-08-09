@@ -14,7 +14,7 @@ const server = http.createServer(app);
 // Setup socket.io server
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173","http://192.168.141.63:5173"],
     credentials: true,
   },
 });
@@ -75,6 +75,7 @@ import chatRouter from "./routes/chat.routes.js"
 import faqRouter from "./routes/faq.routes.js"
 import ticketRouter from "./routes/ticket.routes.js"
 import settingRouter from "./routes/setting.routes.js"
+import schoolRouter from "./routes/school.routes.js"
 
 // Routes Declarations
 app.use("/api/v1/users", userRouter);
@@ -91,6 +92,7 @@ app.use("/api/v1/chat",chatRouter);
 app.use("/api/v1/faq",faqRouter);
 app.use("/api/v1/ticket",ticketRouter);
 app.use("/api/v1/setting",settingRouter);
+app.use("/api/v1/school",schoolRouter);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

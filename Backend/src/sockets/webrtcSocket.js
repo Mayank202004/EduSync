@@ -1,5 +1,6 @@
 const roomUsersMap = {}; // { roomKey: [ { socketId, user } ] }
 
+
 export const setupWebRTC = (io, socket, user) => {
   socket.on("join-room", ({ roomId }) => {
     const roomKey = `webrtc-${roomId}`;

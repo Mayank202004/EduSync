@@ -1,14 +1,11 @@
-import React from "react";
-import { useActionState } from "react";
+import React,{ useActionState, useState} from "react";
 import { Link, useNavigate } from "react-router-dom";
-
 import { useAuth } from "@/context/AuthContext";
-
-import Input from "../Chat/Input";
-import SimpleButton from "../Chat/SimpleButton";
-import LinkButton from "../Chat/LinkButton";
-
+import Input from "../UI/Input";
+import SimpleButton from "../UI/SimpleButton";
+import LinkButton from "../UI/LinkButton";
 import signInAction from "./form_actions/signInAction";
+import OtpInputCard from "./OtpInputCard";
 
 const inputStyle =
   "border text-black border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-black my-0.5";
@@ -16,8 +13,11 @@ const inputStyle =
 const LoginCard = ({ switchToSignup }) => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [otpRequired, setOtpRequired] = useState(false);
+  const [otpData, setOtpData] = useState("");
+  
   const [signInValues, formAction, isPending] = useActionState(
-    (prevState, formData) => signInAction(prevState, formData, onSuccess),
+    (prevState, formData) => signInAction(prevState, formData, onSuccess, onOtpRequired),
     {
       errors: null,
       inputValues: {
@@ -32,6 +32,14 @@ const LoginCard = ({ switchToSignup }) => {
     navigate("/");
   };
 
+  const onOtpRequired = (otpData) => {
+    setOtpData(otpData);
+    setOtpRequired(true);
+  };
+
+  if (otpRequired) {
+    return <OtpInputCard otpData={otpData} onSuccess={onSuccess} onBack={() => setOtpRequired(false)}/>;
+  }
   return (
     <div className="h-full w-100 flex items-center justify-center">
       <div className="w-full bg-white rounded-xl p-8 justify-center">

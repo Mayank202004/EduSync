@@ -3,6 +3,9 @@ import { Otp } from "../models/otp.model.js";
 
 
 export const sendOtpHelper = async (email, purpose = "LOGIN") => {
+  // Delete any existing OTP for this email & purpose
+  await Otp.deleteMany({ email, purpose });
+  
   const otp = crypto.randomInt(100000, 999999).toString();
   const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 

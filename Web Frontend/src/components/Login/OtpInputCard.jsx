@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { verifyOtpApi, resendOtpApi } from "@/services/authService";
 import toast from "react-hot-toast";
+import { maskEmail } from "@/utils/textUtils";
 
 const OtpInputCard = ({ otpData, onSuccess, onBack }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [timer, setTimer] = useState(60);
+  const [timer, setTimer] = useState(5);
   const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
@@ -18,17 +19,22 @@ const OtpInputCard = ({ otpData, onSuccess, onBack }) => {
     newOtp[index] = value;
     setOtp(newOtp);
     if (value && index < 5) document.getElementById(`otp-${index + 1}`)?.focus();
+
+    // Auto-submit when last digit is entered
+    if (value && index === 5) {
+      setTimeout(() => handleSubmit(newOtp), 100); // small delay so state updates first
+    }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (otpArray = otp) => {
     setVerifying(true);
     try {
-      const code = otp.join("");
-      const res = await verifyOtpApi({ token: otpData.tempToken, code });
-      toast.success("OTP Verified");
-      onSuccess(res.data);
+      const code = otpArray.join("");
+      const response = await verifyOtpApi(code,otpData.tempToken);
+      onSuccess(response.data);
+      toast.success(`Welcome, ${response.data.user.username || "User"}!`);
     } catch {
-      toast.error("Invalid OTP");
+      // Handled by axios interceptor
     } finally {
       setVerifying(false);
     }
@@ -36,7 +42,7 @@ const OtpInputCard = ({ otpData, onSuccess, onBack }) => {
 
   const handleResend = async () => {
     try {
-      await resendOtpApi({ email: otpData.email });
+      await resendOtpApi(otpData.email, otpData.tempToken);
       toast.success("OTP resent");
       setTimer(60);
     } catch {
@@ -44,9 +50,19 @@ const OtpInputCard = ({ otpData, onSuccess, onBack }) => {
     }
   };
 
+  /**
+   * @desc Function to implement backspace to go to previous block while typing otp
+   */
+  const handleKeyDown = (e, index) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      document.getElementById(`otp-${index - 1}`)?.focus();
+    }
+  };
+
+
   return (
     <div className="flex flex-col items-center gap-4">
-      <p className="text-center">Enter the 6-digit code sent to <b>{otpData.email}</b></p>
+      <p className="text-center text-black">Enter the 6-digit code sent to <b>{maskEmail(otpData.email)}</b></p>
       <div className="flex gap-2">
         {otp.map((digit, index) => (
           <input
@@ -54,9 +70,10 @@ const OtpInputCard = ({ otpData, onSuccess, onBack }) => {
             id={`otp-${index}`}
             type="text"
             maxLength={1}
-            className="w-10 h-10 text-center text-xl border border-gray-300 rounded"
+            className="w-10 h-10 text-center text-xl border border-gray-300 rounded text-black"
             value={digit}
             onChange={(e) => handleChange(e.target.value, index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
           />
         ))}
       </div>

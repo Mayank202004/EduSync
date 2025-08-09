@@ -12,7 +12,7 @@ configDotenv({
 //cross origin resourse sharing
 app.use(
   cors({
-    origin: "http://localhost:5173", // or your deployed frontend URL
+    origin: ["http://localhost:5173","http://192.168.141.63:5173"],
     credentials: true,
   })
 );
