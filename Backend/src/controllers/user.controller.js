@@ -7,10 +7,12 @@ import jwt from "jsonwebtoken";
 import { uploadOnCloudinary,deleteFromCloudinary } from "../utils/cloudinary.js";
 import { Student } from "../models/student.model.js"; 
 import { Teacher } from "../models/teacher.model.js";
+import { Otp } from "../models/otp.model.js";
+import { sendOtpHelper } from "../utils/otpUtil.js";
 
 /**
  * @desc   Generate access and refresh tokens
- * @route  POST /api/v1/auth/refresh-token
+ * @route  POST /api/v1/users/refresh-token
  * @access Public
  */ 
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -33,7 +35,7 @@ const generateAccessAndRefereshTokens = async (userId) => {
 
 /**
  * @desc   Register a new user
- * @route  POST /api/v1/auth/register
+ * @route  POST /api/v1/users/register
  * @access Public
  */ 
 const registerUser = asyncHandler(async (req, res) => {
@@ -122,7 +124,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 /**
  * @desc   Login user
- * @route  POST /api/v1/auth/login
+ * @route  POST /api/v1/users/login
  * @access Public
  */
 const loginUser = asyncHandler(async (req, res) => {
@@ -147,13 +149,29 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(403,"You are not verified. Contact super admin");
     }
 
-    if(!user.schooId && !user.role === "system-admin"){
+    if(!user.schoolId && !user.role === "system-admin"){
         throw new ApiError(403,"School not found or inactive");
     }
 
     const isPasswordValid = await user.verifyPassword(password);
     if (!isPasswordValid) {
         throw new ApiError(404, "Invalid Credentials");
+    }
+
+    // If role is admin type → Require OTP
+    if (["system admin", "super admin"].includes(user.role)) {
+      await sendOtpHelper(user.email, "LOGIN");
+
+      // Temporary token valid for ~5 min
+      const tempToken = jwt.sign(
+        { userId: user._id, email: user.email, purpose: "LOGIN" },
+        process.env.TEMP_JWT_SECRET,
+        { expiresIn: process.env.TEMP_JWT_EXPIRY || "10m" }
+      );
+
+      return res.status(200).json(
+        new ApiResponse(200, { otpRequired: true, otpData:{tempToken,email:user.email} }, "OTP sent to your regeistered email")
+      );
     }
 
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
@@ -197,6 +215,108 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 /**
+ * @desc   Verify OTP
+ * @route  POST /api/v1/users/verify-otp
+ * @access Public
+ */
+export const verifyOtp = asyncHandler(async (req, res) => {
+  const { otp } = req.body;
+  const tempToken = req.headers["x-temp-token"];
+
+  if (!otp || !tempToken) throw new ApiError(400, "OTP and temp token required");
+
+  let payload;
+  try {
+    payload = jwt.verify(tempToken, process.env.TEMP_JWT_SECRET);
+  } catch {
+    throw new ApiError(400, "Temp token invalid or expired");
+  }
+
+  const otpRecord = await Otp.findOne({
+    email: payload.email,
+    otp,
+    purpose: "LOGIN",
+  });
+  if (!otpRecord) throw new ApiError(400, "Invalid OTP");
+
+  if (otpRecord.expiresAt < new Date())
+    throw new ApiError(400, "OTP expired");
+
+  await Otp.deleteOne({ _id: otpRecord._id });
+
+  const { accessToken, refreshToken } =
+    await generateAccessAndRefereshTokens(payload.userId);
+
+  const loggedInUser = await User.findById(payload.userId).select(
+    "-password -refreshToken"
+  );
+
+  let roleData = null;
+  if (loggedInUser.role === "student") {
+    roleData = await Student.findOne({ userId: loggedInUser._id }).select(
+      "-parentContact -userId -address -dob -bloodGroup -allergies -height -weight -siblingInfo -parentsInfo -createdAt -updatedAt"
+    );
+  } else if (loggedInUser.role === "teacher") {
+    roleData = await Teacher.findOne({ userId: loggedInUser._id }).select(
+      "-userid -address -phone -createdAt -updatedAt"
+    );
+  }
+
+  const options = {
+    httpOnly: true,
+    secure: false, // change to true in production with HTTPS
+    sameSite: "Lax",
+  };
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          user: loggedInUser,
+          roleData,
+          accessToken,
+          refreshToken,
+        },
+        "OTP verified, login complete"
+      )
+    );
+});
+
+
+/**
+ * @desc   Resend OTP
+ * @route  POST /api/v1/users/resend-otp
+ * @access Public
+ */
+export const resendOtp = asyncHandler(async (req, res) => {
+  const tempToken = req.headers["x-temp-token"];
+
+  if (!tempToken) {
+    throw new ApiError(400, "Temp token is required");
+  }
+
+  let payload;
+  try {
+    payload = jwt.verify(tempToken, process.env.TEMP_JWT_SECRET);
+  } catch {
+    throw new ApiError(401, "Temp token invalid or expired");
+  }
+
+  await sendOtpHelper(payload.email, payload.purpose);
+
+  return res.status(200).json(
+    new ApiResponse(200, { otpSent: true }, "OTP resent successfully")
+  );
+});
+
+
+
+
+/**
  * @desc   Logout user
  * @route  POST /api/v1/auth/logout
  * @access Private (User)
@@ -235,7 +355,6 @@ const refreshAccessToken = asyncHandler(async (req,res) =>{
         const user = await User.findById(decodedToken?._id).select(
             "-password -role -avatar"
         );
-        console.log(`Name : ${user.fullName}`);
 
         if(!user){
             throw new ApiError(401,"Invalid Refresh Token");
