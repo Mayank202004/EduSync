@@ -1,5 +1,5 @@
 import ModalWrapper from "./ModalWrapper";
-import SimpleButton from "./SimpleButton";
+import SimpleButton from "../UI/SimpleButton";
 import OutlinedButton from "./OutlinedButton";
 import TitledContainer from "./TitledContainer";
 

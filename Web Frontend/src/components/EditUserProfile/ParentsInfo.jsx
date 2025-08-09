@@ -1,7 +1,7 @@
 import { useActionState } from "react";
 
-import Input from "@/components/Chat/Input";
-import SimpleButton from "@/components/Chat/SimpleButton";
+import Input from "@/components/UI/Input";
+import SimpleButton from "@/components/UI/SimpleButton";
 
 import parentInfoAction from "./form_actions/parentInfoAction";
 

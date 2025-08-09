@@ -1,9 +1,9 @@
 import { useActionState } from "react";
 import useClickOutside from "@/hooks/useClickOutside";
 import SelectOption from "@/components/Chat/SelectOption";
-import SimpleButton from "@/components/Chat/SimpleButton";
-import Input from "@/components/Chat/Input";
-import TextArea from "@/components/Chat/TextArea";
+import SimpleButton from "@/components/UI/SimpleButton";
+import Input from "@/components/UI/Input";
+import TextArea from "@/components/UI/TextArea";
 
 import { createTicket } from "@/services/raiseTicktetService";
 

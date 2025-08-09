@@ -3,8 +3,8 @@ import toast from "react-hot-toast";
 
 import useExpandable from "@/hooks/useExpandable";
 
-import Input from "@/components/Chat/Input";
-import SimpleButton from "@/components/Chat/SimpleButton";
+import Input from "@/components/UI/Input";
+import SimpleButton from "@/components/UI/SimpleButton";
 import OutlinedButton from "@/components/Chat/OutlinedButton";
 import SelectOption from "@/components/Chat/SelectOption";
 import Checkbox from "@/components/Chat/CheckBox";

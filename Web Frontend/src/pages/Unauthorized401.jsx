@@ -1,4 +1,4 @@
-import LinkButton from "@/components/Chat/LinkButton";
+import LinkButton from "@/components/UI/LinkButton";
 import unauthorizedImg from "@/assets/unauthorized_illustration.png";
 
 const Unauthorized401 = () => {

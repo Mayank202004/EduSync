@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
-import Input from "@/components/Chat/Input";
+import Input from "@/components/UI/Input";
 import SelectOption from "@/components/Chat/SelectOption";
-import SimpleButton from "@/components/Chat/SimpleButton";
-import LinkButton from "@/components/Chat/LinkButton";
+import SimpleButton from "@/components/UI/SimpleButton";
+import LinkButton from "@/components/UI/LinkButton";
 
 import signUpAction from "./form_actions/signUpAction";
 import { ROLES_MAP } from "./value_maps/signupMaps";
