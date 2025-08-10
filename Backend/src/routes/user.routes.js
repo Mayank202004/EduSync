@@ -17,6 +17,7 @@ router.route("/change-password").post(verifyJWT, userController.changeUserPasswo
 router.route("/me").get(verifyJWT, userController.getCurrentUser);
 router.route("/update").put(verifyJWT, userController.updateUser);
 router.route("/update-avatar").put(verifyJWT,upload.single("avatar"),userController.updateUserAvatar);
+router.route("/bulk-register-students").post(verifyJWT,upload.single("file"),verifySuperAdmin,userController.bulkRegisterStudents);
 
 
 export default router;

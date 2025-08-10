@@ -11,6 +11,11 @@ import { Otp } from "../models/otp.model.js";
 import { sendOtpHelper } from "../utils/otpUtil.js";
 import { generateUniqueUsername, generateRandomPassword } from "../utils/userUtils.js";
 import School from "../models/school.model.js";
+import xlsx from "xlsx"
+import { sendCredentialOverMail } from "../utils/userUtils.js";
+import fs from 'fs';
+import { Chat } from "../models/chat.model.js";
+
 
 /**
  * @desc   Generate access and refresh tokens
@@ -535,7 +540,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
  * @route  POST /api/v1/users/bulk-register-students
  * @access Private (Super Admin)
  */
-export const bulkRegisterStudents = asyncHandler(async (req, res) => {
+const bulkRegisterStudents = asyncHandler(async (req, res) => {
     if (!req.file) {
         throw new ApiError(400, "Excel file is required");
     }
@@ -569,9 +574,10 @@ export const bulkRegisterStudents = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Class and division are required in the first row");
     }
 
-    if (!CLASS_ORDER.includes(commonClass)) {
-        throw new ApiError(400, `Invalid class: ${commonClass}`);
+    if (!CLASS_ORDER.includes(String(commonClass))) {
+        throw new ApiError(400, `Invalid class: ${commonClass}. Check if class exist in school order`);
     }
+
 
     const toCreateUsers = [];
     const failedRows = [];
@@ -661,7 +667,7 @@ export const bulkRegisterStudents = asyncHandler(async (req, res) => {
             filter: { className: commonClass, div: commonDiv, isGroupChat: true, schoolId },
             update: {
                 $setOnInsert: {
-                    name: `${commonClass}-${commonDiv}`,
+                    name: `Class ${commonClass}-${commonDiv}`,
                     isGroupChat: true,
                     schoolId,
                     className: commonClass,
@@ -711,4 +717,4 @@ export const bulkRegisterStudents = asyncHandler(async (req, res) => {
 
 
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, changeUserPassword, getCurrentUser, updateUser, updateUserAvatar};
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeUserPassword, getCurrentUser, updateUser, updateUserAvatar, bulkRegisterStudents};
