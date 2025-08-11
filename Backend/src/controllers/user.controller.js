@@ -1,21 +1,21 @@
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import xlsx from "xlsx"
+import fs from 'fs';
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { validateRegisterInput, validateUpdateUserInput} from "../validators/user.validator.js";
-import jwt from "jsonwebtoken";
 import { uploadOnCloudinary,deleteFromCloudinary } from "../utils/cloudinary.js";
 import { Student } from "../models/student.model.js"; 
 import { Teacher } from "../models/teacher.model.js";
 import { Otp } from "../models/otp.model.js";
 import { sendOtpHelper } from "../utils/otpUtil.js";
 import { generateUniqueUsername, generateRandomPassword } from "../utils/userUtils.js";
-import School from "../models/school.model.js";
-import xlsx from "xlsx"
-import { sendCredentialOverMail } from "../utils/userUtils.js";
-import fs from 'fs';
 import { Chat } from "../models/chat.model.js";
-
+import { sendCredentialOverMail } from "../utils/userUtils.js";
+import School from "../models/school.model.js";
 
 /**
  * @desc   Generate access and refresh tokens
@@ -583,11 +583,15 @@ const bulkRegisterStudents = asyncHandler(async (req, res) => {
     const failedRows = [];
     const allCredentials = [];
 
-    // Preload existing emails (case-insensitive, trimmed)
+    // Preload existing emails
     const emailsFromSheet = sheetData.map(r => r.email?.trim().toLowerCase());
     const existingEmails = new Set(
         (await User.find({ email: { $in: emailsFromSheet } }).select("email"))
             .map(u => u.email.toLowerCase())
+    );
+    // Fetch already existing usernames (Used to generate unique username)
+    const usedUsernames = new Set(
+        (await User.find({}, { username: 1 })).map(u => u.username.toLowerCase())
     );
 
     for (const [index, row] of sheetData.entries()) {
@@ -605,7 +609,7 @@ const bulkRegisterStudents = asyncHandler(async (req, res) => {
                 continue;
             }
 
-            const username = await generateUniqueUsername(fullName);
+            const username = await generateUniqueUsername(fullName,usedUsernames);
             //const plainPassword = generateRandomPassword(); To Do : use this 
             const plainPassword  = "admin@123456"; // To Do: Remove this later after testing
             const hashedPassword = await bcrypt.hash(plainPassword, 10);
@@ -629,6 +633,7 @@ const bulkRegisterStudents = asyncHandler(async (req, res) => {
             });
 
         } catch (err) {
+            console.error("Row error:", err);
             failedRows.push({ row: index + 2, reason: err.message });
         }
     }
