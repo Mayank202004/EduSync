@@ -58,7 +58,6 @@ export const addSubject = async (className, subjectName) => {
  * @returns {Promise<Object>} - Promise resolving to the updated class data
  */
 export const addChapter = async (className, subjectName, termNumber, chapterName) =>{
-    console.log('Adding chapter');
     const response = await axiosInstance.post(`${BASEURL}/resource/add-chapter`, {className, subjectName, termNumber, chapterName});
     return response.data;
 }
@@ -84,8 +83,8 @@ export const addResource = async (className, subjectName, termNumber, chapterNam
   const response = await axiosInstance.post(`${BASEURL}/resource/add-resource`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
-    }
-  },{timeout:1000});
+    },timeout:10000
+  });
   return response.data;
 };
 

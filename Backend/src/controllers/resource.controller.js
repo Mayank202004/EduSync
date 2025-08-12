@@ -190,7 +190,7 @@ export const addResource = asyncHandler(async (req, res) => {
                 if (!cloudinaryResponse) {
                     throw new ApiError(500, "Error while uploading file.");
                 }
-                return { type: cloudinaryResponse.resource_type, url: cloudinaryResponse.secure_url };
+                return { format: cloudinaryResponse.format, type: cloudinaryResponse.resource_type, url: cloudinaryResponse.secure_url };
             })
         );
 

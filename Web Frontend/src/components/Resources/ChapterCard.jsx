@@ -87,7 +87,6 @@ function ChapterCard({
 
   const handleDeleteResource = async (chapterName,resourceUrl) => {
     try{
-      console.log(className,subjectName,term,chapterName,resourceUrl);
       const resposne = await toast.promise(
         deleteResource(className,subjectName,term,chapterName,resourceUrl),
         {
@@ -205,7 +204,7 @@ function ChapterCard({
                     return (
                       <div key={res._id} className="flex justify-between items-center">
                         <RenderResource
-                          type={res.type}
+                          type={res?.format == "pdf" ? "pdf" : res.type}
                           id={res._id}
                           name={chapter.chapterName}
                           imagePreviewSetter={setPreviewDetails}
