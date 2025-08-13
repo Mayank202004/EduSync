@@ -36,8 +36,6 @@ const HomeContent = ({monthlyAttendance,attendanceOverMonths}) => {
       present,
     }));
 
-    console.log(attendanceData,monthlyAttendanceData);
-
 
   return (
     <div className="w-full min-h-screen py-2 bg-customLightFg rounded-md dark:bg-customDarkBg">

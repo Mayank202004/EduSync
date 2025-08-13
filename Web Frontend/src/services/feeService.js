@@ -32,7 +32,6 @@ export const addFeeStructure = async (data) => {
 
 // To DO : check this (by/For mayank)
 export const updateFeeStructure = async (data) => {
-  console.log("Mock updateFeeStructure called with:", data);
   return { success: true };
 };
 

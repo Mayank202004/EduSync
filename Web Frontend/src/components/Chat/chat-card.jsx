@@ -105,7 +105,6 @@ const ChatCard = ({
     };
 
     const handleUserDisconnected = (id) => {
-      console.log(`User ${id} disconnected`);
       setOnlineUsers((prev) => prev.filter((uid) => uid !== id));
     };
 

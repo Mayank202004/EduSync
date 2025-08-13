@@ -120,7 +120,6 @@ const LeftSidebar = ({ chatData, setChatData, isMobile = false, searchUsers = []
         const chat = res.data;
 
         if (chat && chat._id) {
-          console.log(chat);
           setChatData(prev => ({
             ...prev,
             personalChats: [chat, ...(prev?.personalChats || [])],

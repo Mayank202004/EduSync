@@ -124,7 +124,6 @@ export const deleteClass = async (className) => {
  * @returns {Promise} - promise resolving to success message
  */
 export const deleteDivision = async (className, div) => {
-    console.log(className, div);
     const response = await axiosInstance.delete(`${BASEURL}/class/div`,{data: { className, div }});
     return response.data;
 }
