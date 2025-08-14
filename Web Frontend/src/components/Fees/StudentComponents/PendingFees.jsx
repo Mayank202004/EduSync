@@ -3,9 +3,11 @@ import FeeCard from "./FeeCard";
 import FeeType from "./FeeType";
 import SimpleButton from "@/components/UI/SimpleButton";
 import { capitalizeFirstLetter } from "@/utils/textUtils";
+import axios from "axios";
 
 const PendingFees = ({ isPending, feesData }) => {
   const [selectedItems, setSelectedItems] = useState({}); // { type1: [id1, id2], type2: [id3] }
+  const [loadingType, setLoadingType] = useState(null);
 
   const selectFee = (type, id) => {
     setSelectedItems((prev) => ({
@@ -19,6 +21,44 @@ const PendingFees = ({ isPending, feesData }) => {
       ...prev,
       [type]: (prev[type] || []).filter((itemId) => itemId !== id),
     }));
+  };
+
+  const handleProceedToPay = async (type) => {
+    const selectedIds = selectedItems[type];
+    if (!selectedIds || selectedIds.length === 0) return;
+
+    const feesToPay = (feesData[type] || [])
+      .filter((fee) => selectedIds.includes(fee._id))
+      .map((fee) => ({
+        structureId: fee._id,
+        amount: fee.amount
+      }));
+
+    const payload = {
+      feeType: type,
+      transactionId: `TXN${Date.now()}`, // To Do: replace with real txn id from payment gateway
+      mode: "Online",
+      fees: feesToPay
+    };
+
+    try {
+      setLoadingType(type);
+      // const res = await axios.post("/api/fees/mark-paid", payload, {
+      //   withCredentials: true
+      // });
+      console.log(payload)
+      console.log("Payment success:", res.data);
+
+      // Clear selection after success
+      setSelectedItems((prev) => ({
+        ...prev,
+        [type]: []
+      }));
+    } catch (err) {
+      console.error("Payment error:", err.response?.data || err.message);
+    } finally {
+      setLoadingType(null);
+    }
   };
 
   return (
@@ -57,10 +97,12 @@ const PendingFees = ({ isPending, feesData }) => {
                       <SimpleButton
                         buttonProps={{
                           type: "button",
+                          onClick: () => handleProceedToPay(type),
+                          disabled: loadingType === type
                         }}
                         predefinedColor="success"
                       >
-                        Proceed to pay
+                        {loadingType === type ? "Processing..." : "Proceed to pay"}
                       </SimpleButton>
                     </div>
                   )}
