@@ -4,10 +4,14 @@ import FeeType from "./FeeType";
 import SimpleButton from "@/components/UI/SimpleButton";
 import { capitalizeFirstLetter } from "@/utils/textUtils";
 import axios from "axios";
+import { payFee } from "@/services/feeService";
+import toast from "react-hot-toast";
 
 const PendingFees = ({ isPending, feesData }) => {
   const [selectedItems, setSelectedItems] = useState({}); // { type1: [id1, id2], type2: [id3] }
   const [loadingType, setLoadingType] = useState(null);
+  const feeTypes = {transport: "Transport Fee",academic: "Tuition Fee",other: "Other Fee"};
+
 
   const selectFee = (type, id) => {
     setSelectedItems((prev) => ({
@@ -35,7 +39,7 @@ const PendingFees = ({ isPending, feesData }) => {
       }));
 
     const payload = {
-      feeType: type,
+      feeType: feeTypes[type],
       transactionId: `TXN${Date.now()}`, // To Do: replace with real txn id from payment gateway
       mode: "Online",
       fees: feesToPay
@@ -43,11 +47,14 @@ const PendingFees = ({ isPending, feesData }) => {
 
     try {
       setLoadingType(type);
-      // const res = await axios.post("/api/fees/mark-paid", payload, {
-      //   withCredentials: true
-      // });
-      console.log(payload)
-      console.log("Payment success:", res.data);
+      await toast.promise(
+        payFee(payload),
+        {
+          loading: "Payment in progress...",
+          success: "Payment successful",
+          error: ""
+        }
+      );
 
       // Clear selection after success
       setSelectedItems((prev) => ({
@@ -55,7 +62,7 @@ const PendingFees = ({ isPending, feesData }) => {
         [type]: []
       }));
     } catch (err) {
-      console.error("Payment error:", err.response?.data || err.message);
+      // Handled by axios instance 
     } finally {
       setLoadingType(null);
     }

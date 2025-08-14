@@ -21,6 +21,17 @@ export const getAllFees = async () => {
 }
 
 /**
+ * @desc Function to pay fee
+ * @param {Object} data - {feeType, studentId, fees<structureId,amount>, transactionId, mode} 
+ * @returns {Promise} - Promise resolving to success message
+ */
+export const payFee = async (data) => {
+  const response = await axiosInstance.post("/fee/pay", data);
+  return response.data;
+}
+
+
+/**
  * @desc Function to add new fee structure
  * @param {Object} - data {className, amount, title, feeType, dueDate, compulasory, discount, addToAllClasses} 
  * @returns {Promise} Promise resolving to success message
