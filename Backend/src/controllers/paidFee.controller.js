@@ -250,7 +250,7 @@ const renderFeeReceipt = asyncHandler(async (req, res) => {
   if (!payment) {
     throw new ApiError(403, "Unauthorized: This payment does not belong to you");
   }
-  academicYear = await getSettingValue("academicYear", req.school?._id);
+  const academicYear = await getSettingValue("academicYear", req.school?._id);
 
   // Prepare data
   const data = { // To Do add school name
