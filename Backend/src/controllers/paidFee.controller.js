@@ -14,9 +14,9 @@ import ejs from 'ejs';
 const markFeeAsPaid = asyncHandler(async (req, res) => {
   const studentId = req.student._id;
   const className = req.student.class;
-  const { feeType, structureId, transactionId, mode, amount} = req.body;
+  const { feeType, fees, transactionId, mode } = req.body;
 
-  if (!feeType?.trim() || !structureId?.trim() || !transactionId?.trim() || !mode?.trim() || !amount?.trim()) {
+  if (!feeType?.trim() || !Array.isArray(fees) || fees.length === 0 || !transactionId?.trim() || !mode?.trim()) {
     throw new ApiError(400, "Missing required payment fields");
   }
 
@@ -24,18 +24,12 @@ const markFeeAsPaid = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Student or class not found");
   }
 
-  // Verify feeType and structureId are valid in FeeStructure
+  // Validate fee structure for class
   const feeStructure = await FeeStructure.findOne({ class: className, schoolId: req.school?._id });
   if (!feeStructure) throw new ApiError(404, "Fee structure not found");
 
   const feeGroup = feeStructure.fee.find(group => group.feeType === feeType);
-  if (!feeGroup || !feeGroup.structure.some(item => item._id.toString() === structureId.toString())) {
-    throw new ApiError(400, "Invalid structureId or feeType");
-  }
-
-  const structureItem = await FeeItem.findById(structureId);
-  if (!structureItem) throw new ApiError(404, "Fee item not found");
-  if(number(structureItem.amount) !== number(amount)) throw new ApiError(400, "Invalid amount");
+  if (!feeGroup) throw new ApiError(400, "Invalid feeType");
 
   // Find or create student's fee status
   let studentFeeStatus = await StudentFeeStatus.findOne({ student: studentId });
@@ -47,35 +41,57 @@ const markFeeAsPaid = asyncHandler(async (req, res) => {
     });
   }
 
-  const paymentEntry = {
-    structureId: structureId,
-    paidOn: new Date(),
-    transactionId,
-    mode,
-    amount
-  };
-
   const groupIndex = studentFeeStatus.paidFees.findIndex(group => group.feeType === feeType);
-
   if (groupIndex === -1) {
-    // Create new group with payment
     studentFeeStatus.paidFees.push({
       feeType,
-      payments: [paymentEntry],
+      payments: []
     });
-  } else {
-    // Modify using array index — safe and tracked
-    const alreadyPaid = studentFeeStatus.paidFees[groupIndex].payments.some(
-  p => p.structureId.toString() === structureId.toString()
-);
-    if (alreadyPaid) throw new ApiError(409, "Fee is already paid");
-
-    studentFeeStatus.paidFees[groupIndex].payments.push(paymentEntry);
   }
+
+  // Track payment entries
+  const paymentEntries = [];
+
+  for (const fee of fees) {
+    const { structureId, amount } = fee;
+    if (!structureId?.trim() || amount == null) {
+      throw new ApiError(400, "Each fee item must have structureId and amount");
+    }
+
+    // Validate existence in fee structure
+    const inStructure = feeGroup.structure.some(item => item._id.toString() === structureId.toString());
+    if (!inStructure) throw new ApiError(400, `Invalid structureId: ${structureId}`);
+
+    // Validate FeeItem and amount
+    const structureItem = await FeeItem.findById(structureId);
+    if (!structureItem) throw new ApiError(404, `Fee item not found: ${structureId}`);
+    if (Number(structureItem.amount) !== Number(amount)) {
+      throw new ApiError(400, `Invalid amount for ${structureId}`);
+    }
+
+    // Check if already paid
+    const alreadyPaid = studentFeeStatus.paidFees[groupIndex !== -1 ? groupIndex : studentFeeStatus.paidFees.length - 1]
+      .payments.some(p => p.structureId.toString() === structureId.toString());
+    if (alreadyPaid) {
+      throw new ApiError(409, `Fee already paid for structureId: ${structureId}`);
+    }
+
+    paymentEntries.push({
+      structureId,
+      paidOn: new Date(),
+      transactionId,
+      mode,
+      amount
+    });
+  }
+
+  // Push all payments to that feeType
+  studentFeeStatus.paidFees[groupIndex !== -1 ? groupIndex : studentFeeStatus.paidFees.length - 1]
+    .payments.push(...paymentEntries);
 
   await studentFeeStatus.save();
 
-  return res.status(200).json(new ApiResponse(200, studentFeeStatus, "Fee marked as paid successfully"));
+  return res.status(200).json(new ApiResponse(200, studentFeeStatus, "Fees marked as paid successfully"));
 });
 
 
