@@ -4,6 +4,7 @@ import { ApiResponse } from '../utils/apiResponse.js';
 import { StudentFeeStatus } from '../models/paidFee.model.js';
 import { FeeItem, FeeStructure } from '../models/feeStructure.model.js';
 import { getSettingValue } from './setting.controller.js'; 
+import pdf from "html-pdf-node";
 import ejs from 'ejs';
 
 /**
@@ -217,43 +218,32 @@ const getStudentFeeStatus = asyncHandler(async (req, res) => {
 
 
 /**
- * @desc Render fee receipt
+ * @desc Render fee receipt as PDF
  * @route GET /api/v1/fee/receipt
  * @access Private (Student)
  */
 const renderFeeReceipt = asyncHandler(async (req, res) => {
   const { transactionId, title, feeId, receiptNo, feeType } = req.body;
-  const templatePath = 'src/templates/fee.template.ejs';
+  const templatePath = "src/templates/fee.template.ejs";
 
-  // Validate required fields
   if (!transactionId || !title || !feeId || !receiptNo || !feeType) {
     throw new ApiError(400, "Missing required fields");
   }
 
-  // Fetch student's paid fee status
   const studentFeeStatus = await StudentFeeStatus.findOne({ student: req.student._id });
+  if (!studentFeeStatus) throw new ApiError(403, "No fee record found for this student");
 
-  if (!studentFeeStatus) {
-    throw new ApiError(403, "No fee record found for this student");
-  }
-
-  // Look only in the specific feeType group
   const feeGroup = studentFeeStatus.paidFees.find(group => group.feeType === feeType);
-  if (!feeGroup) {
-    throw new ApiError(403, "No payments found for this fee type");
-  }
+  if (!feeGroup) throw new ApiError(403, "No payments found for this fee type");
 
   const payment = feeGroup.payments.find(
     p => p.transactionId === transactionId && p.structureId.toString() === feeId
   );
+  if (!payment) throw new ApiError(403, "Unauthorized: This payment does not belong to you");
 
-  if (!payment) {
-    throw new ApiError(403, "Unauthorized: This payment does not belong to you");
-  }
   const academicYear = await getSettingValue("academicYear", req.school?._id);
 
-  // Prepare data
-  const data = { // To Do add school name
+  const data = {
     academicYear: academicYear ?? "20xx-20xx",
     name: req.user.fullName,
     standard: req.student.class + "-" + req.student.div,
@@ -261,24 +251,37 @@ const renderFeeReceipt = asyncHandler(async (req, res) => {
     receiptNo,
     date: formatDate(payment.paidOn),
     stopName: req.student?.stopName ?? "",
-    feeItems: [
-      { title: feeType, amount: payment.amount }
-    ],
+    feeItems: [{ title: feeType, amount: payment.amount }],
     totalAmount: payment.amount,
     paymentMode: payment.mode,
     title,
     feeId,
     transactionId: payment.transactionId,
     transactionDate: formatDate(payment.paidOn),
-    feeType
+    feeType,
   };
 
   try {
+    // Render HTML from EJS
     const html = await ejs.renderFile(templatePath, data);
-    res.setHeader('Content-Type', 'text/html');
-    res.send(html);
+
+    // Convert HTML → PDF
+    const file = { content: html };
+    const options = {
+      format: "A4",
+      printBackground: true,
+      preferCSSPageSize: true,
+      margin: { top: 20, right: 20, bottom: 20, left: 20 },
+    };
+
+    const pdfBuffer = await pdf.generatePdf(file, options);
+
+    // Send PDF as download
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=receipt-${receiptNo}.pdf`);
+    res.send(pdfBuffer);
   } catch (err) {
-    throw new ApiError(err.status, err.message);
+    throw new ApiError(500, "Error generating PDF: " + err.message);
   }
 });
 

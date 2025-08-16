@@ -52,36 +52,27 @@ export const updateFeeStructure = async (data) => {
  * @returns {Promise} Promise resolving to success message
  */
 export const exportFee = async (transactionId, feeId, feeType, title, receiptNo) => {
-  try {
-    const response = await axiosInstance.post(
-      `/fee/receipt`,
-      {
-        transactionId,
-        feeId,
-        feeType,
-        title,
-        receiptNo,
-      },
-      {
-        responseType: "text", // This is HTML
-      }
-    );
+  const response = await axiosInstance.post(
+    "/fee/receipt",
+    { transactionId, feeId, feeType, title, receiptNo },
+    { responseType: "blob" }
+  );
 
-    const blob = new Blob([response.data], { type: "text/html" });
-    const blobUrl = URL.createObjectURL(blob);
+  // Convert blob to PDF object
+  const pdfBlob = new Blob([response.data], { type: "application/pdf" });
+  const pdfUrl = URL.createObjectURL(pdfBlob);
 
-    const a = document.createElement("a");
-    a.href = blobUrl;
-    a.download = `${receiptNo}.html`; // Or `.pdf` if your backend returns PDF
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(blobUrl); // Cleanup
+  // Auto-download
+  const link = document.createElement("a");
+  link.href = pdfUrl;
+  link.download = `receipt-${receiptNo}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 
-  } catch (err) {
-    console.error("Failed to download receipt:", err);
-    alert("Could not download the receipt. Please try again.");
-  }
+  // Preview in new tab (instead of download)
+  window.open(pdfUrl, "_blank");
 };
+
 
 

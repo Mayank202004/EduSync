@@ -1,9 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
-
 import Tag from "./Tag";
 import { exportFee } from "@/services/feeService";
 import { formatDate } from "@/utils/dateUtils";
+import toast from "react-hot-toast";
 
 const COLOR_MAP = {
   Cash: "green",
@@ -22,7 +22,14 @@ const PaidFeesCard = ({ feeData }) => {
     title,
     receiptNo,
   }) => {
-    exportFee(transactionId, structureId, feeType, title, receiptNo);
+    toast.promise(
+      exportFee(transactionId, structureId, feeType, title, receiptNo),
+      {
+        loading: "Exporting fee receipt...",
+        success: "Fee receipt exported successfully.",
+        error: "",
+      }
+    )
   };
 
   return (
