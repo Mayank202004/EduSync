@@ -545,179 +545,184 @@ const bulkRegisterStudents = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Excel file is required");
     }
 
-    const schoolId = req.school?._id;
-    if (!schoolId) {
-        throw new ApiError(400, "School ID is required");
-    }
-
-    // Get class order from school
-    const school = await School.findById(schoolId).select("classOrder").lean();
-    if (!school) throw new ApiError(404, "School not found");
-
-    const CLASS_ORDER = school.classOrder;
-
-    // Parse Excel
-    const workbook = xlsx.readFile(req.file.path);
-    const sheetName = workbook.SheetNames[0];
-    const sheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
-
-    if (sheetData.length === 0) {
-        throw new ApiError(400, "Excel sheet is empty");
-    }
-
-    // Assuming class/div same for all students, take from first row
-    const firstRow = sheetData[0];
-    const commonClass = firstRow.class;
-    const commonDiv = firstRow.div;
-
-    if (!commonClass || !commonDiv) {
-        throw new ApiError(400, "Class and division are required in the first row");
-    }
-
-    if (!CLASS_ORDER.includes(String(commonClass))) {
-        throw new ApiError(400, `Invalid class: ${commonClass}. Check if class exist in school order`);
-    }
-
-
-    const toCreateUsers = [];
-    const failedRows = [];
-    const allCredentials = [];
-
-    // Preload existing emails
-    const emailsFromSheet = sheetData.map(r => r.email?.trim().toLowerCase());
-    const existingEmails = new Set(
-        (await User.find({ email: { $in: emailsFromSheet } }).select("email"))
-            .map(u => u.email.toLowerCase())
-    );
-    // Fetch already existing usernames (Used to generate unique username)
-    const usedUsernames = new Set(
-        (await User.find({}, { username: 1 })).map(u => u.username.toLowerCase())
-    );
-
-    for (const [index, row] of sheetData.entries()) {
-        try {
-            const { fullName, email } = row;
-
-            if (!fullName || !email) {
-                failedRows.push({ row: index + 2, reason: "Missing required fields" });
-                continue;
-            }
-
-            const normalizedEmail = email.trim().toLowerCase();
-            if (existingEmails.has(normalizedEmail)) {
-                failedRows.push({ row: index + 2, reason: "Email already exists" });
-                continue;
-            }
-
-            const username = await generateUniqueUsername(fullName,usedUsernames);
-            //const plainPassword = generateRandomPassword(); To Do : use this 
-            const plainPassword  = "admin@123456"; // To Do: Remove this later after testing
-            const hashedPassword = await bcrypt.hash(plainPassword, 10);
-
-            // Push only user data — let Mongo generate _id
-            toCreateUsers.push({
-                fullName,
-                email: normalizedEmail,
-                username,
-                password: hashedPassword,
-                role: "student",
-                verified: true,
-                schoolId
-            });
-
-            // Store credentials for email sending
-            allCredentials.push({
-                email: normalizedEmail,
-                username,
-                password: plainPassword
-            });
-
-        } catch (err) {
-            console.error("Row error:", err);
-            failedRows.push({ row: index + 2, reason: err.message });
+    try{
+        const schoolId = req.school?._id;
+        if (!schoolId) {
+            throw new ApiError(400, "School ID is required");
         }
-    }
 
-    // Stage 1: Insert users, Mongo creates _id
-    const insertedUsers = await User.insertMany(toCreateUsers, { ordered: false });
+        // Get class order from school
+        const school = await School.findById(schoolId).select("classOrder").lean();
+        if (!school) throw new ApiError(404, "School not found");
 
-    // Stage 2: Create Student docs using the actual _id values
-    const toCreateStudents = insertedUsers.map(user => ({
-        userId: user._id,
-        class: commonClass,
-        div: commonDiv,
-        schoolId
-    }));
+        const CLASS_ORDER = school.classOrder;
 
-    await Student.insertMany(toCreateStudents, { ordered: false });
+        // Parse Excel
+        const workbook = xlsx.readFile(req.file.path);
+        const sheetName = workbook.SheetNames[0];
+        const sheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
-    // ---- Bulk add to chats ----
-    const bulkOps = [];
+        if (sheetData.length === 0) {
+            throw new ApiError(400, "Excel sheet is empty");
+        }
 
-    // Add to school chat
-    bulkOps.push({
-        updateOne: {
-            filter: { name: "School", isGroupChat: true, schoolId },
-            update: {
-                $addToSet: {
-                    participants: { $each: insertedUsers.map(u => u._id) }
+        // Assuming class/div same for all students, take from first row
+        const firstRow = sheetData[0];
+        const commonClass = firstRow.class;
+        const commonDiv = firstRow.div;
+
+        if (!commonClass || !commonDiv) {
+            throw new ApiError(400, "Class and division are required in the first row");
+        }
+
+        if (!CLASS_ORDER.includes(String(commonClass))) {
+            throw new ApiError(400, `Invalid class: ${commonClass}. Check if class exist in school order`);
+        }
+
+
+        const toCreateUsers = [];
+        const failedRows = [];
+        const allCredentials = [];
+
+        // Preload existing emails
+        const emailsFromSheet = sheetData.map(r => r.email?.trim().toLowerCase());
+        const existingEmails = new Set(
+            (await User.find({ email: { $in: emailsFromSheet } }).select("email"))
+                .map(u => u.email.toLowerCase())
+        );
+        // Fetch already existing usernames (Used to generate unique username)
+        const usedUsernames = new Set(
+            (await User.find({}, { username: 1 })).map(u => u.username.toLowerCase())
+        );
+
+        for (const [index, row] of sheetData.entries()) {
+            try {
+                const { fullName, email } = row;
+
+                if (!fullName || !email) {
+                    failedRows.push({ row: index + 2, reason: "Missing required fields" });
+                    continue;
+                }
+
+                const normalizedEmail = email.trim().toLowerCase();
+                if (existingEmails.has(normalizedEmail)) {
+                    failedRows.push({ row: index + 2, reason: "Email already exists" });
+                    continue;
+                }
+
+                const username = await generateUniqueUsername(fullName,usedUsernames);
+                //const plainPassword = generateRandomPassword(); To Do : use this 
+                const plainPassword  = "admin@123456"; // To Do: Remove this later after testing
+                const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
+                // Push only user data — let Mongo generate _id
+                toCreateUsers.push({
+                    fullName,
+                    email: normalizedEmail,
+                    username,
+                    password: hashedPassword,
+                    role: "student",
+                    verified: true,
+                    schoolId
+                });
+
+                // Store credentials for email sending
+                allCredentials.push({
+                    email: normalizedEmail,
+                    username,
+                    password: plainPassword
+                });
+
+            } catch (err) {
+                console.error("Row error:", err);
+                failedRows.push({ row: index + 2, reason: err.message });
+            }
+        }
+
+        // Stage 1: Insert users, Mongo creates _id
+        const insertedUsers = await User.insertMany(toCreateUsers, { ordered: false });
+
+        // Stage 2: Create Student docs using the actual _id values
+        const toCreateStudents = insertedUsers.map(user => ({
+            userId: user._id,
+            class: commonClass,
+            div: commonDiv,
+            schoolId
+        }));
+
+        await Student.insertMany(toCreateStudents, { ordered: false });
+
+        // ---- Bulk add to chats ----
+        const bulkOps = [];
+
+        // Add to school chat
+        bulkOps.push({
+            updateOne: {
+                filter: { name: "School", isGroupChat: true, schoolId },
+                update: {
+                    $addToSet: {
+                        participants: { $each: insertedUsers.map(u => u._id) }
+                    }
                 }
             }
-        }
-    });
+        });
 
-    // Add to class/div chat (create if not exists)
-    bulkOps.push({
-        updateOne: {
-            filter: { className: commonClass, div: commonDiv, isGroupChat: true, schoolId },
-            update: {
-                $setOnInsert: {
-                    name: `Class ${commonClass}-${commonDiv}`,
-                    isGroupChat: true,
-                    schoolId,
-                    className: commonClass,
-                    div: commonDiv,
-                    createdAt: new Date()
+        // Add to class/div chat (create if not exists)
+        bulkOps.push({
+            updateOne: {
+                filter: { className: commonClass, div: commonDiv, isGroupChat: true, schoolId },
+                update: {
+                    $setOnInsert: {
+                        name: `Class ${commonClass}-${commonDiv}`,
+                        isGroupChat: true,
+                        schoolId,
+                        className: commonClass,
+                        div: commonDiv,
+                        createdAt: new Date()
+                    },
+                    $addToSet: {
+                        participants: { $each: insertedUsers.map(u => u._id) }
+                    }
                 },
-                $addToSet: {
-                    participants: { $each: insertedUsers.map(u => u._id) }
-                }
-            },
-            upsert: true
+                upsert: true
+            }
+        });
+
+        if (bulkOps.length) {
+            await Chat.bulkWrite(bulkOps);
         }
-    });
 
-    if (bulkOps.length) {
-        await Chat.bulkWrite(bulkOps);
-    }
+        // Send credentials through email
+        const emailPromises = allCredentials.map(creds =>
+            sendCredentialOverMail(creds.email, {
+                username: creds.username,
+                password: creds.password
+            }).catch(err => {
+                console.error(`Failed to send credentials to ${creds.email}: ${err.message}`);
+            })
+        );
 
-    // Send credentials through email
-    const emailPromises = allCredentials.map(creds =>
-        sendCredentialOverMail(creds.email, {
-            username: creds.username,
-            password: creds.password
-        }).catch(err => {
-            console.error(`Failed to send credentials to ${creds.email}: ${err.message}`);
-        })
-    );
+        // This runs all email sends at once (in parallel) and waits for all to complete
+        await Promise.all(emailPromises);
 
-    // This runs all email sends at once (in parallel) and waits for all to complete
-    await Promise.all(emailPromises);
-
-
-    // Remove uploaded file
-    try{    
-        fs.unlinkSync(req.file.path);
+        return res.status(201).json(
+            new ApiResponse(201, {
+                createdCount: insertedUsers.length,
+                failed: failedRows
+            }, "Bulk student registration completed")
+        );
     }catch(err){
-        //Skip
+        console.error(err);
+        throw new ApiError(err.statusCode || 500, err.message);
+    }finally {
+        try {
+            if (req.file?.path) {
+                fs.unlinkSync(req.file.path);
+            }
+        } catch (err) {
+            console.error("Failed to delete temp file:", err.message);
+        }
     }
-
-    return res.status(201).json(
-        new ApiResponse(201, {
-            createdCount: insertedUsers.length,
-            failed: failedRows
-        }, "Bulk student registration completed")
-    );
 });
 
 
