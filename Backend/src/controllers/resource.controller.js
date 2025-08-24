@@ -6,6 +6,7 @@ import { Student } from '../models/student.model.js';
 import { Teacher } from '../models/teacher.model.js';
 import { uploadOnCloudinary, deleteFromCloudinary} from '../utils/cloudinary.js';
 
+
 /**
  * @desc Add a new class
  * @route POST /api/resource/add-class
@@ -191,6 +192,23 @@ export const addResource = asyncHandler(async (req, res) => {
                     throw new ApiError(500, "Error while uploading file.");
                 }
                 return { format: cloudinaryResponse.format, type: cloudinaryResponse.resource_type, url: cloudinaryResponse.secure_url };
+
+                // == To migrate to blck blaze uncomment below == 
+                // const backblazeResponse = await uploadOnBackblaze(
+                //   file.path,
+                //   process.env.B2_BUCKET_NAME,
+                //   `edusync/resource/${className}/${subjectName}/${chapterName}`
+                // );
+            
+                // if (!backblazeResponse) {
+                //   throw new ApiError(500, "Error while uploading file.");
+                // }
+            
+                // return {
+                //   format: mime.extension(mime.lookup(file.path) || "application/octet-stream"), // e.g. "jpg", "pdf"
+                //   type: mime.lookup(file.path)?.split("/")[0] || "file", // "image", "video", "application"
+                //   url: backblazeResponse.url,
+                // };
             })
         );
 
