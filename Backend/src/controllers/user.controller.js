@@ -197,10 +197,20 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     //Options for cookies
-    const options = {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'Lax',
+    
+  // Use for development
+//   const options = {
+//     httpOnly: true,
+//     secure: false, // change to true in production with HTTPS
+//     sameSite: "Lax",
+//   };
+
+    // Use for production
+  const options = {
+      httpOnly: true,
+      secure: true,      // required for HTTPS
+      sameSite: "None",  // allows cross-site cookies
+      path: "/",
     };
 
     return res
