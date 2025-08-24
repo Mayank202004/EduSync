@@ -12,7 +12,7 @@ configDotenv({
 //cross origin resourse sharing
 app.use(
   cors({
-    origin: ["http://localhost:5173","http://192.168.141.63:5173"],
+    origin: ["http://localhost:5173","http://192.168.141.63:5173","https://edusync-v1.netlify.app"],
     credentials: true,
   })
 );
