@@ -269,11 +269,21 @@ export const verifyOtp = asyncHandler(async (req, res) => {
     );
   }
 
+  // Use for development
+//   const options = {
+//     httpOnly: true,
+//     secure: false, // change to true in production with HTTPS
+//     sameSite: "Lax",
+//   };
+
+// Use for production
   const options = {
-    httpOnly: true,
-    secure: false, // change to true in production with HTTPS
-    sameSite: "Lax",
-  };
+      httpOnly: true,
+      secure: true,      // required for HTTPS
+      sameSite: "None",  // allows cross-site cookies
+      path: "/",
+    };
+
 
   return res
     .status(200)
