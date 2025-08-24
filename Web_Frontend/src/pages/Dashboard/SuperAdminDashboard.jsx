@@ -5,7 +5,7 @@ import { useChatsPanel } from "@/hooks/useChatsPanel";
 import LeftSidebar from "@/components/Home/Sidebar/LeftSidebar";
 import RightSidebar from "@/components/Home/Sidebar/RightSidebar";
 import AdminHomeContent from "@/components/Home/AdminComponents/AdminHomeContent";
-import VerifyStudents from "@/components/Home/AdminComponents/Verifystudents";
+import VerifyStudents from "@/components/Home/AdminComponents/VerifyStudents";
 import VerifyTeachers from "@/components/Home/AdminComponents/VerifyTeachers";
 import ManageClasses from "@/components/Home/AdminComponents/ManageClasses";
 import ManageTeacherSubjects from "@/components/Home/AdminComponents/ManageSubjects";
