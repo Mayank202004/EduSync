@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import IsoCubeAnimation from '../components/Login/isoCubeAnimation';
-import LoginCard from '../components/Login/loginCard';
+import LoginCard from '../components/Login/LoginCard';
 import SignupCard from '@/components/Login/SignupCard';
 
 function Login() {
