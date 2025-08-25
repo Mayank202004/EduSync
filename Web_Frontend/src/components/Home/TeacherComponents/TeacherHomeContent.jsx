@@ -21,7 +21,7 @@ const TeacherHomeContent = () => {
       <div className="max-w-6xl mx-auto space-y-5">
 
         {/* Welcome Card */}
-        <div className="flex items-center bg-white dark:bg-customDarkFg rounded-2xl px-10">
+        <div className="flex items-center bg-white dark:bg-customDarkFg rounded-2xl py-10 md:py-0 px-10">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               Welcome, {user?.fullName || "Teacher"} 👋
@@ -48,7 +48,7 @@ const TeacherHomeContent = () => {
               Easily record and manage student attendance for your subjects.
             </p>
             <button
-              onClick={() => navigate("/teacher/attendance")}
+              onClick={() => navigate("/attendance")}
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
             >
               Go to Attendance
