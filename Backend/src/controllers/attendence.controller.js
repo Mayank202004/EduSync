@@ -1149,11 +1149,11 @@ export const getClassLevelAdminDashboardData = asyncHandler(async (req, res) => 
         classStructure,
         totalStudents
     ] = await Promise.all([
-        getTopAttendees(className,req.school?._id),
-        getGenderDistribution(className,req.school?._id),
-        getWeeklyAbsenteeCount(className,req.school?._id),
+        getTopAttendees(className,null,req.school?._id),
+        getGenderDistribution(className,null,req.school?._id),
+        getWeeklyAbsenteeCount(className,null,req.school?._id),
         getDivisionWisePresenteePercentage(className,req.school?._id),
-        getDailyPresentee(className,req.school?._id),
+        getDailyPresentee(className,null,req.school?._id),
         ClassStructure.find({className,schoolId: req.school?._id}).sort({ className: 1 }).select("-createdAt -updatedAt -__v -_id"),
         Student.countDocuments({ class: className,schoolId: req.school?._id })
     ]);
