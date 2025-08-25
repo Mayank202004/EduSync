@@ -49,11 +49,14 @@ function LeftSidebar({ onDateClicked = () => {}, markAttendance = ()=>{}, isClas
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-full mt-4"
           >Add Todays Attendance
           </button>
-          <button
-                onClick={() => {exportAttendance(className,div)}}
+          {isClassTeacher && (
+            <button
+                onClick={() => {
+                  exportAttendance(className,div)}
+                }
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-full mt-4"
               >Export Attendance
-              </button>
+          </button>)}
         </div>
 
         {isClassTeacher && (

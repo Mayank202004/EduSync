@@ -658,7 +658,6 @@ const getTopAttendees = async (className = null, div = null, schoolId) => {
             studentAttendance
         };
     } catch (error) {
-        console.error("Error in getTopAttendees:", error);
         throw error;
     }
 };
