@@ -3,6 +3,14 @@ import SubjectCard from './SubjectCard';
 import { ArrowLeft,Plus } from 'lucide-react';
 import SingleInputModal from './SingleInputModal';
 import { addSubject } from '@/services/resourcesService';
+import EnglishImg from '@/assets/English.png';
+import MarathiImg from '@/assets/Marathi.png';
+import MathsImg from '@/assets/Mathematics.png';
+import ScienceImg from '@/assets/Science.png';
+import HistoryImg from '@/assets/History.png';
+import HindiImg from '@/assets/Hindi.png';
+import EVSImg from '@/assets/EVS.png';
+import DefaultImg from '@/assets/default.png';
 
 function ResourcesCard({ 
   allSubjects,
@@ -17,13 +25,14 @@ function ResourcesCard({
   const [resources, setResources] = useState([]);
 
   const subjectImages = {
-    English: 'src/assets/English.png',
-    Marathi: 'src/assets/Marathi.png',
-    Maths: 'src/assets/Mathematics.png',
-    Science: 'src/assets/Science.png',
-    History: 'src/assets/History.png',
-    Hindi: 'src/assets/Hindi.png',
-    EVS: 'src/assets/EVS.png',
+    English: EnglishImg,
+    Marathi: MarathiImg,
+    Maths: MathsImg,
+    Science: ScienceImg,
+    History: HistoryImg,
+    Hindi: HindiImg,
+    EVS: EVSImg,
+    default: DefaultImg,
   };
 
   const bgColors = [

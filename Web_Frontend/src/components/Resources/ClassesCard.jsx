@@ -4,6 +4,12 @@ import toast from 'react-hot-toast';
 import { useState } from 'react';
 import SingleInputModal from './SingleInputModal';
 import { addClass } from '@/services/resourcesService';
+import DefaultClass from '@/assets/classes/0.png';
+import Class1 from '@/assets/classes/1.png';
+import Class2 from '@/assets/classes/2.png';
+import Class3 from '@/assets/classes/3.png';
+import Class4 from '@/assets/classes/4.png';
+import Class5 from '@/assets/classes/5.png';
 
 const bgColors = [
   'bg-pink-100',
@@ -15,11 +21,11 @@ const bgColors = [
 ];
 
 const classImages = {
-  1: 'src/assets/classes/1.png',
-  2: 'src/assets/classes/2.png',
-  3: 'src/assets/classes/3.png',
-  4: 'src/assets/classes/4.png',
-  5: 'src/assets/classes/5.png'
+  1: Class1,
+  2: Class2,
+  3: Class3,
+  4: Class4,
+  5: Class5,
 };
 
 
@@ -78,7 +84,7 @@ function ClassesCard({ classes,setClasses, onClassSelect, role='teacher' }) {
               className={`cursor-pointer rounded-lg p-4 shadow-sm hover:shadow-md transition duration-300 ${bgColors[index % bgColors.length]}`}
             >
               <img
-                src={classImages[cls.class] || 'src/assets/default-class.png'}
+                src={classImages[cls.class] || DefaultClass}
                 alt={`Class ${cls.class}`}
                 className='w-20 h-20 object-contain mx-auto mb-3'
               />

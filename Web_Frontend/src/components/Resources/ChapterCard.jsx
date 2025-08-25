@@ -7,16 +7,22 @@ import ImagePreview from "../Chat/ImagePreview";
 import { Trash2 } from "lucide-react";
 import { deleteResource } from "@/services/resourcesService";
 import toast from "react-hot-toast";
+import ImageIcon from '@/assets/Image.png';
+import VideoIcon from '@/assets/Video.png';
+import PDFIcon from '@/assets/PDF.png';
+import DOCIcon from '@/assets/DOC.png';
+import PPTIcon from '@/assets/PPT.png';
+import AudioIcon from '@/assets/Audio.png';
+import DefaultIcon from '@/assets/Default.png';
 
-// Simple icon mapping based on type (replace with PNG <img src> if needed)
 const typeIcons = {
-  image: "src/assets/Image.png",
-  video: "src/assets/Video.png",
-  pdf: "src/assets/PDF.png",
-  doc: "src/assets/Default.png", // To Do:
-  ppt: "src/assets/PPT.png",
-  audio: "src/assets/Audio.png",
-  default: "src/assets/Default.png", // To DO: Add default asset
+  image: ImageIcon,
+  video: VideoIcon,
+  pdf: PDFIcon,
+  doc: DOCIcon,
+  ppt: PPTIcon,
+  audio: AudioIcon,
+  default: DefaultIcon,
 };
 
 const RenderResource = ({ type, url, id, imagePreviewSetter, name }) => {

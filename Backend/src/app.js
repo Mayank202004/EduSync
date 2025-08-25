@@ -24,8 +24,9 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 app.use((err, req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://edusync-v1.netlify.app");
-  res.header("Access-Control-Allow-Credentials", "true");
+  // Use the below two lines only for production
+  // res.header("Access-Control-Allow-Origin", "https://edusync-v1.netlify.app");
+  // res.header("Access-Control-Allow-Credentials", "true");
   res.status(err.status || 500).json({ message: err.message });
 });
 
