@@ -1,7 +1,7 @@
 import { useRive, useStateMachineInput } from "@rive-app/react-canvas";
 import animationFile from "../../assets/isoCube.riv";
 
-const IsoCubeAnimation = () => {
+const IsoCubeAnimation = (autoplay = true) => {
   const STATE_MACHINE_NAME = "State Machine 1";
   const HOVER_INPUT_NAME = "Hovered";
 
@@ -9,7 +9,7 @@ const IsoCubeAnimation = () => {
     src: animationFile,
     artboard: "Artboard",
     stateMachines: [STATE_MACHINE_NAME],
-    autoplay: true,
+    autoplay: autoplay,
     fit: "cover", // Rive may ignore, but fine
   });
 
