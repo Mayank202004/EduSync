@@ -8,6 +8,7 @@ import {
 } from 'recharts';
 import { getClassLevelDashboardData } from '@/services/attendenceService';
 import TopLevelDashboardSkeleton from './TopLevelSkeleton';
+import { ArrowLeft } from 'lucide-react';
 
 const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 
@@ -52,11 +53,13 @@ const ClassDashboard = ({ selectedClass, onBack=()=>{}, onDivisionClicked=()=>{}
 
   return (
     <div className="w-full h-full overflow-y-auto bg-white dark:bg-customDarkFg px-4 py-2 space-y-6">
+ 
       <button
-        onClick={onBack}
-        className="mb-2 px-3 py-1 bg-gray-300 dark:bg-gray-700 rounded hover:bg-gray-400 dark:hover:bg-gray-600"
-      >
-        &larr; Back to School Overview
+          onClick={onBack}
+          className='mb-4 flex items-center text-blue-600 hover:underline'
+          >
+          <ArrowLeft className='mr-2' size={18} />
+          Back to School Overview
       </button>
 
       <h1 className="text-2xl font-bold text-center">Class {selectedClass} Dashboard</h1>

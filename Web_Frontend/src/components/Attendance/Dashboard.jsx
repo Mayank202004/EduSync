@@ -62,6 +62,7 @@ function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=f
           Back to dashboard
       </button>)}
       <div className="space-y-6 p-1 md:p-4 dark:bg-customDarkFg h-full">
+        {isSuperAdmin &&(<h1 className="text-2xl font-bold text-center">Class {className} {div} Dashboard</h1>)}
         {/* First row: 2 charts → stack on small, 2-col on md, stay 2-col on lg */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Line Chart */}
@@ -129,13 +130,28 @@ function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=f
               <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
                 <h2 className="text-lg font-semibold mb-2">Top 6 Attendant</h2>
                 <ul className="space-y-2">
-                  {topStudents.map((student, index) => (
-                    <li key={index} className="flex justify-between">
-                      <span>{student.name}</span>
-                      <span>{student.percentage} ({student.days} days)</span>
-                    </li>
-                  ))}
-                </ul>
+  {topStudents.map((student, idx) => (
+    <li
+      key={student.name}
+      className="bg-white dark:bg-customDarkFg border border-gray-200 dark:border-gray-600 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow"
+    >
+      <div className="flex justify-between items-center mb-1">
+        <span className="font-medium text-gray-800 dark:text-gray-200">{idx + 1}. {student.name}</span>
+        <span className="text-green-600 dark:text-green-400 font-semibold">{student.percentage}</span>
+      </div>
+      <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
+        <span>{student.days} days</span>
+        <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-green-500 dark:bg-green-400 rounded-full"
+            style={{ width: `${((student.days / dashboardData.topAttendees.totalWorkingDays) * 100).toFixed(1)}%` }}
+          ></div>
+        </div>
+      </div>
+    </li>
+  ))}
+</ul>
+
               </div>
                 
               {/* Radar */}
