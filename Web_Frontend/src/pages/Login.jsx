@@ -9,19 +9,22 @@ function Login() {
   return (
     <>
       {/* Small Screen: Island layout over fullscreen animation */}
-      <div className="md:hidden relative w-full h-screen overflow-hidden">
-        <IsoCubeAnimation />
-        {/* Overlay that doesn't block animation clicks outside card */}
-        <div className="absolute inset-0 flex items-center justify-center z-10 px-4 pointer-events-none">
-          <div className="w-full max-w-sm pointer-events-auto">
-            {isLogin ? (
-              <LoginCard switchToSignup={() => setIsLogin(false)} />
-            ) : (
-              <SignupCard switchToLogin={() => setIsLogin(true)} />
-            )}
-          </div>
-        </div>
-      </div>
+{/* Small Screen: Island layout over fullscreen animation */}
+<div className="md:hidden relative w-full h-dvh overflow-hidden">
+  <IsoCubeAnimation autoplay={false} />
+
+  {/* Absolute overlay with centered card */}
+  <div className="absolute inset-0 flex items-center justify-center z-10 px-4">
+    <div className="w-full max-w-sm pointer-events-auto">
+      {isLogin ? (
+        <LoginCard switchToSignup={() => setIsLogin(false)} />
+      ) : (
+        <SignupCard switchToLogin={() => setIsLogin(true)} />
+      )}
+    </div>
+  </div>
+</div>
+
 
       {/* Large Screen: Side-by-side layout */}
       <div className="hidden md:flex w-full min-h-screen bg-white">

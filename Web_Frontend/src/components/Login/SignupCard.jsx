@@ -51,7 +51,7 @@ function SignupCard({ switchToLogin }) {
   };
 
   return (
-    <div className="h-full w-100 flex items-center justify-center">
+    <div className="h-full w-full md:w-100 flex items-center justify-center">
       <div className="w-full bg-white rounded-xl p-8">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">EduSync</h1>
         <form className="space-y-4" onSubmit={handleSubmit}>
