@@ -22,17 +22,17 @@ const SkeletonList = () => (
 
 function AttendanceDashboardSkeleton({isClassTeacher=true,isSuperAdmin=true}) {
   return (
-    <div className={`flex flex-col ${isSuperAdmin ? "w-full" : ""}`}>
+    <div className={`flex flex-col w-full`}>
       {!isClassTeacher && !isSuperAdmin && (
         <div className="p-4 mx-4 bg-yellow-100 dark:bg-yellow-50 text-yellow-800 rounded-md border border-yellow-300">
             <p className='font-bold'>Seems like you are not a class teacher. If this is a mistake contact super admin</p>
           </div>
         )}
-      <div className="space-y-6 p-4 dark:bg-customDarkFg">
+      <div className="space-y-6 p-4 dark:bg-customDarkFg w-full">
         {/* First row: Line & Bar Charts */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <SkeletonCard title="Total Attendance Report" height="h-[200px]" width="w=[600px]" />
-          <SkeletonCard title="Presentee by Division" height="h-[200px]" width='w-[500px]' />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
+          <SkeletonCard title="Total Attendance Report" height="h-[200px]" />
+          <SkeletonCard title="Presentee by Division" height="h-[200px]" />
         </div>
 
         {/* Second row: PieChart, List, RadarChart */}

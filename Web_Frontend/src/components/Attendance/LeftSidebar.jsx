@@ -59,11 +59,13 @@ function LeftSidebar({ onDateClicked = () => {}, markAttendance = ()=>{}, isClas
         {isClassTeacher && (
         <div>
           <h2 className="text-xl font-semibold mt-6 mb-2">Attendance by Date</h2>
-          <Calendar
-            onChange={(date) => onDateClicked(date)}
-            value={new Date()}
-            className="rounded border"
-          />
+          <div className="flex justify-center items-center">
+            <Calendar
+              onChange={(date) => onDateClicked(date)}
+              value={new Date()}
+              className="rounded border"
+            />
+          </div>
         </div>
       )}
       </div>

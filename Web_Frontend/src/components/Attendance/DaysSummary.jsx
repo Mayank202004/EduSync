@@ -5,6 +5,12 @@ import { getAttendanceByDate } from '@/services/attendenceService';
 import { useAuth } from '@/context/AuthContext';
 import DaySummarySkeleton from './DaySummarySkeleton';
 
+import totalIcon from '@/assets/attendance/students.png';
+import presentIcon from '@/assets/attendance/present.png';
+import absentIcon from '@/assets/attendance/absent.png';
+import leaveIcon from '@/assets/attendance/permit.png';
+
+
 function DaysSummary({className,div,date,goBack = ()=>{}}) {
   // Hooks
   const [isLoading,setisLoading]=useState(false);
@@ -34,18 +40,14 @@ function DaysSummary({className,div,date,goBack = ()=>{}}) {
     ? attendance?.filter((s) => s.status === selectedFilter)
     : attendance;
 
-  // Icons
-  const totalIcon = 'src/assets/attendance/students.png';
-  const presentIcon = 'src/assets/attendance/present.png';
-  const absentIcon = 'src/assets/attendance/absent.png';
-  const leaveIcon = 'src/assets/attendance/permit.png';
+
 
 
   // UI
   if(isLoading)
     return <DaySummarySkeleton/>
   return (
-    <div className="p-6 bg-white dark:bg-customDarkFg text-gray-900 dark:text-white min-h-screen">
+    <div className="p-1 md:p-6 bg-white dark:bg-customDarkFg text-gray-900 dark:text-white min-h-screen">
       <button
           onClick={goBack}
           className='mb-4 flex items-center text-blue-600 hover:underline'
@@ -56,7 +58,7 @@ function DaysSummary({className,div,date,goBack = ()=>{}}) {
       <h1 className="text-2xl font-semibold mb-4">Day's Attendance Summary</h1>
 
       {/* Summary Boxes */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-blue-100 dark:bg-blue-900 rounded-2xl p-4 shadow flex items-center gap-4" onClick={() => setSelectedFilter(null)}>
           <img src={totalIcon} alt="Total Students" className="w-10 h-10" />
           <div>
@@ -96,7 +98,7 @@ function DaysSummary({className,div,date,goBack = ()=>{}}) {
         <h3 className="text-lg font-semibold mb-3">Students</h3>
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
           {filteredAttendance?.map((student, index) => (
-            <li key={index} className="flex justify-between py-2">
+            <li key={index} className="flex justify-between items-center py-2">
               <span>{student.studentId?.userId?.fullName}</span>
               <span
                 className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -105,7 +107,7 @@ function DaysSummary({className,div,date,goBack = ()=>{}}) {
                     : student.status === 'Absent'
                     ? 'bg-red-200 text-red-800 dark:bg-red-700 dark:text-white'
                     : 'bg-yellow-200 text-yellow-800 dark:bg-yellow-700 dark:text-white'
-                }`}
+                }` }
               >
                 {student.status}
               </span>

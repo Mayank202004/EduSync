@@ -47,57 +47,58 @@ function TeacherAttendance() {
 
 
 
-  return (
-    <div className="flex w-full min-h-screen bg-transparent">
-      <div className="w-[20%] dark:border-gray-700 pl-4 pr-1 py-4 h-full overflow-y-auto">
-        <LeftSidebar
-          isClassTeacher={isClassTeacher}
-          className={OwnClass}
-          div={OwnDiv}
-          onDateClicked={(date)=> {
-            setIsMarkingAttendance(false);
-            setSelectedDate(date);
-          }}
-          markAttendance={(className,div) => handleMarkAttendance(className,div)}
-        />
-      </div>
-      <div className="w-[80%] py-4 pl-2 pr-4 overflow-y-auto">
-        {/* Main Content */}
-        <div className="flex-1 space-y-6 h-full">
-          {isMarkingAttendance ? (
-            <MarkAttendance
-              goBack={()=> 
-                {
-                  setIsMarkingAttendance(false);
-                  setSelectedDate(null);
-                }}
-              className={selectedClass}
-              div={selectedDiv}
-            />
-          ) : 
-            <div className="bg-white dark:bg-customDarkFg p-4 rounded shadow gap-4 h-full">
-              {selectedDate && isClassTeacher ? (
-                <DaysSummary
-                  goBack={() => setSelectedDate(null)} 
-                  date={selectedDate}
-                  isClassTeacher={isClassTeacher}
-                  className={OwnClass}
-                  div={OwnDiv}
-                />
-              ) : (
-                <AttendanceDashboard
-                  dashboardData={dashboardData}
-                  isClassTeacher={isClassTeacher}
-                  className={OwnClass}
-                  div={OwnDiv}
-                />
-              )}
-            </div>
-          }
-        </div>
+return (
+  <div className="flex flex-col md:flex-row w-full min-h-screen bg-transparent">
+    {/* Sidebar */}
+    <div className="w-full md:w-[35%] lg:w-[30%] xl:w-[20%] dark:border-gray-700 pl-4 pr-1 lg:pr-2 py-4 h-auto md:h-full overflow-y-auto">
+      <LeftSidebar
+        isClassTeacher={isClassTeacher}
+        className={OwnClass}
+        div={OwnDiv}
+        onDateClicked={(date) => {
+          setIsMarkingAttendance(false);
+          setSelectedDate(date);
+        }}
+        markAttendance={(className, div) => handleMarkAttendance(className, div)}
+      />
+    </div>
+
+    {/* Main Content */}
+    <div className="w-full md:w-[65%] lg:w-[70%] xl:w-[80%] py-4 md:pl-2 md:pr-4 px-4 overflow-y-auto">
+      <div className="flex-1 space-y-6 h-full">
+        {isMarkingAttendance ? (
+          <MarkAttendance
+            goBack={() => {
+              setIsMarkingAttendance(false);
+              setSelectedDate(null);
+            }}
+            className={selectedClass}
+            div={selectedDiv}
+          />
+        ) : (
+          <div className="bg-white dark:bg-customDarkFg p-4 rounded shadow gap-4 h-full">
+            {selectedDate && isClassTeacher ? (
+              <DaysSummary
+                goBack={() => setSelectedDate(null)}
+                date={selectedDate}
+                isClassTeacher={isClassTeacher}
+                className={OwnClass}
+                div={OwnDiv}
+              />
+            ) : (
+              <AttendanceDashboard
+                dashboardData={dashboardData}
+                isClassTeacher={isClassTeacher}
+                className={OwnClass}
+                div={OwnDiv}
+              />
+            )}
+          </div>
+        )}
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 export default TeacherAttendance;
