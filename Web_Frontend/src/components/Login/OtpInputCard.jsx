@@ -61,7 +61,7 @@ const OtpInputCard = ({ otpData, onSuccess, onBack }) => {
 
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 bg-white md:bg-transparent py-6 md:py-0 rounded-lg sm:rounded-none">
       <p className="text-center text-black">Enter the 6-digit code sent to <b>{maskEmail(otpData.email)}</b></p>
       <div className="flex gap-2">
         {otp.map((digit, index) => (
