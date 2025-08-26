@@ -81,7 +81,7 @@ const SuperAdminDashboard = () => {
       </div>
 
       {/* Right Sidebar - Desktop only */}
-      <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden pb-10 md:block">
+      <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden pb-10 lg:block">
         <RightSidebar events={events} />
       </div>
 
