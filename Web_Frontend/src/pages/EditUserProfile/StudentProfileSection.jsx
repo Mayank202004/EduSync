@@ -64,7 +64,7 @@ const StudentProfileSection = () => {
           titleElementMap={SECTIONS}
           offset={OFFSET}
         />
-        <div className="min-w-2xs max-w-4xl w-full flex flex-col gap-6 items-center rounded-md mx-auto mb-[50vh]">
+        <div className="min-w-2xs max-w-4xl w-full flex flex-col gap-6 items-center rounded-md mx-auto">
           <TitledContainer
             id="photo-preview-section"
             title="Photo Preview"

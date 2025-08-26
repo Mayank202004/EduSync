@@ -1,49 +1,51 @@
-//taken from: https://blog.maximeheckel.com/posts/scrollspy-demystified/
-
 import { useEffect, useRef, useState } from "react";
 
-const useScrollspy = (
-  elements,
-  options = {root: null, offset: 0}
-)=> {
-  const [
-    currentIntersectingElementIndex,
-    setCurrentIntersectingElementIndex,
-  ] = useState(-1);
+const useScrollspy = (elements, options = { root: null, offset: 0 }) => {
+  const [currentIntersectingElementIndex, setCurrentIntersectingElementIndex] =
+    useState(-1);
 
-  const rootMargin = `-${(options && options.offset) || 0}px 0px 0px 0px`;
-
+  const rootMargin = `-${(options?.offset || 0)}px 0px -40% 0px`;
   const observer = useRef();
 
   useEffect(() => {
-    if (observer.current) {
-      observer.current.disconnect();
-    }
+    if (observer.current) observer.current.disconnect();
 
     observer.current = new IntersectionObserver(
       (entries) => {
-        // find the index of the section that is currently intersecting
-        const indexOfElementIntersecting = entries.findIndex((entry) => {
-          // if intersection > 0 it means entry is intersecting with the view port
-          return entry.intersectionRatio > 0;
-        });
+        // Filter only visible sections
+        const visible = entries
+          .map((entry, i) => ({
+            index: elements.indexOf(entry.target),
+            isIntersecting: entry.isIntersecting,
+            ratio: entry.intersectionRatio,
+            y: entry.boundingClientRect.y,
+          }))
+          .filter((e) => e.isIntersecting);
 
-        // store the value of indexOfElementIntersecting
-        setCurrentIntersectingElementIndex(indexOfElementIntersecting);
+        if (visible.length > 0) {
+          // ✅ pick the last visible section (lowest in viewport)
+          const lastVisible = visible.reduce((a, b) =>
+            a.y > b.y ? a : b
+          );
+          setCurrentIntersectingElementIndex(lastVisible.index);
+        } else {
+          // ✅ fallback: if scrolled to very bottom, force last section
+          if (
+            window.innerHeight + window.scrollY >=
+            document.body.offsetHeight - 2
+          ) {
+            setCurrentIntersectingElementIndex(elements.length - 1);
+          }
+        }
       },
       {
         root: options?.root instanceof Element ? options.root : null,
-        // use this option to handle custom offset
         rootMargin,
       }
     );
 
     const { current: ourObserver } = observer;
-
-    // observe all the elements passed as argument of the hook
-    elements?.forEach((element) =>
-      element ? ourObserver.observe(element) : null
-    );
+    elements?.forEach((element) => element && ourObserver.observe(element));
 
     return () => ourObserver.disconnect();
   }, [elements, options, rootMargin]);
