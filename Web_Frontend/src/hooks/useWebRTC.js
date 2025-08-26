@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { mediaConstraints } from "@/lib/webrtc/constraints";
+import { useNavigate } from "react-router-dom";
 
 export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin, initialMic = true, initialCam = true) {
   const [mic, setMic] = useState(true);
@@ -11,6 +12,7 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
   const [handRaised, setHandRaised] = useState(false);
   const [messages, setMessages] = useState([]);
   const peerMetadata = useRef({});
+  const navigate = useNavigate();
 
   const [hostControls, setHostControls] = useState({
     microphoneEnableAllowed: true,
@@ -388,6 +390,8 @@ const participantName = isScreenTrack
     }
 
     setParticipants([]);
+    navigate(`/meeting/end`);
+
   };
 
   const handleRemoteMediaUpdated = ({ socketId, videoEnabled, audioEnabled, screenSharing }) => {
