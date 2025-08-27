@@ -16,6 +16,7 @@ import { generateUniqueUsername, generateRandomPassword } from "../utils/userUti
 import { Chat } from "../models/chat.model.js";
 import { sendCredentialOverMail } from "../utils/userUtils.js";
 import School from "../models/school.model.js";
+import { cookieOptions } from "../config/cookieOptions.js";
 
 /**
  * @desc   Generate access and refresh tokens
@@ -197,21 +198,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     //Options for cookies
-    
-  // Use for development
-  const options = {
-    httpOnly: true,
-    secure: false, // change to true in production with HTTPS
-    sameSite: "Lax",
-  };
-
-    // Use for production
-//   const options = {
-//       httpOnly: true,
-//       secure: true,      // required for HTTPS
-//       sameSite: "None",  // allows cross-site cookies
-//       path: "/",
-//     };
+    const options = cookieOptions;
 
     return res
         .status(200)
@@ -279,20 +266,8 @@ export const verifyOtp = asyncHandler(async (req, res) => {
     );
   }
 
-  // Use for development
-  const options = {
-    httpOnly: true,
-    secure: false, // change to true in production with HTTPS
-    sameSite: "Lax",
-  };
-
-// Use for production
-//   const options = {
-//       httpOnly: true,
-//       secure: true,      // required for HTTPS
-//       sameSite: "None",  // allows cross-site cookies
-//       path: "/",
-//     };
+  //Options for cookies
+  const options = cookieOptions;
 
 
   return res
