@@ -321,6 +321,24 @@ export const exportAttendanceExcel = asyncHandler(async (req, res) => {
     const { month, year, className, div } = req.body;
     const targetYear = year || new Date().getFullYear();
 
+    if(!className.trim() || !div.trim()) {
+        throw new ApiError(400, "Class and division are required");
+    }
+    if (req.user.role === "teacher") {
+      const isClassTeacher =
+        req.teacher.classTeacher?.class === className &&
+        req.teacher.classTeacher?.div === div;
+
+      const isClassCoordinator = req.teacher.classCoordinator === className;
+
+      if (!isClassTeacher && !isClassCoordinator) {
+        throw new ApiError(403, "Forbidden: You do not have permission to access this resource.");
+      }
+    } 
+    else if (req.user.role !== "super admin") {
+      throw new ApiError(403, "Forbidden: You do not have permission to access this resource.");
+    }
+
     const query = {};
     if (className) query.class = className;
     if (div) query.div = div;

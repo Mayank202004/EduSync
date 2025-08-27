@@ -10,7 +10,7 @@ router.route("/mark").post(verifyJWT,verifyTeacher,markAttendance);
 router.route("/daily").post(verifyJWT,getDailyAttendance);
 router.route("/me").get(verifyJWT,getMyAttendance);
 router.route("/").get(verifyJWT,verifyTeacher,getAttendance);
-router.route("/export").post(verifyJWT,exportAttendanceExcel);
+router.route("/export").post(verifyJWT,orMiddleware([verifyTeacher,verifySuperAdmin]),exportAttendanceExcel);
 router.post("/students",verifyJWT,verifyTeacher,getStudentList);
 router.post("/dashboard",verifyJWT,orMiddleware([verifyTeacher,verifySuperAdmin]),getTeacherDashboardData);
 router.get("/admin-dashboard",verifyJWT,verifySuperAdmin,getTopLevelAdminDashboardData);
