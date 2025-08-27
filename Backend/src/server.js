@@ -8,13 +8,21 @@ import cookie from "cookie";
 import jwt from "jsonwebtoken";
 import { User } from "./models/user.model.js";
 
+const isProduction = process.env.NODE_ENV === "production";
+const allowedOrigins = isProduction
+  ? ["https://edusync-v1.netlify.app"] // only prod domain
+  : ["http://localhost:5173", "http://192.168.141.63:5173"]; // dev + LAN
+
+
 // Create HTTP server
 const server = http.createServer(app);
+
+
 
 // Setup socket.io server
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173","http://192.168.141.63:5173","https://edusync-v1.netlify.app"],
+    origin: allowedOrigins,
     credentials: true,
   },
 });
@@ -47,6 +55,12 @@ setupSocket(io); // Initialize socket events
 
 connectDatabase()
   .then(() => {
+    // For running on local IP
+    // server.listen(process.env.PORT || 3000,"0.0.0.0", () => {
+      // console.log(`Server is running at port : ${process.env.PORT}`);
+    // });
+    
+    // = = = For Local host or production 
     server.listen(process.env.PORT || 3000, () => {
       console.log(`Server is running at port : ${process.env.PORT}`);
     });
@@ -96,8 +110,10 @@ app.use("/api/v1/school",schoolRouter);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://edusync-v1.netlify.app");
-  res.header("Access-Control-Allow-Credentials", "true");
+  if (isProduction) {
+    res.header("Access-Control-Allow-Origin", "https://edusync-v1.netlify.app");
+    res.header("Access-Control-Allow-Credentials", "true");
+  }
   const statusCode = err.statusCode || 500;
   res.status(statusCode).json({
     success: false,

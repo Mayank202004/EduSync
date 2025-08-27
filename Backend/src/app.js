@@ -9,10 +9,16 @@ configDotenv({
     path: "./.env",
 });
 
+const isProduction = process.env.NODE_ENV === "production";
+
+const allowedOrigins = isProduction
+  ? ["https://edusync-v1.netlify.app"] // only prod domain
+  : ["http://localhost:5173", "http://192.168.141.63:5173"]; // dev + LAN
+
 //cross origin resourse sharing
 app.use(
   cors({
-    origin: ["http://localhost:5173","http://192.168.141.63:5173","https://edusync-v1.netlify.app"],
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
@@ -24,10 +30,12 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 app.use((err, req, res, next) => {
-  // Use the below two lines only for production
-  // res.header("Access-Control-Allow-Origin", "https://edusync-v1.netlify.app");
-  // res.header("Access-Control-Allow-Credentials", "true");
+  if (isProduction) {
+    res.header("Access-Control-Allow-Origin", "https://edusync-v1.netlify.app");
+    res.header("Access-Control-Allow-Credentials", "true");
+  }
   res.status(err.status || 500).json({ message: err.message });
 });
+
 
 export { app };
