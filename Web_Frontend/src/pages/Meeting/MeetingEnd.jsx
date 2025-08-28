@@ -47,7 +47,7 @@ export default function MeetingEnded() {
             cx="25"
             cy="25"
             r={radius}
-            stroke="blue"
+            className="stroke-current text-blue-700 dark:text-blue-500"
             strokeWidth="4"
             fill="none"
             strokeDasharray={circumference}
@@ -62,12 +62,13 @@ export default function MeetingEnded() {
             textAnchor="middle"
             dy="0.3em"
             fontSize="12"
-            fill="blue"
+            className="text-blue-700 dark:text-blue-500 font-bold"
+            fill="currentColor"
           >
             {counter}
           </text>
         </svg>
-        <span className="text-sm">Returning to home</span>
+        <span className="dark:text-gray-400 font-semibold  text-sm">Returning to home</span>
       </div>
 
       <h1 className="text-2xl font-semibold mb-6">{reason}</h1>
