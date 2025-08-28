@@ -48,7 +48,7 @@ const ChatCard = ({
   const [attachments, setAttachments] = useState([]); // Used to track/set attachments
   const [onlineUsers, setOnlineUsers] = useState([]); // Used to track all online users
   const [isUploading, setIsUploading] = useState(false); // Used to track upload status
-  const [typingUsers, setTypingUsers] = useState([]); // Used to track all users data those are typing currently
+  const [typingUsers, setTypingUsers] = useState([{fullName:"Testing",avatar:""}]); // Used to track all users data those are typing currently
   const chatMessagesRef = useRef(null); // used to track messages scroll value
   const [previewDetails, setPreviewDetails] = useState(null);
   const [showScheduleMeetingOptions, setShowScheduleMeetingOptions] = useState(false);
@@ -445,7 +445,7 @@ const ChatCard = ({
             )}
             {/* Typing Indicator UI */}
             {typingUsers.length > 0 && (
-              <div className="flex items-center gap-3 px-1 mt-1 pl-4 shrink-0">
+              <div className="flex items-center gap-3 px-1 mt-1 shrink-0">
                 {/* Avatar Stack */}
                 <div className="relative w-[38px] h-6">
                   {typingUsers.slice(0, 2).map((user, index) => (
