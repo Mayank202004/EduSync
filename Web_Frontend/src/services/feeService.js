@@ -55,7 +55,10 @@ export const exportFee = async (transactionId, feeId, feeType, title, receiptNo)
   const response = await axiosInstance.post(
     "/fee/receipt",
     { transactionId, feeId, feeType, title, receiptNo },
-    { responseType: "blob" }
+    { 
+      responseType: "blob",
+      timeout: 10000,
+     }
   );
 
   // Convert blob to PDF object
