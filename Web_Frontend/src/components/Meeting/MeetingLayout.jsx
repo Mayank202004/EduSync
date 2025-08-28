@@ -39,6 +39,7 @@ const MeetingLayout = ({
   });
 
   const allParticipants = participants; // To do remove this to use participants directly 
+  console.log(allParticipants);
 
 
   const visibleTiles = useMemo(() => {
@@ -72,7 +73,7 @@ const MeetingLayout = ({
   }[columnCount];
 
   // Small screen (sm): 1 column for 1 participant, 2 for 2+, fallback to max 2
-  const smColumnCount = Math.min(baseCount === 1 ? 1 : 2, 2);
+  const smColumnCount = Math.min(baseCount <=3 ? 1 : 2, 2);
   const smColumnClass = {
     1: "grid-cols-1",
     2: "grid-cols-2",
