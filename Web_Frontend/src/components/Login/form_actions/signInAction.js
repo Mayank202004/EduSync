@@ -24,7 +24,6 @@ const signInAction = async (prevState, formData, onSuccess, onOtpRequired) => {
     return { errors: null, inputValues: values };
 
   } catch (err) {
-    toast.error("Login failed. Please try again.");
     return { errors: null, inputValues: values };
   }
 };

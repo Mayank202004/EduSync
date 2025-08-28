@@ -28,7 +28,7 @@ const signUpAction = async (prevState, formData, onSuccess) => {
       },
     });
   } catch (err) {
-    if (err?.message) toast.error("Signup failed. Please try again.");
+    // Handled by axiosInstance
   }
 
   return { errors: null, inputValues: values };
