@@ -19,6 +19,7 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
     videoEnableAllowed: true,
     screenShareAllowed: true,
     chatAllowed: true,
+    access:"open"
   });
 
 
@@ -86,6 +87,7 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
     });
 
     socket.on("user-joined", ({ socketId, user }) => {
+      // console.log("respomdig to user-joined", { socketId, user });
       setTimeout(() => {
        socket.emit("update-media-state", {
         roomId,
@@ -101,6 +103,8 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
     socket.on("ice-candidate", handleNewICECandidateMsg);
     socket.on("user-left", handleUserLeft);
     socket.on("remote-media-updated", handleRemoteMediaUpdated);
+    socket.on("host-controls-updated", (controls) => handleUpdateHostControls(controls));
+
     socket.on("meeting-message", (msg) => {
       setMessages((prev) => [...prev, msg]);
     });
@@ -114,6 +118,7 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
       socket.off("ice-candidate");
       socket.off("user-left");
       socket.off("remote-media-updated");
+      socket.off("host-controls-updated");
       socket.off("meeting-message");
     };
   }, [shouldJoin, socket]);
@@ -415,6 +420,80 @@ const participantName = isScreenTrack
     );
   };
 
+  const handleUpdateHostControls = (controls ) => {
+    console.log("Controls updated:", controls);
+    setHostControls(controls);
+
+    // Apply restrictions immediately
+    if (!controls.microphoneEnableAllowed) {
+      forceDisableMic();
+    }
+    if (!controls.videoEnableAllowed) {
+      forceDisableCam();
+    }
+    if (!controls.screenShareAllowed && screen) {
+      leaveScreenShare();
+    }
+  };
+
+  // Force disable mic (used when host blocks mic)
+  const forceDisableMic = () => {
+    const audioTrack = localStream.current?.getAudioTracks()?.[0];
+    if (audioTrack) {
+      audioTrack.enabled = false;
+      setMic(false);
+
+      setParticipants((prev) =>
+        prev.map((p) =>
+          p.isLocal ? { ...p, audioEnabled: false } : p
+        )
+      );
+
+      socket.emit("update-media-state", {
+        roomId,
+        videoEnabled: cam,
+        audioEnabled: false,
+      });
+    }
+  };
+
+  // Force disable camera (used when host blocks video)
+  const forceDisableCam = () => {
+    const videoTrack = localStream.current?.getVideoTracks()?.[0];
+    if (videoTrack) {
+      videoTrack.enabled = false;
+      setCam(false);
+
+      setParticipants((prev) =>
+        prev.map((p) =>
+          p.isLocal && !p.isScreen ? { ...p, videoEnabled: false } : p
+        )
+      );
+
+      socket.emit("update-media-state", {
+        roomId,
+        videoEnabled: false,
+        audioEnabled: mic,
+      });
+    }
+  };
+
+  // Leave screen share if host disallows
+  const leaveScreenShare = () => {
+    setScreen(false);
+    setParticipants((prev) =>
+      prev.filter((p) => p._id !== `screen-${socket.id}`)
+    );
+
+    socket.emit("update-media-state", {
+      roomId,
+      videoEnabled: cam,
+      audioEnabled: mic,
+      screenSharing: false,
+    });
+  };
+
+
   
 
   return {
@@ -431,6 +510,8 @@ const participantName = isScreenTrack
     leaveMeeting,
     messages,
     setMessages,
-    screen
+    screen,
+    hostControls,
+    setHostControls
   };
 }

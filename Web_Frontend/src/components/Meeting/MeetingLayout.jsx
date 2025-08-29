@@ -21,7 +21,9 @@ const MeetingLayout = ({
   CurrentUser,
   messages,
   setMessages,
-  roomId
+  roomId,
+  hostControls,
+  setHostControls
 }) => {
   const isLgOrLarger = useMediaQuery("(min-width: 1024px)"); // Update max tiles as per the screen size
   const MAX_VISIBLE_TILES = isLgOrLarger ? 12 : 6;
@@ -30,16 +32,7 @@ const MeetingLayout = ({
   const [pinned, setPinned] = useState(null);
   
 
-  const [controls, setControls] = useState({
-    screenShare: true,
-    microphone: true,
-    video: true,
-    chat: true,
-    access: "open",
-  });
-
   const allParticipants = participants; // To do remove this to use participants directly 
-  console.log(allParticipants);
 
 
   const visibleTiles = useMemo(() => {
@@ -143,7 +136,7 @@ const MeetingLayout = ({
             <ChatPanel messages={messages} setMessages={setMessages} CurrentUser={CurrentUser} roomId={roomId} />
           )}
           {showHostControls && (
-            <HostControlPanel controls={controls} setControls={setControls} />
+            <HostControlPanel controls={hostControls} setControls={setHostControls} roomId={roomId} />
           )}
         </SidePanel>
       )}

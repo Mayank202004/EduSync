@@ -8,10 +8,18 @@ import {
 } from "lucide-react";
 import Switch from "@/components/UI/Switch";
 import OptionSelection from "@/components/UI/OptionSelection";
+import { useSocket } from "@/context/SocketContext";
 
-const HostControlPanel = ({ controls, setControls }) => {
-  const toggle = (key) =>
-    setControls((prev) => ({ ...prev, [key]: !prev[key] }));
+const HostControlPanel = ({ controls, setControls, roomId}) => {
+  const { socket } = useSocket();
+  const toggle = (key) => {
+  setControls((prev) => {
+    const updated = { ...prev, [key]: !prev[key] };
+    socket.emit("update-host-controls", { roomId, controls: updated });
+    return updated;
+  });
+};
+
 
   return (
     <div className="px-4 py-2 space-y-6">
@@ -25,20 +33,20 @@ const HostControlPanel = ({ controls, setControls }) => {
         <ToggleItem
           label="Allow screen sharing"
           icon={<Monitor size={16} />}
-          value={controls.screenShare}
-          onChange={() => toggle("screenShare")}
+          value={controls.screenShareAllowed}
+          onChange={() => toggle("screenShareAllowed")}
         />
         <ToggleItem
           label="Allow microphone usage"
           icon={<Mic size={16} />}
-          value={controls.microphone}
-          onChange={() => toggle("microphone")}
+          value={controls.microphoneEnableAllowed}
+          onChange={() => toggle("microphoneEnableAllowed")}
         />
         <ToggleItem
           label="Allow video usage"
           icon={<Video size={16} />}
-          value={controls.video}
-          onChange={() => toggle("video")}
+          value={controls.videoEnableAllowed}
+          onChange={() => toggle("videoEnableAllowed")}
         />
       </div>
 
@@ -48,8 +56,8 @@ const HostControlPanel = ({ controls, setControls }) => {
         <ToggleItem
           label="Allow participants to send messages"
           icon={<MessageSquareText size={16} />}
-          value={controls.chat}
-          onChange={() => toggle("chat")}
+          value={controls.chatAllowed}
+          onChange={() => toggle("chatAllowed")}
         />
       </div>
 

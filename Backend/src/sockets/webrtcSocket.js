@@ -113,4 +113,19 @@ export const setupWebRTC = (io, socket, user) => {
     socket.to(`webrtc-${roomId}`).emit("meeting-message", message);
   });
 
+  socket.on("update-host-controls", async ({ roomId, controls }) => {
+    try {
+      const user = socket.user; // assuming you attach user info to socket on connection
+
+      // ✅ Only host can update
+      // if (!user.isHost) {
+      //   console.log("Unauthorized control update attempt");
+      //   return;
+      // }
+
+      socket.to(`webrtc-${roomId}`).emit("host-controls-updated", controls);
+    } catch (err) {
+      console.error("Error updating host controls:", err);
+    }
+  });
 };
