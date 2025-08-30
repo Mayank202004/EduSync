@@ -18,6 +18,7 @@ const ControlsBar = ({
   mic,
   cam,
   screen,
+  hostControls,
   isHost,
   onToggleMic,
   onToggleCam,
@@ -38,7 +39,7 @@ const ControlsBar = ({
 
         <div className="flex justify-center gap-4 w-1/3">
           <button onClick={onToggleMic} title="Toggle Microphone" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
-            {mic ? <Mic /> : <MicOff className="text-red-500" />}
+            { isHost || hostControls.microphoneEnableAllowed ? (mic ? <Mic /> : <MicOff className="text-red-500" />) : <MicOff className="text-gray-500"/>}
           </button>
 
           <button onClick={onToggleCam} title="Toggle Camera" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">

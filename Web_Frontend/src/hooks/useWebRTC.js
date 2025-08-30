@@ -258,6 +258,10 @@ const participantName = isScreenTrack
   };
 
   const toggleMic = () => {
+    if(hostControls.microphoneEnableAllowed === false){
+      toast.error("Host has disabled microphone");
+      return
+    }
     const audioTrack = localStream.current?.getAudioTracks()?.[0];
     if (audioTrack) {
       const enabled = !audioTrack.enabled;
@@ -280,6 +284,10 @@ const participantName = isScreenTrack
 
   
   const toggleCam = () => {
+    if(hostControls.cameraEnableAllowed === false){
+      toast.error("Host has disabled camera");
+      return;
+    }
     const videoTrack = localStream.current?.getVideoTracks()?.[0];
     if (videoTrack) {
       const enabled = !videoTrack.enabled;
