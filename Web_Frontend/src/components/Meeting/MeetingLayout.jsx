@@ -128,6 +128,7 @@ const MeetingLayout = ({
             <ParticipantPanel
               participants={allParticipants}
               pinned={pinned}
+              isHost={isHost}
               setPinned={(id) =>
                 setPinned((prev) => (prev === id ? null : id))
               }
