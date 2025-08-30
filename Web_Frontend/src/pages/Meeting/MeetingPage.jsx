@@ -88,6 +88,7 @@ export default function MeetingPage() {
         roomId={meetingId}
         hostControls={hostControls}
         setHostControls={setHostControls}
+        isHost={isHost}
       />
 
       <ControlsBar

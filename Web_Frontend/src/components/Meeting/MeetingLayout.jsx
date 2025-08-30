@@ -22,6 +22,7 @@ const MeetingLayout = ({
   messages,
   setMessages,
   roomId,
+  isHost,
   hostControls,
   setHostControls
 }) => {
@@ -133,7 +134,7 @@ const MeetingLayout = ({
             />
           )}
           {showChat && (
-            <ChatPanel messages={messages} setMessages={setMessages} CurrentUser={CurrentUser} roomId={roomId} />
+            <ChatPanel messages={messages} setMessages={setMessages} CurrentUser={CurrentUser} roomId={roomId} hostControls={hostControls} isHost={isHost}/>
           )}
           {showHostControls && (
             <HostControlPanel controls={hostControls} setControls={setHostControls} roomId={roomId} />

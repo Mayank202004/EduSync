@@ -3,14 +3,16 @@ import { Send } from "lucide-react";
 import Avatar from "../Avatar";
 import { useSocket } from "@/context/SocketContext";
 
-const ChatPanel = ({ messages, setMessages, CurrentUser, roomId}) => {
+const ChatPanel = ({ messages, setMessages, CurrentUser, roomId, isHost, hostControls }) => {
   const { socket } = useSocket();
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
 
+  const canSend = isHost || hostControls?.chatAllowed;
+
   const handleSend = () => {
     const trimmed = input.trim();
-    if (!trimmed) return;
+    if (!trimmed || !canSend) return;
 
     const newMsg = {
       _id: `${Date.now()}`,
@@ -31,7 +33,6 @@ const ChatPanel = ({ messages, setMessages, CurrentUser, roomId}) => {
       message: newMsg
     });
   };
-
 
   // Scroll to bottom whenever messages change
   useEffect(() => {
@@ -54,24 +55,33 @@ const ChatPanel = ({ messages, setMessages, CurrentUser, roomId}) => {
             </div>
           </div>
         ))}
-        {/* Dummy div to scroll into view */}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Input Field */}
-      <div className="px-2 py-1 border rounded-4xl border-gray-300 flex gap-2 items-center">
+      <div
+        className={`px-2 py-1 border rounded-4xl flex gap-2 items-center ${
+          canSend ? "border-gray-300" : "border-gray-200 bg-gray-100 opacity-70"
+        }`}
+      >
         <input
-          placeholder="Send a message"
+          placeholder={canSend ? "Send a message" : "Chat disabled by host"}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          className="flex-1 bg-white border-none px-3 py-2 text-sm text-black placeholder-gray-500 focus:outline-none"
+          disabled={!canSend}
+          className="flex-1 bg-transparent border-none px-3 py-2 text-sm text-black placeholder-gray-500 focus:outline-none disabled:cursor-not-allowed"
         />
         <button
           onClick={handleSend}
-          className="px-3 py-2 hover:bg-gray-200 rounded-4xl flex items-center justify-center"
+          disabled={!canSend}
+          className={`px-3 py-2 rounded-4xl flex items-center justify-center ${
+            canSend
+              ? "hover:bg-gray-200"
+              : "cursor-not-allowed text-gray-400"
+          }`}
         >
-          <Send size={16} className="text-gray-500" />
+          <Send size={16} className={canSend ? "text-gray-600" : "text-gray-400"} />
         </button>
       </div>
     </div>
