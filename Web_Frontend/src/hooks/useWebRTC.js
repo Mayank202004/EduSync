@@ -284,7 +284,7 @@ const participantName = isScreenTrack
 
   
   const toggleCam = () => {
-    if(hostControls.cameraEnableAllowed === false){
+    if(hostControls.videoEnableAllowed === false){
       toast.error("Host has disabled camera");
       return;
     }
@@ -310,6 +310,10 @@ const participantName = isScreenTrack
 
 
   const toggleScreen = async () => {
+    if(hostControls.screenShareAllowed === false){
+      toast.error("Host has disabled screen sharing");
+      return
+    }
     try {
       const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
       const screenTrack = screenStream.getVideoTracks()[0];

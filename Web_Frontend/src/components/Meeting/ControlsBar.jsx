@@ -10,6 +10,7 @@ import {
   Shield,
   MessageCircle,
   MoreVertical,
+  MonitorOffIcon,
   X,
 } from "lucide-react";
 import { useState } from "react";
@@ -43,11 +44,11 @@ const ControlsBar = ({
           </button>
 
           <button onClick={onToggleCam} title="Toggle Camera" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
-            {cam ? <Video /> : <VideoOff className="text-red-500" />}
+            {isHost || hostControls.videoEnableAllowed ? (cam ? <Video /> : <VideoOff className="text-red-500" />) : <VideoOff className="text-gray-500"/>}
           </button>
 
           <button onClick={onToggleScreen} title="Share Screen" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
-            <MonitorUp className={screen ? "text-green-500" : ""} />
+            { isHost || hostControls.screenShareAllowed ?  <MonitorUp className={screen ? "text-green-500" : ""}/> : <MonitorOffIcon className="text-gray-500"  />}
           </button>
 
           <button onClick={onRaiseHand} title="Raise Hand" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
