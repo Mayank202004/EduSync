@@ -419,9 +419,7 @@ const participantName = isScreenTrack
   };
 
   const handleKickedOut = () => {
-    console.log(`I am ${currentUser.fullName} and I was kicked out`);
-    toast.error("You have been kicked out of the meeting.");
-    leaveMeeting("You were kicked out by the host"); // ✅ custom reason
+    leaveMeeting("You were kicked out by the host"); // To Do : test this why state msg is not getting shown
   };
 
 

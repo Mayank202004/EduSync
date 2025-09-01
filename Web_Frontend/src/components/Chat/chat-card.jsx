@@ -70,6 +70,7 @@ const ChatCard = ({
     };
 
     const handleIncomingMeetingInvitation = (message) => {
+      console.log(message);
       if (message.chatId !== chatId) return;
       setMessages((prev) => [...prev, message]);
       if (

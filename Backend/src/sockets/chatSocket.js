@@ -95,8 +95,11 @@ export const setupChatSocket = (io, socket, user) => {
           content, // decrypted version for frontend
           sender: user,
           updatedAt: Date.now(),
-          meetingId,
-          type: type,
+          meeting :{
+            meetingId: meetingId,
+            meetingTime: meetingTime
+          },
+          type,
         });
       
         // 4. Fetch chat participants
