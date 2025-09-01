@@ -55,7 +55,7 @@ const ControlsBar = ({
             <Hand />
           </button>
 
-          <button onClick={onLeave} title="Leave Meeting" className="bg-red-600 hover:bg-red-700 p-3 rounded-full text-white transition">
+          <button onClick={() => onLeave()} title="Leave Meeting" className="bg-red-600 hover:bg-red-700 p-3 rounded-full text-white transition">
             <PhoneOff />
           </button>
         </div>
@@ -87,7 +87,7 @@ const ControlsBar = ({
           <Hand />
         </button>
 
-        <button onClick={onLeave} title="Leave Meeting" className="bg-red-600 hover:bg-red-700 p-3 rounded-full text-white transition">
+        <button onClick={() => onLeave()} title="Leave Meeting" className="bg-red-600 hover:bg-red-700 p-3 rounded-full text-white transition">
           <PhoneOff />
         </button>
 
