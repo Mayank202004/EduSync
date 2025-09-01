@@ -39,6 +39,7 @@ const ChatCard = ({
   onSendMessage = () => {},
   onSendMeetingInvitation = () => {},
   className,
+  loading
 }) => {
   const messagesEndRef = useRef(null);
   const { socket } = useSocket();
@@ -55,9 +56,10 @@ const ChatCard = ({
 
 
   // Setting initial message
-  useEffect(() => {
+ useEffect(() => {
     setMessages(initialMessages);
-  }, [initialMessages]);
+}, [initialMessages]);
+
 
   // Listen for incoming messages
   useEffect(() => {
@@ -70,7 +72,6 @@ const ChatCard = ({
     };
 
     const handleIncomingMeetingInvitation = (message) => {
-      console.log(message);
       if (message.chatId !== chatId) return;
       setMessages((prev) => [...prev, message]);
       if (
@@ -305,7 +306,7 @@ const ChatCard = ({
             className={`chat-messages px-4 pt-4 space-y-4 overflow-y-auto  flex-grow min-h-0 max-h-96`}
             ref={chatMessagesRef}
           >
-            {messages === null ? (
+            {loading ? (
               <>
                 <MessageSkeleton />
                 <MessageSkeleton />
