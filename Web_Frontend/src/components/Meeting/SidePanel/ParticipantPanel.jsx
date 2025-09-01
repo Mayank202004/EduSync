@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -9,11 +9,15 @@ import {
   PinOff,
 } from "lucide-react";
 import useClickOutside from "@/hooks/useClickOutside";
+import { useSocket } from "@/context/SocketContext";
 
-const ParticipantPanel = ({ participants, pinned, setPinned, isHost }) => {
+const ParticipantPanel = ({ participants, pinned, setPinned, isHost, roomId }) => {
+  const { socket } = useSocket();
   const [isExpanded, setIsExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
+
+  console.log(participants)
 
   const handleToggle = () => setIsExpanded((prev) => !prev);
 
@@ -22,6 +26,9 @@ const ParticipantPanel = ({ participants, pinned, setPinned, isHost }) => {
   );
 
   const isPinned = (id) => pinned === id;
+
+  const menuRef = useRef(null);
+  useClickOutside(() => setOpenMenuId(null), menuRef);
 
   return (
     <div className="p-4 space-y-4">
@@ -54,55 +61,51 @@ const ParticipantPanel = ({ participants, pinned, setPinned, isHost }) => {
 
         {isExpanded && (
           <div className="mt-2 space-y-2">
-            {filteredParticipants.map((p) => {
-              const [menuRef] = useClickOutside(() => {
-                if (openMenuId === p._id) setOpenMenuId(null);
-              });
-
-              return (
-                <div
-                  key={p._id}
-                  className="flex items-center justify-between px-2 py-2 hover:bg-gray-50 rounded-md relative"
-                >
-                  {/* Avatar + Info */}
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={p.avatar}
-                      alt={p.name}
-                      className="w-8 h-8 rounded-full"
-                    />
-                    <div className="text-sm">
-                      <div>
-                        {p.name}{" "}
-                        {p.isYou && (
-                          <span className="text-xs text-gray-500">(You)</span>
-                        )}
-                      </div>
-                      {p.host && (
-                        <div className="text-xs text-gray-500">Meeting Host</div>
+            {filteredParticipants.map((p) => (
+              <div
+                key={p._id}
+                className="flex items-center justify-between px-2 py-2 hover:bg-gray-50 rounded-md relative"
+              >
+                {/* Avatar + Info */}
+                <div className="flex items-center gap-2">
+                  <img
+                    src={p.avatar}
+                    alt={p.name}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <div className="text-sm">
+                    <div>
+                      {p.name}{" "}
+                      {p.isYou && (
+                        <span className="text-xs text-gray-500">(You)</span>
                       )}
                     </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2 items-center">
-                    {!p.audioEnabled && (
-                      <MicOff size={16} className="text-gray-500" />
+                    {p.isHost && (
+                      <div className="text-xs text-gray-500">Meeting Host</div>
                     )}
+                  </div>
+                </div>
 
-                    <button
-                      onClick={() => setPinned(p._id)}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      {isPinned(p._id) ? (
-                        <PinOff size={16} className="text-blue-600" />
-                      ) : (
-                        <Pin size={16} />
-                      )}
-                    </button>
+                {/* Actions */}
+                <div className="flex gap-2 items-center">
+                  {!p.audioEnabled && (
+                    <MicOff size={16} className="text-gray-500" />
+                  )}
 
-                    <div className="relative" ref={menuRef}>
-                      {isHost && <MoreVertical
+                  <button
+                    onClick={() => setPinned(p._id)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    {isPinned(p._id) ? (
+                      <PinOff size={16} className="text-blue-600" />
+                    ) : (
+                      <Pin size={16} />
+                    )}
+                  </button>
+
+                  <div className="relative" ref={menuRef}>
+                    {(isHost && !p.isYou) && (
+                      <MoreVertical
                         size={16}
                         className="text-gray-500 cursor-pointer"
                         onClick={() =>
@@ -110,27 +113,51 @@ const ParticipantPanel = ({ participants, pinned, setPinned, isHost }) => {
                             prev === p._id ? null : p._id
                           )
                         }
-                      />}
+                      />
+                    )}
 
-                      {/* Dropdown menu for host only */}
-                      {isHost && openMenuId === p._id && (
-                        <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-                          <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                            Mute User
+                    {/* Dropdown menu for host only */}
+                    {isHost && openMenuId === p._id && (
+                      <div
+                        className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10"
+                        role="menu"
+                      >
+                        {[
+                          {
+                            label: "Mute User",
+                            action: "mute-user",
+                            className: "hover:bg-gray-100",
+                          },
+                          {
+                            label: "Turn Off Camera",
+                            action: "turn-user-video-off",
+                            className: "hover:bg-gray-100",
+                          },
+                          {
+                            label: "Kick Out",
+                            action: "kick-user",
+                            className: "hover:bg-red-50 text-red-500",
+                          },
+                        ].map(({ label, action, className }) => (
+                          <button
+                            key={action}
+                            className={`w-full text-left px-4 py-2 text-sm ${className}`}
+                            role="menuitem"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              socket.emit(action, { roomId, userId: p._id });
+                              setOpenMenuId(null);
+                            }}
+                          >
+                            {label}
                           </button>
-                          <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                            Turn Off Camera
-                          </button>
-                          <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-500">
-                            Kick Out
-                          </button>
-                        </div>
-                      )}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         )}
       </div>

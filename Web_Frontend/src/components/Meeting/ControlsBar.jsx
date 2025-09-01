@@ -76,11 +76,11 @@ const ControlsBar = ({
       {/* Mobile Layout */}
       <div className="md:hidden flex justify-evenly items-center gap-2 bg-black/60 p-3 rounded-full">
         <button onClick={onToggleMic} title="Toggle Microphone" className="text-white">
-          {mic ? <Mic /> : <MicOff className="text-red-500" />}
+          { isHost || hostControls.microphoneEnableAllowed ? (mic ? <Mic /> : <MicOff className="text-red-500" />) : <MicOff className="text-gray-500"/>}
         </button>
 
         <button onClick={onToggleCam} title="Toggle Camera" className="text-white">
-          {cam ? <Video /> : <VideoOff className="text-red-500" />}
+          {isHost || hostControls.videoEnableAllowed ? (cam ? <Video /> : <VideoOff className="text-red-500" />) : <VideoOff className="text-gray-500"/>}
         </button>
 
         <button onClick={onRaiseHand} title="Raise Hand" className="text-white">
@@ -129,7 +129,7 @@ const ControlsBar = ({
                 <Users className="w-4 h-4" /> Participants
               </button>
 
-              <button
+              {isHost && <button
                 onClick={() => {
                   onToggleHostControls();
                   setShowMore(false);
@@ -137,7 +137,7 @@ const ControlsBar = ({
                 className="flex items-center gap-2 text-sm text-black dark:text-white hover:bg-gray-100 dark:hover:bg-zinc-700 p-2 rounded"
               >
                 <Shield className="w-4 h-4" /> Host Controls
-              </button>
+              </button>}
             </div>
           )}
         </div>
