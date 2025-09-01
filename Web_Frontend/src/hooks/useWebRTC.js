@@ -40,13 +40,15 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
         setParticipants([
           {
             _id: socket?.id || "local",
-            name: `${currentUser.fullName} (You)`,
+            name: `${currentUser.fullName}`,
             avatar: currentUser.avatar,
             videoEnabled: initialCam,
             audioEnabled: initialMic,
             videoRef: localVideoRef,
             stream: localStream.current,
             isLocal: true,
+            isYou: true,
+            isHost: isHost,
           },
         ]);
       } catch (err) {
@@ -104,7 +106,9 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
     socket.on("user-left", handleUserLeft);
     socket.on("remote-media-updated", handleRemoteMediaUpdated);
     socket.on("host-controls-updated", (controls) => handleUpdateHostControls(controls));
-
+    socket.on("force-mute", () => forceDisableMic());
+    socket.on("force-video-off", () => forceDisableCam());
+    socket.on("kicked-out",() => handleKickedOut());
     socket.on("meeting-message", (msg) => {
       setMessages((prev) => [...prev, msg]);
     });
@@ -119,6 +123,9 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
       socket.off("user-left");
       socket.off("remote-media-updated");
       socket.off("host-controls-updated");
+      socket.off("force-mute");
+      socket.off("force-video-off");
+      socket.off("kicked-out");
       socket.off("meeting-message");
     };
   }, [shouldJoin, socket]);
@@ -258,7 +265,7 @@ const participantName = isScreenTrack
   };
 
   const toggleMic = () => {
-    if(hostControls.microphoneEnableAllowed === false){
+    if(hostControls.microphoneEnableAllowed === false && !isHost){
       toast.error("Host has disabled microphone");
       return
     }
@@ -284,7 +291,7 @@ const participantName = isScreenTrack
 
   
   const toggleCam = () => {
-    if(hostControls.videoEnableAllowed === false){
+    if(hostControls.videoEnableAllowed === false && !isHost){
       toast.error("Host has disabled camera");
       return;
     }
@@ -310,7 +317,7 @@ const participantName = isScreenTrack
 
 
   const toggleScreen = async () => {
-    if(hostControls.screenShareAllowed === false){
+    if(hostControls.screenShareAllowed === false && !isHost){
       toast.error("Host has disabled screen sharing");
       return
     }
@@ -396,7 +403,7 @@ const participantName = isScreenTrack
     socket.emit("raise-hand", { handRaised: !handRaised });
   };
 
-  const leaveMeeting = () => {
+  const leaveMeeting = (reason = "You left the meeting") => {
     Object.values(peerConnections.current).forEach((pc) => pc.close());
     peerConnections.current = {};
 
@@ -407,9 +414,16 @@ const participantName = isScreenTrack
     }
 
     setParticipants([]);
-    navigate(`/meeting/end`);
+    navigate("/meeting/end", { state: { reason } });
 
   };
+
+  const handleKickedOut = () => {
+    console.log(`I am ${currentUser.fullName} and I was kicked out`);
+    toast.error("You have been kicked out of the meeting.");
+    leaveMeeting("You were kicked out by the host"); // ✅ custom reason
+  };
+
 
   const handleRemoteMediaUpdated = ({ socketId, videoEnabled, audioEnabled, screenSharing }) => {
     setParticipants((prev) =>
