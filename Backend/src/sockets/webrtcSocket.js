@@ -128,4 +128,28 @@ export const setupWebRTC = (io, socket, user) => {
       console.error("Error updating host controls:", err);
     }
   });
+
+  // when host clicks "mute" on someone
+  socket.on("mute-user", ({ userId }) => {
+    io.to(userId).emit("force-mute"); 
+  });
+
+  socket.on("turn-user-video-off", ({ userId }) => {
+    io.to(userId).emit("force-video-off");
+  });
+
+
+  socket.on("kick-user", ({ roomId, userId }) => {
+    const roomKey = `webrtc-${roomId}`;
+    
+    io.sockets.sockets.get(userId)?.leave(roomKey);
+
+    roomUsersMap[roomKey] = (roomUsersMap[roomKey] || []).filter(
+      (entry) => entry.socketId !== userId
+    );
+
+    io.to(userId).emit("kicked-out");
+  });
+
+
 };
