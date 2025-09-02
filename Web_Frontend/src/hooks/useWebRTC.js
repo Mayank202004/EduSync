@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { mediaConstraints } from "@/lib/webrtc/constraints";
 import { useNavigate } from "react-router-dom";
+import playSound from "@/utils/playSound";
+import joinSound from "@/assets/sounds/userJoined.mp3";
 
 export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin, initialMic = true, initialCam = true) {
   const [mic, setMic] = useState(true);
@@ -67,6 +69,7 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
     joinedRoom.current = true;
 
     socket.emit("join-room", { roomId });
+    playSound(joinSound);
     setTimeout(() => { 
       socket.emit("update-media-state", {
         roomId,
@@ -188,6 +191,7 @@ const participantName = isScreenTrack
       }
 
       return [
+        ...prev,
         {
           _id: participantId,
           name: participantName,
@@ -198,8 +202,7 @@ const participantName = isScreenTrack
           videoRef,
           isLocal: false,
           isScreen: isScreenTrack,
-        },
-        ...prev,
+        }
       ];
     });
   };
