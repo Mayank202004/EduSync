@@ -1,6 +1,7 @@
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
 import homeIllustration from '@/assets/homePage.svg';
+import NoAttendanceDataIllustration from '@/assets/noAttendanceData.png';
 import {
   PieChart,
   Pie,
@@ -35,6 +36,9 @@ const HomeContent = ({monthlyAttendance,attendanceOverMonths}) => {
       month: new Date(month).toLocaleString('default', { month: 'short' }), // "2025-05" => "May"
       present,
     }));
+
+    console.log(attendanceData);
+    console.log(monthlyAttendanceData);
 
 
   return (
@@ -71,51 +75,80 @@ const HomeContent = ({monthlyAttendance,attendanceOverMonths}) => {
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-6">
               Attendance Overview (This Month)
             </h2>
-            <div className="w-full h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={attendanceData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    innerRadius={50}
-                    label
-                    isAnimationActive={false}
-                  >
-                    {attendanceData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                  <Legend verticalAlign="bottom" height={36} />
-                </PieChart>
-              </ResponsiveContainer>
+            <div className="w-full h-72 flex items-center justify-center">
+              {attendanceData.every(d => d.value === 0) ? (
+                <div className="flex flex-col items-center text-center">
+                  <img
+                    src={NoAttendanceDataIllustration}
+                    alt="No data"
+                    className="w-40 mb-4"
+                  />
+                  <p className="text-gray-500 dark:text-gray-400">
+                    No attendance recorded for this month.
+                  </p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={attendanceData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      innerRadius={50}
+                      label
+                      isAnimationActive={false}
+                    >
+                      {attendanceData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend verticalAlign="bottom" height={36} />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
-
+            
           {/* Line Chart */}
           <div className="bg-white dark:bg-customDarkFg p-6 rounded-2xl shadow-md">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-6">
               Attendance Over Months
             </h2>
-            <div className="w-full h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyAttendanceData}>
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="present"
-                    stroke="#10b981"
-                    strokeWidth={2.5}
-                    activeDot={{ r: 6 }}
+            <div className="w-full h-72 flex items-center justify-center">
+              {monthlyAttendanceData.length === 0 ? (
+                <div className="flex flex-col items-center text-center">
+                  <img
+                    src={NoAttendanceDataIllustration}
+                    alt="No data"
+                    className="w-36 mb-4"
                   />
-                </LineChart>
-              </ResponsiveContainer>
+                  <p className="text-gray-500 dark:text-gray-400">
+                    Your attendance trend will appear here soon.
+                  </p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={monthlyAttendanceData}>
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="present"
+                      stroke="#10b981"
+                      strokeWidth={2.5}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
         </div>
