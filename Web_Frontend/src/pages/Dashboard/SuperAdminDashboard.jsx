@@ -67,7 +67,7 @@ const SuperAdminDashboard = () => {
   return (
     <div className="relative flex grow w-full h-screen bg-transparent">
       {/* Left Sidebar - Desktop only */}
-      <div className="md:w-[30%] lg:w-[20%] border-r border-gray-200 dark:border-gray-700 h-full pb-10 hidden md:block">
+      <div className="md:w-[30%] lg:w-[20%] border-r border-gray-200 dark:border-gray-700 h-full hidden md:block">
         <LeftSidebar
           chatData={chats}
           setChatData={setChats}
@@ -81,7 +81,7 @@ const SuperAdminDashboard = () => {
       </div>
 
       {/* Right Sidebar - Desktop only */}
-      <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden pb-10 lg:block">
+      <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden lg:block">
         <RightSidebar events={events} />
       </div>
 
