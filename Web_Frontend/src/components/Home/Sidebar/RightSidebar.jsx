@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 const RightSidebar = ({events}) => {
   const navigate = useNavigate();
   return (
-    <div className="max-w-[85%] px-3 py-5 xl:p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md h-full flex flex-col">
+    <div className="max-w-[85%] px-3 py-5 xl:p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md h-[calc(100%-100px)] flex flex-col">
       <div className="flex items-center gap-2 justify-center align-middle mb-3 ">
         <FontAwesomeIcon
           icon={faCalendar}
@@ -17,12 +17,12 @@ const RightSidebar = ({events}) => {
         />
         <h2 className="font-semibold text-1.5xl">Events</h2>
       </div>
-      <div className="">
+      <div className="flex-1 overflow-y-auto">
         <UpcomingEvents events={events} isLoading={false}/>
       </div>
 
       <button 
-        className="px-5 mt-3 text-blue-500 hover:text-blue-300 duration-500"
+        className="px-5 mt-3 text-blue-500 hover:text-blue-300 duration-500 self-center"
         onClick={() => navigate('/calendar')}
       >
           View Calendar

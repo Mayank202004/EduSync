@@ -178,7 +178,7 @@ const LeftSidebar = ({ chatData, setChatData, isMobile = false, searchUsers = []
   const [containerRef] = useClickOutside(handleChatClose);
 
   return (
-    <div className={cn("p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto h-full flex flex-col", isMobile ? "w-full my-0 h-full" :  "max-w-17/20")}>
+    <div className={cn("p-5  text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto h-[calc(100%-100px)] flex flex-col", isMobile ? "w-full my-0 h-[calc(100%-60px)]" :  "max-w-17/20")}>
       <div className="flex items-center justify-center gap-2 mb-3 px-3">
         <FontAwesomeIcon icon={faMessage} className="dark:text-white text-black text-1.5xl" />
         <h2 className="font-semibold text-1.5xl">Channels</h2>

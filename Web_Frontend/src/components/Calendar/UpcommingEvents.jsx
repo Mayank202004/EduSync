@@ -8,7 +8,7 @@ const UpcomingEvents = ({ events, isLoading }) => {
     .slice(0, 10);
 
   return (
-    <div className="flex-1 overflow-auto pr-2 max-h-[75vh]">
+    <div className="flex-1 pr-2 max-h-[75vh]">
       <h3 className="text-md xl:text-lg font-bold text-gray-700 dark:text-gray-200 ml-1 mb-2">Upcoming Events</h3>
       {isLoading ? ( // To Do add skeleton 
         <p className="text-sm text-gray-600 dark:text-gray-300">Loading upcoming events...</p>
