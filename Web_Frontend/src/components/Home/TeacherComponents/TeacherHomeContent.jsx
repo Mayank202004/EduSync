@@ -17,7 +17,7 @@ const TeacherHomeContent = () => {
   ];
 
   return (
-    <div className="w-full min-h-screen py-3 px-4 bg-customLightFg dark:bg-customDarkBg">
+    <div className="w-full h-full px-4 bg-customLightFg dark:bg-customDarkBg overflow-y-auto">
       <div className="max-w-6xl mx-auto space-y-5">
 
         {/* Welcome Card */}

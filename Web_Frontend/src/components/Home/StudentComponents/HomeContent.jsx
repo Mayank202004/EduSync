@@ -37,13 +37,9 @@ const HomeContent = ({monthlyAttendance,attendanceOverMonths}) => {
       present,
     }));
 
-    console.log(attendanceData);
-    console.log(monthlyAttendanceData);
-
-
   return (
-    <div className="w-full min-h-screen py-2 bg-customLightFg rounded-md dark:bg-customDarkBg">
-      <div className="max-w-5xl mx-auto space-y-5">
+    <div className="w-full h-full bg-customLightFg rounded-md dark:bg-customDarkBg overflow-y-auto">
+  <div className="max-w-5xl mx-auto space-y-5 h-full">
         {/* Study Materials CTA */}
         <div className="flex flex-col md:flex-row items-center gap-6 bg-white dark:bg-customDarkFg p-6 rounded-2xl shadow-md">
           <img
@@ -69,19 +65,19 @@ const HomeContent = ({monthlyAttendance,attendanceOverMonths}) => {
         </div>
 
         {/* Charts Section: Pie and Line Side by Side */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
           {/* Pie Chart */}
           <div className="bg-white dark:bg-customDarkFg p-6 rounded-2xl shadow-md">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-6">
               Attendance Overview (This Month)
             </h2>
-            <div className="w-full h-72 flex items-center justify-center">
+            <div className="w-full h-75 flex items-center justify-center">
               {attendanceData.every(d => d.value === 0) ? (
                 <div className="flex flex-col items-center text-center">
                   <img
                     src={NoAttendanceDataIllustration}
                     alt="No data"
-                    className="w-40 mb-4"
+                    className="w-40 mb-4 rounded-md"
                   />
                   <p className="text-gray-500 dark:text-gray-400">
                     No attendance recorded for this month.
@@ -127,7 +123,7 @@ const HomeContent = ({monthlyAttendance,attendanceOverMonths}) => {
                   <img
                     src={NoAttendanceDataIllustration}
                     alt="No data"
-                    className="w-36 mb-4"
+                    className="w-36 mb-4 rounded-md"
                   />
                   <p className="text-gray-500 dark:text-gray-400">
                     Your attendance trend will appear here soon.
