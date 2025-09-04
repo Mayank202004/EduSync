@@ -65,7 +65,7 @@ const SuperAdminDashboard = () => {
   };
 
   return (
-    <div className="relative flex grow w-full h-screen bg-transparent">
+    <div className="relative flex grow w-full h-[90vh] bg-transparent">
       {/* Left Sidebar - Desktop only */}
       <div className="md:w-[30%] lg:w-[20%] border-r border-gray-200 dark:border-gray-700 h-full hidden md:block">
         <LeftSidebar

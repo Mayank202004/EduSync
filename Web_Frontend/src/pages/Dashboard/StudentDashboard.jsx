@@ -39,21 +39,25 @@ const StudentDashboard = () => {
   }, [isChatOpen]);
 
   return (
-    <div className="flex grow w-full h-full bg-transparent relative">
-      {/* Left Sidebar - Desktop only */}
+    <div className="flex w-full h-[90vh] bg-transparent relative">
+      {/* Left Sidebar */}
       <div className="md:w-[30%] lg:w-[20%] border-r border-gray-200 dark:border-gray-700 hidden md:block">
         <LeftSidebar chatData={chats} setChatData={setChats} />
       </div>
-
-      <div className="w-full md:w-[70%] lg:w-[60%] p-4 overflow-y-auto">
+      
+      {/* Main Content */}
+      <div className="w-full md:w-[70%] lg:w-[60%] h-[calc(100vh-100px)] mt-5 px-4">
         <HomeContent
           monthlyAttendance={monthlyAttendance}
           attendanceOverMonths={attendanceOverMonths}
         />
       </div>
+      
+      {/* Right Sidebar */}
       <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden lg:block">
         <RightSidebar events={events} />
       </div>
+
 
       {/* Floating Chat Button - Mobile only */}
       {!isChatOpen && (
