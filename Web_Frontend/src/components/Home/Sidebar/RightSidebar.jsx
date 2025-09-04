@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 const RightSidebar = ({events}) => {
   const navigate = useNavigate();
   return (
-    <div className="max-w-[85%] px-3 py-5 xl:p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md h-[calc(100%-100px)] flex flex-col">
+    <div className="max-w-[85%] px-3 py-5 xl:p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md h-[calc(100%-30px)] flex flex-col">
       <div className="flex items-center gap-2 justify-center align-middle mb-3 ">
         <FontAwesomeIcon
           icon={faCalendar}
