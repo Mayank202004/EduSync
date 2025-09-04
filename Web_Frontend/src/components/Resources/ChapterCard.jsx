@@ -93,7 +93,7 @@ function ChapterCard({
 
   const handleDeleteResource = async (chapterName,resourceUrl) => {
     try{
-      const resposne = await toast.promise(
+      const response = await toast.promise(
         deleteResource(className,subjectName,term,chapterName,resourceUrl),
         {
           loading: "Deleting resource...",
@@ -101,7 +101,7 @@ function ChapterCard({
           error: "",
         }
       )
-      setUpdatedClass(resposne.data);
+      setUpdatedClass(response.data);
     } catch(err){
       // Handled by axios interceptor
     }

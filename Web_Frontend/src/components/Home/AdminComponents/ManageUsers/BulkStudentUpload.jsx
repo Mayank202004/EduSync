@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ArrowLeft, UploadCloud, FileSpreadsheet, Download } from "lucide-react";
 import toast from "react-hot-toast";
+import { bulkStudentUpload } from "@/services/dashboardService";
 
 const BulkStudentUpload = ({ onBack }) => {
   const [file, setFile] = useState(null);
@@ -44,6 +45,27 @@ const BulkStudentUpload = ({ onBack }) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const onUpload = async () => {
+    if (!file) {
+      toast.error("Please select a file first!");
+      return;
+    }
+    try{
+      const response = await toast.promise(
+        bulkStudentUpload(file),
+        {
+          loading: "Bulk student upload in progress...",
+          success: "Students uploaded successfully",
+          error: "", // handled by interceptor
+        }
+      )
+      // Set some data and display component if sme student fail To DO:
+    } catch(err){
+      // Handled by axios interceptor
+    }
+    
   };
 
   return (
@@ -129,7 +151,7 @@ const BulkStudentUpload = ({ onBack }) => {
       {file && (
         <div className="mt-6 flex justify-end">
           <button
-            onClick={() => alert("Uploading " + file.name)}
+            onClick={() => onUpload()}
             className="px-6 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700"
           >
             Upload Students
