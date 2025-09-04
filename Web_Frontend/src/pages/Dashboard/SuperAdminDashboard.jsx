@@ -15,7 +15,7 @@ import TicketInbox from "@/components/Home/AdminComponents/TicketInbox";
 import ShowChatsButton from "@/components/Home/ShowChatsButton";
 import IconTextButton from "@/components/Chat/IconTextButton";
 import { formatEvents } from "@/utils/calendarUtil";
-import ManageUsers from "@/components/Home/AdminComponents/ManageUsers";
+import ManageUsers from "@/components/Home/AdminComponents/ManageUsers/ManageUsers";
 
 const SuperAdminDashboard = () => {
   const [activeView, setActiveView] = useState('home');
