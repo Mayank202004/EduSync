@@ -15,6 +15,7 @@ import TicketInbox from "@/components/Home/AdminComponents/TicketInbox";
 import ShowChatsButton from "@/components/Home/ShowChatsButton";
 import IconTextButton from "@/components/Chat/IconTextButton";
 import { formatEvents } from "@/utils/calendarUtil";
+import ManageUsers from "@/components/Home/AdminComponents/ManageUsers";
 
 const SuperAdminDashboard = () => {
   const [activeView, setActiveView] = useState('home');
@@ -58,6 +59,8 @@ const SuperAdminDashboard = () => {
         return <ManageAcademicYear onBackPressed={onBackPressed} />;
       case "ticket-inbox":
         return <TicketInbox onBackPressed={onBackPressed} />;
+      case "manage-users":
+        return <ManageUsers onBackPressed={onBackPressed} />;
       case "home":
       default:
         return <AdminHomeContent setActiveView={setActiveView} />;
@@ -76,7 +79,7 @@ const SuperAdminDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="w-full md:w-[70%] lg:w-[60%] p-4 overflow-y-auto">
+      <div className="w-full md:w-[70%] lg:w-[60%] px-4 lg:px-2 py-4 overflow-y-auto">
         {renderMainContent()}
       </div>
 

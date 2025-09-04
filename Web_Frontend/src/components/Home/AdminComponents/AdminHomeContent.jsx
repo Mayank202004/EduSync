@@ -86,6 +86,7 @@ const AdminHomeContent = ({setActiveView=()=>{}}) => {
           icon={Users}
           title="User Management"
           description="View and manage all registered users."
+          onClick={() => setActiveView('manage-users')}
         />
       </div>
     </div>
