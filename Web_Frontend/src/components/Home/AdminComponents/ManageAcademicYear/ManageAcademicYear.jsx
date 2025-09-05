@@ -29,6 +29,7 @@ const ManageAcademicYear = ({ onBackPressed }) => {
     feeStatus: false,
     messages: false,
     tickets: false,
+    events: false,
   });
   
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -70,19 +71,19 @@ const ManageAcademicYear = ({ onBackPressed }) => {
   };
 
   const handleClearData = async () => {
-    const { attendance, feeStatus, messages, tickets } = clearOptions;
+    const { attendance, feeStatus, messages, tickets, events } = clearOptions;
 
-    if (!attendance && !feeStatus && !messages && !tickets) {
+    if (!attendance && !feeStatus && !messages && !tickets && !events) {
       return toast.error("Select something to clear");
     }
 
     try {
       await toast.promise(
-        clearOldData(attendance, feeStatus, messages, tickets),
+        clearOldData(attendance, feeStatus, messages, tickets, events),
         {
           loading: "Clearing Data...",
           success: "Selected data cleared successfully",
-          error: "Failed to clear data",
+          error: "", // handled by interceptor
         }
       );
       setShowClearModal(false);

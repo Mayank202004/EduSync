@@ -187,8 +187,8 @@ export const assignStudentDivisions = async (className, assignments) => {
  * @desc Clear old data
  * @returns {Promise} - promise resolving to success message
  */
-export const clearOldData = async (attendance=false,feeStatus=false,messages=false,tickets=false) => {
-    await axiosInstance.post(`${BASEURL}/dashboard/cleanup`,{attendance,feeStatus,messages,tickets});
+export const clearOldData = async (attendance=false,feeStatus=false,messages=false,tickets=false,events=false) => {
+    await axiosInstance.post(`${BASEURL}/dashboard/cleanup`,{attendance,feeStatus,messages,tickets,events});
 };
 
 /**
