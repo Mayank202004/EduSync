@@ -4,6 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useAuth } from "@/context/AuthContext";
 import AddEventModal from "./AddEventModal";
+import { getEventColor } from "@/utils/calendarUtil";
 
 const CalendarPanel = ({ events,setEvents, handleEventClick }) => {
   const { user } = useAuth();
@@ -19,7 +20,8 @@ const CalendarPanel = ({ events,setEvents, handleEventClick }) => {
   };
 
   const handleEventSubmit = (eventData) => {
-    setEvents((prev) => [...prev, eventData]);
+    const { bg, border } = getEventColor(eventData.eventType);
+    setEvents((prev) => [...prev, {...eventData, backgroundColor:bg, borderColor:border}]);
     setShowModal(false);
   };
 
