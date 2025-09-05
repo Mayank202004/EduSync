@@ -11,6 +11,7 @@ import { getSettingValue } from "./setting.controller.js";
 import { ClassStructure } from "../models/classStructure.model.js";
 import { Student } from "../models/student.model.js";
 import { returnAllEvents } from "./calendar.controller.js";
+import { deleteAllEvents } from "./calendar.controller.js";
 
 export const fetchDashboardData = asyncHandler(async (req, res) => {
     const user = req.user;
@@ -43,9 +44,9 @@ export const fetchSuperAdminDashboardData = asyncHandler(async (req, res) => {
  * @access Private (Super Admin)
  */
 export const performSelectiveCleanup = asyncHandler(async (req, res) => {
-  const { attendance, feeStatus, messages, tickets } = req.body;
+  const { attendance, feeStatus, messages, tickets, events} = req.body;
 
-  if (!attendance && !feeStatus && !messages && !tickets) {
+  if (!attendance && !feeStatus && !messages && !tickets && !events) {
     throw new ApiError(400, "No cleanup options selected.");
   }
   const toBool = (val) => val === true || val === "true";
@@ -64,6 +65,10 @@ export const performSelectiveCleanup = asyncHandler(async (req, res) => {
   
     if (toBool(tickets)) {
         await deleteAllTickets(req.school?._id);
+    }
+
+    if (toBool(events)) {
+      await deleteAllEvents(req.school?._id);
     }
   
     return res.status(200).json(new ApiResponse(200, null, "Selective cleanup completed."));

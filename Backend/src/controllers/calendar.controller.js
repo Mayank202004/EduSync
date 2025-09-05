@@ -98,3 +98,16 @@ export const deleteEvent = asyncHandler(async (req, res) => {
 
   res.status(200).json(new ApiResponse(200, null, 'Event deleted successfully.'));
 });
+
+
+/**
+ * @desc Helper function to delete all events
+ * @access Private (Super Admin)
+ */
+export const deleteAllEvents = async (schoolId) => {
+  try{
+    await CalendarEvent.deleteMany({ schoolId });
+  }catch(error){
+    throw error;
+  }
+};
