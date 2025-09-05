@@ -19,6 +19,6 @@ router.route("/update").put(verifyJWT, userController.updateUser);
 router.route("/update-avatar").put(verifyJWT,upload.single("avatar"),userController.updateUserAvatar);
 router.route("/bulk-register-students").post(verifyJWT,upload.single("file"),verifySuperAdmin,userController.bulkRegisterStudents);
 router.route("/register-student").post(verifyJWT,verifySuperAdmin,userController.createStudentByAdmin);
-
+router.route("/register-teacher").post(verifyJWT,verifySuperAdmin,userController.createTeacherByAdmin);
 
 export default router;

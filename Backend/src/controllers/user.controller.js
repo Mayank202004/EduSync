@@ -816,6 +816,123 @@ export const createStudentByAdmin = asyncHandler(async (req, res) => {
 });
 
 
+/**
+ * @desc    Super admin creates a new teacher (auto-verified)
+ * @route   POST /api/v1/users/create-teacher
+ * @access  Private (super admin only)
+ */
+export const createTeacherByAdmin = asyncHandler(async (req, res) => {
+  const {fullName,email,username,position,subjects,classTeacher,classCoordinator,phone,address,role="teacher"} = req.body;
+
+  const schoolId = req.school?._id;
+
+  if ([fullName, email, username, schoolId].some((field) => !field || field?.toString().trim() === "")) {
+    throw new ApiError(400, "Full name, email, username and schoolId are required");
+  }
+
+  // Check if user already exists
+  const existingUser = await User.findOne({
+    $or: [{ email }, { username }],
+  });
+  if (existingUser) throw new ApiError(400, "Username or email already exists");
+
+  // --- Password Handling ---
+  const password = "admin@123456"; // To DO: generate random + email
+
+  // --- Create User ---
+  const user = await User.create({
+    fullName,
+    email,
+    username,
+    password,
+    role: role,
+    verified: true,
+    schoolId,
+  });
+
+  const createdUser = await User.findById(user._id).select("-password -refreshToken -avatar");
+  if (!createdUser) throw new ApiError(500, "Error creating teacher user");
+
+  // --- Create Teacher entry ---
+  const teacher = await Teacher.create({
+    userId: user._id,
+    schoolId,
+    position: position || null,
+    subjects: subjects || [],
+    classTeacher: classTeacher || null,
+    classCoordinator: classCoordinator || null,
+    phone: phone || null,
+    address: address || null,
+  });
+  if (!teacher) throw new ApiError(500, "Error creating Teacher details");
+
+  // --- Auto-join chats ---
+  const joinedSections = new Set();
+
+  const joinClassChat = async (className, div) => {
+    const key = `${className}-${div}`;
+    if (joinedSections.has(key)) return;
+    joinedSections.add(key);
+
+    let chat = await Chat.findOne({ className, div, isGroupChat: true, schoolId });
+    if (chat) {
+      await Chat.findOneAndUpdate(
+        { _id: chat._id, schoolId },
+        { $addToSet: { participants: user._id } }
+      );
+    } else {
+      await Chat.create({
+        name: `Class ${className}-${div}`,
+        isGroupChat: true,
+        className,
+        div,
+        participants: [user._id],
+        schoolId,
+      });
+    }
+  };
+
+  // From subjects
+  if (subjects) {
+    subjects.forEach((subject) => {
+      subject.classes.forEach((cls) => {
+        cls.div.forEach((d) => {
+          joinClassChat(cls.class, d);
+        });
+      });
+    });
+  }
+
+  // From classTeacher
+  if (classTeacher) {
+    await joinClassChat(classTeacher.class, classTeacher.div);
+  }
+
+  // From classCoordinator → join all division chats of that class
+  if (classCoordinator) {
+    const divisionChats = await Chat.find({
+      className: classCoordinator,
+      isGroupChat: true,
+      schoolId,
+    });
+
+    if (divisionChats.length) {
+      for (const chat of divisionChats) {
+        await Chat.findOneAndUpdate(
+          { _id: chat._id, schoolId },
+          { $addToSet: { participants: user._id } }
+        );
+      }
+    }
+  }
+
+  return res.status(201).json(
+    new ApiResponse(201, { user: createdUser, teacher }, "Teacher created and chats synced")
+  );
+});
+
+
+
 
 
 export { registerUser, loginUser, logoutUser, refreshAccessToken, changeUserPassword, getCurrentUser, updateUser, updateUserAvatar, bulkRegisterStudents};
