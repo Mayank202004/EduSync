@@ -216,6 +216,10 @@ export const bulkStudentUpload = async (file) => {
       },
     }
   );
-
   return response.data;
 };
+
+export const registerStudentBySuperAdmin = async (formData) => {
+  const response = await axiosInstance.post(`${BASEURL}/users/register-student`, formData);
+  return response.data;
+}
