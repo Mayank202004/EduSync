@@ -51,7 +51,7 @@ const StudentProfileSection = () => {
   return (
     <div
       ref={rootRef}
-      className="flex flex-col h-screen w-fit mx-auto bg-customLightBg dark:bg-customDarkBg"
+      className="flex flex-col min-h-screen w-fit mx-auto bg-customLightBg dark:bg-customDarkBg"
     >
       <h1 className="font-bold text-4xl w-fit mx-auto mt-10">Edit Profile</h1>
       <h3 className="mx-auto text-lg text-gray-400">
