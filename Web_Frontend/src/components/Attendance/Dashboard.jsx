@@ -10,6 +10,7 @@ import { getAttendanceDashboardData } from '@/services/attendenceService';
 import LoadingScreen from '../Loading';
 import AttendanceDashboardSkeleton from './DashboardSkeleton';
 import { ArrowLeft } from 'lucide-react';
+import NoAttendanceDataIllustration from '@/assets/noAttendanceData.png';
 
 const COLORS = ['#34d399', '#3b82f6'];
 
@@ -40,6 +41,7 @@ function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=f
   })) || [];
 
 
+
   if (!dashboardData) {
     return (
       <div className="flex h-full w-full">
@@ -68,31 +70,59 @@ function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=f
           {/* Line Chart */}
           <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200 h-[350px] lg:h-[450px]">
             <h2 className="text-lg font-semibold mb-2">Total Attendance Report</h2>
-            <ResponsiveContainer width="100%" height="85%">
-              <LineChart data={lineData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis domain={[0, totalStudents]} allowDecimals={false} />
-                <Tooltip />
-                <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} name="Present Students" />
-              </LineChart>
-            </ResponsiveContainer>
+            {lineData.length === 0 ? (
+              <div className="flex flex-col items-center text-center h-full justify-center">
+                <img
+                  src={NoAttendanceDataIllustration}
+                  alt="No data"
+                  className="w-40 mb-4 rounded-md"
+                />
+                <p className="text-gray-500 dark:text-gray-400">
+                  No attendance recorded for this month.
+                </p>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="85%">
+                <LineChart data={lineData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis domain={[0, totalStudents]} allowDecimals={false} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} name="Present Students" />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
 
           {/* Bar Chart */}
           <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200 h-[400px] md:h-[350px] lg:h-[450px]">
             <h2 className="text-lg font-semibold mb-2">Presentee by Division</h2>
-            <ResponsiveContainer width="100%" height="85%">
-              <BarChart data={barData}>
-                <XAxis dataKey="class" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill="#34d399" name="Presentee Percentage"/>
-              </BarChart>
-            </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-2 text-center font-bold">
-              Presentee %age for class {className} for {barDataMonth}
-            </p>
+            {barData.length === 0 ? (
+              <div className="flex flex-col items-center text-center justify-center h-full">
+                <img
+                  src={NoAttendanceDataIllustration}
+                  alt="No data"
+                  className="w-40 mb-4 rounded-md"
+                />
+                <p className="text-gray-500 dark:text-gray-400">
+                  No attendance recorded for this month.
+                </p>
+              </div>
+            ) : (
+              <>
+                <ResponsiveContainer width="100%" height="85%">
+                  <BarChart data={barData}>
+                    <XAxis dataKey="class" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#34d399" name="Presentee Percentage"/>
+                  </BarChart>
+                </ResponsiveContainer>
+                <p className="text-sm text-gray-600 mt-2 text-center font-bold">
+                  Presentee %age for class {className} for {barDataMonth}
+                </p>
+              </>
+            )}
           </div>
         </div>
 
@@ -130,28 +160,40 @@ function AttendanceDashboard({dashboardData, isClassTeacher=false,isSuperAdmin=f
               <div className="bg-white dark:bg-customDarkFg p-4 rounded w-full dark:border-gray-600 border border-gray-200">
                 <h2 className="text-lg font-semibold mb-2">Top 6 Attendant</h2>
                 <ul className="space-y-2">
-  {topStudents.map((student, idx) => (
-    <li
-      key={student.name}
-      className="bg-white dark:bg-customDarkFg border border-gray-200 dark:border-gray-600 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow"
-    >
-      <div className="flex justify-between items-center mb-1">
-        <span className="font-medium text-gray-800 dark:text-gray-200">{idx + 1}. {student.name}</span>
-        <span className="text-green-600 dark:text-green-400 font-semibold">{student.percentage}</span>
-      </div>
-      <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-        <span>{student.days} days</span>
-        <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-green-500 dark:bg-green-400 rounded-full"
-            style={{ width: `${((student.days / dashboardData.topAttendees.totalWorkingDays) * 100).toFixed(1)}%` }}
-          ></div>
-        </div>
-      </div>
-    </li>
-  ))}
-</ul>
-
+                  {topStudents.length === 0 ? (
+                    <div className="flex flex-col items-center text-center">
+                      <img
+                        src={NoAttendanceDataIllustration}
+                        alt="No data"
+                        className="w-40 mb-4 rounded-md"
+                      />
+                      <p className="text-gray-500 dark:text-gray-400">
+                        No attendance recorded for this month.
+                      </p>
+                    </div>
+                  ) : (
+                    topStudents.map((student, idx) => (
+                      <li
+                        key={student.name}
+                        className="bg-white dark:bg-customDarkFg border border-gray-200 dark:border-gray-600 rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="font-medium text-gray-800 dark:text-gray-200">{idx + 1}. {student.name}</span>
+                          <span className="text-green-600 dark:text-green-400 font-semibold">{student.percentage}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
+                          <span>{student.days} days</span>
+                          <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-green-500 dark:bg-green-400 rounded-full"
+                              style={{ width: `${((student.days / dashboardData.topAttendees.totalWorkingDays) * 100).toFixed(1)}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </li>
+                    ))
+                  )}
+                </ul>
               </div>
                 
               {/* Radar */}

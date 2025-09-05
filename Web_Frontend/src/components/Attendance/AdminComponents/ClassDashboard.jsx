@@ -9,6 +9,7 @@ import {
 import { getClassLevelDashboardData } from '@/services/attendenceService';
 import TopLevelDashboardSkeleton from './TopLevelSkeleton';
 import { ArrowLeft } from 'lucide-react';
+import NoAttendanceDataIllustration from '@/assets/noAttendanceData.png';
 
 const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 
@@ -107,15 +108,28 @@ const ClassDashboard = ({ selectedClass, onBack=()=>{}, onDivisionClicked=()=>{}
         {/* Division Attendance */}
         <div className="bg-white dark:bg-customDarkFg p-3 rounded border shadow h-[260px]">
           <h2 className="text-md font-semibold mb-1">Attendance by Division</h2>
-          <ResponsiveContainer width="100%" height="85%">
-            <BarChart data={divisionAttendance}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="div" />
-              <YAxis domain={[0, 100]} />
-              <Tooltip />
-              <Bar dataKey="percentage" fill="#3b82f6" name="Attendance %" />
-            </BarChart>
-          </ResponsiveContainer>
+          {divisionAttendance.length === 0 ? (
+            <div className="flex flex-col items-center text-center">
+              <img
+                src={NoAttendanceDataIllustration}
+                alt="No data"
+                className="w-40 mb-4 rounded-md"
+              />
+              <p className="text-gray-500 dark:text-gray-400">
+                No attendance recorded yet.
+              </p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="85%">
+              <BarChart data={divisionAttendance}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="div" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                <Bar dataKey="percentage" fill="#3b82f6" name="Attendance %" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         {/* Gender Distribution */}
@@ -137,27 +151,53 @@ const ClassDashboard = ({ selectedClass, onBack=()=>{}, onDivisionClicked=()=>{}
         <div className="bg-white dark:bg-customDarkFg p-3 rounded border shadow">
           <h2 className="text-md font-semibold mb-2 text-center">Top Students by Attendance</h2>
           <ul className="divide-y divide-gray-300 dark:divide-gray-600">
-            {topStudents.map((student, idx) => (
-              <li key={student.name} className="flex justify-between py-1 px-2 text-sm">
-                <span>{idx + 1}. {student.name}</span>
-                <span className="text-green-600 dark:text-green-400 font-medium">{student.attendance}%</span>
-              </li>
-            ))}
+            {topStudents.length === 0 ? (
+              <div className="flex flex-col items-center text-center">
+                <img
+                  src={NoAttendanceDataIllustration}
+                  alt="No data"
+                  className="w-40 mb-4 rounded-md"
+                />
+                <p className="text-gray-500 dark:text-gray-400">
+                  No attendance recorded yet.
+                </p>
+              </div>
+            ) : (
+              topStudents.map((student, idx) => (
+                <li key={student.name} className="flex justify-between py-1 px-2 text-sm">
+                  <span>{idx + 1}. {student.name}</span>
+                  <span className="text-green-600 dark:text-green-400 font-medium">{student.attendance}%</span>
+                </li>
+              ))
+            )}
           </ul>
         </div>
 
         {/* Daily Presentee Line Chart */}
         <div className="bg-white dark:bg-customDarkFg p-3 rounded border shadow h-[260px]">
           <h2 className="text-md font-semibold mb-1">Daily Total Presentees</h2>
-          <ResponsiveContainer width="100%" height="85%">
-            <LineChart data={dashboardData?.dailyTotalPresentee.data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis domain={[0, dashboardData?.totalStudents]} />
-              <Tooltip />
-              <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
+          {dashboardData?.dailyTotalPresentee.data.length === 0 ? (
+            <div className="flex flex-col items-center text-center">
+              <img
+                src={NoAttendanceDataIllustration}
+                alt="No data"
+                className="w-40 mb-4 rounded-md"
+              />
+              <p className="text-gray-500 dark:text-gray-400">
+                No attendance recorded yet.
+              </p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="85%">
+              <LineChart data={dashboardData?.dailyTotalPresentee.data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis domain={[0, dashboardData?.totalStudents]} />
+                <Tooltip />
+                <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         {/* Weekly Absentee Radar Chart */}

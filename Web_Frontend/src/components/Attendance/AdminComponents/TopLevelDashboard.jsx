@@ -7,6 +7,8 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import TopLevelDashboardSkeleton from './TopLevelSkeleton';
+import NoAttendanceDataIllustration from '@/assets/noAttendanceData.png';
+import NoDataIllustration from '@/assets/noData.png';
 
 const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
 
@@ -28,6 +30,8 @@ const TopLevelDashboard = ({ dashboardData,setDashboardData, onClassClicked }) =
   const lineData = dashboardData?.dailyTotalPresentee?.data || [];
    const totalStudents = dashboardData?.totalStudents || 0;
   const totalClasses = dashboardData?.classStructure?.length || 0;
+
+  console.log(weeklyAbsenteeCount);
   
   if (!dashboardData) {
     return <TopLevelDashboardSkeleton/>
@@ -57,30 +61,56 @@ const TopLevelDashboard = ({ dashboardData,setDashboardData, onClassClicked }) =
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-white dark:bg-customDarkFg p-4 rounded border border-gray-200 dark:border-gray-600 shadow h-[300px]">
           <h2 className="text-md font-semibold mb-2">Class-wise Attendance</h2>
-          <ResponsiveContainer width="100%" height="85%">
-            <BarChart data={classWiseAttendance}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="className" />
-              <YAxis domain={[0, 100]} />
-              <Tooltip />
-              <Bar dataKey="percentage" fill="#3b82f6" name="Attendance %" />
-            </BarChart>
-          </ResponsiveContainer>
+          {classWiseAttendance.length === 0 ? (
+            <div className="flex flex-col items-center text-center">
+              <img
+                src={NoAttendanceDataIllustration}
+                alt="No data"
+                className="w-40 mb-4 rounded-md"
+              />
+              <p className="text-gray-500 dark:text-gray-400">
+                No attendance recorded yet.
+              </p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="85%">
+              <BarChart data={classWiseAttendance}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="className" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip />
+                <Bar dataKey="percentage" fill="#3b82f6" name="Attendance %" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         <div className="bg-white dark:bg-customDarkFg p-4 rounded border border-gray-200 dark:border-gray-600 shadow h-[300px]">
           <h2 className="text-md font-semibold mb-2">Gender Distribution</h2>
-          <ResponsiveContainer width="100%" height="95%">
-            <PieChart>
-              <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
-                {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend verticalAlign="bottom" height={36} />
-            </PieChart>
-          </ResponsiveContainer>
+          {!pieData ? (
+            <div className="flex flex-col items-center text-center">
+              <img
+                src={NoDataIllustration}
+                alt="No data"
+                className="w-40 mb-4 rounded-md"
+              />
+              <p className="text-gray-500 dark:text-gray-400">
+                No attendance recorded yet.
+              </p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="95%">
+              <PieChart>
+                <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label>
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" height={36} />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 
@@ -88,28 +118,54 @@ const TopLevelDashboard = ({ dashboardData,setDashboardData, onClassClicked }) =
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-white dark:bg-customDarkFg p-4 rounded border border-gray-200 dark:border-gray-600 shadow h-[300px]">
           <h2 className="text-md font-semibold mb-2">Daily Total Presentees</h2>
-          <ResponsiveContainer width="100%" height="85%">
-            <LineChart data={lineData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
+          {lineData.length === 0 ? (
+            <div className="flex flex-col items-center text-center">
+              <img
+                src={NoAttendanceDataIllustration}
+                alt="No data"
+                className="w-40 mb-4 rounded-md"
+              />
+              <p className="text-gray-500 dark:text-gray-400">
+                No attendance recorded yet.
+              </p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="85%">
+              <LineChart data={lineData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         <div className="bg-white dark:bg-customDarkFg p-4 rounded border border-gray-200 dark:border-gray-600 shadow h-[300px]">
           <h2 className="text-md font-semibold mb-2">Weekly Absentee Pattern</h2>
-          <ResponsiveContainer width="100%" height="85%">
-            <RadarChart outerRadius="80%" data={weeklyAbsenteeCount}>
-              <PolarGrid />
-              <PolarAngleAxis dataKey="day" />
-              <PolarRadiusAxis allowDecimals={false} />
-              <Radar name="Absents" dataKey="absent" stroke="#ef4444" fill="#ef4444" fillOpacity={0.6} />
-              <Tooltip />
-            </RadarChart>
-          </ResponsiveContainer>
+          {!weeklyAbsenteeCount ? (
+            <div className="flex flex-col items-center text-center">
+              <img
+                src={NoAttendanceDataIllustration}
+                alt="No data"
+                className="w-40 mb-4 rounded-md"
+              />
+              <p className="text-gray-500 dark:text-gray-400">
+                No attendance recorded yet.
+              </p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="85%">
+              <RadarChart outerRadius="80%" data={weeklyAbsenteeCount}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey="day" />
+                <PolarRadiusAxis allowDecimals={false} />
+                <Radar name="Absents" dataKey="absent" stroke="#ef4444" fill="#ef4444" fillOpacity={0.6} />
+                <Tooltip />
+              </RadarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 

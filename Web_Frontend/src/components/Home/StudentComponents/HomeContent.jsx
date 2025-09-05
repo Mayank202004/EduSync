@@ -39,7 +39,7 @@ const HomeContent = ({monthlyAttendance,attendanceOverMonths}) => {
 
   return (
     <div className="w-full h-full bg-customLightFg rounded-md dark:bg-customDarkBg overflow-y-auto">
-  <div className="max-w-5xl mx-auto space-y-5 h-full">
+      <div className="max-w-5xl mx-auto space-y-5 h-full">
         {/* Study Materials CTA */}
         <div className="flex flex-col md:flex-row items-center gap-6 bg-white dark:bg-customDarkFg p-6 rounded-2xl shadow-md">
           <img
