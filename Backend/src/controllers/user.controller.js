@@ -721,5 +721,101 @@ const bulkRegisterStudents = asyncHandler(async (req, res) => {
 });
 
 
+/**
+ * @desc    Super admin creates a new student (auto-verified)
+ * @route   POST /api/v1/users/create-student
+ * @access  Private (super admin only)
+ */
+export const createStudentByAdmin = asyncHandler(async (req, res) => {
+  const {fullName,email,username,className,div,gender,dob} = req.body;
+
+  const schoolId = req.school?._id;
+
+  // Validate required fields
+  if ([fullName, email, username, className, div, schoolId].some(f => !f || f?.toString().trim() === "")) {
+    throw new ApiError(400, "All required fields must be provided");
+  }
+
+  // Check if user already exists
+  const existingUser = await User.findOne({
+    $or: [{ email }, { username }],
+    schoolId
+  });
+  if (existingUser) {
+    throw new ApiError(400, "Username or email already exists");
+  }
+
+  // --- Password handling ---
+  // const randomPassword = generateRandomPassword(); // TODO: later enable
+  const password = "admin@123456"; // TEMP default password
+
+  const user = await User.create({
+    fullName,
+    email,
+    username,
+    password,
+    role: "student",
+    verified: true,
+    schoolId
+  });
+
+  if (!user) throw new ApiError(500, "Error creating user");
+
+  // Create Student profile
+  const student = await Student.create({
+    userId: user._id,
+    class: className.trim(),
+    div: div.trim(),
+    gender: gender,
+    dob: dob,
+    schoolId
+  });
+
+  if (!student) throw new ApiError(500, "Error creating student profile");
+
+  // --- CHAT GROUP HANDLING ---
+
+  // Join "School" group
+  await Chat.findOneAndUpdate(
+    { name: "School", isGroupChat: true, schoolId },
+    { $addToSet: { participants: user._id } },
+    { new: true }
+  );
+
+  // Join or create "Class" group (e.g., "Class 5-A")
+  let classChat = await Chat.findOne({ className, div, isGroupChat: true, schoolId });
+  if (classChat) {
+    classChat = await Chat.findOneAndUpdate(
+      { _id: classChat._id, schoolId },
+      { $addToSet: { participants: user._id } },
+      { new: true }
+    );
+  } else {
+    classChat = await Chat.create({
+      name: `Class ${className}-${div}`,
+      isGroupChat: true,
+      className,
+      div,
+      schoolId,
+      participants: [user._id],
+    });
+  }
+
+  // --- Mail sending (commented for now) ---
+  // await sendWelcomeMail(email, {
+  //   fullName,
+  //   username,
+  //   password: randomPassword
+  // });
+
+  const createdUser = await User.findById(user._id).select("-password -refreshToken -avatar");
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, { user: createdUser, student }, "Student created successfully by admin"));
+});
+
+
+
 
 export { registerUser, loginUser, logoutUser, refreshAccessToken, changeUserPassword, getCurrentUser, updateUser, updateUserAvatar, bulkRegisterStudents};
