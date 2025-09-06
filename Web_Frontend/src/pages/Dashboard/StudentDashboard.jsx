@@ -17,15 +17,23 @@ const StudentDashboard = () => {
   const [attendanceOverMonths, setAttendanceOverMonths] = useState(null);
   const [events, setEvents] = useState([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { showChatButton } = useChatsPanel();
 
   useEffect(() => {
     const getDashboardData = async () => {
-      const response = await fetchStudentDashboardData();
-      setChats(response?.data.chatData);
-      setAttendanceOverMonths(response?.data?.monthlyAttendancePercentage);
-      setMonthlyAttendance(response?.data?.attendanceForTheMonth);
-      setEvents(formatEvents(response?.data.events));
+      try{
+        setLoading(true);
+        const response = await fetchStudentDashboardData();
+        setChats(response?.data.chatData);
+        setAttendanceOverMonths(response?.data?.monthlyAttendancePercentage);
+        setMonthlyAttendance(response?.data?.attendanceForTheMonth);
+        setEvents(formatEvents(response?.data.events));
+      }catch(err){
+        // Handled by axios interceptor
+      }finally{
+        setLoading(false);
+      }
     };
     getDashboardData();
   }, []);
@@ -55,7 +63,7 @@ const StudentDashboard = () => {
       
       {/* Right Sidebar */}
       <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden lg:block">
-        <RightSidebar events={events} />
+        <RightSidebar events={events} isLoading={loading}/>
       </div>
 
 

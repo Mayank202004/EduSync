@@ -24,13 +24,21 @@ const SuperAdminDashboard = () => {
   const [events, setEvents] = useState([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { showChatButton } = useChatsPanel();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getDashboardData = async () => {
-      const response = await fetchSuperAdminDashboardData();
-      setChats(response?.data.chatData);
-      setAllUsers(response?.data.allUsers);
-      setEvents(formatEvents(response?.data.events));
+      try{
+        setLoading(true);
+        const response = await fetchSuperAdminDashboardData();
+        setChats(response?.data.chatData);
+        setAllUsers(response?.data.allUsers);
+        setEvents(formatEvents(response?.data.events));
+      }catch(err){
+        // Handled by axios interceptor
+      }finally{
+        setLoading(false);
+      }
     };
     getDashboardData();
   }, []);
@@ -85,7 +93,7 @@ const SuperAdminDashboard = () => {
 
       {/* Right Sidebar - Desktop only */}
       <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden lg:block">
-        <RightSidebar events={events} />
+        <RightSidebar events={events} isLoading={loading} />
       </div>
 
       {/* Floating Chat Button - Mobile only */}
