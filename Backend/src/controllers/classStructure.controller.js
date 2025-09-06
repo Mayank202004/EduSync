@@ -101,6 +101,22 @@ export const deleteClass = asyncHandler(async (req, res) => {
  * @access Private (Super admin)
  */
 export const getAllClasses = asyncHandler(async (req, res) => {
-    const classes = await ClassStructure.find({schoolId: req.school?._id}).sort({ className: 1 }).select("className divisions"); // Optional sorting by className
+    const classes = await fetchClassesBySchool(req.school?._id);
     res.status(200).json(new ApiResponse(200, classes, "Classes fetched successfully"));
 });
+
+/**
+ * Fetch all classes and their divisions for a given school
+ * @param {string} schoolId - The ID of the school
+ * @returns {Promise<Array>} - Array of classes with divisions
+ */
+export const fetchClassesBySchool = async (schoolId) => {
+  if (!schoolId) {
+    throw new Error("School ID is required");
+  }
+  try{
+      return await ClassStructure.find({ schoolId }).sort({ className: 1 }).select("className divisions");
+  }catch(error){
+    throw error;
+  }
+};

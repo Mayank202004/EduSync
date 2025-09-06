@@ -6,6 +6,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ClassStructure } from "../models/classStructure.model.js";
 import ExcelJS from "exceljs";
 import moment from "moment-timezone";
+import { fetchClassesBySchool } from "./classStructure.controller.js";
 
 /**
  * @desc Mark attendence of a class
@@ -1082,13 +1083,15 @@ export const getTeacherDashboardData = asyncHandler(async (req, res) => {
         genderStats,
         weeklyAbsenteeCount,
         divisionPresenteePercentage,
-        dailyTotalPresentee
+        dailyTotalPresentee,
+        classesDivisions
     ] = await Promise.all([
         getTopAttendees(className, div,req.school?._id),
         getGenderDistribution(className, div,req.school?._id),
         getWeeklyAbsenteeCount(className, div,req.school?._id),
         getDivisionWisePresenteePercentage(className,req.school?._id),
-        getDailyPresentee(className,div,req.school?._id)
+        getDailyPresentee(className,div,req.school?._id),
+        fetchClassesBySchool(req.school?._id)
     ]);
 
     res.status(200).json(new ApiResponse(
@@ -1098,7 +1101,8 @@ export const getTeacherDashboardData = asyncHandler(async (req, res) => {
             genderStats,
             weeklyAbsenteeCount,
             divisionPresenteePercentage,
-            dailyTotalPresentee
+            dailyTotalPresentee,
+            classesDivisions
         },
         "Dashboard data fetched successfully"
     ));

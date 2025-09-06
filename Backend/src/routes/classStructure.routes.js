@@ -6,12 +6,13 @@ import {
   deleteClass,
   getAllClasses
 } from "../controllers/classStructure.controller.js";
-import { verifyJWT, verifySuperAdmin } from "../middlewares/auth.middleware.js";
+import { verifyJWT, verifySuperAdmin, verifyTeacher} from "../middlewares/auth.middleware.js";
+import { orMiddleware } from "../middlewares/orMiddleware.js";
 
 const router = Router();
 
 // Protected Routes (Super Admin only)
-router.get("/", verifyJWT, verifySuperAdmin, getAllClasses);
+router.get("/", verifyJWT, orMiddleware([verifySuperAdmin, verifyTeacher]), getAllClasses);
 router.post("/add", verifyJWT, verifySuperAdmin, addClass);
 router.delete("/", verifyJWT, verifySuperAdmin, deleteClass);
 router.post("/add-div", verifyJWT, verifySuperAdmin, addDivision);

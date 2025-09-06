@@ -812,7 +812,7 @@ export const createStudentByAdmin = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(new ApiResponse(201, { user: createdUser, student }, "Student created successfully by admin"));
+    .json(new ApiResponse(201, null, "Student created successfully by admin"));
 });
 
 
@@ -927,7 +927,7 @@ export const createTeacherByAdmin = asyncHandler(async (req, res) => {
   }
 
   return res.status(201).json(
-    new ApiResponse(201, { user: createdUser, teacher }, "Teacher created and chats synced")
+    new ApiResponse(201, null, "Teacher created and chats synced")
   );
 });
 
