@@ -6,7 +6,7 @@ import UpcomingEvents from "@/components/Calendar/UpcommingEvents";
 import { useNavigate } from "react-router-dom";
 
 
-const RightSidebar = ({events}) => {
+const RightSidebar = ({events, isLoading}) => {
   const navigate = useNavigate();
   return (
     <div className="max-w-[85%] px-3 py-5 xl:p-5 text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md h-[calc(100%-30px)] flex flex-col">
@@ -18,7 +18,7 @@ const RightSidebar = ({events}) => {
         <h2 className="font-semibold text-1.5xl">Events</h2>
       </div>
       <div className="flex-1 overflow-y-auto">
-        <UpcomingEvents events={events} isLoading={false}/>
+        <UpcomingEvents events={events} isLoading={isLoading}/>
       </div>
 
       <button 
