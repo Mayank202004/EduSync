@@ -6,15 +6,9 @@ import resourceImg from "@/assets/homePage.svg";
 import teachingImg from "@/assets/teaching.png";
 import { CalendarCheck, Book, School } from "lucide-react";
 
-const TeacherHomeContent = () => {
+const TeacherHomeContent = ({teacherSubjects=[]}) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-
-  const teacherSubjects = [
-    { subject: "Mathematics", class: "10", division: "A" },
-    { subject: "Physics", class: "11", division: "B" },
-    { subject: "Computer Science", class: "12", division: "C" },
-  ];
 
   return (
     <div className="w-full h-full px-4 bg-customLightFg dark:bg-customDarkBg overflow-y-auto">

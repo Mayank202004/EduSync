@@ -15,6 +15,7 @@ const TeacherDashboard = () => {
   const [chats, setChats] = useState(null);
   const [events, setEvents] = useState([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [teacherSubjects, setTeacherSubjects] = useState([]);
   const { showChatButton } = useChatsPanel();
 
   useEffect(() => {
@@ -22,6 +23,7 @@ const TeacherDashboard = () => {
       const response = await fetchTeacherDashboardData();
       setChats(response?.data.chatData);
       setEvents(formatEvents(response?.data.events));
+      setTeacherSubjects(response?.data.teacherSubjects);
     };
     getDashboardData();
   }, []);
@@ -40,7 +42,7 @@ const TeacherDashboard = () => {
         <LeftSidebar chatData={chats} setChatData={setChats} />
       </div>
       <div className="w-full md:w-[70%] lg:w-[60%] h-[calc(100vh-100px)] mt-5">
-        <TeacherHomeContent />
+        <TeacherHomeContent teacherSubjects={teacherSubjects} />
       </div>
       <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden lg:block">
         <RightSidebar events={events} />
