@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Calendar from 'react-calendar';
 import { exportAttendance } from '@/services/attendenceService';
 
-function LeftSidebar({ onDateClicked = () => {}, markAttendance = ()=>{}, isClassTeacher, className='1', div='A'}) {
+function LeftSidebar({ onDateClicked = () => {}, markAttendance = ()=>{}, isClassTeacher, className, div,classesDivisions=[]}) {
   const [selectedClass, setSelectedClass] = useState(className);
   const [selectedDiv, setSelectedDiv] = useState(div);
   const [showAttendanceForm, setShowAttendanceForm] = useState(false);
@@ -13,6 +13,10 @@ function LeftSidebar({ onDateClicked = () => {}, markAttendance = ()=>{}, isClas
   const isViewingOwnClass = isClassTeacher &&
     selectedClass === className &&
     selectedDiv === div;
+
+  const currentClass = classesDivisions.find(
+    (cls) => cls.className === selectedClass
+  );
 
   return (
       <div className="w-full p-4 bg-white dark:bg-customDarkFg rounded h-full">
@@ -26,23 +30,33 @@ function LeftSidebar({ onDateClicked = () => {}, markAttendance = ()=>{}, isClas
           <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">Class</label>
           <select
             value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
+            onChange={(e) => {
+              setSelectedClass(e.target.value);
+              setSelectedDiv(""); 
+            }}
             className="w-full border p-2 rounded dark:bg-customDarkFg dark:text-white dark:border-gray-600"
           >
             <option value="">-- Select --</option>
-            <option value="1">Class 1</option>
-            <option value="2">Class 2</option>
+            {classesDivisions.map((cls) => (
+              <option key={cls._id} value={cls.className}>
+                Class {cls.className}
+              </option>
+            ))}
           </select>
 
           <label className="block text-sm font-medium text-gray-700 dark:text-white mt-4 mb-1">Division</label>
           <select
             value={selectedDiv}
             onChange={(e) => setSelectedDiv(e.target.value)}
+            disabled={!currentClass}
             className="w-full border p-2 rounded dark:bg-customDarkFg dark:text-white dark:border-gray-600"
           >
             <option value="">-- Select --</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
+            {currentClass?.divisions?.map((division) => (
+              <option key={division} value={division}>
+                {division}
+              </option>
+            ))}
           </select>
           <button
             onClick={() => {markAttendance(selectedClass,selectedDiv)}}

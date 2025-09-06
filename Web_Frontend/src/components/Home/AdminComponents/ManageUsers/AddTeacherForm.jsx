@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { ArrowLeft, PlusCircle, Trash2 } from "lucide-react";
 import Modal from "@/components/Modals/Modal";
+import toast from "react-hot-toast";
+import { registerTeacherBySuperAdmin } from "@/services/dashboardService";
 
 const AddTeacherForm = ({ onBack }) => {
   const [formData, setFormData] = useState({
@@ -17,6 +19,8 @@ const AddTeacherForm = ({ onBack }) => {
   });
 
   const [showModal, setShowModal] = useState(false);
+
+  const teacherPositions = ["PGT", "TGT", "PRT", "Sports Teacher", "Principal", "Vice Principal", "Music Teacher", "Art Teacher"];
 
   // --- Handle simple input fields ---
   const handleChange = (e) => {
@@ -66,6 +70,22 @@ const AddTeacherForm = ({ onBack }) => {
     setFormData((prev) => ({ ...prev, subjects: updated }));
   };
 
+  const removeClassFromSubject = (sIndex, cIndex) => {
+    const updated = [...formData.subjects];
+    updated[sIndex].classes = updated[sIndex].classes.filter((_, i) => i !== cIndex);
+    setFormData((prev) => ({ ...prev, subjects: updated }));
+  };
+
+  const removeDivFromClass = (sIndex, cIndex, dIndex) => {
+    const updated = [...formData.subjects];
+    updated[sIndex].classes[cIndex].div = updated[sIndex].classes[cIndex].div.filter(
+      (_, i) => i !== dIndex
+    );
+    setFormData((prev) => ({ ...prev, subjects: updated }));
+  };
+
+
+
   const handleDivChange = (sIndex, cIndex, dIndex, value) => {
     const updated = [...formData.subjects];
     updated[sIndex].classes[cIndex].div[dIndex] = value;
@@ -91,8 +111,19 @@ const AddTeacherForm = ({ onBack }) => {
     setShowModal(true);
   };
 
-  const handleFinalSubmit = () => {
-    console.log("Payload:", formData);
+  const handleFinalSubmit = async () => {
+    try{
+      const response = await toast.promise(
+        registerTeacherBySuperAdmin(formData),
+        {
+          loading: "Registering Teacher...",
+          success: "Teacher registered successfully",
+          error: "", // handled by interceptor
+        }
+      )
+    } catch(err){
+      // Handled by axios interceptor
+    }
     setShowModal(false);
   };
 
@@ -138,14 +169,19 @@ const AddTeacherForm = ({ onBack }) => {
               className="p-2 border rounded"
               required
             />
-            <input
-              type="text"
+            <select
               name="position"
-              placeholder="Position (Optional)"
               value={formData.position || ""}
               onChange={handleChange}
               className="p-2 border rounded"
-            />
+            >
+              <option value="">Select Position (Optional)</option>
+              {teacherPositions.map((pos, index) => (
+                <option key={index} value={pos}>
+                  {pos}
+                </option>
+              ))}
+            </select>
             <input
               type="text"
               name="phone"
@@ -259,7 +295,7 @@ const AddTeacherForm = ({ onBack }) => {
               {formData.subjects.map((subject, sIndex) => (
                 <div
                   key={sIndex}
-                  className="p-3 border rounded-lg bg-gray-50 dark:bg-gray-800"
+                  className="p-3 border rounded-lg bg-gray-50 dark:bg-customDarkFg"
                 >
                   <div className="flex items-center gap-2">
                     <input
@@ -290,43 +326,66 @@ const AddTeacherForm = ({ onBack }) => {
                     {subject.classes.map((cls, cIndex) => (
                       <div
                         key={cIndex}
-                        className="p-2 border rounded bg-white dark:bg-gray-700"
+                        className="p-2 border rounded bg-white dark:bg-customDarkFg"
                       >
-                        <div className="flex items-center gap-2 mb-2">
-                          <input
-                            type="text"
-                            placeholder="Class"
-                            value={cls.class}
-                            onChange={(e) =>
-                              handleClassChange(sIndex, cIndex, e.target.value)
-                            }
-                            className="p-2 border rounded"
-                          />
+                        <div className="flex items-center justify-between mb-2">
+                          {/* Class input */}
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              placeholder="Class"
+                              value={cls.class}
+                              onChange={(e) => handleClassChange(sIndex, cIndex, e.target.value)}
+                              className="p-2 border rounded"
+                              />
+
+                            {/* Add Division button */}
+                            <button
+                              type="button"
+                              onClick={() => addDivToClass(sIndex, cIndex)}
+                              className="text-blue-600 hover:text-blue-800"
+                            >
+                              + Div
+                            </button>
+                          </div>
+
+                          {/* Delete Class button */}
                           <button
                             type="button"
-                            onClick={() => addDivToClass(sIndex, cIndex)}
-                            className="text-purple-600 hover:text-purple-800"
+                            onClick={() => removeClassFromSubject(sIndex, cIndex)}
+                            className="text-red-600 hover:text-red-800"
                           >
-                            + Div
+                            <Trash2 size={18} />
                           </button>
                         </div>
 
                         {/* Divisions inside Class */}
                         <div className="pl-6 flex gap-2 flex-wrap">
                           {cls.div.map((d, dIndex) => (
-                            <input
-                              key={dIndex}
-                              type="text"
-                              placeholder="Div"
-                              value={d}
-                              onChange={(e) =>
-                                handleDivChange(sIndex, cIndex, dIndex, e.target.value)
-                              }
-                              className="p-2 border rounded w-16"
-                            />
+                            <div key={dIndex} className="flex items-center gap-1">
+                              <input
+                                type="text"
+                                placeholder="Div"
+                                value={d}
+                                onChange={(e) =>
+                                  handleDivChange(sIndex, cIndex, dIndex, e.target.value)
+                                }
+                                className="p-2 border rounded w-16"
+                              />
+
+                              {/* Delete Division button */}
+                              <button
+                                type="button"
+                                onClick={() => removeDivFromClass(sIndex, cIndex, dIndex)}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
                           ))}
                         </div>
                       </div>
+
                     ))}
                   </div>
                 </div>

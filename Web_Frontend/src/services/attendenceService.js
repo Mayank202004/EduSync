@@ -56,6 +56,15 @@ export const getStudentList = async (className, div) => {
 }
 
 /**
+ * @desc Function to fetch all classes and divisions 
+ * @returns {Promise<Object>} - Promise resolving to the list of classes and divisions
+ */
+export const getAllClasses = async () => {
+    const response = await axiosInstance.get(`${BASEURL}/class/`);
+    return response.data;
+}
+
+/**
  * @desc Mark attendance
  * @param {Array<String>} absentStudents - Array of _id (Student Id) of absent students
  * @param {Array<String>} permittedLeaveStudents - Array of _id (Student Id) of students who have permitted leave

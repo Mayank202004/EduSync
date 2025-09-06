@@ -38,7 +38,7 @@ const AddStudentForm = ({ onBack }) => {
         registerStudentBySuperAdmin(formData),
         {
           loading: "Registering Student...",
-          success: "Students registered successfully",
+          success: "Student registered successfully",
           error: "", // handled by interceptor
         }
       )

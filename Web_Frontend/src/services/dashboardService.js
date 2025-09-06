@@ -223,3 +223,8 @@ export const registerStudentBySuperAdmin = async (formData) => {
   const response = await axiosInstance.post(`${BASEURL}/users/register-student`, formData);
   return response.data;
 }
+
+export const registerTeacherBySuperAdmin = async (formData) => {
+  const response = await axiosInstance.post(`${BASEURL}/users/register-teacher`, formData);
+  return response.data;
+}

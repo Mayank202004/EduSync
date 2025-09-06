@@ -5,39 +5,45 @@ import AttendanceDashboard from '@/components/Attendance/Dashboard';
 import LeftSidebar from '@/components/Attendance/LeftSidebar';
 import DaysSummary from '@/components/Attendance/DaysSummary';
 import { useEffect } from 'react';
-import { getAttendanceDashboardData } from '@/services/attendenceService';
+import { getAllClasses, getAttendanceDashboardData } from '@/services/attendenceService';
 import MarkAttendance from '@/components/Attendance/MarkAttendance';
 import { useAuth } from '@/context/AuthContext';
 
 function TeacherAttendance() {
   const { roleInfo } = useAuth();
   const isClassTeacher = !!roleInfo?.classTeacher;
-  const OwnClass = roleInfo?.classTeacher?.class ?? '1';
-  const OwnDiv = roleInfo?.classTeacher?.div ?? 'A';
+  const OwnClass = roleInfo?.classTeacher?.class;
+  const OwnDiv = roleInfo?.classTeacher?.div;
 
 
   // States
-  const [selectedClass, setSelectedClass] = useState(OwnClass ?? '1');
-  const [selectedDiv, setSelectedDiv] = useState(OwnDiv ?? 'A');
+  const [selectedClass, setSelectedClass] = useState(OwnClass);
+  const [selectedDiv, setSelectedDiv] = useState(OwnDiv);
   const [showAttendanceForm, setShowAttendanceForm] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
   const [isMarkingAttendance, setIsMarkingAttendance] = useState(false);
+  const [classesDivisions, setClassesDivisions] = useState(null);
+
 
   useEffect(() => {
-    if (!isClassTeacher) {
-      return;
-    }
-    const fetchDashboardData = async () => {
+    const fetchData = async () => {
       try {
-        const response = await getAttendanceDashboardData(OwnClass,OwnDiv);
-        setDashboardData(response.data);
+        if (!isClassTeacher) {
+          const response = await getAllClasses();
+          setClassesDivisions(response.data);
+        } else {
+          const response = await getAttendanceDashboardData(OwnClass, OwnDiv);
+          setDashboardData(response.data);
+          setClassesDivisions(response.data?.classesDivisions);
+        }
       } catch (error) {
         // handled by axios interceptor
       }
     };
-    fetchDashboardData();
-  }, [isClassTeacher,OwnClass,OwnDiv]);
+    fetchData();
+  }, [isClassTeacher, OwnClass, OwnDiv]);
+
 
   const handleMarkAttendance = (className, div) => {
     setSelectedClass(className);
@@ -55,6 +61,7 @@ return (
         isClassTeacher={isClassTeacher}
         className={OwnClass}
         div={OwnDiv}
+        classesDivisions={classesDivisions ?? []}
         onDateClicked={(date) => {
           setIsMarkingAttendance(false);
           setSelectedDate(date);
