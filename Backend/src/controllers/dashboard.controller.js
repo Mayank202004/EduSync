@@ -12,6 +12,7 @@ import { ClassStructure } from "../models/classStructure.model.js";
 import { Student } from "../models/student.model.js";
 import { returnAllEvents } from "./calendar.controller.js";
 import { deleteAllEvents } from "./calendar.controller.js";
+import { formatTeacherSubjects } from "./teacher.controller.js";
 
 export const fetchDashboardData = asyncHandler(async (req, res) => {
     const user = req.user;
@@ -27,7 +28,8 @@ export const fetchTeacherDashboardData = asyncHandler(async (req, res) => {
     const teacher = req.teacher;
     const chatData = await getTeacherChats(teacher,req.school?._id);
     const events = await returnAllEvents(req.school?._id);
-    return res.status(200).json(new ApiResponse(200, {chatData,events}, "Teacher Dashboard data fetched successfully"));
+    const teacherSubjects = formatTeacherSubjects(teacher.subjects);
+    return res.status(200).json(new ApiResponse(200, {chatData,events,teacherSubjects}, "Teacher Dashboard data fetched successfully"));
 });
 
 export const fetchSuperAdminDashboardData = asyncHandler(async (req, res) => {

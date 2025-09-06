@@ -209,3 +209,29 @@ export const getUnverifiedTeachers = asyncHandler(async (req, res) => {
     new ApiResponse(200, unverifiedTeachers, "Unverified teachers fetched successfully")
   );
 });
+
+
+/**
+ * @desc Helper function to return teacher subjects in format [{subject,class,div}]
+ * @param {Object} teacherSubjects  teacher subjects 
+ * @returns {Array} array of subjects
+ */
+export const formatTeacherSubjects = (teacherSubjects) => {
+
+  if (!teacherSubjects || !Array.isArray(teacherSubjects) || teacherSubjects.length === 0) return [];
+
+  const subjects = [];
+
+  teacherSubjects.forEach((subj) => {
+    subj.classes.forEach((cls) => {
+      cls.div.forEach((division) => {
+        subjects.push({
+          subject: subj.name,
+          class: cls.class,
+          division,
+        });
+      });
+    });
+  });
+  return subjects;
+};
