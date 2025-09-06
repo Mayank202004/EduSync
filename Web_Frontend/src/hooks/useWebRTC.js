@@ -92,15 +92,15 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
     });
 
     socket.on("user-joined", ({ socketId, user }) => {
-      // console.log("respomdig to user-joined", { socketId, user });
       setTimeout(() => {
-       socket.emit("update-media-state", {
-        roomId,
-        videoEnabled: cam,
-        audioEnabled: mic,
-        screenSharing: false,
-      });
-      }, 500);
+        socket.emit("update-media-state", {
+          roomId,
+          videoEnabled: cam,
+          audioEnabled: mic,
+          screenSharing: false,
+        });
+        playSound(joinSound);
+      }, 1000);
     });
 
     socket.on("offer", handleReceiveOffer);
