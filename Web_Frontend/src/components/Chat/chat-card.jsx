@@ -303,11 +303,13 @@ const ChatCard = ({
         </div>
         <div className="flex flex-col flex-grow min-h-0">
           <div
-            className={`chat-messages px-4 pt-4 space-y-4 overflow-y-auto  flex-grow min-h-0 max-h-96`}
+            className={`chat-messages px-4 pt-4 space-y-4 overflow-y-auto overflow-x-hidden flex-grow min-h-0 max-h-96`}
             ref={chatMessagesRef}
           >
             {loading ? (
               <>
+                <MessageSkeleton />
+                <MessageSkeleton />
                 <MessageSkeleton />
                 <MessageSkeleton />
                 <MessageSkeleton />
@@ -332,7 +334,7 @@ const ChatCard = ({
                     />
                   </div>
 
-                  <div className="message-content flex flex-col">
+                  <div className="message-content flex flex-col w-full">
                     <div className="message-header flex justify-between text-sm text-gray-400 gap-3">
                       <span className="sender-name text-black dark:text-white font-bold break-words flex-grow">
                         {message.sender.fullName}
@@ -380,7 +382,14 @@ const ChatCard = ({
 
                     {/* Message Attachments */}
                     {message.attachments?.length > 0 && (
-                      <div className="attachments grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
+                      <div className={`attachments grid  ${
+                        message.attachments.length === 1 
+                        ? "grid-cols-1" 
+                        : message.attachments.length === 2 
+                        ? "grid-cols-2" 
+                        : "grid-cols-2 sm:grid-cols-3"} 
+                        gap-3 mt-2`
+                      }>
                         {message.attachments.map((file, idx) => {
                           const isObject = typeof file !== "string";
                           const fileType = isObject ? file.type : "";
@@ -397,7 +406,7 @@ const ChatCard = ({
                               {isImage ? (
                                 <>
                                   <button
-                                    className="relative min-w-56 max-w-9/10 hover:opacity-80 flex object-cover cursor-pointer"
+                                    className="relative hover:opacity-80 flex object-cover cursor-pointer"
                                     onClick={() => {
                                       setPreviewDetails({
                                         fullName: message.sender.fullName,
