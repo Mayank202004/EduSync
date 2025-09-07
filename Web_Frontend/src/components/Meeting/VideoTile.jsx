@@ -1,21 +1,25 @@
 import { Mic, MicOff, Video, VideoOff, Pin, PinOff } from "lucide-react";
 import Avatar from "./Avatar";
 import { cn } from "@/lib/cn";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 const VideoTile = ({ participant, pinned = false, setPinned = () => {} }) => {
-  const { _id, name, videoEnabled, audioEnabled, videoRef, avatar, isLocal } = participant;
+  const { _id, name, videoEnabled, audioEnabled, videoRef, avatar, isLocal, isSpeaking, handRaised } = participant;
 
-  // 🔌 Attach local MediaStream to video element
+  // Attach MediaStream
   useEffect(() => {
-  if (videoRef?.current && participant?.stream) {
+    if (videoRef?.current && participant?.stream) {
       videoRef.current.srcObject = participant.stream;
     }
   }, [videoRef, participant?.stream]);
 
-
   return (
-    <div className="relative bg-gray-800 rounded-2xl overflow-hidden shadow-lg group">
+    <div
+      className={cn(
+        "relative bg-gray-800 rounded-2xl overflow-hidden shadow-lg group transition-all duration-300",
+        isSpeaking && "ring-4 ring-green-400 animate-pulse" // Speaking indicator
+      )}
+    >
       <video
         ref={videoRef}
         autoPlay
@@ -31,6 +35,11 @@ const VideoTile = ({ participant, pinned = false, setPinned = () => {} }) => {
         <div className="w-full h-full flex items-center justify-center text-white bg-gray-700 text-3xl font-semibold">
           <Avatar name={name} avatar={avatar} />
         </div>
+      )}
+
+      {/* Hand Raised Indicator */}
+      {handRaised && (
+        <span className="absolute top-2 left-2 text-yellow-400 text-xl animate-bounce">✋</span>
       )}
 
       {/* Translucent overlay + Pin icon */}
@@ -50,18 +59,10 @@ const VideoTile = ({ participant, pinned = false, setPinned = () => {} }) => {
       {/* Audio/Video Icons */}
       <div className="absolute bottom-2 left-2 flex gap-2 text-white opacity-0 group-hover:opacity-100 transition">
         <div className="bg-black/50 p-1 rounded-full">
-          {audioEnabled ? (
-            <Mic className="w-4 h-4" />
-          ) : (
-            <MicOff className="w-4 h-4 text-red-500" />
-          )}
+          {audioEnabled ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4 text-red-500" />}
         </div>
         <div className="bg-black/50 p-1 rounded-full">
-          {videoEnabled ? (
-            <Video className="w-4 h-4" />
-          ) : (
-            <VideoOff className="w-4 h-4 text-red-500" />
-          )}
+          {videoEnabled ? <Video className="w-4 h-4" /> : <VideoOff className="w-4 h-4 text-red-500" />}
         </div>
       </div>
 

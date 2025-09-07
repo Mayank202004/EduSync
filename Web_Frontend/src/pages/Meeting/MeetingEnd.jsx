@@ -6,6 +6,8 @@ export default function MeetingEnded() {
   const navigate = useNavigate();
 
   const reason = location.state?.reason || "You left the meeting";
+  const hostId = location.state?.hostId;
+  const roomId = location.state?.roomId;
   const duration = 60; // seconds
 
   const [counter, setCounter] = useState(duration);
@@ -75,7 +77,15 @@ export default function MeetingEnded() {
 
       <div className="flex gap-4 mb-6">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            if (location.state?.roomId && location.state?.hostId) {
+              navigate(`/meeting/${roomId}`, {
+                state: { hostId: hostId }
+              });
+            } else {
+              navigate("/"); // fallback
+            }
+          }}
           className="px-6 py-2 rounded-full border border-gray-300 hover:bg-gray-100"
         >
           Rejoin

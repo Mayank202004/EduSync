@@ -4,16 +4,18 @@ import { mediaConstraints } from "@/lib/webrtc/constraints";
 import { useNavigate } from "react-router-dom";
 import playSound from "@/utils/playSound";
 import joinSound from "@/assets/sounds/userJoined.mp3";
+import setupAudioAnalyser from "@/utils/setupAudioAnalyzer";
 
-export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin, initialMic = true, initialCam = true) {
-  const [mic, setMic] = useState(true);
-  const [cam, setCam] = useState(true);
+export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin, initialMic = true, initialCam = true, hostId) {
+  const [mic, setMic] = useState(initialMic);
+  const [cam, setCam] = useState(initialCam);
   const [screen, setScreen] = useState(false);
   const localVideoRef = useRef(null);
   const [participants, setParticipants] = useState([]);
   const [handRaised, setHandRaised] = useState(false);
   const [messages, setMessages] = useState([]);
   const peerMetadata = useRef({});
+  const audioAnalysers = useRef({});
   const navigate = useNavigate();
 
   const [hostControls, setHostControls] = useState({
@@ -52,6 +54,7 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
             isYou: true,
             isHost: isHost,
             handRaised: false,
+            isSpeaking: false,
           },
         ]);
       } catch (err) {
@@ -172,13 +175,12 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
     const videoTrack = stream.getVideoTracks()[0];
     const audioTrack = stream.getAudioTracks()[0];
     const isScreenTrack = peerMetadata.current[socketId]?.isScreen || false;
-    
-
     const participantId = isScreenTrack ? `screen-${socketId}` : socketId;
+
     const userMeta = peerMetadata.current[socketId]?.user || {};
-const participantName = isScreenTrack
-  ? `${userMeta.fullName || `User ${socketId}`} (Screen)`
-  : userMeta.fullName || `User ${socketId}`;
+    const participantName = isScreenTrack
+      ? `${userMeta.fullName || `User ${socketId}`} (Screen)`
+      : userMeta.fullName || `User ${socketId}`;
 
 
     const videoRef = { current: document.createElement("video") };
@@ -267,6 +269,10 @@ const participantName = isScreenTrack
       peerConnections.current[socketId].close();
       delete peerConnections.current[socketId];
     }
+    if (audioAnalysers.current[socketId]) {
+      audioAnalysers.current[socketId](); // call cleanup
+      delete audioAnalysers.current[socketId];
+    }
     setParticipants((prev) => prev.filter((p) => p._id !== socketId));
   };
 
@@ -286,6 +292,16 @@ const participantName = isScreenTrack
           p.isLocal ? { ...p, audioEnabled: enabled } : p
         )
       );
+
+      if (enabled) {
+        // start analyser for local mic
+        const cleanup = setupAudioAnalyser(socket.id, localStream.current, setParticipants);
+        audioAnalysers.current[socket.id] = cleanup;
+      } else {
+        // stop analyser
+        audioAnalysers.current[socket.id]?.();
+        delete audioAnalysers.current[socket.id];
+      }
 
       socket.emit("update-media-state", {
         roomId,
@@ -451,8 +467,7 @@ const participantName = isScreenTrack
     }
 
     setParticipants([]);
-    navigate("/meeting/end", { state: { reason } });
-
+    navigate("/meeting/end", { state: { reason, roomId, hostId: hostId }});
   };
 
   const handleKickedOut = () => {
@@ -468,6 +483,17 @@ const participantName = isScreenTrack
             return null;
           }
           if (p._id === socketId) { // Cam or mic toggle 
+            if (audioEnabled !== undefined) {
+              if (audioEnabled && !audioAnalysers.current[socketId] && p.stream) {
+                // start analyser
+                const cleanup = setupAudioAnalyser(socketId, p.stream, setParticipants);
+                audioAnalysers.current[socketId] = cleanup;
+              } else if (!audioEnabled && audioAnalysers.current[socketId]) {
+                // stop analyser
+                audioAnalysers.current[socketId]();
+                delete audioAnalysers.current[socketId];
+              }
+            }
             return {
               ...p,
               videoEnabled: videoEnabled ?? p.videoEnabled,
@@ -571,7 +597,6 @@ const participantName = isScreenTrack
     messages,
     setMessages,
     screen,
-    hostControls,
     setHostControls
   };
 }

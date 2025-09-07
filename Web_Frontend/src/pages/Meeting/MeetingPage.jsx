@@ -44,7 +44,7 @@ export default function MeetingPage() {
     setMessages,
     hostControls,
     setHostControls
-  } = useWebRTC(socket, meetingId, CurrentUser,isHost, hasJoined, preJoinMic, preJoinCam); 
+  } = useWebRTC(socket, meetingId, CurrentUser,isHost, hasJoined, preJoinMic, preJoinCam, hostId); 
 
   const [showParticipants, setShowParticipants] = useState(false);
   const [showChat, setShowChat] = useState(false);
