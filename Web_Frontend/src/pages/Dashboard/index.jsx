@@ -29,11 +29,11 @@ export default function Resources() {
       Component = SystemAdminDashboard;
       break;
     default:
-      return <Unauthorized401 />; 
+      return <Unauthorized401 />;
   }
 
   return (
-    <Suspense fallback={<LoadingScreen/>}>
+    <Suspense fallback={<LoadingScreen />}>
       <Component />
     </Suspense>
   );

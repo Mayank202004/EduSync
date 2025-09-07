@@ -19,8 +19,8 @@ const TeacherDashboard = () => {
   const [teacherSubjects, setTeacherSubjects] = useState([]);
   const { showChatButton } = useChatsPanel();
   const [loading, setLoading] = useState(true);
-  const { unreadCounts, setUnreadCounts } = useSocket(); 
-  
+  const { unreadCounts, setUnreadCounts } = useSocket();
+
   // Sum all chat unread counts (Used for mobile screen floating chat button)
   const totalUnread = Object.values(unreadCounts || {}).reduce(
     (sum, count) => sum + count,
@@ -29,15 +29,15 @@ const TeacherDashboard = () => {
 
   useEffect(() => {
     const getDashboardData = async () => {
-      try{
+      try {
         setLoading(true);
         const response = await fetchTeacherDashboardData();
         setChats(response?.data.chatData);
         setEvents(formatEvents(response?.data.events));
         setTeacherSubjects(response?.data.teacherSubjects);
-      }catch(err){
+      } catch (err) {
         // Handled by axios interceptor
-      }finally{
+      } finally {
         setLoading(false);
       }
     };

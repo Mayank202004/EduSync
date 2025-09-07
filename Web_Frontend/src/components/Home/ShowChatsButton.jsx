@@ -22,19 +22,17 @@ const ShowChatsButton = ({ onClick, isShown, unreadCount }) => {
             />
 
             {/* Unread Count Badge*/}
-            {/* Unread Count Badge */}
-{unreadCount > 0 && (
-  <span
-    className={cn(
-      "absolute -top-1 -right-1 flex items-center justify-center",
-      "h-5 w-5 rounded-full bg-red-600 text-white text-[10px] font-bold",
-      "border-2 border-white shadow-md"
-    )}
-  >
-    {unreadCount > 9 ? "9+" : unreadCount}
-  </span>
-)}
-
+            {unreadCount > 0 && (
+              <span
+                className={cn(
+                  "absolute -top-1 -right-1 flex items-center justify-center",
+                  "h-5 w-5 rounded-full bg-red-600 text-white text-[10px] font-bold",
+                  "border-2 border-white shadow-md"
+                )}
+              >
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </div>
         }
         className="bg-blue-600 hover:bg-blue-700 w-fit text-white rounded-md shadow-lg"

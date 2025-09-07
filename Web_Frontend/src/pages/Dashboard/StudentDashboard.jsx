@@ -21,7 +21,7 @@ const StudentDashboard = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { showChatButton } = useChatsPanel();
-  const { unreadCounts, setUnreadCounts } = useSocket(); 
+  const { unreadCounts, setUnreadCounts } = useSocket();
 
   // Sum all chat unread counts (Used for mobile screen floating chat button)
   const totalUnread = Object.values(unreadCounts || {}).reduce(
@@ -31,16 +31,16 @@ const StudentDashboard = () => {
 
   useEffect(() => {
     const getDashboardData = async () => {
-      try{
+      try {
         setLoading(true);
         const response = await fetchStudentDashboardData();
         setChats(response?.data.chatData);
         setAttendanceOverMonths(response?.data?.monthlyAttendancePercentage);
         setMonthlyAttendance(response?.data?.attendanceForTheMonth);
         setEvents(formatEvents(response?.data.events));
-      }catch(err){
+      } catch (err) {
         // Handled by axios interceptor
-      }finally{
+      } finally {
         setLoading(false);
       }
     };
@@ -76,7 +76,7 @@ const StudentDashboard = () => {
       <div className="md:w-[30%] lg:w-[20%] border-r border-gray-200 dark:border-gray-700 hidden md:block">
         <LeftSidebar chatData={chats} setChatData={setChats} />
       </div>
-      
+
       {/* Main Content */}
       <div className="w-full md:w-[70%] lg:w-[60%] h-[calc(100vh-100px)] mt-5 px-4">
         <HomeContent
@@ -84,10 +84,10 @@ const StudentDashboard = () => {
           attendanceOverMonths={attendanceOverMonths}
         />
       </div>
-      
+
       {/* Right Sidebar */}
       <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden lg:block">
-        <RightSidebar events={events} isLoading={loading}/>
+        <RightSidebar events={events} isLoading={loading} />
       </div>
 
 

@@ -1,14 +1,14 @@
-import { useState, useRef} from "react";
+import { useState, useRef } from "react";
 import MeetingLayout from "@/components/Meeting/MeetingLayout";
 import ControlsBar from "@/components/Meeting/ControlsBar";
 import useWebRTC from "@/hooks/useWebRTC";
 import { useSocket } from "@/context/SocketContext";
 import { useAuth } from "@/context/AuthContext";
-import { useParams, useLocation} from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import PreJoinScreen from "@/components/Meeting/PreJoiningScreen";
 
 export default function MeetingPage() {
-  const { socket } = useSocket(); 
+  const { socket } = useSocket();
   const { user } = useAuth();
   const { meetingId } = useParams();
 
@@ -44,7 +44,7 @@ export default function MeetingPage() {
     setMessages,
     hostControls,
     setHostControls
-  } = useWebRTC(socket, meetingId, CurrentUser,isHost, hasJoined, preJoinMic, preJoinCam, hostId); 
+  } = useWebRTC(socket, meetingId, CurrentUser, isHost, hasJoined, preJoinMic, preJoinCam, hostId);
 
   const [showParticipants, setShowParticipants] = useState(false);
   const [showChat, setShowChat] = useState(false);

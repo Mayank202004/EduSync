@@ -26,8 +26,8 @@ const SuperAdminDashboard = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { showChatButton } = useChatsPanel();
   const [loading, setLoading] = useState(true);
-  const { unreadCounts, setUnreadCounts } = useSocket(); 
-  
+  const { unreadCounts, setUnreadCounts } = useSocket();
+
   // Sum all chat unread counts (Used for mobile screen floating chat button)
   const totalUnread = Object.values(unreadCounts || {}).reduce(
     (sum, count) => sum + count,
@@ -36,15 +36,15 @@ const SuperAdminDashboard = () => {
 
   useEffect(() => {
     const getDashboardData = async () => {
-      try{
+      try {
         setLoading(true);
         const response = await fetchSuperAdminDashboardData();
         setChats(response?.data.chatData);
         setAllUsers(response?.data.allUsers);
         setEvents(formatEvents(response?.data.events));
-      }catch(err){
+      } catch (err) {
         // Handled by axios interceptor
-      }finally{
+      } finally {
         setLoading(false);
       }
     };

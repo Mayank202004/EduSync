@@ -50,32 +50,32 @@ const LeftSidebar = ({ chatData, setChatData, isMobile = false, searchUsers = []
 
   // Create new chat if no personal chat exists (On receive)
   useEffect(() => {
-  if (!socket || !user) return;
-  const handleNotify = ({ chatId, from, content }) => {
-    const isExisting = (chatData?.personalChats || []).some(chat => chat._id === chatId);
+    if (!socket || !user) return;
+    const handleNotify = ({ chatId, from, content }) => {
+      const isExisting = (chatData?.personalChats || []).some(chat => chat._id === chatId);
 
-    if (isExisting) return;
+      if (isExisting) return;
 
-    const newChat = {
-      _id: chatId,
-      participants: [from, CURRENT_USER],
-      updatedAt: new Date().toISOString(),
-      unreadMessageCount: 1,
-      student: from.role === "student" ? from : undefined,
-      teacher: from.role === "teacher" ? from : undefined,
-      user : from ?? undefined, 
-      userId: from?._id
+      const newChat = {
+        _id: chatId,
+        participants: [from, CURRENT_USER],
+        updatedAt: new Date().toISOString(),
+        unreadMessageCount: 1,
+        student: from.role === "student" ? from : undefined,
+        teacher: from.role === "teacher" ? from : undefined,
+        user: from ?? undefined,
+        userId: from?._id
+      };
+
+      setChatData(prev => ({
+        ...prev,
+        personalChats: [newChat, ...(prev?.personalChats || [])],
+      }));
     };
 
-    setChatData(prev => ({
-      ...prev,
-      personalChats: [newChat, ...(prev?.personalChats || [])],
-    }));
-  };
-
-  socket.on("notifyNewMessage", handleNotify);
-  return () => socket.off("notifyNewMessage", handleNotify);
-}, [socket, user, chatData, setChatData]);
+    socket.on("notifyNewMessage", handleNotify);
+    return () => socket.off("notifyNewMessage", handleNotify);
+  }, [socket, user, chatData, setChatData]);
 
 
 
@@ -164,7 +164,7 @@ const LeftSidebar = ({ chatData, setChatData, isMobile = false, searchUsers = []
   const [containerRef] = useClickOutside(handleChatClose);
 
   return (
-    <div className={cn("p-5  text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto h-[calc(100%-30px)] flex flex-col", isMobile ? "w-full my-0 h-[calc(100%-60px)]" :  "max-w-17/20")}>
+    <div className={cn("p-5  text-sm my-5 mx-auto bg-white dark:bg-customDarkFg rounded-md overflow-y-auto h-[calc(100%-30px)] flex flex-col", isMobile ? "w-full my-0 h-[calc(100%-60px)]" : "max-w-17/20")}>
       <div className="flex items-center justify-center gap-2 mb-3 px-3">
         <FontAwesomeIcon icon={faMessage} className="dark:text-white text-black text-1.5xl" />
         <h2 className="font-semibold text-1.5xl">Channels</h2>
@@ -182,15 +182,15 @@ const LeftSidebar = ({ chatData, setChatData, isMobile = false, searchUsers = []
             unreadCount={unreadCounts[chatData.announcements[0]?._id] || 0}
             onUnreadReset={handleUnreadReset}
             onClick={() =>
-                  handleChatOpen({
-                    chatId: chatData.announcements[0]?._id,
-                    title: chatData.announcements[0]?.name,
-                    avatar: chatData.announcements[0]?.avatar,
-                    memberCount: chatData.announcements[0]?.participants?.length,
-                    participants: chatData.announcements[0]?.participants,
-                    unreadCount: unreadCounts[chatData.announcements[0]?._id] || 0,
-                  })
-                }
+              handleChatOpen({
+                chatId: chatData.announcements[0]?._id,
+                title: chatData.announcements[0]?.name,
+                avatar: chatData.announcements[0]?.avatar,
+                memberCount: chatData.announcements[0]?.participants?.length,
+                participants: chatData.announcements[0]?.participants,
+                unreadCount: unreadCounts[chatData.announcements[0]?._id] || 0,
+              })
+            }
           />
         </ExpandableItem>
       )}
@@ -209,15 +209,15 @@ const LeftSidebar = ({ chatData, setChatData, isMobile = false, searchUsers = []
               unreadCount={unreadCounts[item._id] || 0}
               onUnreadReset={handleUnreadReset}
               onClick={() =>
-                  handleChatOpen({
-                    chatId: item._id,
-                    title: item?.name,
-                    avatar: item?.avatar,
-                    memberCount: item.participants?.length,
-                    participants: item.participants,
-                    unreadCount: unreadCounts[item._id] || 0,
-                  })
-                }
+                handleChatOpen({
+                  chatId: item._id,
+                  title: item?.name,
+                  avatar: item?.avatar,
+                  memberCount: item.participants?.length,
+                  participants: item.participants,
+                  unreadCount: unreadCounts[item._id] || 0,
+                })
+              }
             />
           ))}
         </ExpandableItem>
@@ -270,10 +270,10 @@ const LeftSidebar = ({ chatData, setChatData, isMobile = false, searchUsers = []
                   item.teacher
                     ? person?.subjects?.join(", ") || "No subjects"
                     : item.student
-                    ? "Student"
-                    : item.user?.role
-                    ? item.user.role
-                    : "User"
+                      ? "Student"
+                      : item.user?.role
+                        ? item.user.role
+                        : "User"
                 }
                 avatar={person?.avatar}
                 chatId={item._id}
@@ -330,13 +330,13 @@ const LeftSidebar = ({ chatData, setChatData, isMobile = false, searchUsers = []
                   attachments,
                 });
               }}
-              onSendMeetingInvitation={(type,content,meetingTime) =>{
+              onSendMeetingInvitation={(type, content, meetingTime) => {
                 try {
                   socket.emit("sendMeetingInvitation", {
                     chatId: selectedChat.chatId,
                     content,
                     type, // "now" or "later"
-                    time:meetingTime
+                    time: meetingTime
                   });
                 } catch (err) {
                   toast.error(err.message);
