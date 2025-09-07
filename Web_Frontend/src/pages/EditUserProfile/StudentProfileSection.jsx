@@ -12,6 +12,7 @@ import ScrollSpy from "@/components/EditUserProfile/ScrollSpy";
 import ParentsInfo from "@/components/EditUserProfile/ParentsInfo";
 import ParentsContact from "@/components/EditUserProfile/ParentsContact";
 import Allergies from "@/components/EditUserProfile/Allergies";
+import StudentDetails from "@/components/EditUserProfile/StudentDetails";
 
 import { capitalizeFirstLetter } from "@/utils/textUtils";
 
@@ -21,6 +22,7 @@ const OFFSET = 40;
 const SECTIONS = [
   { id: "photo-preview", title: "Photo Preview" },
   { id: "account-details", title: "Account Details" },
+  { id: "student-details", title: "Student Details" },
   { id: "siblings-info", title: "Siblings Info" },
   { id: "parents-info", title: "Parents Info" },
   { id: "parents-contact", title: "Parents Contact" },
@@ -33,6 +35,8 @@ const StudentProfileSection = () => {
   const { user } = useAuth();
   const rootRef = useRef();
   const [info, setInfo] = useState([]);
+
+  console.log(info);
 
   const [elements, setElements] = useState();
 
@@ -81,6 +85,20 @@ const StudentProfileSection = () => {
               accountInfo={{
                 fullName: user.fullName,
                 username: user.username,
+              }}
+            />
+          </TitledContainer>
+          <TitledContainer
+            id="student-details-section"
+            title="Student Details"
+            containerStyle={titledContainerStyle}
+          >
+            <StudentDetails
+              key={info}
+              initialInfo={{
+                bloodGroup: info.bloodGroup,
+                dob: info.dob,
+                address: info.address,
               }}
             />
           </TitledContainer>
