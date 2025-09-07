@@ -32,20 +32,6 @@ const LeftSidebar = ({ chatData, setChatData, isMobile = false, searchUsers = []
     role: user.role,
   };
 
-  useEffect(() => {
-    if (!chatData) return;
-    const counts = {};
-    const allChats = [
-      ...(chatData?.announcements || []),
-      ...(chatData?.sectionChats || []),
-      ...(chatData?.personalChats || []),
-    ];
-    allChats.forEach((chat) => {
-      if (chat?._id) counts[chat._id] = chat.unreadMessageCount || 0;
-    });
-    setUnreadCounts(counts);
-  }, [chatData]);
-
   const handleUnreadReset = (chatId) => {
     setUnreadCounts((prev) => ({ ...prev, [chatId]: 0 }));
   };

@@ -16,6 +16,7 @@ import ShowChatsButton from "@/components/Home/ShowChatsButton";
 import IconTextButton from "@/components/Chat/IconTextButton";
 import { formatEvents } from "@/utils/calendarUtil";
 import ManageUsers from "@/components/Home/AdminComponents/ManageUsers/ManageUsers";
+import { useSocket } from "@/context/SocketContext";
 
 const SuperAdminDashboard = () => {
   const [activeView, setActiveView] = useState('home');
@@ -25,6 +26,13 @@ const SuperAdminDashboard = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { showChatButton } = useChatsPanel();
   const [loading, setLoading] = useState(true);
+  const { unreadCounts, setUnreadCounts } = useSocket(); 
+  
+  // Sum all chat unread counts (Used for mobile screen floating chat button)
+  const totalUnread = Object.values(unreadCounts || {}).reduce(
+    (sum, count) => sum + count,
+    0
+  );
 
   useEffect(() => {
     const getDashboardData = async () => {
@@ -101,6 +109,7 @@ const SuperAdminDashboard = () => {
         <ShowChatsButton
           isShown={showChatButton}
           onClick={() => setIsChatOpen(true)}
+          unreadCount={totalUnread}
         />
       )}
 

@@ -10,6 +10,7 @@ import TeacherHomeContent from "@/components/Home/TeacherComponents/TeacherHomeC
 import { fetchTeacherDashboardData } from "@/services/dashboardService";
 import { formatEvents } from "@/utils/calendarUtil";
 import ShowChatsButton from "@/components/Home/ShowChatsButton";
+import { useSocket } from "@/context/SocketContext";
 
 const TeacherDashboard = () => {
   const [chats, setChats] = useState(null);
@@ -18,6 +19,13 @@ const TeacherDashboard = () => {
   const [teacherSubjects, setTeacherSubjects] = useState([]);
   const { showChatButton } = useChatsPanel();
   const [loading, setLoading] = useState(true);
+  const { unreadCounts, setUnreadCounts } = useSocket(); 
+  
+  // Sum all chat unread counts (Used for mobile screen floating chat button)
+  const totalUnread = Object.values(unreadCounts || {}).reduce(
+    (sum, count) => sum + count,
+    0
+  );
 
   useEffect(() => {
     const getDashboardData = async () => {
@@ -61,6 +69,7 @@ const TeacherDashboard = () => {
         <ShowChatsButton
           isShown={showChatButton}
           onClick={() => setIsChatOpen(true)}
+          unreadCount={totalUnread}
         />
       )}
 

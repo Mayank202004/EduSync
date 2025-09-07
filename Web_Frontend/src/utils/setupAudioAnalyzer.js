@@ -1,4 +1,4 @@
-export default function setupAudioAnalyser(socketId, stream, setParticipants, threshold = 40, delay = 200) {
+export default function setupAudioAnalyser(socketId, stream, setParticipants, threshold = 30, delay = 500) {
   if (!stream) return;
 
   const audioCtx = new AudioContext();

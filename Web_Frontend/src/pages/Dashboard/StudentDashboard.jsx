@@ -10,6 +10,8 @@ import ShowChatsButton from "@/components/Home/ShowChatsButton";
 import IconTextButton from "@/components/Chat/IconTextButton";
 import { fetchStudentDashboardData } from "@/services/dashboardService";
 import { formatEvents } from "@/utils/calendarUtil";
+import { useSocket } from "@/context/SocketContext";
+import toast from "react-hot-toast";
 
 const StudentDashboard = () => {
   const [chats, setChats] = useState(null);
@@ -19,6 +21,13 @@ const StudentDashboard = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { showChatButton } = useChatsPanel();
+  const { unreadCounts, setUnreadCounts } = useSocket(); 
+
+  // Sum all chat unread counts (Used for mobile screen floating chat button)
+  const totalUnread = Object.values(unreadCounts || {}).reduce(
+    (sum, count) => sum + count,
+    0
+  );
 
   useEffect(() => {
     const getDashboardData = async () => {
@@ -37,6 +46,21 @@ const StudentDashboard = () => {
     };
     getDashboardData();
   }, []);
+
+  useEffect(() => {
+    if (!chats) return;
+    const counts = {};
+    const allChats = [
+      ...(chats?.announcements || []),
+      ...(chats?.sectionChats || []),
+      ...(chats?.personalChats || []),
+    ];
+    allChats.forEach((chat) => {
+      if (chat?._id) counts[chat._id] = chat.unreadMessageCount || 0;
+    });
+    setUnreadCounts(counts);
+  }, [chats]);
+
 
   useEffect(() => {
     if (isChatOpen) {
@@ -72,6 +96,7 @@ const StudentDashboard = () => {
         <ShowChatsButton
           isShown={showChatButton}
           onClick={() => setIsChatOpen(true)}
+          unreadCount={totalUnread}
         />
       )}
 
