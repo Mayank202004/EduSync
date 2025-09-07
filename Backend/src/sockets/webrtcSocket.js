@@ -115,7 +115,7 @@ export const setupWebRTC = (io, socket, user) => {
 
   socket.on("update-host-controls", async ({ roomId, controls }) => {
     try {
-      const user = socket.user; // assuming you attach user info to socket on connection
+      //const user = socket.user; // assuming you attach user info to socket on connection
 
       // ✅ Only host can update
       // if (!user.isHost) {
@@ -149,6 +149,10 @@ export const setupWebRTC = (io, socket, user) => {
     );
 
     io.to(userId).emit("kicked-out");
+  });
+
+  socket.on("raise-hand", ({ roomId,socketId, handRaised }) => {
+    socket.to(`webrtc-${roomId}`).emit("raise-hand",{socketId,handRaised});
   });
 
 

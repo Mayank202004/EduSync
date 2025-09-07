@@ -26,6 +26,7 @@ const ControlsBar = ({
   onToggleScreen,
   onLeave,
   onRaiseHand,
+  handRaised,
   onToggleParticipants,
   onToggleHostControls,
   onToggleChat,
@@ -51,9 +52,10 @@ const ControlsBar = ({
             { isHost || hostControls.screenShareAllowed ?  <MonitorUp className={screen ? "text-green-500" : ""}/> : <MonitorOffIcon className="text-gray-500"  />}
           </button>
 
-          <button onClick={onRaiseHand} title="Raise Hand" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
-            <Hand />
+          <button onClick={onRaiseHand} title={handRaised ? "Lower Hand" : "Raise Hand"} className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
+            <Hand className={handRaised ? "text-yellow-400" : ""} />
           </button>
+
 
           <button onClick={() => onLeave()} title="Leave Meeting" className="bg-red-600 hover:bg-red-700 p-3 rounded-full text-white transition">
             <PhoneOff />
@@ -83,8 +85,8 @@ const ControlsBar = ({
           {isHost || hostControls.videoEnableAllowed ? (cam ? <Video /> : <VideoOff className="text-red-500" />) : <VideoOff className="text-gray-500"/>}
         </button>
 
-        <button onClick={onRaiseHand} title="Raise Hand" className="text-white">
-          <Hand />
+        <button onClick={onRaiseHand} title={handRaised ? "Lower Hand" : "Raise Hand"} className=" p-3 rounded-full text-white hover:bg-white/20 transition">
+          <Hand className={handRaised ? "text-yellow-400" : ""} />
         </button>
 
         <button onClick={() => onLeave()} title="Leave Meeting" className="bg-red-600 hover:bg-red-700 p-3 rounded-full text-white transition">

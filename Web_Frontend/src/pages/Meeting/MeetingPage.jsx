@@ -102,6 +102,7 @@ export default function MeetingPage() {
         onToggleScreen={toggleScreen}
         onLeave={leaveMeeting}
         onRaiseHand={raiseHand}
+        handRaised={handRaised}
         onToggleParticipants={() => {
           setShowParticipants((prev) => !prev);
           setShowChat(false);

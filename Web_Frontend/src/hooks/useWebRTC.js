@@ -51,6 +51,7 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
             isLocal: true,
             isYou: true,
             isHost: isHost,
+            handRaised: false,
           },
         ]);
       } catch (err) {
@@ -112,6 +113,7 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
     socket.on("force-mute", () => forceDisableMic());
     socket.on("force-video-off", () => forceDisableCam());
     socket.on("kicked-out",() => handleKickedOut());
+    socket.on("raise-hand",handleRemoteRaiseHand);
     socket.on("meeting-message", (msg) => {
       setMessages((prev) => [...prev, msg]);
     });
@@ -129,6 +131,7 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
       socket.off("force-mute");
       socket.off("force-video-off");
       socket.off("kicked-out");
+      socket.off("raise-hand");
       socket.off("meeting-message");
     };
   }, [shouldJoin, socket]);
@@ -400,11 +403,42 @@ const participantName = isScreenTrack
     }
   };
 
+  const handleRemoteRaiseHand = ({ socketId, handRaised }) => {
+    console.log(`${socketId} raised hand ${handRaised}`)
+    setParticipants((prev) =>
+      prev.map((p) => {
+        if (p._id === socketId) {
+          p.handRaised = handRaised; 
+        }
+        return p;
+      })
+    );
+  };
+
+
+
 
   const raiseHand = () => {
-    setHandRaised((prev) => !prev);
-    socket.emit("raise-hand", { handRaised: !handRaised });
+    setHandRaised((prev) => {
+      const newState = !prev;
+
+      setParticipants((prevParts) =>
+        prevParts.map((p) =>
+          p.isYou ? { ...p, handRaised: newState } : p
+        )
+      );
+
+      socket.emit("raise-hand", {
+        roomId,
+        socketId: socket.id,
+        handRaised: newState,
+      });
+
+      return newState;
+    });
   };
+
+
 
   const leaveMeeting = (reason = "You left the meeting") => {
     Object.values(peerConnections.current).forEach((pc) => pc.close());
@@ -448,7 +482,6 @@ const participantName = isScreenTrack
   };
 
   const handleUpdateHostControls = (controls ) => {
-    console.log("Controls updated:", controls);
     setHostControls(controls);
 
     // Apply restrictions immediately
