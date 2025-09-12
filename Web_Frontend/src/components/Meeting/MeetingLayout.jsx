@@ -7,9 +7,6 @@ import ChatPanel from "./SidePanel/ChatPanel";
 import HostControlPanel from "./SidePanel/HostControlPanel";
 import useMediaQuery from "@/hooks/useMediaQuery";
 
-
-
-
 const MeetingLayout = ({
   participants,
   screenSharerId,

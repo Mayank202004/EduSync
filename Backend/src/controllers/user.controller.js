@@ -592,7 +592,7 @@ const bulkRegisterStudents = asyncHandler(async (req, res) => {
 
         for (const [index, row] of sheetData.entries()) {
             try {
-                const { fullName, email } = row;
+                const { fullName, email, gender} = row;
 
                 if (!fullName || !email) {
                     failedRows.push({ row: index + 2, reason: "Missing required fields" });
@@ -638,12 +638,21 @@ const bulkRegisterStudents = asyncHandler(async (req, res) => {
         const insertedUsers = await User.insertMany(toCreateUsers, { ordered: false });
 
         // Stage 2: Create Student docs using the actual _id values
-        const toCreateStudents = insertedUsers.map(user => ({
-            userId: user._id,
-            class: commonClass,
-            div: commonDiv,
-            schoolId
-        }));
+        const toCreateStudents = insertedUsers.map(user => {
+            // Find matching row from Excel by email
+            const matchingRow = sheetData.find(
+                r => r.email?.trim().toLowerCase() === user.email.toLowerCase()
+            );
+          
+            return {
+                userId: user._id,
+                class: commonClass,
+                div: commonDiv,
+                schoolId,
+                gender: matchingRow?.gender || undefined,
+                dob: matchingRow?.dob || undefined,
+            };
+        });
 
         await Student.insertMany(toCreateStudents, { ordered: false });
 
