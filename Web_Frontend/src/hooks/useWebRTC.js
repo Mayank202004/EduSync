@@ -4,6 +4,7 @@ import { mediaConstraints } from "@/lib/webrtc/constraints";
 import { useNavigate } from "react-router-dom";
 import playSound from "@/utils/playSound";
 import joinSound from "@/assets/sounds/userJoined.mp3";
+import raiseHandSound from "@/assets/sounds/raiseHand.mp3";
 import setupAudioAnalyser from "@/utils/setupAudioAnalyzer";
 
 export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin, initialMic = true, initialCam = true, hostId) {
@@ -420,7 +421,7 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
   };
 
   const handleRemoteRaiseHand = ({ socketId, handRaised }) => {
-    console.log(`${socketId} raised hand ${handRaised}`)
+
     setParticipants((prev) =>
       prev.map((p) => {
         if (p._id === socketId) {
@@ -429,6 +430,7 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
         return p;
       })
     );
+    if(handRaised) playSound(raiseHandSound);
   };
 
 
@@ -437,6 +439,7 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
   const raiseHand = () => {
     setHandRaised((prev) => {
       const newState = !prev;
+      if(newState) playSound(raiseHandSound);
 
       setParticipants((prevParts) =>
         prevParts.map((p) =>
