@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Marks Sheet</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 0; 
+      padding: 5px; /* reduced padding */
+    }
+    h2 { 
+      text-align: center; 
+      margin: 0 0 10px 0; /* remove top margin completely */
+    }
+
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+    }
+    th, td { 
+      border: 1px solid #000; 
+      font-size: 14px; 
+      text-align: left;
+    }
+    th { 
+      background-color: #f2f2f2; 
+      text-align: center; 
+      padding: 6px;
+    }
+    td { 
+      padding: 6px 8px;
+    }
+
+    th:nth-child(1), td:nth-child(1) {
+      width: 220px; /* Student Id */
+    }
+    th:nth-child(2), td:nth-child(2) {
+      width: 300px; /* Full Name */
+    }
+    th:nth-child(3), td:nth-child(3) {
+      width: 120px; /* Marks Obtained */
+      text-align: center;
+    }
+
+    /* Marks column */
+    .marks-cell {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 50px; 
+    }
+    .marks-box {
+      width: 110px;  
+      height: 45px;  
+      border: 2px solid #000; 
+      text-align: center;
+      font-size: 16px; 
+      font-weight: bold;
+      line-height: 45px; /* perfectly center the text */
+    }
+  </style>
+</head>
+<body>
+  <h2>Class <%= className %>-<%= div %> Marks Sheet</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Student Id</th>
+        <th>Full Name</th>
+        <th>Marks Obtained</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% students.forEach(s => { %>
+        <tr>
+          <td><%= s._id %></td>
+          <td><%= s.userId ? s.userId.fullName : s.fullName %></td>
+          <td>
+            <div class="marks-cell">
+              <div class="marks-box">
+                <% if (s.marks !== undefined) { %>
+                  <%= s.marks %>
+                <% } %>
+              </div>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>
