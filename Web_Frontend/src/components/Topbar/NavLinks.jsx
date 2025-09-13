@@ -57,6 +57,17 @@ const NavLinks = ({ closeMenuCallback }) => {
       {(role !== "system admin") && (
         <li>
           <NavLink
+            to="/marks"
+            className={navLinkClass}
+            onClick={closeMenuCallback}
+          >
+            Marks
+          </NavLink>
+        </li>
+      )}
+      {(role !== "system admin") && (
+        <li>
+          <NavLink
             to="/calendar"
             className={navLinkClass}
             onClick={closeMenuCallback}

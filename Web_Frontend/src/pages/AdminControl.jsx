@@ -17,9 +17,9 @@ import AdminControlHome from '@/components/Home/SystemAdminComponents/AdminContr
 
 const AdminControl = () => {
   const [activeView, setActiveView] = useState('home');
-  const [chats, setChats] = useState(null);
-  const [allUsers, setAllUsers] = useState(null);
-  const [events,setEvents] = useState([]);
+  // const [chats, setChats] = useState(null);
+  // const [allUsers, setAllUsers] = useState(null);
+  // const [events,setEvents] = useState([]);
   
   useEffect(() => {
     const getDashboardData = async () => {

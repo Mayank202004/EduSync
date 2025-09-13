@@ -20,7 +20,7 @@ export default function Resources() {
       Component = AdminFees;
       break;
     default:
-      return <Unauthorized401 />; // To DO: Make a Unauthorised page 
+      return <Unauthorized401 />; 
   }
 
   return (
@@ -29,4 +29,4 @@ export default function Resources() {
     </Suspense>
   );
 }
-// This code is a React component that conditionally renders different resource components based on user roles.
+// This code is a React component that conditionally renders different fee components based on user roles.
