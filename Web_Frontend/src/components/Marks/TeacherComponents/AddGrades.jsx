@@ -1,25 +1,35 @@
 import React, { useState } from "react";
-import { Upload, ClipboardList } from "lucide-react";
+import { Upload, ClipboardList, FileUp } from "lucide-react";
+import { getStudentList } from "@/services/attendenceService";
 
 function AddGrades() {
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedDiv, setSelectedDiv] = useState("");
   const [students, setStudents] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalMarks, setTotalMarks] = useState(""); 
+  const [selectedExam, setSelectedExam] = useState("");
+
 
   const subjects = ["Math", "Science", "English"];
   const classes = ["1", "2", "3"];
   const divisions = ["A", "B", "C"];
+  const exams = ["Unit Test 1", "Midterm", "Final Exam"];
 
-  // Dummy student data
-  const dummyStudents = [
-    { _id: "1", fullName: "John Doe" },
-    { _id: "2", fullName: "Jane Smith" },
-    { _id: "3", fullName: "Alex Johnson" },
-  ];
 
-  const handleFetchStudents = () => {
-    setStudents(dummyStudents.map((s) => ({ ...s, marks: "" })));
+  const handleFetchStudents = async () => {
+    try {
+      if (selectedClass && selectedDiv) {
+        setIsLoading(true);
+        const response = await getStudentList(selectedClass, selectedDiv);
+        setStudents(response.data || []);
+      }
+    } catch (err) {
+      // Error handled by axios interceptor
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleMarksChange = (id, value) => {
@@ -32,10 +42,26 @@ function AddGrades() {
     alert("Upload XLSX clicked (dummy)");
   };
 
-  const handleAddMarkList = () => {
-    alert("Marks submitted (dummy)");
-    console.log(students);
+  const handleUploadMarklist = () => {
+    alert("Upload Marklist clicked (dummy)");
   };
+
+  const handleAddMarkList = () => {
+    if (!totalMarks) {
+      alert("Please enter total marks for the test.");
+      return;
+    }
+    alert("Marks submitted (dummy)");
+    console.log("Subject:", selectedSubject);
+    console.log("Class:", selectedClass, "Div:", selectedDiv);
+    console.log("Total Marks:", totalMarks);
+    console.log("Student Marks:", students);
+  };
+
+  // Check if all students have marks filled
+  const allMarksFilled =
+    students.length > 0 &&
+    students.every((s) => s.marks !== "" && s.marks !== null);
 
   return (
     <div className="w-full h-full bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 overflow-y-auto">
@@ -43,6 +69,19 @@ function AddGrades() {
 
       {/* Dropdowns */}
       <div className="flex flex-wrap gap-4 mb-6">
+        <select
+          className="border rounded p-2"
+          value={selectedExam}
+          onChange={(e) => setSelectedExam(e.target.value)}
+        >
+          <option value="">Select Exam</option>
+          {exams.map((exam) => (
+            <option key={exam} value={exam}>
+              {exam}
+            </option>
+          ))}
+        </select>
+        
         <select
           className="border rounded p-2"
           value={selectedSubject}
@@ -92,22 +131,55 @@ function AddGrades() {
 
       {/* Action Buttons */}
       {students.length > 0 && (
-        <div className="flex gap-4 mb-6">
-          <button
-            onClick={handleUploadXLSX}
-            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          >
-            <Upload size={18} />
-            Upload XLSX
-          </button>
-          <button
-            onClick={handleAddMarkList}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            <ClipboardList size={18} />
-            Add Mark List
-          </button>
-        </div>
+        <>
+          <div className="flex flex-wrap gap-4 mb-4">
+            <button
+              onClick={handleUploadXLSX}
+              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              <Upload size={18} />
+              Upload XLSX
+            </button>
+
+            <button
+              onClick={handleUploadMarklist}
+              className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+            >
+              <FileUp size={18} />
+              Upload Marklist
+            </button>
+          </div>
+
+          {/* Total Marks + Submit beside each other */}
+          <div className="flex items-center gap-4 mb-6">
+            <div>
+              <label className="block mb-2 font-medium">Total Marks</label>
+              <input
+                type="number"
+                min="1"
+                value={totalMarks}
+                onChange={(e) => setTotalMarks(e.target.value)}
+                className="border rounded px-3 py-2 w-40"
+                placeholder="Enter total marks"
+              />
+            </div>
+
+            <div className="mt-6">
+              <button
+                onClick={handleAddMarkList}
+                disabled={!allMarksFilled || !totalMarks}
+                className={`flex items-center gap-2 px-4 py-2 rounded text-white ${
+                  allMarksFilled && totalMarks
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : "bg-gray-400 cursor-not-allowed"
+                }`}
+              >
+                <ClipboardList size={18} />
+                Submit Marks
+              </button>
+            </div>
+          </div>
+        </>
       )}
 
       {/* Student Table */}
@@ -131,7 +203,7 @@ function AddGrades() {
                     <input
                       type="number"
                       min="0"
-                      max="100"
+                      max={totalMarks || 100}
                       value={student.marks}
                       onChange={(e) =>
                         handleMarksChange(student._id, e.target.value)
