@@ -13,6 +13,7 @@ import { Student } from "../models/student.model.js";
 import { returnAllEvents } from "./calendar.controller.js";
 import { deleteAllEvents } from "./calendar.controller.js";
 import { formatTeacherSubjects } from "./teacher.controller.js";
+import { Exam } from "../models/exam.model.js";
 
 export const fetchDashboardData = asyncHandler(async (req, res) => {
     const user = req.user;
@@ -97,8 +98,10 @@ export const manageAcademicYearData = asyncHandler(async (req, res) => {
 
     // Filter out unverified studnets (userId will be null)
     const verifiedStudents = students.filter(s => s.userId !== null);
+
+    const exams = await Exam.find({schoolId:req.school?._id}).select("_id name");
   
   return res.status(200).json(
-    new ApiResponse(200, { academicYear, classesAndDivs, students: verifiedStudents }, "Academic Year Data Fetched")
+    new ApiResponse(200, { academicYear, classesAndDivs, students: verifiedStudents,exams }, "Academic Year Data Fetched")
   );
 });

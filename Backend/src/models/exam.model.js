@@ -5,4 +5,4 @@ const examSchema = new mongoose.Schema({
   schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School", required: true },
 }, { timestamps: true });
 
-export default mongoose.model("Exam", examSchema);
+export const Exam = mongoose.model("Exam", examSchema);

@@ -6,6 +6,7 @@ import ejs from "ejs";
 import { Student } from "../models/student.model.js";
 import ClassMarks from "../models/marks.model.js";
 import StudentMarks from "../models/studentMarks.model.js";
+import { isTeacherAllowed } from "../utils/verificationUtils.js"
 
 /**
  * @desc Export class mark sheet template (To handfill marks physically)
