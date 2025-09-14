@@ -95,7 +95,7 @@ const SuperAdminDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="w-full md:w-[70%] lg:w-[60%] px-4 lg:px-2 py-4 overflow-y-auto">
+      <div className="w-full md:w-[70%] lg:w-[60%] px-4 lg:px-2">
         {renderMainContent()}
       </div>
 

@@ -18,12 +18,14 @@ import {
   shuffleDivisions,
 } from "@/services/dashboardService";
 import ManualDivisionAllotment from "./ManualDivisionAllotment";
+import ExamManagement from "./ExamManagement.jsx";
 
 const ManageAcademicYear = ({ onBackPressed }) => {
   const [year, setYear] = useState(null);
   const [newYear, setNewYear] = useState("");
   const [editing, setEditing] = useState(false);
   const [showClearModal, setShowClearModal] = useState(false);
+  const [initialExams,setInitialExams] = useState([]);
   const [clearOptions, setClearOptions] = useState({
     attendance: false,
     feeStatus: false,
@@ -48,6 +50,7 @@ const ManageAcademicYear = ({ onBackPressed }) => {
         setNewYear(response.data?.academicYear);
         setClasses(response.data?.classesAndDivs || []);
         setAllStudents(response.data?.students || []);
+        setInitialExams(response.data?.exams || []);
       } catch (err) {
         // Handled by interceptor
       }
@@ -98,7 +101,7 @@ const ManageAcademicYear = ({ onBackPressed }) => {
       await toast.promise(promoteStudents(), {
         loading: "Promoting Students...",
         success: "Students promoted",
-        error: "Promotion failed",
+        error: "",
       });
     } catch (err) {}
   };
@@ -108,7 +111,7 @@ const ManageAcademicYear = ({ onBackPressed }) => {
       await toast.promise(shuffleDivisions(), {
         loading: "Shuffling Divisions...",
         success: "Divisions shuffled",
-        error: "Shuffle failed",
+        error: "",
       });
     } catch (err) {}
   };
@@ -124,7 +127,7 @@ const ManageAcademicYear = ({ onBackPressed }) => {
   };
 
   return (
-    <div className="p-6 space-y-8 max-w-5xl mx-auto text-gray-900 dark:text-gray-100">
+    <div className="p-5 my-5 space-y-8 max-w-5xl h-[calc(100%-30px)] mx-auto text-gray-900 dark:text-gray-100 overflow-y-auto">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold flex items-center gap-2">
           <CalendarDays className="w-6 h-6 text-blue-600" />
@@ -232,6 +235,22 @@ const ManageAcademicYear = ({ onBackPressed }) => {
                 Manually assign students to divisions for each class.
               </p>
             </div>
+
+            <div
+              onClick={() => setActiveSection("exam")}
+              className="cursor-pointer bg-teal-50 dark:bg-teal-900/30 
+                         border border-teal-200 dark:border-teal-800 
+                         p-6 rounded-xl shadow 
+                         hover:bg-teal-100 dark:hover:bg-teal-900 transition"
+            >
+              <h4 className="text-lg font-semibold flex items-center gap-2 text-teal-700">
+                📘 Exam Management
+              </h4>
+              <p className="text-sm mt-2 text-gray-600 dark:text-gray-300">
+                Create and manage exams and related data.
+              </p>
+            </div>
+
           </div>
         </>
       )}
@@ -243,6 +262,11 @@ const ManageAcademicYear = ({ onBackPressed }) => {
           onBack={() => setActiveSection("dashboard")}
         />
       )}
+
+      {activeSection === "exam" && (
+        <ExamManagement onBack={() => setActiveSection("dashboard")} initialExams={initialExams} />
+      )}
+
 
       {showClearModal && (
         <Modal title="🧹 Clear Data Options" onClose={() => setShowClearModal(false)}>

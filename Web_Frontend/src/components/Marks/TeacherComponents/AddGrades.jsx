@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Upload, ClipboardList, FileUp } from "lucide-react";
 import { getStudentList } from "@/services/attendenceService";
+import toast from "react-hot-toast";
+import { addClassMarks } from "@/services/marksServices";
 
 function AddGrades() {
   const [selectedSubject, setSelectedSubject] = useState("");
@@ -46,17 +48,23 @@ function AddGrades() {
     alert("Upload Marklist clicked (dummy)");
   };
 
-  const handleAddMarkList = () => {
-    if (!totalMarks) {
-      alert("Please enter total marks for the test.");
-      return;
+  const handleAddMarkList = async () => {
+    if (!totalMarks || !selectedClass || !selectedDiv || !selectedSubject || !selectedExam) {
+      toast.error("Please fill in all the required fields.");
     }
-    alert("Marks submitted (dummy)");
-    console.log("Subject:", selectedSubject);
-    console.log("Class:", selectedClass, "Div:", selectedDiv);
-    console.log("Total Marks:", totalMarks);
-    console.log("Student Marks:", students);
-  };
+      try {
+        await toast.promise(
+          addClassMarks(selectedExam,selectedSubject,selectedClass,selectedDiv,students,totalMarks),
+          {
+            loading: "Adding Class Marks...",
+            success: "Marks Added Successfully",
+            error: "",
+          }
+        );
+      } catch (err) {
+        // Handled by axios instance
+      }
+}
 
   // Check if all students have marks filled
   const allMarksFilled =
