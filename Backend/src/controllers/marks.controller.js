@@ -7,13 +7,14 @@ import { Student } from "../models/student.model.js";
 import ClassMarks from "../models/marks.model.js";
 import StudentMarks from "../models/studentMarks.model.js";
 import { isTeacherAllowed } from "../utils/verificationUtils.js"
+import { Exam } from "../models/exam.model.js";
 
 /**
  * @desc Export class mark sheet template (To handfill marks physically)
  * @route POST /api/v1/marks/class-marksheet
  * @access Private (Teacher & Super Admin)
  */
-export const exportClassMarkSheet = asyncHandler(async (req, res) => {
+export const exportClassMarklistTemplate = asyncHandler(async (req, res) => {
   const { className, div } = req.body;
 
   if(!className?.trim() || !div?.trim()){
@@ -182,4 +183,81 @@ export const addClassMarks = asyncHandler(async (req, res) => {
       skippedCount,
     })
   );
+});
+
+/**
+ * @desc Get teacher marks data (Exams,Previous Markings)
+ * @route GET /api/v1/marks/teacher-data
+ * @access Private (Teacher)
+ */
+export const getTeacherMarksData = asyncHandler(async (req, res) => {
+  const teacher = req.teacher;
+  if (!teacher) {
+    return res.status(400).json({ message: "Teacher not found in request" });
+  }
+
+
+  const exams = await Exam.find({ schoolId: req.school?._id }).select("_id name");
+
+  // Fetch only marks graded by this teacher
+  const teacherMarks = await StudentMarks.find({
+    "marks.markedBy": teacher._id,
+  })
+    .populate("examId", "name")
+    .populate({
+      path: "studentId",
+      select: "class div userId",
+      populate: {
+        path: "userId",
+        select: "fullName",
+      },
+    });
+  
+  // Organize data in nested structure
+  const examMap = new Map();
+
+  teacherMarks.forEach((sm) => {
+    const examName = sm.examId?.name;
+    if (!examName) return;
+
+    if (!examMap.has(examName)) {
+      examMap.set(examName, { _id:sm.examId._id,name:examName, subjects: [] });
+    }
+    const examObj = examMap.get(examName);
+
+    sm.marks.forEach((mark) => {
+      if (String(mark.markedBy) !== String(teacher._id)) return;
+
+      // check subject exists or push
+      let subjectObj = examObj.subjects.find((s) => s.name === mark.subject);
+      if (!subjectObj) {
+        subjectObj = { name: mark.subject, classes: [] };
+        examObj.subjects.push(subjectObj);
+      }
+
+      // check class exists
+      let classObj = subjectObj.classes.find((c) => c.class === sm.studentId.class);
+      if (!classObj) {
+        classObj = { class: sm.studentId.class, divs: [] };
+        subjectObj.classes.push(classObj);
+      }
+
+      // check div exists
+      let divObj = classObj.divs.find((d) => d.div === sm.studentId.div);
+      if (!divObj) {
+        divObj = { div: sm.studentId.div, students: [] };
+        classObj.divs.push(divObj);
+      }
+
+      // push student marks
+      divObj.students.push({
+        studentId: sm.studentId._id,
+        name: sm.studentId.userId?.fullName,
+        marksObtained: mark.marksObtained,
+        totalMarks: mark.totalMarks,
+      });
+    });
+  });
+  
+  res.status(200).json(new ApiResponse(200, {exams, previousMarkings: Array.from(examMap.values())}, "Teacher marks data fetched successfully"));
 });

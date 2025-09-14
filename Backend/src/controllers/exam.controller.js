@@ -40,3 +40,13 @@ export const deleteExam = asyncHandler(async (req, res) => {
   }
   return res.status(200).json(new ApiResponse(200, null, "Exam deleted successfully"));
 });
+
+/**
+ * @desc Get all exams
+ * @route GET /exams
+ * @access Private (Super Admin)
+ */
+export const getExams = asyncHandler(async (req, res) => {
+  const exams = await Exam.find({ schoolId: req.school?._id }).select("_id name");
+  return res.status(200).json(new ApiResponse(200, exams, "Exams fetched successfully"));
+});
