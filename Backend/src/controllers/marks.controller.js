@@ -79,7 +79,15 @@ export const getStudentMarks = asyncHandler(async (req, res) => {
 export const addClassMarks = asyncHandler(async (req, res) => {
   const { examId, subject, className, div, students, totalMarks } = req.body;
 
-  if (!examId?.trim() || !subject?.trim() || !className?.trim() || !div?.trim() || !Array.isArray(students) || !students.length || !totalMarks){
+  if (
+    !examId?.trim() ||
+    !subject?.trim() ||
+    !className?.trim() ||
+    !div?.trim() ||
+    !Array.isArray(students) ||
+    !students.length ||
+    !totalMarks
+  ) {
     throw new ApiError(400, "All fields are required");
   }
 
@@ -87,7 +95,10 @@ export const addClassMarks = asyncHandler(async (req, res) => {
 
   // Permission check
   if (!isTeacherAllowed(teacher, subject, className, div)) {
-    throw new ApiError(403, "You are not allowed to add marks for this subject");
+    throw new ApiError(
+      403,
+      "You are not allowed to add marks for this subject"
+    );
   }
 
   const classStudentDocs = await Student.find({ class: className, div }).select("_id");
@@ -95,7 +106,6 @@ export const addClassMarks = asyncHandler(async (req, res) => {
   if (!classStudentDocs.length) {
     throw new ApiError(400, "No students found for given class/div");
   }
-
 
   let classMarks = await ClassMarks.findOne({ examId, class: className, div });
 
@@ -108,53 +118,49 @@ export const addClassMarks = asyncHandler(async (req, res) => {
     });
   }
 
-  let subjectMarks = classMarks.subjects.find(s => s.subject === subject);
+  let subjectMarks = classMarks.subjects.find((s) => s.subject === subject);
 
   if (!subjectMarks) {
-    subjectMarks = { subject, students: [], gradedBy: teacher._id };
-    classMarks.subjects.push(subjectMarks);
+    classMarks.subjects.push({
+      subject,
+      students: [],
+      gradedBy: teacher._id,
+    });
+
+    subjectMarks = classMarks.subjects[classMarks.subjects.length - 1];
   }
 
   const bulkOps = [];
   let allottedCount = 0;
   let skippedCount = 0;
+  let alreadyMarked = [];
 
-  students.forEach(({ studentId, marksObtained }) => {
-    const found = classStudentDocs.find(s => s._id.toString() === studentId);
+  for (const { studentId, marksObtained } of students) {
+    const found = classStudentDocs.find((s) => s._id.toString() === studentId);
 
     if (!found) {
       skippedCount++;
-      return; // skip invalid studentId
+      continue;
+    }
+
+    // Check if already marked for this subject
+    const existing = subjectMarks.students.find(
+      (s) => s.studentId.toString() === studentId
+    );
+    if (existing) {
+      alreadyMarked.push(studentId);
+      continue; // do not allow update
     }
 
     allottedCount++;
 
-    // Update/add in ClassMarks
-    const existing = subjectMarks.students.find(s => s.studentId.toString() === studentId);
-    if (existing) {
-      existing.marksObtained = marksObtained;
-      existing.totalMarks = totalMarks;
-    } else {
-      subjectMarks.students.push({ studentId, marksObtained, totalMarks });
-    }
+    // Add in ClassMarks
+    subjectMarks.students.push({ studentId, marksObtained, totalMarks });
 
-    // Prepare StudentMarks bulkOps
+    // Add in StudentMarks
     bulkOps.push({
       updateOne: {
-        filter: { examId, studentId, "marks.subject": subject },
-        update: {
-          $set: {
-            "marks.$.marksObtained": marksObtained,
-            "marks.$.totalMarks": totalMarks,
-            "marks.$.markedBy": teacher._id,
-          },
-        },
-      },
-    });
-
-    bulkOps.push({
-      updateOne: {
-        filter: { examId, studentId, "marks.subject": { $ne: subject } },
+        filter: { examId, studentId },
         update: {
           $setOnInsert: { examId, studentId },
           $push: {
@@ -164,12 +170,18 @@ export const addClassMarks = asyncHandler(async (req, res) => {
         upsert: true,
       },
     });
-  });
-
-  if (!allottedCount) {
-    throw new ApiError(400, "No valid students found for given class/div");
   }
 
+  if (!allottedCount) {
+    throw new ApiError(
+      400,
+      alreadyMarked.length
+        ? "Marks already added check previous markings for updating"
+        : "No valid students found for given class/div"
+    );
+  }
+
+  classMarks.markModified("subjects");
   await classMarks.save();
 
   if (bulkOps.length) {
@@ -181,9 +193,131 @@ export const addClassMarks = asyncHandler(async (req, res) => {
       message: "Marks Added Successfully",
       allottedCount,
       skippedCount,
+      alreadyMarkedCount: alreadyMarked.length,
     })
   );
 });
+
+/**
+ * @desc Update Already Added Marks
+ * @route PUT /api/v1/update-class-marks
+ * @access Private (Teacher)
+ */
+export const updateClassMarks = asyncHandler(async (req, res) => {
+  const { examId, subject, className, div, students, totalMarks } = req.body;
+
+  if (
+    !examId?.trim() ||
+    !subject?.trim() ||
+    !className?.trim() ||
+    !div?.trim() ||
+    !Array.isArray(students) ||
+    !students.length ||
+    !totalMarks
+  ) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  const teacher = req.teacher;
+
+  // Permission check
+  if (!isTeacherAllowed(teacher, subject, className, div)) {
+    throw new ApiError(
+      403,
+      "You are not allowed to update marks for this subject"
+    );
+  }
+
+  const classStudentDocs = await Student.find({ class: className, div }).select("_id");
+
+  if (!classStudentDocs.length) {
+    throw new ApiError(400, "No students found for given class/div");
+  }
+
+  const classMarks = await ClassMarks.findOne({ examId, class: className, div });
+
+  if (!classMarks) {
+    throw new ApiError(400, "Marks not found for this class/exam/subject");
+  }
+
+  const subjectMarks = classMarks.subjects.find((s) => s.subject === subject);
+
+  if (!subjectMarks) {
+    throw new ApiError(400, "Marks not found for this subject in class marks");
+  }
+
+  const bulkOps = [];
+  let updatedCount = 0;
+  let skippedCount = 0;
+  let notMarkedStudents = [];
+
+  for (const { studentId, marksObtained } of students) {
+    const found = classStudentDocs.find((s) => s._id.toString() === studentId);
+
+    if (!found) {
+      skippedCount++;
+      continue;
+    }
+
+    // Check if student exists in classMarks
+    const existingClassStudent = subjectMarks.students.find(
+      (s) => s.studentId.toString() === studentId
+    );
+    if (!existingClassStudent) {
+      notMarkedStudents.push(studentId);
+      continue; // skip students who have no existing marks
+    }
+
+    // Update ClassMarks
+    existingClassStudent.marksObtained = marksObtained;
+    existingClassStudent.totalMarks = totalMarks;
+
+    // Prepare bulk update for StudentMarks
+    bulkOps.push({
+      updateOne: {
+        filter: { examId, studentId, "marks.subject": subject },
+        update: {
+          $set: {
+            "marks.$.marksObtained": marksObtained,
+            "marks.$.totalMarks": totalMarks,
+            "marks.$.markedBy": teacher._id,
+          },
+        },
+        upsert: false, // Only update existing, do not insert
+      },
+    });
+
+    updatedCount++;
+  }
+
+  if (!updatedCount) {
+    throw new ApiError(
+      400,
+      notMarkedStudents.length
+        ? "Marks not found for these students, cannot update"
+        : "No valid students to update"
+    );
+  }
+
+  // Save ClassMarks
+  classMarks.markModified("subjects");
+  await classMarks.save();
+
+  if (bulkOps.length) {
+    await StudentMarks.bulkWrite(bulkOps, { ordered: false });
+  }
+
+  res.status(200).json(
+    new ApiResponse(200, {
+      message: "Marks Updated Successfully",
+      updatedCount,
+      skippedCount,
+      notMarkedCount: notMarkedStudents.length,
+    })
+  );
+});
+
+
 
 /**
  * @desc Get teacher marks data (Exams,Previous Markings)

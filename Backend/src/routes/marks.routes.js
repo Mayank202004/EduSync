@@ -9,6 +9,7 @@ router.get('/me',verifyJWT,verifyStudent,MarksController.getStudentMarks);
 router.get('/teacher-data',verifyJWT,verifyTeacher,MarksController.getTeacherMarksData);
 
 router.post('/add-class-marks',verifyJWT,verifyTeacher,MarksController.addClassMarks);
+router.put('/update-class-marks',verifyJWT,verifyTeacher,MarksController.updateClassMarks);
 router.post('/class-marklist-template',verifyJWT,orMiddleware([verifyTeacher,verifySuperAdmin]),MarksController.exportClassMarklistTemplate);
 
 export default router;
