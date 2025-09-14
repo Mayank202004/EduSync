@@ -96,6 +96,7 @@ function PreviousMarkings({ onDivSelect, previousMarkings}) {
                                     key={d.div}
                                     onClick={() =>
                                       onDivSelect?.({
+                                        examId: exam._id,
                                         exam: exam.name,
                                         subject: sub.name,
                                         class: cls.class,

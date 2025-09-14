@@ -224,7 +224,9 @@ function AddGrades({exams}) {
           </table>
         </div>
       ) : (
-        <p className="text-gray-500">No students loaded.</p>
+        <div className="flex w-full items-center justify-center mt-4">
+          <p className="text-gray-500 text-lg">No students loaded.</p>
+        </div>
       )}
       {isModalOpen && (
         <UploadMarklistModal

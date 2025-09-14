@@ -60,6 +60,24 @@ export const addClassMarks = async (examId,subject,className,div,marks,totalMark
 };
 
 /**
+ * @desc Update already existing marks of a class
+ * @param {String} examId _id of Exam selected
+ * @param {String} subject Subject Name
+ * @param {String} className Class Name
+ * @param {String} div Division
+ * @param {Object} marks {_id,marks} 
+ * @param {String} totalMarks Maximum atainable marks of the exam 
+ * @returns {Promise} - Promise resolving to count of success and failed mark entries
+ */
+export const updateClassMarks = async (examId,subject,className,div,marks,totalMarks) => {
+  const response = await axiosInstance.put(
+    "/marks/update-class-marks", 
+    {examId,subject,className,div,students:marks,totalMarks},
+    {timeout: 10000});
+  return response.data;
+};
+
+/**
  * @desc Fetch initial data for teacher marks tab
  * @returns {Promise{Object}} Promise resolving to exams and Previous Marking Data
  */

@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import { Pencil, X, Save } from "lucide-react";
+import toast from "react-hot-toast";
+import { updateClassMarks } from "@/services/marksServices";
+import OptionSelection from "@/components/UI/OptionSelection";
+import ConfirmActionModal from "@/components/Modals/ConfirmationActionModal";
 
 function MarkList({ context, onBack }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -7,6 +11,7 @@ function MarkList({ context, onBack }) {
   const [totalMarks, setTotalMarks] = useState(
     marks.length > 0 ? marks[0].totalMarks : 0
   );
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleChange = (index, value) => {
     const updated = [...marks];
@@ -14,14 +19,34 @@ function MarkList({ context, onBack }) {
     setMarks(updated);
   };
 
-  const handleSave = () => {
-    if (window.confirm("Are you sure you want to save the changes?")) {
-      // Update totalMarks for all students
-      const updatedMarks = marks.map((s) => ({ ...s, totalMarks }));
-      console.log("Updated Marks:", updatedMarks);
-      setMarks(updatedMarks);
+  const handleSaveClick = () => {
+    setShowConfirm(true); // open confirmation dialog
+  };
+
+  const handleConfirmSave = async () => {
+    setShowConfirm(false);
+
+    const updatedMarks = marks.map((s) => ({studentId: s.studentId,marksObtained: s.marksObtained,}));
+
+    try {
+      await toast.promise(
+        updateClassMarks(
+          context.examId,
+          context.subject,
+          context.class,
+          context.div,
+          updatedMarks,
+          totalMarks
+        ),
+        {
+          loading: "Updating Marks...",
+          success: "Marks Updated successfully",
+          error: "",
+        }
+      );
       setIsEditing(false);
-      // Call API here if needed
+    } catch (err) {
+      // error handled by axios interceptor
     }
   };
 
@@ -49,7 +74,7 @@ function MarkList({ context, onBack }) {
         <div className="flex gap-2">
           {isEditing && (
             <button
-              onClick={handleSave}
+              onClick={handleSaveClick}
               className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
             >
               <Save size={16} /> Save
@@ -121,6 +146,16 @@ function MarkList({ context, onBack }) {
           </tbody>
         </table>
       </div>
+
+      {/* Confirmation Dialog */}
+      {showConfirm && (
+        <ConfirmActionModal
+          title="Confirm Save"
+          message="Do you want to update marks for this class?"
+          onConfirm={handleConfirmSave}
+          onCancel={() => setShowConfirm(false)}
+        />
+      )}
     </div>
   );
 }
