@@ -1,38 +1,7 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-function PreviousMarkings({ onDivSelect }) {
-  // Dummy data
-  const exams = [
-    {
-      _id: "exam1",
-      name: "Pre Mid Term",
-      subjects: [
-        {
-          name: "English",
-          classes: [
-            { class: "1", div: ["A", "B"] },
-            { class: "2", div: ["A"] },
-          ],
-        },
-        {
-          name: "Math",
-          classes: [{ class: "3", div: ["A", "B", "C"] }],
-        },
-      ],
-    },
-    {
-      _id: "exam2",
-      name: "Mid Term",
-      subjects: [
-        {
-          name: "Science",
-          classes: [{ class: "1", div: ["A", "B"] }],
-        },
-      ],
-    },
-  ];
-
+function PreviousMarkings({ onDivSelect, previousMarkings}) {
   const [openExam, setOpenExam] = useState(null);
   const [openSubject, setOpenSubject] = useState(null);
   const [openClass, setOpenClass] = useState(null);
@@ -42,7 +11,7 @@ function PreviousMarkings({ onDivSelect }) {
       <h2 className="text-2xl font-semibold mb-6">Previous Markings</h2>
 
       <div className="space-y-4">
-        {exams.map((exam) => (
+        {previousMarkings.map((exam) => (
           <div key={exam._id} className="border rounded-lg dark:border-gray-700">
             {/* Exam */}
             <div
@@ -122,20 +91,21 @@ function PreviousMarkings({ onDivSelect }) {
                             {openClass ===
                               `${exam._id}-${sub.name}-${cls.class}` && (
                               <div className="px-5 py-2 flex flex-wrap gap-2">
-                                {cls.div.map((d) => (
+                                {cls.divs.map((d) => (
                                   <button
-                                    key={d}
+                                    key={d.div}
                                     onClick={() =>
                                       onDivSelect?.({
                                         exam: exam.name,
                                         subject: sub.name,
                                         class: cls.class,
-                                        div: d,
+                                        div: d.div,
+                                        studentMarks:d.students
                                       })
                                     }
                                     className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm hover:bg-blue-200 dark:hover:bg-blue-800 transition"
                                   >
-                                    Div {d}
+                                    Div {d.div}
                                   </button>
                                 ))}
                               </div>

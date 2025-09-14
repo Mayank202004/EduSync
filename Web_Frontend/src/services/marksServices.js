@@ -18,8 +18,8 @@ export const getUserFees = async () => {
  * @return {Promise} Promise resolving to template pdf
  */
 export const getMarkListTemplate = async (className,div) => {
-    const response = await axiosInstance.get(
-        "/marks/template",
+    const response = await axiosInstance.post(
+        "/marks/class-marklist-template",
         {className,div},
         {
             responseType:"blob", 
@@ -58,3 +58,12 @@ export const addClassMarks = async (examId,subject,className,div,marks,totalMark
     {timeout: 10000});
   return response.data;
 };
+
+/**
+ * @desc Fetch initial data for teacher marks tab
+ * @returns {Promise{Object}} Promise resolving to exams and Previous Marking Data
+ */
+export const getTeacherMarksData = async () => {
+  const response = await axiosInstance.get("/marks/teacher-data");
+  return response.data;
+}

@@ -3,8 +3,9 @@ import { Upload, ClipboardList, FileUp } from "lucide-react";
 import { getStudentList } from "@/services/attendenceService";
 import toast from "react-hot-toast";
 import { addClassMarks } from "@/services/marksServices";
+import UploadMarklistModal from "@/components/Modals/UploadMarkListModal";
 
-function AddGrades() {
+function AddGrades({exams}) {
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedDiv, setSelectedDiv] = useState("");
@@ -12,20 +13,25 @@ function AddGrades() {
   const [isLoading, setIsLoading] = useState(false);
   const [totalMarks, setTotalMarks] = useState(""); 
   const [selectedExam, setSelectedExam] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
 
   const subjects = ["Math", "Science", "English"];
   const classes = ["1", "2", "3"];
   const divisions = ["A", "B", "C"];
-  const exams = ["Unit Test 1", "Midterm", "Final Exam"];
-
 
   const handleFetchStudents = async () => {
     try {
       if (selectedClass && selectedDiv) {
         setIsLoading(true);
         const response = await getStudentList(selectedClass, selectedDiv);
-        setStudents(response.data || []);
+        const studentList = (response.data || []).map(({ _id, ...rest }) => ({
+          ...rest,
+          studentId: _id,                
+          marksObtained: rest.marksObtained ?? "",
+        }));
+        setStudents(studentList)
       }
     } catch (err) {
       // Error handled by axios interceptor
@@ -36,21 +42,14 @@ function AddGrades() {
 
   const handleMarksChange = (id, value) => {
     setStudents((prev) =>
-      prev.map((s) => (s._id === id ? { ...s, marks: value } : s))
+      prev.map((s) => (s.studentId === id ? { ...s, marksObtained: value } : s))
     );
   };
 
-  const handleUploadXLSX = () => {
-    alert("Upload XLSX clicked (dummy)");
-  };
-
-  const handleUploadMarklist = () => {
-    alert("Upload Marklist clicked (dummy)");
-  };
-
-  const handleAddMarkList = async () => {
+  const handleAddClassMarks = async () => {
     if (!totalMarks || !selectedClass || !selectedDiv || !selectedSubject || !selectedExam) {
       toast.error("Please fill in all the required fields.");
+      return;
     }
       try {
         await toast.promise(
@@ -69,7 +68,7 @@ function AddGrades() {
   // Check if all students have marks filled
   const allMarksFilled =
     students.length > 0 &&
-    students.every((s) => s.marks !== "" && s.marks !== null);
+    students.every((s) => s.marksObtained !== "" && s.marksObtained !== null);
 
   return (
     <div className="w-full h-full bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 overflow-y-auto">
@@ -77,6 +76,7 @@ function AddGrades() {
 
       {/* Dropdowns */}
       <div className="flex flex-wrap gap-4 mb-6">
+        {/* Exams Dropdown */}
         <select
           className="border rounded p-2"
           value={selectedExam}
@@ -84,8 +84,8 @@ function AddGrades() {
         >
           <option value="">Select Exam</option>
           {exams.map((exam) => (
-            <option key={exam} value={exam}>
-              {exam}
+            <option key={exam._id} value={exam._id}>
+              {exam.name}
             </option>
           ))}
         </select>
@@ -142,7 +142,6 @@ function AddGrades() {
         <>
           <div className="flex flex-wrap gap-4 mb-4">
             <button
-              onClick={handleUploadXLSX}
               className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
             >
               <Upload size={18} />
@@ -150,7 +149,7 @@ function AddGrades() {
             </button>
 
             <button
-              onClick={handleUploadMarklist}
+              onClick={() => setIsModalOpen(true)}
               className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
             >
               <FileUp size={18} />
@@ -174,7 +173,7 @@ function AddGrades() {
 
             <div className="mt-6">
               <button
-                onClick={handleAddMarkList}
+                onClick={handleAddClassMarks}
                 disabled={!allMarksFilled || !totalMarks}
                 className={`flex items-center gap-2 px-4 py-2 rounded text-white ${
                   allMarksFilled && totalMarks
@@ -203,7 +202,7 @@ function AddGrades() {
             <tbody>
               {students.map((student) => (
                 <tr
-                  key={student._id}
+                  key={student.studentId}
                   className="border-t dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   <td className="p-3">{student.fullName}</td>
@@ -212,9 +211,9 @@ function AddGrades() {
                       type="number"
                       min="0"
                       max={totalMarks || 100}
-                      value={student.marks}
+                      value={student.marksObtained}
                       onChange={(e) =>
-                        handleMarksChange(student._id, e.target.value)
+                        handleMarksChange(student.studentId, e.target.value)
                       }
                       className="border rounded px-2 py-1 w-24 text-center"
                     />
@@ -227,6 +226,15 @@ function AddGrades() {
       ) : (
         <p className="text-gray-500">No students loaded.</p>
       )}
+      {isModalOpen && (
+        <UploadMarklistModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          className={selectedClass}
+          div={selectedDiv}
+        />
+      )}
+
     </div>
   );
 }

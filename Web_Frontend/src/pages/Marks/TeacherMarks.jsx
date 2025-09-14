@@ -1,17 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import { ClipboardList, FileSpreadsheet } from "lucide-react";
 import AddGrades from "@/components/Marks/TeacherComponents/AddGrades";
 import PreviousMarkings from "@/components/Marks/TeacherComponents/PreviousMarkings";
 import MarkList from "@/components/Marks/TeacherComponents/MarkList";
+import { getTeacherMarksData } from "@/services/marksServices";
 
 function TeacherMarks() {
   const [activeTab, setActiveTab] = useState("addGrades");
   const [selectedContext, setSelectedContext] = useState(null); // exam + subject + class + div
+  const [exams,setExams] = useState([]);
+  const [previousMarkings,setPreviousMarkings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch exams and previous marking data
+    const fetchData = async () => {
+      try {
+        const response = await getTeacherMarksData();
+        setExams(response.data?.exams || []);
+        setPreviousMarkings(response.data?.previousMarkings || []);
+      } catch (error) {
+        // Already handled by axios instance
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const renderContent = () => {
     switch (activeTab) {
       case "addGrades":
-        return <AddGrades />;
+        return <AddGrades exams={exams}/>;
 
       case "previousMarkings":
         return selectedContext ? (
@@ -20,7 +40,7 @@ function TeacherMarks() {
             onBack={() => setSelectedContext(null)}
           />
         ) : (
-          <PreviousMarkings onDivSelect={setSelectedContext} />
+          <PreviousMarkings onDivSelect={setSelectedContext} previousMarkings={previousMarkings} />
         );
 
       default:
