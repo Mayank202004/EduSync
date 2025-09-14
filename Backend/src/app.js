@@ -13,7 +13,7 @@ const isProduction = process.env.NODE_ENV === "production";
 
 const allowedOrigins = isProduction
   ? ["https://edusync-v1.netlify.app"] // only prod domain
-  : ["http://localhost:5173", "http://192.168.141.63:5173"]; // dev + LAN
+  : ["http://localhost:5173","http://172.31.91.63:5173"]; // dev + LAN
 
 //cross origin resourse sharing
 app.use(

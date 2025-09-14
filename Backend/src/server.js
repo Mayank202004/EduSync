@@ -11,7 +11,7 @@ import { User } from "./models/user.model.js";
 const isProduction = process.env.NODE_ENV === "production";
 const allowedOrigins = isProduction
   ? ["https://edusync-v1.netlify.app"] // only prod domain
-  : ["http://localhost:5173", "http://192.168.141.63:5173"]; // dev + LAN
+  : ["http://localhost:5173", "http://172.31.91.63:5173"]; // dev + LAN
 
 
 // Create HTTP server
@@ -57,7 +57,7 @@ connectDatabase()
   .then(() => {
     // For running on local IP
     // server.listen(process.env.PORT || 3000,"0.0.0.0", () => {
-      // console.log(`Server is running at port : ${process.env.PORT}`);
+    //   console.log(`Server is running at port : ${process.env.PORT}`);
     // });
     
     // = = = For Local host or production 
@@ -90,6 +90,8 @@ import faqRouter from "./routes/faq.routes.js"
 import ticketRouter from "./routes/ticket.routes.js"
 import settingRouter from "./routes/setting.routes.js"
 import schoolRouter from "./routes/school.routes.js"
+import marksRouter from "./routes/marks.routes.js"
+import examRouter from "./routes/exam.routes.js"
 
 // Routes Declarations
 app.use("/api/v1/users", userRouter);
@@ -107,6 +109,8 @@ app.use("/api/v1/faq",faqRouter);
 app.use("/api/v1/ticket",ticketRouter);
 app.use("/api/v1/setting",settingRouter);
 app.use("/api/v1/school",schoolRouter);
+app.use("/api/v1/marks",marksRouter);
+app.use("/api/v1/exams",examRouter);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
