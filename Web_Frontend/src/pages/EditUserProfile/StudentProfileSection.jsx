@@ -35,9 +35,6 @@ const StudentProfileSection = () => {
   const { user } = useAuth();
   const rootRef = useRef();
   const [info, setInfo] = useState([]);
-
-  console.log(info);
-
   const [elements, setElements] = useState();
 
   useEffect(() => {
