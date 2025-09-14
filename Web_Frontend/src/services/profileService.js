@@ -35,3 +35,8 @@ export const updateAvatarApi = async (avatarFormData) => {
 
   return response.data;
 };
+
+export const changePasswordApi = async (data) => {
+  const response = await axiosInstance.post("/users/change-password", data);
+  return response.data;
+};
