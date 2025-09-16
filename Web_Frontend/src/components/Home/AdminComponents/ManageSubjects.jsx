@@ -113,7 +113,7 @@ const ManageTeacherSubjects = ({ onBackPressed }) => {
 
 
   return (
-    <div className="text-gray-900 dark:text-white">
+    <div className="text-gray-900 dark:text-white overflow-y-auto h-[calc(100%-30px)] my-5 w-full px-2">
       {/* Top Bar */}
       <div className="flex justify-between items-center mb-6">
         <button

@@ -53,11 +53,11 @@ const TeacherDashboard = () => {
   }, [isChatOpen]);
 
   return (
-    <div className="flex grow w-full h-[90vh] bg-transparent relative">
+    <div className="flex grow w-full h-full md:h-[90vh] bg-transparent relative">
       <div className="md:w-[30%] lg:w-[20%] border-r border-gray-200 dark:border-gray-700 h-full hidden md:block">
         <LeftSidebar chatData={chats} setChatData={setChats} />
       </div>
-      <div className="w-full md:w-[70%] lg:w-[60%] h-[calc(100vh-100px)] mt-5">
+      <div className="w-full md:w-[70%] lg:w-[60%] h-full mt-5">
         <TeacherHomeContent teacherSubjects={teacherSubjects} />
       </div>
       <div className="w-[20%] border-l border-gray-200 dark:border-gray-700 hidden lg:block">

@@ -56,7 +56,7 @@ function TeacherAttendance() {
 return (
   <div className="flex flex-col md:flex-row w-full min-h-screen bg-transparent">
     {/* Sidebar */}
-    <div className="w-full md:w-[35%] lg:w-[30%] xl:w-[20%] dark:border-gray-700 pl-4 pr-1 lg:pr-2 py-4 h-auto md:h-full overflow-y-auto">
+    <div className="w-full md:w-[35%] lg:w-[30%] xl:w-[20%] dark:border-gray-700 pt-4 px-4 md:pl-4 md:pr-1 lg:pr-2 md:pb-4 h-auto md:h-full overflow-y-auto">
       <LeftSidebar
         isClassTeacher={isClassTeacher}
         className={OwnClass}

@@ -71,7 +71,7 @@ const StudentDashboard = () => {
   }, [isChatOpen]);
 
   return (
-    <div className="flex w-full h-[90vh] bg-transparent relative">
+    <div className="flex w-full  h-full md:h-[90vh] bg-transparent relative">
       {/* Left Sidebar */}
       <div className="md:w-[30%] lg:w-[20%] border-r border-gray-200 dark:border-gray-700 hidden md:block">
         <LeftSidebar chatData={chats} setChatData={setChats} />

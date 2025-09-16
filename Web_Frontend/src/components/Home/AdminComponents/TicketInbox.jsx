@@ -32,7 +32,7 @@ const TicketInbox = ({ onBackPressed }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-customDarkFg border p-6 rounded-xl shadow-sm text-gray-900 dark:text-white max-w-5xl mx-auto h-full flex flex-col overflow-hidden pb-4">
+    <div className="bg-white dark:bg-customDarkFg border p-6 rounded-xl shadow-sm text-gray-900 dark:text-white max-w-5xl mx-auto h-[calc(100%-30px)] my-5 w-full px-4 flex flex-col overflow-hidden">
       <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
         <Inbox className="w-6 h-6 text-blue-600" /> Support Tickets
       </h2>

@@ -129,7 +129,7 @@ const ManageClasses = ({ onBackPressed }) => {
 
 
   return (
-    <div className="text-gray-900 dark:text-white">
+    <div className="text-gray-900 dark:text-white overflow-y-auto h-[calc(100%-30px)] my-5 w-full px-2">
       <button
           onClick={onBackPressed}
           className="flex items-center gap-2 text-blue-600 hover:underline mb-6 mt-3"

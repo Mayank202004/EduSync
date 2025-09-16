@@ -69,7 +69,7 @@ const BulkStudentUpload = ({ onBack }) => {
   };
 
   return (
-    <div className="px-6 text-gray-900 dark:text-white">
+    <div className="px-1 md:px-6 text-gray-900 dark:text-white">
       {/* Back Button */}
       <button
         onClick={onBack}
@@ -85,7 +85,7 @@ const BulkStudentUpload = ({ onBack }) => {
       </p>
 
       {/* Template Button */}
-      <div className="mb-6 flex justify-end">
+      <div className="mb-6 flex justify-center md:justify-end">
         <button
           onClick={handleDownloadTemplate}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"

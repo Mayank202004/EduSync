@@ -53,16 +53,20 @@ const ExamManagement = ({ onBack, initialExams}) => {
       <h3 className="text-xl font-semibold">📘 Exam Management</h3>
 
       {/* Add New Exam */}
-      <div className="flex gap-3 items-center">
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center w-full">
         <input
           value={newExamName}
           onChange={(e) => setNewExamName(e.target.value)}
           placeholder="Enter exam name"
-          className="border border-gray-300 dark:border-gray-600 rounded px-4 py-2 text-black dark:text-white w-64"
+          className="border border-gray-300 dark:border-gray-600 rounded px-4 py-2
+                     text-black dark:text-white 
+                     w-full sm:w-[calc(100vw-150px)] md:w-64 max-w-full"
         />
         <button
           onClick={handleAddExam}
-          className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded"
+          className="flex items-center justify-center gap-2
+                     bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded
+                     w-full sm:w-[150px]"
         >
           <PlusCircle size={18} /> Add Exam
         </button>

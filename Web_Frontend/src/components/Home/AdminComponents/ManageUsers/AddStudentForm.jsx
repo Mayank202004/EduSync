@@ -49,7 +49,7 @@ const AddStudentForm = ({ onBack }) => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-1 md:p-6">
       <button
         onClick={onBack}
         className="flex items-center gap-2 text-blue-600 hover:underline mb-6"
