@@ -49,7 +49,7 @@ function TeacherMarks() {
   };
 
   return (
-    <div className="flex h-[90vh] w-full bg-customLightBg dark:bg-customDarkFg px-4 py-2">
+    <div className="flex flex-col md:flex-row hh-full md:h-[90vh] w-full bg-customLightBg dark:bg-customDarkFg px-4 py-4 md:py-2">
       {/* Sidebar */}
       <div className="hidden md:block md:w-[30%] lg:w-[20%] pr-4">
         <div className="h-full bg-white dark:bg-gray-900 rounded-2xl shadow-md p-5 dark:border dark:border-gray-700">
@@ -85,8 +85,39 @@ function TeacherMarks() {
         </div>
       </div>
 
+      {/* Mobile Tab Header */}
+<div className="flex md:hidden mb-4 bg-white dark:bg-gray-900 rounded-lg shadow overflow-hidden">
+  <button
+    className={`flex items-center justify-center gap-2 px-3 py-2 w-1/2 ${
+      activeTab === "addGrades"
+        ? "bg-blue-600 text-white"
+        : "text-gray-700 dark:text-gray-300"
+    }`}
+    onClick={() => {
+      setActiveTab("addGrades");
+      setSelectedContext(null);
+    }}
+  >
+    <ClipboardList size={18} /> Add Grades
+  </button>
+  <button
+    className={`flex items-center justify-center gap-2 px-3 py-2 w-1/2 ${
+      activeTab === "previousMarkings"
+        ? "bg-blue-600 text-white"
+        : "text-gray-700 dark:text-gray-300"
+    }`}
+    onClick={() => {
+      setActiveTab("previousMarkings");
+      setSelectedContext(null);
+    }}
+  >
+    <FileSpreadsheet size={18} /> Previous Markings
+  </button>
+</div>
+
+
       {/* Main Content */}
-      <div className="w-full md:w-[70%] lg:w-[80%]">{renderContent()}</div>
+      <div className="h-full w-full md:w-[70%] lg:w-[80%]">{renderContent()}</div>
     </div>
   );
 }
