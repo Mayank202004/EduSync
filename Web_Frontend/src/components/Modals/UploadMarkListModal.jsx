@@ -49,7 +49,7 @@ function UploadMarklistModal({ isOpen, onClose, className, div }) {
   return (
     <Modal title="AI-Powered Marks Parsing" onClose={onClose}>
       {/* Download Template */}
-      <div className="mb-4">
+      <div className="mb-4 overflow-y-auto w-full md:w-auto justify-center md:justify-start flex">
         <button
           onClick={downloadTemplate}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
@@ -86,43 +86,48 @@ function UploadMarklistModal({ isOpen, onClose, className, div }) {
       </div>
 
       {/* Steps Illustration */}
-          <h3 className="text-lg font-semibold mb-4 text-center">Steps to Upload Marklist</h3>
-      <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-4">
-        <div className="flex flex-col items-center text-center">
-          <div className="bg-blue-100 dark:bg-blue-800 p-3 rounded-full mb-2">
-            <Download className="text-blue-600 dark:text-blue-200" size={24} />
+      <h3 className="text-lg font-semibold mb-4 text-center">Steps to Upload Marklist</h3>
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4 sm:gap-0">
+        
+        <div className="flex gap-3 sm:gap-0">
+          <div className="flex flex-col items-center text-center">
+            <div className="bg-blue-100 dark:bg-blue-800 p-3 rounded-full mb-2">
+              <Download className="text-blue-600 dark:text-blue-200" size={24} />
+            </div>
+            <p className="text-sm font-medium">Download Template</p>
           </div>
-          <p className="text-sm font-medium">Download Template</p>
+
+          <div className="flex-1 h-1 bg-gray-300 dark:bg-gray-600 md:hidden"></div>
+          <div className="hidden md:block flex-1 h-1 bg-gray-300 dark:bg-gray-600"></div>
+
+          <div className="flex flex-col items-center text-center">
+            <div className="bg-green-100 dark:bg-green-800 p-3 rounded-full mb-2">
+              <Printer className="text-green-600 dark:text-green-200" size={24} />
+            </div>
+            <p className="text-sm font-medium">Print Template</p>
+          </div>
+
+          <div className="flex-1 h-1 bg-gray-300 dark:bg-gray-600 md:hidden"></div>
+          <div className="hidden md:block flex-1 h-1 bg-gray-300 dark:bg-gray-600"></div>
         </div>
 
-        <div className="flex-1 h-1 bg-gray-300 dark:bg-gray-600 md:hidden"></div>
-        <div className="hidden md:block flex-1 h-1 bg-gray-300 dark:bg-gray-600"></div>
-
-        <div className="flex flex-col items-center text-center">
-          <div className="bg-green-100 dark:bg-green-800 p-3 rounded-full mb-2">
-            <Printer className="text-green-600 dark:text-green-200" size={24} />
+        <div className="flex gap-3 md:gap-0">
+          <div className="flex flex-col items-center text-center">
+            <div className="bg-yellow-100 dark:bg-yellow-800 p-3 rounded-full mb-2">
+              <Edit3 className="text-yellow-600 dark:text-yellow-200" size={24} />
+            </div>
+            <p className="text-sm font-medium">Fill Marks by Hand</p>
           </div>
-          <p className="text-sm font-medium">Print Template</p>
-        </div>
 
-        <div className="flex-1 h-1 bg-gray-300 dark:bg-gray-600 md:hidden"></div>
-        <div className="hidden md:block flex-1 h-1 bg-gray-300 dark:bg-gray-600"></div>
+          <div className="flex-1 h-1 bg-gray-300 dark:bg-gray-600 md:hidden"></div>
+          <div className="hidden md:block flex-1 h-1 bg-gray-300 dark:bg-gray-600"></div>
 
-        <div className="flex flex-col items-center text-center">
-          <div className="bg-yellow-100 dark:bg-yellow-800 p-3 rounded-full mb-2">
-            <Edit3 className="text-yellow-600 dark:text-yellow-200" size={24} />
+          <div className="flex flex-col items-center text-center">
+            <div className="bg-purple-100 dark:bg-purple-800 p-3 rounded-full mb-2">
+              <CloudUpload className="text-purple-600 dark:text-purple-200" size={24} />
+            </div>
+            <p className="text-sm font-medium">Upload PDF</p>
           </div>
-          <p className="text-sm font-medium">Fill Marks by Hand</p>
-        </div>
-
-        <div className="flex-1 h-1 bg-gray-300 dark:bg-gray-600 md:hidden"></div>
-        <div className="hidden md:block flex-1 h-1 bg-gray-300 dark:bg-gray-600"></div>
-
-        <div className="flex flex-col items-center text-center">
-          <div className="bg-purple-100 dark:bg-purple-800 p-3 rounded-full mb-2">
-            <CloudUpload className="text-purple-600 dark:text-purple-200" size={24} />
-          </div>
-          <p className="text-sm font-medium">Upload PDF</p>
         </div>
       </div>
 
