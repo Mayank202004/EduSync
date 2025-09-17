@@ -1,4 +1,3 @@
-// models/ClassMarks.js
 import mongoose from "mongoose";
 
 const studentMarkSchema = new mongoose.Schema({
@@ -18,6 +17,7 @@ const classMarksSchema = new mongoose.Schema({
   class: { type: String, required: true },
   div: { type: String, required: true },
   subjects: [subjectMarksSchema],
+  isPublished : { type: Boolean, default: false}
 }, { timestamps: true });
 
 export default mongoose.model("ClassMarks", classMarksSchema);

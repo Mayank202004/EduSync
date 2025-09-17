@@ -4,10 +4,12 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import puppeteer from "puppeteer";
 import ejs from "ejs";
 import { Student } from "../models/student.model.js";
+import { SchoolResource } from "../models/resource.model.js";
 import ClassMarks from "../models/marks.model.js";
 import StudentMarks from "../models/studentMarks.model.js";
 import { isTeacherAllowed } from "../utils/verificationUtils.js"
 import { Exam } from "../models/exam.model.js";
+import { ClassStructure } from "../models/classStructure.model.js";
 
 /**
  * @desc Export class mark sheet template (To handfill marks physically)
@@ -394,4 +396,79 @@ export const getTeacherMarksData = asyncHandler(async (req, res) => {
   });
   
   res.status(200).json(new ApiResponse(200, {exams, previousMarkings: Array.from(examMap.values())}, "Teacher marks data fetched successfully"));
+});
+
+/**
+ * @desc Get class marks data for a particular exam
+ * @route GET /api/v1/marks/class-marks-data
+ * @access Private (SuperAdmin)
+ */
+export const getClassMarksData = asyncHandler(async (req, res) => {
+  const { examId, className, div } = req.body;
+
+  if (!examId?.trim() || !className?.trim() || !div?.trim()) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  const classMarks = await ClassMarks.findOne({
+    examId,
+    class: className,
+    div,
+  })
+    .select("subjects isPublished")
+    .populate({
+      path: "subjects.gradedBy",
+      select: "userId",
+      populate: {
+        path: "userId",
+        select: "fullName",
+        model: "User",
+      },
+      model: "Teacher",
+    })
+    .populate({
+      path: "subjects.students.studentId",
+      select: "userId",
+      populate: {
+        path: "userId",
+        select: "fullName",
+        model: "User",
+      },
+      model: "Student",
+    })
+    .lean(); 
+
+  const transformed = {
+    isPublished: classMarks?.isPublished || false,
+    subjects: classMarks?.subjects?.map((subj) => ({
+      subject: subj.subject,
+      gradedBy: subj.gradedBy?.userId?.fullName || "N/A",
+      students: subj.students.map((stu) => ({
+        fullName: stu.studentId?.userId?.fullName || "Unknown",
+        marksObtained: stu.marksObtained,
+        totalMarks: stu.totalMarks,
+      })),
+    })),
+  };
+
+  const resource = await SchoolResource.findOne({ class: className })
+  .select("subjects.subjectName -_id")
+  .lean();
+  const subjectNames = resource?.subjects.map(s => s.subjectName) || [];
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, {marks: transformed,subjectNames}, "Marks data fetched successfully"));
+});
+
+/**
+ * @desc Get Initial Data for superadmin marks tab
+ * @route GET /api/v1/marks/superadmin-data
+ * @access Private (Super Admin)
+ */
+export const getSuperAdminData = asyncHandler(async (req, res) => {
+  const exams = await Exam.find({ schoolId: req.school?._id }).select("_id name");
+  const classes = await ClassStructure.find({ schoolId: req.school?._id }).select('className divisions');
+
+  res.status(200).json(new ApiResponse(200, {exams, classes}, "Superadmin data fetched successfully"));
 });

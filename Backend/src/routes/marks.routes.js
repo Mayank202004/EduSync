@@ -7,9 +7,11 @@ const router = Router();
 
 router.get('/me',verifyJWT,verifyStudent,MarksController.getStudentMarks);
 router.get('/teacher-data',verifyJWT,verifyTeacher,MarksController.getTeacherMarksData);
+router.get('/superadmin-data',verifyJWT,verifySuperAdmin,MarksController.getSuperAdminData);
 
 router.post('/add-class-marks',verifyJWT,verifyTeacher,MarksController.addClassMarks);
 router.put('/update-class-marks',verifyJWT,verifyTeacher,MarksController.updateClassMarks);
 router.post('/class-marklist-template',verifyJWT,orMiddleware([verifyTeacher,verifySuperAdmin]),MarksController.exportClassMarklistTemplate);
+router.post('/class-marks-data',verifyJWT,verifySuperAdmin,MarksController.getClassMarksData);
 
 export default router;
