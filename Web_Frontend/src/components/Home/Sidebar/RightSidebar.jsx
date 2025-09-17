@@ -17,7 +17,7 @@ const RightSidebar = ({events, isLoading}) => {
         />
         <h2 className="font-semibold text-1.5xl">Events</h2>
       </div>
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-hidden">
         <UpcomingEvents events={events} isLoading={isLoading}/>
       </div>
 
