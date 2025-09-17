@@ -85,3 +85,24 @@ export const getTeacherMarksData = async () => {
   const response = await axiosInstance.get("/marks/teacher-data");
   return response.data;
 }
+
+/**
+ * @desc Fetch marks data of a class for a particular exam
+ * @param {String} className - Class Name
+ * @param {String} div - Division
+ * @param {String} examId - _id of Exam
+ * @returns {Promise<Object>} - {marks,subjectName} Object of marks data along with list of subjects
+ */
+export const getClassMarksData = async (className,div,examId) => {
+  const response = await axiosInstance.post("/marks/class-marks-data",{className,div,examId});
+  return response.data;
+}
+
+/**
+ * @desc Fetch Initial data for super admin marks tab
+ * @returns {Promise<Object>} - Promise resolving to super admin data
+ */
+export const getSuperAdminData = async () => {
+  const response = await axiosInstance.get("/marks/superadmin-data");
+  return response.data;
+}
