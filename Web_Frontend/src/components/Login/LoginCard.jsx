@@ -1,4 +1,4 @@
-import React,{ useActionState, useState} from "react";
+import React, { useActionState, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import Input from "../UI/Input";
@@ -9,15 +9,19 @@ import OtpInputCard from "./OtpInputCard";
 
 const inputStyle =
   "border text-black border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-black my-0.5";
+const capsLockHint = { text: "*Caps Lock is on", style: "text-blue-400 text-xs dark:text-blue-400" };
 
 const LoginCard = ({ switchToSignup }) => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [otpRequired, setOtpRequired] = useState(false);
   const [otpData, setOtpData] = useState("");
-  
+  const [isCapsLockOn, setIsCapsLockOn] = useState(false);
+  const [password, setPassword] = useState("");
+
   const [signInValues, formAction, isPending] = useActionState(
-    (prevState, formData) => signInAction(prevState, formData, onSuccess, onOtpRequired),
+    (prevState, formData) =>
+      signInAction(prevState, formData, onSuccess, onOtpRequired),
     {
       errors: null,
       inputValues: {
@@ -38,7 +42,13 @@ const LoginCard = ({ switchToSignup }) => {
   };
 
   if (otpRequired) {
-    return <OtpInputCard otpData={otpData} onSuccess={onSuccess} onBack={() => setOtpRequired(false)}/>;
+    return (
+      <OtpInputCard
+        otpData={otpData}
+        onSuccess={onSuccess}
+        onBack={() => setOtpRequired(false)}
+      />
+    );
   }
   return (
     <div className="h-full w-full md:w-100 flex items-center justify-center">
@@ -60,14 +70,22 @@ const LoginCard = ({ switchToSignup }) => {
           />
           <Input
             inputStyle={inputStyle}
-            key={signInValues.inputValues.password + "password-SignIp"}
             error={signInValues.errors?.get("password")}
+            hints={isCapsLockOn ? [capsLockHint] : []}
             inputProps={{
               type: "password",
               name: "password",
               required: true,
               placeholder: "Password",
-              defaultValue: signInValues.inputValues.password,
+              value: password,
+              onChange: (e) => {
+                setPassword(e.target.value);
+              },
+              onKeyDown: (e) => {
+                const caps =
+                  e.getModifierState && e.getModifierState("CapsLock");
+                setIsCapsLockOn(caps);
+              },
             }}
           />
           <SimpleButton
@@ -88,9 +106,9 @@ const LoginCard = ({ switchToSignup }) => {
 
         <div className="flex flex-wrap gap-1.5 mt-0.5 w-fit mx-auto text-center text-sm text-gray-600">
           <span className="">Don’t have an account??</span>
-          <LinkButton
-            buttonProps={{ onClick: switchToSignup }}
-          >Sign up</LinkButton>
+          <LinkButton buttonProps={{ onClick: switchToSignup }}>
+            Sign up
+          </LinkButton>
         </div>
       </div>
     </div>
