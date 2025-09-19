@@ -350,7 +350,7 @@ const MainContent = ({
           onConfirm={confirmModal.action}
           onCancel={() => setConfirmModal(null)}
         />
-      )};
+      )}
     </div>
   );
 };
