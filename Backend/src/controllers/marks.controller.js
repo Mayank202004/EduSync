@@ -10,6 +10,7 @@ import StudentMarks from "../models/studentMarks.model.js";
 import { isTeacherAllowed } from "../utils/verificationUtils.js"
 import { Exam } from "../models/exam.model.js";
 import { ClassStructure } from "../models/classStructure.model.js";
+import { getGrade } from "../utils/marksUtils.js"
 
 /**
  * @desc Export class mark sheet template (To handfill marks physically)
@@ -472,3 +473,55 @@ export const getSuperAdminData = asyncHandler(async (req, res) => {
 
   res.status(200).json(new ApiResponse(200, {exams, classes}, "Superadmin data fetched successfully"));
 });
+
+/**
+ * @desc Get student marks data for a particular exam (Grades for lower classes and marks for higher classes)
+ * @route GET /api/v1/marks/student-data
+ * @access Private (Student)
+ */
+export const getStudentMarksData = asyncHandler(async (req, res) => {
+  const marks =
+    (await StudentMarks.find({ studentId: req.student?._id }) 
+      .select("examId marks")
+      .populate({
+        path: "examId",
+        select: "name", 
+      })
+      .populate({
+        path: "marks.markedBy",
+        select: "userId",
+        populate: {
+          path: "userId",
+          select: "fullName",
+        },
+      })) ?? [];
+
+  if (!marks || marks.length === 0) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, [], "No marks found for this student"));
+  }
+
+  // If class is below 8 → return grades for each exam
+  if (req.student.class < 8) {
+    const gradesData = marks.map((exam) => ({
+      id: exam._id,
+      examId: exam.examId,
+      grades: exam.marks.map((m) => ({
+        subject: m.subject,
+        grade: getGrade(m.marksObtained, m.totalMarks),
+        markedBy: {userId:{fullName: m.markedBy?.userId?.fullName || "N/A"}},
+      })),
+    }));
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, gradesData, "Grades fetched successfully"));
+  }
+
+  // Else → return marks as they are (array of exams)
+  return res
+    .status(200)
+    .json(new ApiResponse(200, marks, "Student marks fetched successfully"));
+});
+

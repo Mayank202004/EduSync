@@ -8,6 +8,7 @@ const router = Router();
 router.get('/me',verifyJWT,verifyStudent,MarksController.getStudentMarks);
 router.get('/teacher-data',verifyJWT,verifyTeacher,MarksController.getTeacherMarksData);
 router.get('/superadmin-data',verifyJWT,verifySuperAdmin,MarksController.getSuperAdminData);
+router.get('/student-data',verifyJWT,verifyStudent,MarksController.getStudentMarksData);
 
 router.post('/add-class-marks',verifyJWT,verifyTeacher,MarksController.addClassMarks);
 router.put('/update-class-marks',verifyJWT,verifyTeacher,MarksController.updateClassMarks);
