@@ -71,14 +71,14 @@ function AddGrades({exams}) {
     students.every((s) => s.marksObtained !== "" && s.marksObtained !== null);
 
   return (
-    <div className="w-full h-full bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 overflow-y-auto">
+    <div className="w-full h-full bg-white dark:bg-customDarkFg rounded-2xl shadow-md p-6 overflow-y-auto">
       <h2 className="text-2xl font-semibold mb-4">Add Grades</h2>
 
       {/* Dropdowns */}
       <div className="flex flex-wrap gap-4 mb-6">
         {/* Exams Dropdown */}
         <select
-          className="border rounded p-2"
+          className="border rounded p-2 dark:bg-customDarkFg"
           value={selectedExam}
           onChange={(e) => setSelectedExam(e.target.value)}
         >
@@ -91,7 +91,7 @@ function AddGrades({exams}) {
         </select>
         
         <select
-          className="border rounded p-2"
+          className="border rounded p-2 dark:bg-customDarkFg"
           value={selectedSubject}
           onChange={(e) => setSelectedSubject(e.target.value)}
         >
@@ -104,7 +104,7 @@ function AddGrades({exams}) {
         </select>
 
         <select
-          className="border rounded p-2"
+          className="border rounded p-2 dark:bg-customDarkFg"
           value={selectedClass}
           onChange={(e) => setSelectedClass(e.target.value)}
         >
@@ -117,7 +117,7 @@ function AddGrades({exams}) {
         </select>
 
         <select
-          className="border rounded p-2"
+          className="border rounded p-2 dark:bg-customDarkFg"
           value={selectedDiv}
           onChange={(e) => setSelectedDiv(e.target.value)}
         >
@@ -194,7 +194,7 @@ function AddGrades({exams}) {
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white dark:bg-customDarkFg border dark:border-gray-600 rounded-lg table-fixed">
             <thead>
-              <tr className="text-left bg-gray-100 dark:bg-gray-800">
+              <tr className="text-left bg-gray-100 dark:bg-customDarkFg">
                 <th className="p-3 w-3/4">Name</th>
                 <th className="p-3 w-1/4">Marks</th>
               </tr>
@@ -215,7 +215,7 @@ function AddGrades({exams}) {
                       onChange={(e) =>
                         handleMarksChange(student.studentId, e.target.value)
                       }
-                      className="border rounded px-2 py-1 w-24 text-center"
+                      className="border rounded px-2 py-1 w-24 text-center dark:border-gray-500"
                     />
                   </td>
                 </tr>

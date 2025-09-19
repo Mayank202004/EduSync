@@ -1,6 +1,7 @@
 import { Download, BarChart2 } from "lucide-react";
+import MainContentSkeleton from "./MainContentSkeleton";
 
-function MainContent({ student, activeIndex, exams }) {
+function MainContent({ student, activeIndex, exams, loading}) {
   const selectedExam = exams[activeIndex - 1];
 
   const totalObtained = selectedExam?.marks
@@ -16,10 +17,13 @@ function MainContent({ student, activeIndex, exams }) {
       ? ((totalObtained / totalMarks) * 100).toFixed(2)
       : 0;
 
+  if (loading)
+    return <MainContentSkeleton activeIndex={activeIndex} />
+
   return (
     <div className="w-full md:w-[75%] lg:w-[80%] space-y-6 overflow-y-auto">
       {/* Student Info */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mt-5">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {student.name}

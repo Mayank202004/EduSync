@@ -19,6 +19,7 @@ function StudentMarks() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const response = await getStudentMarksData();
         setExams(response.data);
       } catch (err) {
@@ -30,18 +31,11 @@ function StudentMarks() {
     fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[90vh] text-gray-600 dark:text-gray-300">
-        Loading student marks...
-      </div>
-    );
-  }
 
   return (
     <div className="flex h-[90vh] w-full bg-gray-50 dark:bg-gray-900 px-4 py-2">
       <LeftSidebar exams={exams} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
-      <MainContent student={student} activeIndex={activeIndex} exams={exams} />
+      <MainContent student={student} activeIndex={activeIndex} exams={exams} loading={loading}/>
     </div>
   );
 }

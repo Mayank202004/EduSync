@@ -17,12 +17,12 @@ function PreviousMarkings({ onDivSelect, previousMarkings}) {
   }
 
   return (
-    <div className="w-full h-full bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6">
+    <div className="w-full h-full bg-white dark:bg-customDarkFg rounded-2xl shadow-md p-6">
       <h2 className="text-2xl font-semibold mb-6">Previous Markings</h2>
 
       <div className="space-y-4">
         {previousMarkings.map((exam) => (
-          <div key={exam._id} className="border rounded-lg dark:border-gray-700">
+          <div key={exam._id} className="border rounded-lg dark:border-gray-500">
             {/* Exam */}
             <div
               onClick={() =>
@@ -42,11 +42,11 @@ function PreviousMarkings({ onDivSelect, previousMarkings}) {
 
             {/* Subjects */}
             {openExam === exam._id && (
-              <div className="px-6 py-3 space-y-3 bg-gray-50 dark:bg-gray-900">
+              <div className="px-6 py-3 space-y-3 bg-gray-50 dark:bg-customDarkFg">
                 {exam.subjects.map((sub) => (
                   <div
                     key={sub.name}
-                    className="border rounded-md dark:border-gray-600"
+                    className="border rounded-md dark:border-gray-500"
                   >
                     <div
                       onClick={() =>
@@ -74,7 +74,7 @@ function PreviousMarkings({ onDivSelect, previousMarkings}) {
                         {sub.classes.map((cls) => (
                           <div
                             key={cls.class}
-                            className="border rounded-md dark:border-gray-600"
+                            className="border rounded-md dark:border-gray-500"
                           >
                             <div
                               onClick={() =>
