@@ -106,3 +106,12 @@ export const getSuperAdminData = async () => {
   const response = await axiosInstance.get("/marks/superadmin-data");
   return response.data;
 }
+
+/**
+ * @desc Fetch Student Marks data
+ * @returns {Promise<Object>} - Promise resolving to marks data
+ */
+export const getStudentMarksData = async () => {
+  const response = await axiosInstance.get('/marks/student-data');
+  return response.data;
+}
