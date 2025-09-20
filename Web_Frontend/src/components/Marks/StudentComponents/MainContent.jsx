@@ -1,5 +1,6 @@
 import { Download, BarChart2 } from "lucide-react";
 import MainContentSkeleton from "./MainContentSkeleton";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 function MainContent({ student, activeIndex, exams, loading}) {
   const selectedExam = exams[activeIndex - 1];
@@ -17,13 +18,19 @@ function MainContent({ student, activeIndex, exams, loading}) {
       ? ((totalObtained / totalMarks) * 100).toFixed(2)
       : 0;
 
+  const chartData =
+    exams?.map((exam) => ({
+      name: exam.examId?.name || "Exam",
+      percentage: parseFloat(exam.percentage), 
+    })) ?? [];
+
   if (loading)
     return <MainContentSkeleton activeIndex={activeIndex} />
 
   return (
     <div className="w-full md:w-[75%] lg:w-[80%] space-y-6 overflow-y-auto">
       {/* Student Info */}
-      <div className="flex justify-between items-center mt-5">
+      <div className="flex flex-col md:flex-row justify-between items-center mt-5 gap-4 md:gap-0">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {student.name}
@@ -45,17 +52,39 @@ function MainContent({ student, activeIndex, exams, loading}) {
           <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
             Performance Overview
           </h2>
-          <div className="flex justify-center items-center h-64 text-gray-400 dark:text-gray-500">
-            <BarChart2 size={64} className="animate-bounce" />
-            <span className="ml-4">Graph of marks across exams here</span>
-          </div>
+
+          {chartData.length >= 2 ? (
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="percentage"
+                    stroke="#2563eb" // blue-600
+                    strokeWidth={3}
+                    dot={{ r: 5 }}
+                    activeDot={{ r: 8 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+              <div className="flex justify-center items-center h-64 text-gray-400 dark:text-gray-500">
+                <BarChart2 size={64} className="animate-bounce" />
+                <span className="ml-4">Graph of marks across exams will appear here - Currently Not enough exams to show performance graph</span>
+            </div>
+          )}
         </div>
       )}
 
       {/* Selected Exam */}
       {activeIndex > 0 && selectedExam && (
-        <div className="p-6 bg-white dark:bg-gray-800 shadow rounded-lg">
-          <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+        <div className="p-2 md:p-6 bg-white dark:bg-gray-800 shadow rounded-lg">
+          <h2 className="ml-2 md:ml-0 text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
             {selectedExam.examId.name || "Exam"}
           </h2>
 
@@ -91,7 +120,7 @@ function MainContent({ student, activeIndex, exams, loading}) {
               </div>
 
               {/* Summary */}
-              <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded flex justify-between items-center">
+              <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded flex flex-col md:flex-row justify-between items-center">
                 <p className="font-semibold">
                   Total Marks: {totalObtained} / {totalMarks}
                 </p>
