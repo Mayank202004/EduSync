@@ -10,7 +10,7 @@ import StudentMarks from "../models/studentMarks.model.js";
 import { isTeacherAllowed } from "../utils/verificationUtils.js"
 import { Exam } from "../models/exam.model.js";
 import { ClassStructure } from "../models/classStructure.model.js";
-import { getGrade } from "../utils/marksUtils.js"
+import { cleanClassTeacherMarks,cleanTeacherMarks, getGrade } from "../utils/marksUtils.js"
 
 /**
  * @desc Export class mark sheet template (To handfill marks physically)
@@ -337,7 +337,7 @@ export const getTeacherMarksData = asyncHandler(async (req, res) => {
   const exams = await Exam.find({ schoolId: req.school?._id }).select("_id name");
 
   // Fetch only marks graded by this teacher
-  const teacherMarks = await StudentMarks.find({
+  let teacherMarks = await StudentMarks.find({
     "marks.markedBy": teacher._id,
   })
     .populate("examId", "name")
@@ -349,54 +349,48 @@ export const getTeacherMarksData = asyncHandler(async (req, res) => {
         select: "fullName",
       },
     });
-  
-  // Organize data in nested structure
-  const examMap = new Map();
 
-  teacherMarks.forEach((sm) => {
-    const examName = sm.examId?.name;
-    if (!examName) return;
-
-    if (!examMap.has(examName)) {
-      examMap.set(examName, { _id:sm.examId._id,name:examName, subjects: [] });
-    }
-    const examObj = examMap.get(examName);
-
-    sm.marks.forEach((mark) => {
-      if (String(mark.markedBy) !== String(teacher._id)) return;
-
-      // check subject exists or push
-      let subjectObj = examObj.subjects.find((s) => s.name === mark.subject);
-      if (!subjectObj) {
-        subjectObj = { name: mark.subject, classes: [] };
-        examObj.subjects.push(subjectObj);
-      }
-
-      // check class exists
-      let classObj = subjectObj.classes.find((c) => c.class === sm.studentId.class);
-      if (!classObj) {
-        classObj = { class: sm.studentId.class, divs: [] };
-        subjectObj.classes.push(classObj);
-      }
-
-      // check div exists
-      let divObj = classObj.divs.find((d) => d.div === sm.studentId.div);
-      if (!divObj) {
-        divObj = { div: sm.studentId.div, students: [] };
-        classObj.divs.push(divObj);
-      }
-
-      // push student marks
-      divObj.students.push({
-        studentId: sm.studentId._id,
-        name: sm.studentId.userId?.fullName,
-        marksObtained: mark.marksObtained,
-        totalMarks: mark.totalMarks,
+  let classTeacherData = [];
+  let resource=[];
+  if (teacher.classTeacher?.class && teacher.classTeacher?.div) {
+    classTeacherData = await ClassMarks.find({
+      class: teacher.classTeacher.class,
+      div: teacher.classTeacher.div,
+    }).select("examId subjects isPublished")
+      .populate("examId", "name")
+      .populate({
+        path: "subjects.gradedBy",
+        select: "userId",
+        populate: {
+          path: "userId",
+          select: "fullName",
+          model: "User",
+        },
+        model: "Teacher",
+      })
+      .populate({
+        path: "subjects.students.studentId",
+        select: "class div userId", 
+        populate: {
+          path: "userId",
+          select: "fullName", 
+        },
       });
-    });
-  });
+
+    resource = await SchoolResource.findOne({ class: teacher.classTeacher.class })
+      .select("subjects.subjectName -_id")
+      .lean();
+  }
+  // Clean Marks Data into proper nested structure
+  if(teacherMarks && teacherMarks.length)teacherMarks = cleanTeacherMarks(teacherMarks);
+  if(classTeacherData && classTeacherData.length) classTeacherData = cleanClassTeacherMarks(classTeacherData);
+
+  // Fetch subjects list
   
-  res.status(200).json(new ApiResponse(200, {exams, previousMarkings: Array.from(examMap.values())}, "Teacher marks data fetched successfully"));
+  const subjectNames = resource?.subjects.map(s => s.subjectName) || [];
+
+  
+  res.status(200).json(new ApiResponse(200, {exams, previousMarkings: teacherMarks, classTeacherData,subjectNames}, "Teacher marks data fetched successfully"));
 });
 
 /**
@@ -481,11 +475,11 @@ export const getSuperAdminData = asyncHandler(async (req, res) => {
  */
 export const getStudentMarksData = asyncHandler(async (req, res) => {
   const marks =
-    (await StudentMarks.find({ studentId: req.student?._id }) 
+    (await StudentMarks.find({ studentId: req.student?._id })
       .select("examId marks")
       .populate({
         path: "examId",
-        select: "name", 
+        select: "name",
       })
       .populate({
         path: "marks.markedBy",
@@ -502,26 +496,45 @@ export const getStudentMarksData = asyncHandler(async (req, res) => {
       .json(new ApiResponse(404, [], "No marks found for this student"));
   }
 
-  // If class is below 8 → return grades for each exam
+  // If class is below 8 → return grades for each exam with percentage
   if (req.student.class < 8) {
-    const gradesData = marks.map((exam) => ({
-      id: exam._id,
-      examId: exam.examId,
-      grades: exam.marks.map((m) => ({
-        subject: m.subject,
-        grade: getGrade(m.marksObtained, m.totalMarks),
-        markedBy: {userId:{fullName: m.markedBy?.userId?.fullName || "N/A"}},
-      })),
-    }));
+    const gradesData = marks.map((exam) => {
+      const totalObtained = exam.marks.reduce((sum, m) => sum + m.marksObtained, 0);
+      const totalMarks = exam.marks.reduce((sum, m) => sum + m.totalMarks, 0);
+      const percentage = totalMarks > 0 ? ((totalObtained / totalMarks) * 100).toFixed(2) : 0;
+
+      return {
+        id: exam._id,
+        examId: exam.examId,
+        percentage, 
+        grades: exam.marks.map((m) => ({
+          subject: m.subject,
+          grade: getGrade(m.marksObtained, m.totalMarks),
+          markedBy: { userId: { fullName: m.markedBy?.userId?.fullName || "N/A" } },
+        })),
+      };
+    });
 
     return res
       .status(200)
       .json(new ApiResponse(200, gradesData, "Grades fetched successfully"));
   }
 
-  // Else → return marks as they are (array of exams)
+  // Else → return marks with percentage
+  const marksWithPercentage = marks.map((exam) => {
+    const totalObtained = exam.marks.reduce((sum, m) => sum + m.marksObtained, 0);
+    const totalMarks = exam.marks.reduce((sum, m) => sum + m.totalMarks, 0);
+    const percentage = totalMarks > 0 ? ((totalObtained / totalMarks) * 100).toFixed(2) : 0;
+
+    return {
+      id: exam._id,
+      examId: exam.examId,
+      percentage, 
+      marks: exam.marks,
+    };
+  });
+
   return res
     .status(200)
-    .json(new ApiResponse(200, marks, "Student marks fetched successfully"));
+    .json(new ApiResponse(200, marksWithPercentage, "Student marks fetched successfully"));
 });
-
