@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getStudentMarksData } from "@/services/marksServices";
-import LeftSidebar from "@/components/Marks/StudentComponents/leftSidebar";
+import LeftSidebar from "@/components/Marks/StudentComponents/LeftSidebar";
 import MainContent from "@/components/Marks/StudentComponents/MainContent";
+import MobileTabs from "@/components/Marks/StudentComponents/MobileTabs";
 
 function StudentMarks() {
   const { user, roleInfo } = useAuth();
@@ -30,12 +31,25 @@ function StudentMarks() {
     };
     fetchData();
   }, []);
-
-
+  
   return (
-    <div className="flex h-[90vh] w-full bg-gray-50 dark:bg-gray-900 px-4 py-2">
-      <LeftSidebar exams={exams} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
-      <MainContent student={student} activeIndex={activeIndex} exams={exams} loading={loading}/>
+    <div className="flex flex-col h-[90vh] w-full bg-gray-50 dark:bg-gray-900">
+      {/* Mobile Tabs */}
+      <MobileTabs exams={exams} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+      <div className="flex flex-1 px-4 py-2 overflow-hidden">
+        <LeftSidebar
+          exams={exams}
+          activeIndex={activeIndex}
+          setActiveIndex={setActiveIndex}
+        />
+        <MainContent
+          student={student}
+          activeIndex={activeIndex}
+          exams={exams}
+          loading={loading}
+        />
+      </div>
+
     </div>
   );
 }
