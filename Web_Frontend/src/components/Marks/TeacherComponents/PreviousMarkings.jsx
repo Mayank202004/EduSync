@@ -8,7 +8,7 @@ function PreviousMarkings({ onDivSelect, previousMarkings}) {
 
   if (!previousMarkings || previousMarkings.length === 0) {
     return (
-      <div className="w-full h-full bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 flex items-center justify-center">
+      <div className="w-full h-full bg-white dark:bg-customDarkFg rounded-2xl shadow-md p-6 flex items-center justify-center">
         <p className="text-gray-500 dark:text-gray-400 text-lg">
           No data found. Start adding marks to see them here.
         </p>

@@ -1,8 +1,9 @@
 import AddGrades from "@/components/Marks/TeacherComponents/AddGrades";
 import PreviousMarkings from "@/components/Marks/TeacherComponents/PreviousMarkings";
 import MarkList from "@/components/Marks/TeacherComponents/MarkList";
+import MyClass from "./MyClass";
 
-function MainContent({ activeTab, exams, previousMarkings, selectedContext, setSelectedContext }) {
+function MainContent({ activeTab, exams, previousMarkings, selectedContext, setSelectedContext, classTeacherData, subjectNames}) {
   const renderContent = () => {
     switch (activeTab) {
       case "addGrades":
@@ -20,6 +21,9 @@ function MainContent({ activeTab, exams, previousMarkings, selectedContext, setS
             previousMarkings={previousMarkings}
           />
         );
+      
+      case "myClass":
+        return <MyClass classTeacherData={classTeacherData} subjectNames={subjectNames}/>;
 
       default:
         return <p>Select an option from the sidebar.</p>;

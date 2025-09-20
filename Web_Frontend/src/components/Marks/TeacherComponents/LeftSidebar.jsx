@@ -1,4 +1,4 @@
-import { ClipboardList, FileSpreadsheet } from "lucide-react";
+import { ClipboardList, FileSpreadsheet, Users } from "lucide-react";
 
 function LeftSidebar({ activeTab, setActiveTab, setSelectedContext }) {
   return (
@@ -18,6 +18,7 @@ function LeftSidebar({ activeTab, setActiveTab, setSelectedContext }) {
             <ClipboardList size={18} />
             <span>Add Grades</span>
           </li>
+
           <li
             className={`flex items-center space-x-2 cursor-pointer hover:text-blue-600 ${
               activeTab === "previousMarkings" ? "text-blue-600 font-medium" : ""
@@ -29,6 +30,20 @@ function LeftSidebar({ activeTab, setActiveTab, setSelectedContext }) {
           >
             <FileSpreadsheet size={18} />
             <span>Previous Markings</span>
+          </li>
+
+          {/* New "My Class" tab */}
+          <li
+            className={`flex items-center space-x-2 cursor-pointer hover:text-blue-600 ${
+              activeTab === "myClass" ? "text-blue-600 font-medium" : ""
+            }`}
+            onClick={() => {
+              setActiveTab("myClass");
+              setSelectedContext(null);
+            }}
+          >
+            <Users size={18} />
+            <span>My Class</span>
           </li>
         </ul>
       </div>
