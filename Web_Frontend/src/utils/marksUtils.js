@@ -20,7 +20,6 @@ export const calculateNormalDistribution = (percentages) => {
 
 
 export const transformAndSortMarks = (students, sortConfig) => {
-    console.log(students, sortConfig);
   const base = students.map((s, idx) => ({
     name: s.name ?? "Unknown",
     roll: s.roll ?? idx + 1,

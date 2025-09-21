@@ -13,6 +13,7 @@ import {
 import toast from "react-hot-toast";
 import ConfirmActionModal from "@/components/Modals/ConfirmationActionModal";
 import { calculateNormalDistribution, transformAndSortMarks } from "@/utils/marksUtils";
+import { togglePublishExamResult } from "@/services/marksServices";
 
 
 const ClassCoordinatorPanel = ({ coordinatorData, subjectNames }) => {
@@ -34,9 +35,7 @@ const ClassCoordinatorPanel = ({ coordinatorData, subjectNames }) => {
     (d) => d.exam === selectedExam && d.div === selectedDiv
   );
 
-  const [isPublished, setIsPublished] = useState(
-    marksData?.isPublished === true || marksData?.isPublished === "true"
-  );
+  const [isPublished, setIsPublished] = useState(marksData?.isPublished === true || marksData?.isPublished === "true");
   const [confirmModal, setConfirmModal] = useState(null);
 
   const subjectData = marksData?.subjects.find(
@@ -75,7 +74,7 @@ const ClassCoordinatorPanel = ({ coordinatorData, subjectNames }) => {
         setConfirmModal(null); // close modal first
         try {
           await toast.promise(
-            togglePublishExamResult(selectedDiv.examId, selectedDiv.class, selectedDiv.div),
+            togglePublishExamResult(marksData.examId, marksData.class, selectedDiv),
             {
               loading: isPublished ? "Unpublishing..." : "Publishing...",
               success: (res) => {

@@ -115,3 +115,15 @@ export const getStudentMarksData = async () => {
   const response = await axiosInstance.get('/marks/student-data');
   return response.data;
 }
+
+/**
+ * @desc Publish Exam Result (So that students can see)
+ * @param {String} examId _id of Exam
+ * @param {String} className Class Name
+ * @param {String} div Division
+ * @returns 
+ */
+export const togglePublishExamResult = async (examId,className,div) => {
+  const response = await axiosInstance.post('/marks/toggle-publish-exam-result', {examId,className,div});
+  return response.data;
+}

@@ -12,6 +12,8 @@ import {
 } from "recharts";
 import toast from "react-hot-toast";
 import ConfirmActionModal from "@/components/Modals/ConfirmationActionModal";
+import { calculateNormalDistribution, transformAndSortMarks } from "@/utils/marksUtils";
+import { togglePublishExamResult } from "@/services/marksServices";
 
 const MainContent = ({
   selectedDiv,
@@ -30,7 +32,6 @@ const MainContent = ({
     (sub) => sub.subject === selectedSubject
   );
 
-  console.log(marksData);
   const [isPublished, setIsPublished] = useState(marksData.isPublished === true || marksData.isPublished === "true");
   const [confirmModal, setConfirmModal] = useState(null); // {title, message, action}
 
@@ -43,53 +44,8 @@ const MainContent = ({
       }))
     : [];
 
-  // Function to sort data
-  const sortedMarks = [...studentMarks]
-    .map((s) => ({
-      ...s,
-      percentage: (s.marks / s.total) * 100,
-    }))
-    // First sort by marks (highest first) to assign rank correctly
-    .sort((a, b) => b.marks - a.marks)
-    .map((s, idx) => ({
-      ...s,
-      rank: idx + 1,
-    }))
-    // Then apply user-selected sorting (name, roll, or rank)
-    .sort((a, b) => {
-      if (sortConfig.key === "name") {
-        return sortConfig.direction === "asc"
-          ? a.name.localeCompare(b.name)
-          : b.name.localeCompare(a.name);
-      } else if (sortConfig.key === "roll") {
-        return sortConfig.direction === "asc" ? a.roll - b.roll : b.roll - a.roll;
-      } else if (sortConfig.key === "rank") {
-        return sortConfig.direction === "asc" ? a.rank - b.rank : b.rank - a.rank;
-      }
-      return 0;
-    });
-
-  // Normal distribution data
-  const getNormalDistributionData = (percentages) => {
-    if (percentages.length === 0) return { data: [], mean: 0 };
-
-    const mean = percentages.reduce((a, b) => a + b, 0) / percentages.length;
-    const variance =
-      percentages.reduce((a, b) => a + (b - mean) ** 2, 0) /
-      percentages.length;
-    const stdDev = Math.sqrt(variance);
-
-    const normalPDF = (x, mean, stdDev) =>
-      (1 / (stdDev * Math.sqrt(2 * Math.PI))) *
-      Math.exp(-0.5 * ((x - mean) / stdDev) ** 2);
-
-    const data = [];
-    for (let x = 0; x <= 100; x += 2) {
-      data.push({ x, y: normalPDF(x, mean, stdDev) });
-    }
-
-    return { data, mean };
-  };
+  // Sort Marks data
+  const sortedMarks = transformAndSortMarks(studentMarks, sortConfig);
 
   // graded counter
   const gradedSubjects = marksData.subjects.map((s) => s.subject);
@@ -110,14 +66,26 @@ const MainContent = ({
       message: isPublished
         ? "Are you sure you want to unpublish the results? Students will no longer see them."
         : "Are you sure you want to publish the results? Students will be able to see them.",
-      action: () => {
-        setIsPublished(!isPublished);
-
-        // 🚀 API call (to be implemented)
-        // await api.post("/publish-status", { examId, class, div, isPublished: !isPublished });
-
-        setConfirmModal(null); // close modal
-      },
+      action: async () => {
+        setConfirmModal(null); 
+        try {
+          await toast.promise(
+            togglePublishExamResult(selectedDiv.examId, selectedDiv.class, selectedDiv.div),
+            {
+              loading: isPublished ? "Unpublishing..." : "Publishing...",
+              success: (res) => {
+                setIsPublished(!isPublished);
+                return isPublished
+                  ? "Results unpublished successfully!"
+                  : "Results published successfully!";
+              },
+              error: "",
+            }
+          );
+        } catch (err) {
+          // Error handled by axios interceptor
+        }
+      }
     });
   };
 
@@ -215,7 +183,7 @@ const MainContent = ({
                 const percentages = studentMarks.map(
                   (s) => (s.marks / s.total) * 100
                 );
-                const { data, mean } = getNormalDistributionData(percentages);
+                const { data, mean } = calculateNormalDistribution(percentages);
 
                 return (
                   <ResponsiveContainer width="100%" height={240}>
