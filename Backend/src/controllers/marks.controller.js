@@ -81,6 +81,7 @@ export const getStudentMarks = asyncHandler(async (req, res) => {
  */
 export const addClassMarks = asyncHandler(async (req, res) => {
   const { examId, subject, className, div, students, totalMarks } = req.body;
+  const schoolId = req.school._id;
 
   if (
     !examId?.trim() ||
@@ -117,6 +118,7 @@ export const addClassMarks = asyncHandler(async (req, res) => {
       examId,
       class: className,
       div,
+      schoolId,
       subjects: [],
     });
   }
@@ -165,7 +167,7 @@ export const addClassMarks = asyncHandler(async (req, res) => {
       updateOne: {
         filter: { examId, studentId },
         update: {
-          $setOnInsert: { examId, studentId },
+          $setOnInsert: { examId, studentId, class: className, div, schoolId },
           $push: {
             marks: { subject, marksObtained, totalMarks, markedBy: teacher._id },
           },
@@ -358,6 +360,7 @@ export const getTeacherMarksData = asyncHandler(async (req, res) => {
     classTeacherData = await ClassMarks.find({
       class: teacher.classTeacher.class,
       div: teacher.classTeacher.div,
+      schoolId: req.school?._id,
     })
       .select("examId subjects isPublished")
       .populate("examId", "name")
@@ -380,13 +383,13 @@ export const getTeacherMarksData = asyncHandler(async (req, res) => {
         },
       });
 
-    resource = await SchoolResource.findOne({ class: teacher.classTeacher.class })
+    resource = await SchoolResource.findOne({ class: teacher.classTeacher.class, schoolId: req.school?._id })
       .select("subjects.subjectName -_id")
       .lean();
   }
   // ---------- CLASS COORDINATOR CASE ----------
   else if (teacher.classCoordinator) {
-    const allClassMarks = await ClassMarks.find({ class: teacher.classCoordinator })
+    const allClassMarks = await ClassMarks.find({ class: teacher.classCoordinator, schoolId: req.school?._id })
       .select("examId class div subjects isPublished")
       .populate("examId", "name")
       .populate({
@@ -405,7 +408,7 @@ export const getTeacherMarksData = asyncHandler(async (req, res) => {
 
     coordinatorData = allClassMarks.map(transformClassMarks);
 
-    resource = await SchoolResource.findOne({ class: teacher.classCoordinator })
+    resource = await SchoolResource.findOne({ class: teacher.classCoordinator, schoolId: req.school?._id })
       .select("subjects.subjectName -_id")
       .lean();
   }
@@ -571,6 +574,7 @@ export const getStudentMarksData = asyncHandler(async (req, res) => {
  */
 export const togglePublishExamResult = asyncHandler(async (req, res) => {
   const { examId, className, div } = req.body;
+  const schoolId = req.school._id;
 
   // Only Super Admin or class coordinator can toggle
   if (req.user.role === "teacher" && req.teacher?.classCoordinator !== className) {
@@ -602,6 +606,11 @@ export const togglePublishExamResult = asyncHandler(async (req, res) => {
   // Toggle the publish status
   classMarks.isPublished = !classMarks.isPublished;
   await classMarks.save();
+
+  await StudentMarks.updateMany(
+    { examId, class: className, div, schoolId },
+    { $set: { isPublished: classMarks.isPublished } }
+  );
 
   res.status(200).json(
     new ApiResponse(

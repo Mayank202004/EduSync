@@ -16,6 +16,7 @@ const classMarksSchema = new mongoose.Schema({
   examId: { type: mongoose.Schema.Types.ObjectId, ref: "Exam", required: true },
   class: { type: String, required: true },
   div: { type: String, required: true },
+  schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School", required: true },
   subjects: [subjectMarksSchema],
   isPublished : { type: Boolean, default: false}
 }, { timestamps: true });

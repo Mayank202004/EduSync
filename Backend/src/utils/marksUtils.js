@@ -104,7 +104,8 @@ export const transformClassMarks = (classMarks) => {
   if (!classMarks) return null;
 
   return {
-    exam: classMarks.examId?.name || undefined, // only if examId is populated
+    examId: classMarks.examId?._id,
+    exam: classMarks.examId?.name || undefined, 
     class: classMarks.class,
     div: classMarks.div,
     isPublished: classMarks?.isPublished || false,
