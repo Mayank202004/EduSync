@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { fetchAllTeachers, updateTeacherSubjects} from "@/services/dashboardService";
 
 const classOptions = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
-const subjectOptions = ["English", "Maths", "Science", "History", "Geography"];
+const subjectOptions = ["English", "Maths","Marathi","Hindi","EVS", "Science", "History", "Geography"];
 const divisionOptions = ["A", "B", "C", "D", "E"];
 
 const ManageTeacherSubjects = ({ onBackPressed }) => {

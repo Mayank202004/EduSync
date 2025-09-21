@@ -45,7 +45,7 @@ export const cleanClassTeacherMarks = (classTeacherMarks) => {
  * @param {Object} teacherMarks - Class Marks for all classes, divisions and subjects the teacher is teaching 
  * @returns {Object} - Cleaned Teacher Marks
  */
-export const cleanTeacherMarks = (teacherMarks) => {
+export const cleanTeacherMarks=(teacherMarks, teacherId) => {
   const examMap = new Map();
 
   teacherMarks.forEach((sm) => {
@@ -59,7 +59,7 @@ export const cleanTeacherMarks = (teacherMarks) => {
     const examObj = examMap.get(examName);
 
     sm.marks.forEach((mark) => {
-      // teacherId check removed here
+      if (String(mark.markedBy) !== String(teacherId)) return;
 
       // check if subject exists, else add
       let subjectObj = examObj.subjects.find((s) => s.name === mark.subject);
@@ -94,3 +94,28 @@ export const cleanTeacherMarks = (teacherMarks) => {
 
   return Array.from(examMap.values());
 }
+
+/**
+ * @desc Cleans and organises class marks data
+ * @param {Object} classMarks 
+ * @returns Return organised class Marks
+ */
+export const transformClassMarks = (classMarks) => {
+  if (!classMarks) return null;
+
+  return {
+    exam: classMarks.examId?.name || undefined, // only if examId is populated
+    class: classMarks.class,
+    div: classMarks.div,
+    isPublished: classMarks?.isPublished || false,
+    subjects: classMarks?.subjects?.map((subj) => ({
+      subject: subj.subject,
+      gradedBy: subj.gradedBy?.userId?.fullName || "N/A",
+      students: subj.students.map((stu) => ({
+        fullName: stu.studentId?.userId?.fullName || "Unknown",
+        marksObtained: stu.marksObtained,
+        totalMarks: stu.totalMarks,
+      })),
+    })),
+  };
+};

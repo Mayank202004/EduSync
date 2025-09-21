@@ -13,7 +13,8 @@ const studentMarksSchema = new mongoose.Schema({
       totalMarks: { type: Number, required: true },
       markedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
     }
-  ]
+  ],
+  isPublished : { type: Boolean, default: false}
 }, { timestamps: true });
 
 export default mongoose.model("StudentMarks", studentMarksSchema);

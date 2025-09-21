@@ -10,7 +10,7 @@ import StudentMarks from "../models/studentMarks.model.js";
 import { isTeacherAllowed } from "../utils/verificationUtils.js"
 import { Exam } from "../models/exam.model.js";
 import { ClassStructure } from "../models/classStructure.model.js";
-import { cleanClassTeacherMarks,cleanTeacherMarks, getGrade } from "../utils/marksUtils.js"
+import { cleanClassTeacherMarks,cleanTeacherMarks, getGrade, transformClassMarks } from "../utils/marksUtils.js"
 
 /**
  * @desc Export class mark sheet template (To handfill marks physically)
@@ -333,7 +333,6 @@ export const getTeacherMarksData = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Teacher not found in request" });
   }
 
-
   const exams = await Exam.find({ schoolId: req.school?._id }).select("_id name");
 
   // Fetch only marks graded by this teacher
@@ -351,12 +350,16 @@ export const getTeacherMarksData = asyncHandler(async (req, res) => {
     });
 
   let classTeacherData = [];
-  let resource=[];
+  let resource = [];
+  let coordinatorData = [];
+
+  // ---------- CLASS TEACHER CASE ----------
   if (teacher.classTeacher?.class && teacher.classTeacher?.div) {
     classTeacherData = await ClassMarks.find({
       class: teacher.classTeacher.class,
       div: teacher.classTeacher.div,
-    }).select("examId subjects isPublished")
+    })
+      .select("examId subjects isPublished")
       .populate("examId", "name")
       .populate({
         path: "subjects.gradedBy",
@@ -370,10 +373,10 @@ export const getTeacherMarksData = asyncHandler(async (req, res) => {
       })
       .populate({
         path: "subjects.students.studentId",
-        select: "class div userId", 
+        select: "class div userId",
         populate: {
           path: "userId",
-          select: "fullName", 
+          select: "fullName",
         },
       });
 
@@ -381,17 +384,50 @@ export const getTeacherMarksData = asyncHandler(async (req, res) => {
       .select("subjects.subjectName -_id")
       .lean();
   }
-  // Clean Marks Data into proper nested structure
-  if(teacherMarks && teacherMarks.length)teacherMarks = cleanTeacherMarks(teacherMarks);
-  if(classTeacherData && classTeacherData.length) classTeacherData = cleanClassTeacherMarks(classTeacherData);
+  // ---------- CLASS COORDINATOR CASE ----------
+  else if (teacher.classCoordinator) {
+    const allClassMarks = await ClassMarks.find({ class: teacher.classCoordinator })
+      .select("examId class div subjects isPublished")
+      .populate("examId", "name")
+      .populate({
+        path: "subjects.gradedBy",
+        select: "userId",
+        populate: { path: "userId", select: "fullName", model: "User" },
+        model: "Teacher",
+      })
+      .populate({
+        path: "subjects.students.studentId",
+        select: "userId",
+        populate: { path: "userId", select: "fullName", model: "User" },
+        model: "Student",
+      })
+      .lean();
 
-  // Fetch subjects list
-  
-  const subjectNames = resource?.subjects.map(s => s.subjectName) || [];
+    coordinatorData = allClassMarks.map(transformClassMarks);
 
-  
-  res.status(200).json(new ApiResponse(200, {exams, previousMarkings: teacherMarks, classTeacherData,subjectNames}, "Teacher marks data fetched successfully"));
+    resource = await SchoolResource.findOne({ class: teacher.classCoordinator })
+      .select("subjects.subjectName -_id")
+      .lean();
+  }
+
+  // ---------- CLEAN TEACHER DATA ----------
+  if (teacherMarks && teacherMarks.length)
+    teacherMarks = cleanTeacherMarks(teacherMarks, teacher._id);
+
+  if (classTeacherData && classTeacherData.length)
+    classTeacherData = cleanClassTeacherMarks(classTeacherData);
+
+  const subjectNames = resource?.subjects?.map((s) => s.subjectName) || [];
+
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {exams,previousMarkings: teacherMarks,classTeacherData,subjectNames,coordinatorData,},
+      "Teacher marks data fetched successfully"
+    ));
 });
+
 
 /**
  * @desc Get class marks data for a particular exam
@@ -433,18 +469,7 @@ export const getClassMarksData = asyncHandler(async (req, res) => {
     })
     .lean(); 
 
-  const transformed = {
-    isPublished: classMarks?.isPublished || false,
-    subjects: classMarks?.subjects?.map((subj) => ({
-      subject: subj.subject,
-      gradedBy: subj.gradedBy?.userId?.fullName || "N/A",
-      students: subj.students.map((stu) => ({
-        fullName: stu.studentId?.userId?.fullName || "Unknown",
-        marksObtained: stu.marksObtained,
-        totalMarks: stu.totalMarks,
-      })),
-    })),
-  };
+  const transformed = transformClassMarks(classMarks);
 
   const resource = await SchoolResource.findOne({ class: className })
   .select("subjects.subjectName -_id")
@@ -475,7 +500,7 @@ export const getSuperAdminData = asyncHandler(async (req, res) => {
  */
 export const getStudentMarksData = asyncHandler(async (req, res) => {
   const marks =
-    (await StudentMarks.find({ studentId: req.student?._id })
+    (await StudentMarks.find({ studentId: req.student?._id, isPublished: true })
       .select("examId marks")
       .populate({
         path: "examId",
@@ -493,7 +518,7 @@ export const getStudentMarksData = asyncHandler(async (req, res) => {
   if (!marks || marks.length === 0) {
     return res
       .status(404)
-      .json(new ApiResponse(404, [], "No marks found for this student"));
+      .json(new ApiResponse(404, [], "No results Available Yet"));
   }
 
   // If class is below 8 → return grades for each exam with percentage
@@ -537,4 +562,54 @@ export const getStudentMarksData = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, marksWithPercentage, "Student marks fetched successfully"));
+});
+
+/**
+ * @desc Toggle publish/unpublish marks for a particular exam for a class
+ * @route POST /api/v1/marks/toggle-publish-exam-result
+ * @access Private (Class Coordinator of that particular class / SuperAdmin) 
+ */
+export const togglePublishExamResult = asyncHandler(async (req, res) => {
+  const { examId, className, div } = req.body;
+
+  // Only Super Admin or class coordinator can toggle
+  if (req.user.role === "teacher" && req.teacher?.classCoordinator !== className) {
+    throw new ApiError(403, "You are not allowed to publish/unpublish marks for this class");
+  }
+
+  const resource = await SchoolResource.findOne({ class: className })
+    .select("subjects.subjectName -_id")
+    .lean();
+
+  const classMarks = await ClassMarks.findOne({ examId, class: className, div });
+
+  if (!classMarks) {
+    throw new ApiError(404, "Marks not found for this class and exam");
+  }
+
+  // If currently unpublished, check if all subjects are marked
+  if (!classMarks.isPublished) {
+    const markedSubjects = classMarks.subjects.map((s) => s.subject);
+    const allSubjectsMarked = resource.subjects.every((sub) =>
+      markedSubjects.includes(sub.subjectName)
+    );
+
+    if (!allSubjectsMarked) {
+      throw new ApiError(400, "All subjects must be marked before publishing!");
+    }
+  }
+
+  // Toggle the publish status
+  classMarks.isPublished = !classMarks.isPublished;
+  await classMarks.save();
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      { isPublished: classMarks.isPublished },
+      classMarks.isPublished
+        ? "Marks published successfully"
+        : "Marks unpublished successfully"
+    )
+  );
 });
