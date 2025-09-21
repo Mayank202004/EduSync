@@ -1,6 +1,9 @@
 import { ClipboardList, FileSpreadsheet, Users } from "lucide-react";
+import { use } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 function LeftSidebar({ activeTab, setActiveTab, setSelectedContext }) {
+  const {roleInfo} = useAuth();
   return (
     <div className="w-full h-full pr-4">
       <div className="h-full bg-white dark:bg-customDarkFg rounded-2xl shadow-md p-5">
@@ -33,7 +36,7 @@ function LeftSidebar({ activeTab, setActiveTab, setSelectedContext }) {
           </li>
 
           {/* New "My Class" tab */}
-          <li
+          {roleInfo.classTeacher && <li
             className={`flex items-center space-x-2 cursor-pointer hover:text-blue-600 ${
               activeTab === "myClass" ? "text-blue-600 font-medium" : ""
             }`}
@@ -44,7 +47,21 @@ function LeftSidebar({ activeTab, setActiveTab, setSelectedContext }) {
           >
             <Users size={18} />
             <span>My Class</span>
-          </li>
+          </li>}
+
+          {/* New "Coordinator Tab" tab */}
+          {roleInfo.classCoordinator && <li
+            className={`flex items-center space-x-2 cursor-pointer hover:text-blue-600 ${
+              activeTab === "myClass" ? "text-blue-600 font-medium" : ""
+            }`}
+            onClick={() => {
+              setActiveTab("classCoordinatorPanel");
+              setSelectedContext(null);
+            }}
+          >
+            <Users size={18} />
+            <span>Coordinator Panel</span>
+          </li>}
         </ul>
       </div>
     </div>

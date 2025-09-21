@@ -10,6 +10,7 @@ function TeacherMarks() {
   const [exams, setExams] = useState([]);
   const [previousMarkings, setPreviousMarkings] = useState([]);
   const [classTeacherData, setClassTeacherData] = useState([]);
+  const [coordinatorData, setCoordinatorData] = useState([]);
   const [subjectNames, setSubjectNames] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -20,6 +21,7 @@ function TeacherMarks() {
         setExams(response.data?.exams || []);
         setPreviousMarkings(response.data?.previousMarkings || []);
         setClassTeacherData(response.data?.classTeacherData || []);
+        setCoordinatorData(response.data?.coordinatorData || []);
         setSubjectNames(response.data?.subjectNames || []);
       } catch (error) {
         // Error already handled by axios instance
@@ -50,6 +52,7 @@ function TeacherMarks() {
           exams={exams}
           previousMarkings={previousMarkings}
           classTeacherData={classTeacherData}
+          coordinatorData={coordinatorData}
           selectedContext={selectedContext}
           setSelectedContext={setSelectedContext}
           subjectNames={subjectNames}

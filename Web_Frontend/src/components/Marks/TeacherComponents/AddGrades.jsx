@@ -17,7 +17,7 @@ function AddGrades({exams}) {
 
 
 
-  const subjects = ["Maths", "Science", "English","EVS"];
+  const subjects = ["English", "Maths","Marathi","Hindi","EVS", "Science", "History", "Geography"];
   const classes = ["1", "2", "3"];
   const divisions = ["A", "B", "C"];
 

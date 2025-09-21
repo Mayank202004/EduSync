@@ -2,8 +2,9 @@ import AddGrades from "@/components/Marks/TeacherComponents/AddGrades";
 import PreviousMarkings from "@/components/Marks/TeacherComponents/PreviousMarkings";
 import MarkList from "@/components/Marks/TeacherComponents/MarkList";
 import MyClass from "./MyClass";
+import ClassCoordinatorPanel from "./ClassCoordinatorPanel";
 
-function MainContent({ activeTab, exams, previousMarkings, selectedContext, setSelectedContext, classTeacherData, subjectNames}) {
+function MainContent({ activeTab, exams, previousMarkings, selectedContext, setSelectedContext, classTeacherData, subjectNames, coordinatorData}) {
   const renderContent = () => {
     switch (activeTab) {
       case "addGrades":
@@ -25,6 +26,9 @@ function MainContent({ activeTab, exams, previousMarkings, selectedContext, setS
       case "myClass":
         return <MyClass classTeacherData={classTeacherData} subjectNames={subjectNames}/>;
 
+      case "classCoordinatorPanel":
+        return <ClassCoordinatorPanel subjectNames={subjectNames} coordinatorData={coordinatorData}/>;
+        
       default:
         return <p>Select an option from the sidebar.</p>;
     }

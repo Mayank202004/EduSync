@@ -8,7 +8,7 @@ const TeacherMarks = lazy(() => import('./TeacherMarks'));
 const AdminMarks = lazy(() => import('./AdminMarks'));
 
 export default function Marks() {
-  const { user, roleInfo} = useAuth();
+  const { user } = useAuth();
 
   if (!user) return null;
 
