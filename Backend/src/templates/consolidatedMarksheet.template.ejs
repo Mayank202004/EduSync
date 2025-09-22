@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Marksheet</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+    <!-- Header -->
+    <div class="flex items-center justify-center border-b pb-4 mb-6 relative">
+      <!-- Logo at extreme left -->
+      <img src="<%= logo %>" id="logo" alt="Logo" class="absolute left-0 h-12 w-auto" />
+        
+      <!-- Centered content -->
+      <div class="text-center">
+        <h1 class="text-xl font-bold"><%= schoolName %></h1>
+        <p class="text-gray-600">Progress Report for <span><%= examName %></span> (<span><%= academicYear %></span>)</p>
+      </div>
+    </div>
+
+
+    <!-- Student Info -->
+    <div class="flex-col border p-4 rounded-md mb-6 text-sm gap-4">
+      <p class="font-bold font-underline">Students Information</p>
+      <div class = "grid grid-cols-2 gap-1 ml-10">
+        <p><span class="font-semibold">Name of Student:</span> <%= student.name %></p>
+        <p><span class="font-semibold">Id.:</span> <%= student._id %></p>
+        <p><span class="font-semibold">Class:</span> <%= student.class %></p>
+        <p><span class="font-semibold">Division:</span> <%= student.div %></p>
+        <p><span class="font-semibold">Date of Birth:</span> <%= student.dob %></p>
+      </div>
+      <p class="font-bold font-underline mt-4">Attendance Information</p>
+      <div class = "grid grid-cols-2 gap-1 ml-10">
+        <p><span class="font-semibold">Working Days:</span> <%= student.workingDays %></p>
+        <p><span class="font-semibold">Days Present:</span> <%= student.daysPresent %></p>
+      </div>
+    </div>
+
+
+    <!-- Marks Table -->
+    <div class="overflow-x-auto mb-6">
+      <table class="w-full border-collapse border text-sm">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border px-3 py-2 text-left">Subject</th>
+            <% examHeaders.forEach(exam => { %>
+              <th class="border px-3 py-2 text-center"><%= exam %></th>
+            <% }) %>
+            <th class="border px-3 py-2 text-center">Total (100)</th>
+            <th class="border px-3 py-2 text-center">Grade</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% subjects.forEach(sub => { %>
+            <tr>
+              <td class="border px-3 py-2"><%= sub.subject %></td>
+              <% examHeaders.forEach(exam => { %>
+                <td class="border px-3 py-2 text-center">
+                  <% if (sub.exams[exam]) { %>
+                    <%= sub.exams[exam].obtained %> / <%= sub.exams[exam].total %>
+                  <% } else { %>
+                    -
+                  <% } %>
+                </td>
+              <% }) %>
+              <td class="border px-3 py-2 text-center"><%= sub.finalPercent %> %</td>
+              <td class="border px-3 py-2 text-center"><%= sub.grade %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Remarks -->
+    <div class="border p-4 rounded-md mb-6">
+      <p><span class="font-semibold">Class Teacher’s Remarks:</span> <%= student.remarks%></p>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex-col justify-between text-xs pt-6">
+      <p>Generated on <span><%= date %></span></p>
+      <p>As this is an Electronically Generated Document, It does not require a physical signature.</p>
+    </div>
+  </div>
+</body>
+</html>
