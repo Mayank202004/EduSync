@@ -791,6 +791,14 @@ export const renderConsolidatedMarksheet = asyncHandler(async (req, res) => {
     };
   });
 
+  // 4. Attendance
+  const { workingDays, daysPresent } = await getAttendanceSummary(
+    school._id,
+    student.class,
+    student.div,
+    student._id
+  );
+
   const data = {
     schoolName: school.name,
     logo: school.logo || "",
@@ -798,11 +806,14 @@ export const renderConsolidatedMarksheet = asyncHandler(async (req, res) => {
     date: new Date().toLocaleDateString(),
     examHeaders: exams.map(e => e.name), // for dynamic table headers
     student: {
+      _id: student._id,
       name: req.user.fullName,
       class: student.class,
       div: student.div,
       dob: student.dob ? new Date(student.dob).toLocaleDateString() : "Not Specified",
-      remarks: "Consolidated Report"
+      workingDays,
+      daysPresent,
+      remarks: "Good"
     },
     subjects
   };
