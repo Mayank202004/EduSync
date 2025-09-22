@@ -130,7 +130,8 @@ export const togglePublishExamResult = async (examId,className,div) => {
 
 
 /**
- * @desc Export marksheed for a particular exam for a particular student
+ * @desc Export marksheet for a particular exam for a particular student
+ * @param {String} examId _id of Exam
  * @returns {Promise} Promise resolving to PDF download
  */
 export const exportExamMarksheet = async (examId) => {
@@ -139,7 +140,36 @@ export const exportExamMarksheet = async (examId) => {
     { examId },
     { 
       responseType: "blob",
-      timeout: 10000,
+      timeout: 15000,
+     }
+  );
+
+  // Convert blob to PDF object
+  const pdfBlob = new Blob([response.data], { type: "application/pdf" });
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+
+  // Auto-download
+  const link = document.createElement("a");
+  link.href = pdfUrl;
+  link.download = `marksheet.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  // Preview in new tab (instead of download)
+  window.open(pdfUrl, "_blank");
+};
+
+/**
+ * @desc Export consolidated marksheet
+ * @returns {Promise} Promise resolving to PDF download
+ */
+export const exportConsolidatedResult = async () => {
+  const response = await axiosInstance.post(
+    "/marks/consolidated-marksheet",
+    {}, // No payload
+    { 
+      responseType: "blob",
+      timeout: 150000,
      }
   );
 

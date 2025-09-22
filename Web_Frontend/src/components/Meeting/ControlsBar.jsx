@@ -30,6 +30,8 @@ const ControlsBar = ({
   onToggleParticipants,
   onToggleHostControls,
   onToggleChat,
+  camAvailable,
+  micAvailable
 }) => {
   const [showMore, setShowMore] = useState(false);
 
@@ -41,11 +43,27 @@ const ControlsBar = ({
 
         <div className="flex justify-center gap-4 w-1/3">
           <button onClick={onToggleMic} title="Toggle Microphone" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
-            { isHost || hostControls.microphoneEnableAllowed ? (mic ? <Mic /> : <MicOff className="text-red-500" />) : <MicOff className="text-gray-500"/>}
+            {isHost || hostControls.microphoneEnableAllowed ? (
+              micAvailable
+                ? mic
+                  ? <Mic />
+                  : <MicOff className="text-red-500" />
+                : <MicOff className="text-yellow-400" /> // ⚠️ yellow if no mic or permission denied
+            ) : (
+              <MicOff className="text-gray-500" />
+            )}
           </button>
 
           <button onClick={onToggleCam} title="Toggle Camera" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
-            {isHost || hostControls.videoEnableAllowed ? (cam ? <Video /> : <VideoOff className="text-red-500" />) : <VideoOff className="text-gray-500"/>}
+            {isHost || hostControls.videoEnableAllowed ? (
+              camAvailable
+                ? cam
+                  ? <Video />
+                  : <VideoOff className="text-red-500" />
+                : <VideoOff className="text-yellow-400" />   // Yellow means unavailable
+            ) : (
+              <VideoOff className="text-gray-500" />
+            )}
           </button>
 
           <button onClick={onToggleScreen} title="Share Screen" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
@@ -77,13 +95,29 @@ const ControlsBar = ({
 
       {/* Mobile Layout */}
       <div className="md:hidden flex justify-evenly items-center gap-2 bg-black/60 p-3 rounded-full">
-        <button onClick={onToggleMic} title="Toggle Microphone" className="text-white">
-          { isHost || hostControls.microphoneEnableAllowed ? (mic ? <Mic /> : <MicOff className="text-red-500" />) : <MicOff className="text-gray-500"/>}
-        </button>
+        <button onClick={onToggleMic} title="Toggle Microphone" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
+            {isHost || hostControls.microphoneEnableAllowed ? (
+              micAvailable
+                ? mic
+                  ? <Mic />
+                  : <MicOff className="text-red-500" />
+                : <MicOff className="text-yellow-400" /> // ⚠️ yellow if no mic or permission denied
+            ) : (
+              <MicOff className="text-gray-500" />
+            )}
+          </button>
 
-        <button onClick={onToggleCam} title="Toggle Camera" className="text-white">
-          {isHost || hostControls.videoEnableAllowed ? (cam ? <Video /> : <VideoOff className="text-red-500" />) : <VideoOff className="text-gray-500"/>}
-        </button>
+          <button onClick={onToggleCam} title="Toggle Camera" className="bg-black/70 p-3 rounded-full text-white hover:bg-white/20 transition">
+            {isHost || hostControls.videoEnableAllowed ? (
+              camAvailable
+                ? cam
+                  ? <Video />
+                  : <VideoOff className="text-red-500" />
+                : <VideoOff className="text-yellow-400" />   // Yellow means unavailable
+            ) : (
+              <VideoOff className="text-gray-500" />
+            )}
+          </button>
 
         <button onClick={onRaiseHand} title={handRaised ? "Lower Hand" : "Raise Hand"} className=" p-3 rounded-full text-white hover:bg-white/20 transition">
           <Hand className={handRaised ? "text-yellow-400" : ""} />

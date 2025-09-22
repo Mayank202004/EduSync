@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Mic, MicOff, Video, VideoOff, Loader2 } from "lucide-react";
 
-export default function PreJoinScreen({ mic, cam, toggleMic, toggleCam, onJoin, localVideoRef }) {
+export default function PreJoinScreen({ mic, cam, toggleMic, toggleCam, onJoin, localVideoRef, micAvailable, camAvailable }) {
   const [videoReady, setVideoReady] = useState(false);
 
   return (
@@ -12,7 +12,7 @@ export default function PreJoinScreen({ mic, cam, toggleMic, toggleCam, onJoin, 
         {/* Loading or camera off state */}
         {!cam ? (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
-            <VideoOff className="mr-2" /> Camera is Off
+            <VideoOff className="mr-2" /> {camAvailable ? "Camera is Off" : "Camera or Permission Unavailale"}
           </div>
         ) : !videoReady ? (
           <div className="w-full h-full flex items-center justify-center text-gray-400">

@@ -15,6 +15,8 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
   const [participants, setParticipants] = useState([]);
   const [handRaised, setHandRaised] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [camAvailable, setCamAvailable] = useState(true);
+  const [micAvailable, setMicAvailable] = useState(true);
   const peerMetadata = useRef({});
   const audioAnalysers = useRef({});
   const navigate = useNavigate();
@@ -37,29 +39,59 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
   useEffect(() => {
     const startMedia = async () => {
       try {
-        localStream.current = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+        // check available devices
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const hasMic = devices.some(d => d.kind === "audioinput");
+        const hasCam = devices.some(d => d.kind === "videoinput");
+
+        // Track Cam Availability Status
+        setMicAvailable(hasMic);
+        setCamAvailable(hasCam);
+
+        // adjust constraints depending on availability
+        const constraints = {
+          audio: hasMic && initialMic,
+          video: hasCam && initialCam,
+        };
+
+        if (constraints.audio || constraints.video) {
+          localStream.current = await navigator.mediaDevices.getUserMedia(constraints);
+        } else {
+          localStream.current = new MediaStream(); // empty stream (no tracks)
+          toast.error("No camera/microphone found. Joining without AV.");
+          setMic(false);
+          setCam(false);
+        }
+
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = localStream.current;
         }
 
-        setParticipants([
-          {
-            _id: socket?.id || "local",
-            name: `${currentUser.fullName}`,
-            avatar: currentUser.avatar,
-            videoEnabled: initialCam,
-            audioEnabled: initialMic,
-            videoRef: localVideoRef,
-            stream: localStream.current,
-            isLocal: true,
-            isYou: true,
-            isHost: isHost,
-            handRaised: false,
-            isSpeaking: false,
-          },
-        ]);
+        setParticipants([{
+          _id: socket?.id || "local",
+          name: `${currentUser.fullName}`,
+          avatar: currentUser.avatar,
+          videoEnabled: hasCam && initialCam,
+          audioEnabled: hasMic && initialMic,
+          videoRef: localVideoRef,
+          stream: localStream.current,
+          isLocal: true,
+          isYou: true,
+          isHost: isHost,
+          handRaised: false,
+          isSpeaking: false,
+        }]);
       } catch (err) {
-        toast.error(`Media start failed: ${err.message}`);
+        // failed (user denied, or other error) -> fallback
+        localStream.current = new MediaStream();
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = localStream.current;
+        }
+        setCamAvailable(false); // Permission Declined
+        setMicAvailable(false);
+        setCam(false);
+        setMic(false);
+        toast.error("Media permissions denied.");
       }
     };
 
@@ -277,66 +309,127 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
     setParticipants((prev) => prev.filter((p) => p._id !== socketId));
   };
 
-  const toggleMic = () => {
-    if(hostControls.microphoneEnableAllowed === false && !isHost){
+  const toggleMic = async () => {
+    if (hostControls.microphoneEnableAllowed === false && !isHost) {
       toast.error("Host has disabled microphone");
-      return
+      return;
     }
-    const audioTrack = localStream.current?.getAudioTracks()?.[0];
-    if (audioTrack) {
-      const enabled = !audioTrack.enabled;
-      audioTrack.enabled = enabled;
-      setMic(enabled);
 
-      setParticipants((prev) =>
-        prev.map((p) =>
-          p.isLocal ? { ...p, audioEnabled: enabled } : p
-        )
-      );
+    let audioTrack = localStream.current?.getAudioTracks()?.[0];
 
-      if (enabled) {
-        // start analyser for local mic
-        const cleanup = setupAudioAnalyser(socket.id, localStream.current, setParticipants);
-        audioAnalysers.current[socket.id] = cleanup;
-      } else {
-        // stop analyser
-        audioAnalysers.current[socket.id]?.();
-        delete audioAnalysers.current[socket.id];
+    if (!audioTrack) {
+      // No mic track yet → try to request again
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioTrack = stream.getAudioTracks()[0];
+
+        if (audioTrack) {
+          localStream.current.addTrack(audioTrack);
+          setMic(true);
+          setMicAvailable(true);
+
+          setParticipants((prev) =>
+            prev.map((p) =>
+              p.isLocal ? { ...p, audioEnabled: true, stream: localStream.current } : p
+            )
+          );
+
+          // start analyser for local mic
+          const cleanup = setupAudioAnalyser(socket.id, localStream.current, setParticipants);
+          audioAnalysers.current[socket.id] = cleanup;
+
+          socket.emit("update-media-state", {
+            roomId,
+            videoEnabled: cam,
+            audioEnabled: true,
+          });
+        }
+      } catch (err) {
+        setMicAvailable(false);
+        if (err.name === "NotAllowedError") {
+          toast.error("Microphone access is blocked. Please allow access in your browser settings.");
+        } else if (err.name === "NotFoundError") {
+          toast.error("No microphone detected on this device.");
+        } else {
+          toast.error(`Microphone error: ${err.message}`);
+        }
       }
-
-      socket.emit("update-media-state", {
-        roomId,
-        videoEnabled: cam, 
-        audioEnabled: enabled,
-      });
+      return;
     }
-  };
 
+    // Normal toggle if track exists
+    const enabled = !audioTrack.enabled;
+    audioTrack.enabled = enabled;
+    setMic(enabled);
+
+    setParticipants((prev) =>
+      prev.map((p) =>
+        p.isLocal ? { ...p, audioEnabled: enabled } : p
+      )
+    );
+
+    if (enabled) {
+      const cleanup = setupAudioAnalyser(socket.id, localStream.current, setParticipants);
+      audioAnalysers.current[socket.id] = cleanup;
+    } else {
+      audioAnalysers.current[socket.id]?.();
+      delete audioAnalysers.current[socket.id];
+    }
+
+    socket.emit("update-media-state", {
+      roomId,
+      videoEnabled: cam,
+      audioEnabled: enabled,
+    });
+  };
   
-  const toggleCam = () => {
-    if(hostControls.videoEnableAllowed === false && !isHost){
+  const toggleCam = async () => {
+    if (hostControls.videoEnableAllowed === false && !isHost) {
       toast.error("Host has disabled camera");
       return;
     }
-    const videoTrack = localStream.current?.getVideoTracks()?.[0];
-    if (videoTrack) {
-      const enabled = !videoTrack.enabled;
-      videoTrack.enabled = enabled;
-      setCam(enabled);
-      
-      setParticipants((prev) =>
-        prev.map((p) =>
-          p.isLocal && !p.isScreen ? { ...p, videoEnabled: enabled } : p
-        )
-      );
-      socket.emit("update-media-state", {
-        roomId,
-        videoEnabled: enabled,
-        audioEnabled: mic,
-      });
-    }
-  };
 
+    let videoTrack = localStream.current?.getVideoTracks()?.[0];
+
+    if (!videoTrack) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoTrack = stream.getVideoTracks()[0];
+        if (videoTrack) {
+          localStream.current.addTrack(videoTrack);
+          setCam(true);
+          setCamAvailable(true);
+          setParticipants((prev) =>
+            prev.map((p) =>
+              p.isLocal && !p.isScreen ? { ...p, videoEnabled: true, stream: localStream.current } : p
+            )
+          );
+          socket.emit("update-media-state", { roomId, videoEnabled: true, audioEnabled: mic });
+        }
+      } catch (err) {
+        setCamAvailable(false);
+        if (err.name === "NotAllowedError") {
+          toast.error("Camera access is blocked. Please allow access in your browser settings.");
+        } else if (err.name === "NotFoundError") {
+          toast.error("No camera detected on this device.");
+        } else {
+          toast.error(`Camera error: ${err.message}`);
+        }
+      }
+      return;
+    }
+
+    // Normal toggle if track exists
+    const enabled = !videoTrack.enabled;
+    videoTrack.enabled = enabled;
+    setCam(enabled);
+    setParticipants((prev) =>
+      prev.map((p) =>
+        p.isLocal && !p.isScreen ? { ...p, videoEnabled: enabled } : p
+      )
+    );
+    socket.emit("update-media-state", { roomId, videoEnabled: enabled, audioEnabled: mic });
+  };
 
 
   const toggleScreen = async () => {
@@ -434,8 +527,6 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
   };
 
 
-
-
   const raiseHand = () => {
     setHandRaised((prev) => {
       const newState = !prev;
@@ -456,7 +547,6 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
       return newState;
     });
   };
-
 
 
   const leaveMeeting = (reason = "You left the meeting") => {
@@ -600,6 +690,8 @@ export default function useWebRTC(socket, roomId, currentUser,isHost, shouldJoin
     messages,
     setMessages,
     screen,
-    setHostControls
+    setHostControls,
+    micAvailable,
+    camAvailable,
   };
 }

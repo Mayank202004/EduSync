@@ -14,6 +14,7 @@ function StudentMarks() {
   };
 
   const [exams, setExams] = useState([]);
+  const [allExamsPublished, setAllExamsPublished] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -22,7 +23,8 @@ function StudentMarks() {
       try {
         setLoading(true);
         const response = await getStudentMarksData();
-        setExams(response.data);
+        setExams(response.data.gradesData);
+        setAllExamsPublished(response.data.allExamsPublished);
       } catch (err) {
         // handled globally
       } finally {
@@ -46,6 +48,7 @@ function StudentMarks() {
           student={student}
           activeIndex={activeIndex}
           exams={exams}
+          allExamsPublished={allExamsPublished}
           loading={loading}
         />
       </div>

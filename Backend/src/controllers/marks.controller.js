@@ -527,6 +527,12 @@ export const getStudentMarksData = asyncHandler(async (req, res) => {
       .status(404)
       .json(new ApiResponse(404, [], "No results Available Yet"));
   }
+  
+  const allExams = await Exam.find({ schoolId:req.school?._id }).select("_id name");
+  // Check if all exams are published for the student
+  const allExamsPublished = allExams.every((exam) =>
+    marks.some((m) => m.examId._id.equals(exam._id))
+  );
 
   // If class is below 8 → return grades for each exam with percentage
   if (req.student.class < 8) {
@@ -549,7 +555,7 @@ export const getStudentMarksData = asyncHandler(async (req, res) => {
 
     return res
       .status(200)
-      .json(new ApiResponse(200, gradesData, "Grades fetched successfully"));
+      .json(new ApiResponse(200, {gradesData, allExamsPublished}, "Grades fetched successfully"));
   }
 
   // Else → return marks with percentage
