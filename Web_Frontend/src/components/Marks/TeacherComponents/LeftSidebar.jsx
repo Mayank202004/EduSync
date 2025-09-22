@@ -52,7 +52,7 @@ function LeftSidebar({ activeTab, setActiveTab, setSelectedContext }) {
           {/* New "Coordinator Tab" tab */}
           {roleInfo.classCoordinator && <li
             className={`flex items-center space-x-2 cursor-pointer hover:text-blue-600 ${
-              activeTab === "myClass" ? "text-blue-600 font-medium" : ""
+              activeTab === "classCoordinatorPanel" ? "text-blue-600 font-medium" : ""
             }`}
             onClick={() => {
               setActiveTab("classCoordinatorPanel");

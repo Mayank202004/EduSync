@@ -127,3 +127,36 @@ export const togglePublishExamResult = async (examId,className,div) => {
   const response = await axiosInstance.post('/marks/toggle-publish-exam-result', {examId,className,div});
   return response.data;
 }
+
+
+/**
+ * @desc Export marksheed for a particular exam for a particular student
+ * @returns {Promise} Promise resolving to PDF download
+ */
+export const exportExamMarksheet = async (examId) => {
+  const response = await axiosInstance.post(
+    "/marks/render-exam-marksheet",
+    { examId },
+    { 
+      responseType: "blob",
+      timeout: 10000,
+     }
+  );
+
+  // Convert blob to PDF object
+  const pdfBlob = new Blob([response.data], { type: "application/pdf" });
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+
+  // Auto-download
+  const link = document.createElement("a");
+  link.href = pdfUrl;
+  link.download = `marksheet.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  // Preview in new tab (instead of download)
+  window.open(pdfUrl, "_blank");
+};
+
+
+
