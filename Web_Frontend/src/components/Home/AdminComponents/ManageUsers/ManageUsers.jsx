@@ -4,6 +4,7 @@ import AddStudentForm from "./AddStudentForm";
 import AddTeacherForm from "./AddTeacherForm";
 import BulkStudentUpload from "./BulkStudentUpload";
 import BulkTeacherUpload from "./BulkTeacherUpload";
+import ViewStudentsData from "./ViewStudentsData";
 
 const ManageUsers = ({ onBackPressed }) => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -32,6 +33,12 @@ const ManageUsers = ({ onBackPressed }) => {
       title: "Bulk Teacher Upload",
       description: "Upload multiple teacher accounts together via CSV/Excel.",
       icon: <Upload className="text-orange-600 dark:text-orange-400" size={32} />,
+    },
+    {
+      id: "view-students-data",
+      title: "View Students Data",
+      description: "View Students data and export them via CSV/Excel.",
+      icon: <Users className="text-amber-800 dark:text-amber-400" size={32} />,
     },
   ];
 
@@ -105,6 +112,9 @@ const ManageUsers = ({ onBackPressed }) => {
       )}
       {activeSection === "bulk-teachers" && (
         <BulkTeacherUpload onBack={() => setActiveSection("dashboard")} />
+      )}
+      {activeSection === "view-students-data" && (
+        <ViewStudentsData onBack={() => setActiveSection("dashboard")} />
       )}
     </div>
   );
