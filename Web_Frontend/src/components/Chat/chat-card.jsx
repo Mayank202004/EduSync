@@ -78,7 +78,7 @@ const ChatCard = ({
         message.type === "now" &&
         message.sender?._id === currentUser._id
       ) {
-        navigate(`/meeting/${message.meetingId}`); // Instantly open meeting if (sender is the receiver and type is now)
+        navigate(`/meeting/${message.meeting.meetingId}`); // Instantly open meeting if (sender is the receiver and type is now)
       }
     };
     socket.on("receiveMessage", handleIncoming);
