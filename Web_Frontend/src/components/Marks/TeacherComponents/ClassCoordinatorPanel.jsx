@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
 import Modal from "@/components/Modals/Modal";
 import { CircularProgress } from "@/components/UI/CircularProgressPercentage";
 import {
@@ -18,7 +18,7 @@ import { togglePublishExamResult } from "@/services/marksServices";
 
 const ClassCoordinatorPanel = ({ coordinatorData, subjectNames }) => {
   const exams = [...new Set(coordinatorData.map((d) => d.exam))];
-
+  
   const [selectedExam, setSelectedExam] = useState(exams[0] ?? "");
   const [selectedDiv, setSelectedDiv] = useState(
     coordinatorData.find((d) => d.exam === selectedExam)?.div ?? ""
@@ -30,13 +30,18 @@ const ClassCoordinatorPanel = ({ coordinatorData, subjectNames }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: "roll", direction: "asc" });
   const [showModal, setShowModal] = useState(false);
-
+  
   const marksData = coordinatorData.find(
     (d) => d.exam === selectedExam && d.div === selectedDiv
   );
 
-  const [isPublished, setIsPublished] = useState(marksData?.isPublished === true || marksData?.isPublished === "true");
+  const [isPublished, setIsPublished] = useState(null);
   const [confirmModal, setConfirmModal] = useState(null);
+  
+  useEffect(() => {
+    setIsPublished(marksData?.isPublished === true || marksData?.isPublished === "true");
+  }, [marksData]);
+
 
   const subjectData = marksData?.subjects.find(
     (sub) => sub.subject === selectedSubject
