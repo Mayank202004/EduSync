@@ -1,10 +1,10 @@
 import { Download, BarChart2 } from "lucide-react";
 import MainContentSkeleton from "./MainContentSkeleton";
 import toast from "react-hot-toast";
-import { exportExamMarksheet } from "@/services/marksServices";
+import { exportExamMarksheet, exportConsolidatedResult} from "@/services/marksServices";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-function MainContent({ student, activeIndex, exams, loading}) {
+function MainContent({ student, activeIndex, exams, loading, allExamsPublished }) {
   const selectedExam = exams[activeIndex - 1];
 
   const totalObtained = selectedExam?.marks
@@ -37,6 +37,17 @@ function MainContent({ student, activeIndex, exams, loading}) {
     );
   };
 
+  const handleExportConsolidatedResult = async () => {
+    await toast.promise(
+      exportConsolidatedResult(),
+      {
+        loading: "Generating consolidated result...",
+        success: "Consolidated result downloaded successfully",
+        error: "",
+      }
+    );
+  };
+
 
   if (loading)
     return <MainContentSkeleton activeIndex={activeIndex} />
@@ -53,11 +64,21 @@ function MainContent({ student, activeIndex, exams, loading}) {
             Class {student.class} - {student.division}
           </p>
         </div>
+        {/* Export Marksheet for each exams Button */}
         {activeIndex > 0 && (
           <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             onClick={() => handleExportMarksheet(selectedExam.examId._id)}
           >
             <Download size={18} /> Export Marksheet
+          </button>
+        )}
+        {/* Export OCnsolidated Marksheet Button */}
+        {activeIndex === 0 && allExamsPublished && (
+          <button
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            onClick={() => handleExportConsolidatedResult()} 
+          >
+            <Download size={18} /> Export Consolidated Result
           </button>
         )}
       </div>
