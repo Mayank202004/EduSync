@@ -15,5 +15,7 @@ router.put('/update-class-marks',verifyJWT,verifyTeacher,MarksController.updateC
 router.post('/class-marklist-template',verifyJWT,orMiddleware([verifyTeacher,verifySuperAdmin]),MarksController.exportClassMarklistTemplate);
 router.post('/class-marks-data',verifyJWT,verifySuperAdmin,MarksController.getClassMarksData);
 router.post('/toggle-publish-exam-result',verifyJWT,orMiddleware([verifyTeacher,verifySuperAdmin]),MarksController.togglePublishExamResult);
+router.post('/render-exam-marksheet',verifyJWT,verifyStudent,MarksController.renderExamMarksheet);
+router.post('/consolidated-marksheet',verifyJWT,verifyStudent,MarksController.renderConsolidatedMarksheet);
 
 export default router;

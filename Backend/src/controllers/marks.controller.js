@@ -11,6 +11,10 @@ import { isTeacherAllowed } from "../utils/verificationUtils.js"
 import { Exam } from "../models/exam.model.js";
 import { ClassStructure } from "../models/classStructure.model.js";
 import { cleanClassTeacherMarks,cleanTeacherMarks, getGrade, transformClassMarks } from "../utils/marksUtils.js"
+import { getAttendanceSummary } from "./attendence.controller.js";
+import { getSettingValue } from "./setting.controller.js"
+import pdf from "html-pdf-node";
+
 
 /**
  * @desc Export class mark sheet template (To handfill marks physically)
@@ -621,4 +625,204 @@ export const togglePublishExamResult = asyncHandler(async (req, res) => {
         : "Marks unpublished successfully"
     )
   );
+});
+
+/**
+ * @desc Get marks for a particular student for a particular exam
+ * @param {String} examId _id of the exam
+ * @param {String} studentId _id of the student
+ * @param {String} schoolId _id of the school
+ * @returns 
+ */
+export const getMarks = async (examId, studentId, schoolId) => {
+  const marksRecord = await StudentMarks.findOne({ examId, studentId, schoolId });
+  if (!marksRecord) return [];
+
+  return marksRecord.marks.map(m => ({
+    name: m.subject,
+    marks: m.marksObtained,
+    total: m.totalMarks
+  }));
+};
+
+
+/**
+ * @desc Export Marksheet for a particular exam for a particular student
+ * @route POST /api/v1/marks/export-exam-marksheet
+ * @access Private (Student)
+ */
+export const renderExamMarksheet = asyncHandler(async (req, res) => {
+  const templatePath = "src/templates/examMarksheet.template.ejs";
+  let { examId } = req.body;
+  const school = req.school;
+  const student = req.student;
+
+  if (!student) throw new ApiError(400, "Student not found");
+  if (!examId) throw new ApiError(400, "Exam not found");
+
+  const exam = await Exam.findById(examId);
+  if (!exam) throw new ApiError(400, "Exam not found");
+
+  const examName = exam.name;
+
+  // Attendance
+  const { workingDays, daysPresent } = await getAttendanceSummary(
+    school._id,
+    student.class,
+    student.div,
+    student._id
+  );
+
+  // Marks + Grade
+  let marks = await getMarks(examId, student._id, school._id);
+
+  marks = marks.map(m => {
+    if (m.marks !== undefined && m.total !== undefined) {
+      return {
+        ...m,
+        displayMarks: `${m.marks} / ${m.total}`,
+        grade: getGrade(m.marks, m.total),
+      };
+    }
+    return {
+      ...m,
+      displayMarks: "-",
+      grade: m.grade ?? "N/A",
+    };
+  });
+
+  const data = {
+    schoolName: school.name,
+    logo: school.logo || "",
+    examName,
+    academicYear: (await getSettingValue("academicYear", school._id)) || "20xx-20xx",
+    date: new Date().toLocaleDateString(),
+    student: {
+      name: req.user.fullName,
+      // rollNo: student.rollNo ?? 0,
+      _id: student._id,
+      class: student.class,
+      div: student.div,
+      dob: student.dob ? new Date(student.dob).toLocaleDateString() : "Not Specified",
+      workingDays,
+      daysPresent,
+      remarks: "Good"
+    },
+    marks
+  };
+
+  try {
+    const html = await ejs.renderFile(templatePath, data);
+    const file = { content: html };
+    const options = {
+      format: "A4",
+      printBackground: true,
+      preferCSSPageSize: true,
+      margin: { top: 20, right: 20, bottom: 20, left: 20 },
+    };
+
+    const pdfBuffer = await pdf.generatePdf(file, options);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=${examName}-Marksheet.pdf`);
+    res.send(pdfBuffer);
+  } catch (err) {
+    throw new ApiError(500, "Error generating PDF: " + err.message);
+  }
+});
+
+/**
+ * @desc Export consolidated Marksheet for the year
+ * @route POST /marks/consolidated-markshet
+ * @access Private (Student)
+ */
+export const renderConsolidatedMarksheet = asyncHandler(async (req, res) => {
+  const templatePath = "src/templates/consolidatedMarksheet.template.ejs";
+  const school = req.school;
+  const student = req.student;
+
+  if (!student) throw new ApiError(400, "Student not found");
+
+  // 1. Fetch all exams for the school
+  const exams = await Exam.find({ schoolId: school._id }).sort({ createdAt: 1 });
+
+  if (!exams || exams.length === 0) {
+    throw new ApiError(400, "No exams found for this school");
+  }
+
+  // 2. Collect marks for each subject across all exams
+  let subjectsMap = {};
+
+  for (const exam of exams) {
+    const marks = await getMarks(exam._id, student._id, school._id);
+
+    if (!marks || marks.length === 0) {
+      throw new ApiError(400, `Consolidated marksheet not available yet`);
+    }
+
+    marks.forEach(m => {
+      if (!subjectsMap[m.name]) {
+        subjectsMap[m.name] = {
+          subject: m.name,
+          exams: {},
+          totalObtained: 0,
+          totalMax: 0
+        };
+      }
+
+      if (m.marks !== undefined && m.total !== undefined) {
+        subjectsMap[m.name].exams[exam.name] = {
+          obtained: m.marks,
+          total: m.total
+        };
+        subjectsMap[m.name].totalObtained += m.marks;
+        subjectsMap[m.name].totalMax += m.total;
+      }
+    });
+  }
+
+  // 3. Convert total into 100 scale and grade
+  const subjects = Object.values(subjectsMap).map(sub => {
+    let percentage = (sub.totalObtained / sub.totalMax) * 100;
+    return {
+      ...sub,
+      finalPercent: percentage.toFixed(2),
+      grade: getGrade(sub.totalObtained, sub.totalMax)
+    };
+  });
+
+  const data = {
+    schoolName: school.name,
+    logo: school.logo || "",
+    academicYear: (await getSettingValue("academicYear", school._id)) || "20xx-20xx",
+    date: new Date().toLocaleDateString(),
+    examHeaders: exams.map(e => e.name), // for dynamic table headers
+    student: {
+      name: req.user.fullName,
+      class: student.class,
+      div: student.div,
+      dob: student.dob ? new Date(student.dob).toLocaleDateString() : "Not Specified",
+      remarks: "Consolidated Report"
+    },
+    subjects
+  };
+
+  try {
+    const html = await ejs.renderFile(templatePath, data);
+    const file = { content: html };
+    const options = {
+      format: "A4",
+      printBackground: true,
+      preferCSSPageSize: true,
+      margin: { top: 20, right: 20, bottom: 20, left: 20 },
+    };
+
+    const pdfBuffer = await pdf.generatePdf(file, options);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=consolidated_marksheet.pdf`);
+    res.send(pdfBuffer);
+  } catch (err) {
+    throw new ApiError(500, "Error generating PDF: " + err.message);
+  }
 });

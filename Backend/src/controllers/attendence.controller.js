@@ -1383,3 +1383,22 @@ export const getAttendancePercentageByMonth = async (studentId,className,div,sch
 
     return attendanceByMonth;
 };
+
+
+/**
+ * @desc Get attendance summary for a student in a class/div for the whole academic year
+ * @returns { workingDays, daysPresent }
+ */
+export const getAttendanceSummary = async (schoolId, className, div, studentId) => {
+  const records = await ClassAttendance.find({ schoolId, class: className, div });
+
+  const workingDays = records.length;
+
+  let daysPresent = 0;
+  records.forEach(record => {
+    const studentRecord = record.attendance.find(a => a.studentId.toString() === studentId.toString());
+    if (studentRecord && studentRecord.status === "Present") daysPresent++;
+  });
+
+  return { workingDays, daysPresent };
+};
