@@ -95,7 +95,7 @@ const SuperAdminDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="w-full md:w-[70%] lg:w-[60%] h-full md:h-[calc(100vh-110px)] xl:h-[calc(100vh-100px)] mt-5">
+      <div className="w-full md:w-[70%] lg:w-[60%] md:px-4 lg:px-2 h-full md:h-[calc(100vh-110px)] xl:h-[calc(100vh-100px)] mt-5">
         {renderMainContent()}
       </div>
 

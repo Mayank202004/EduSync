@@ -1,4 +1,5 @@
 import React from "react";
+import AvatarIcon from "@/components/Chat/AvatarIcon";
 
 function StudentDetails({ student, onBack }) {
   if (!student) return null;
@@ -22,17 +23,14 @@ function StudentDetails({ student, onBack }) {
       {/* Header */}
       <div className="flex items-center gap-6 mb-6">
         {/* Avatar */}
-        {student.userId?.avatar ? (
-          <img
-            src={student.userId.avatar}
-            alt={student.userId.fullName}
-            className="w-24 h-24 rounded-full border shadow"
-          />
-        ) : (
-          <div className="w-24 h-24 flex items-center justify-center bg-gray-200 dark:bg-customDarkFg rounded-full text-gray-600 dark:text-gray-300 text-lg">
-            {student.userId?.fullName?.charAt(0) || "?"}
-          </div>
-        )}
+        <AvatarIcon
+          size="large"                
+          withHover={false}         
+          user={{
+            fullName: student.userId?.fullName || "?",
+            avatar: student.userId?.avatar,
+          }}
+        />
 
         {/* Name + Email */}
         <div>
