@@ -681,3 +681,32 @@ export const manuallyAssignDivisions = asyncHandler(async (req, res) => {
 
   res.status(200).json(new ApiResponse(200, {}, "Divisions manually assigned and chats updated successfully"));
 });
+
+/**
+ * @desc Get students' data for a class
+ * @route POST /api/v1/student/see-all
+ * @access Private (Super Admin)
+ */
+export const getStudentsData = asyncHandler(async (req, res) => {
+  const { className } = req.params;
+
+  const students = await Student.find({ class: className, schoolId: req.school?._id })
+    .select("-createdAt -updatedAt -__v -schoolId")
+    .populate("userId", "fullName email avatar verified") 
+    .lean();
+
+  // Filter only verified users
+  const verifiedStudents = students.filter(student => student.userId && student.userId.verified);
+
+  // Group students by division
+  const studentsByDiv = verifiedStudents.reduce((acc, student) => {
+    const div = student.div; 
+    if (!acc[div]) {
+      acc[div] = [];
+    }
+    acc[div].push(student);
+    return acc;
+  }, {});
+
+  res.status(200).json(new ApiResponse(200, studentsByDiv, "Students fetched successfully"));
+});
