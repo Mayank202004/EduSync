@@ -219,12 +219,32 @@ export const bulkStudentUpload = async (file) => {
   return response.data;
 };
 
+/**
+ * @desc Register a student by super admin
+ * @param {Object} formData Student details 
+ * @returns {Promise} Promise resolving to success message
+ */
 export const registerStudentBySuperAdmin = async (formData) => {
   const response = await axiosInstance.post(`${BASEURL}/users/register-student`, formData);
   return response.data;
 }
 
+/**
+ * @desc Register a teacher by super admin
+ * @param {Object} formData Teacher details
+ * @returns {Promise} Promise resolving to success message
+ */
 export const registerTeacherBySuperAdmin = async (formData) => {
   const response = await axiosInstance.post(`${BASEURL}/users/register-teacher`, formData);
   return response.data;
 }
+
+/**
+ * @desc Fetch all students details belonging to a class
+ * @param {String} className Class Name 
+ * @returns {Object} Promise resolving to list of students with details division wise
+ */
+export const getAllStudents = async (className) => {
+    const response = await axiosInstance.get(`${BASEURL}/student/see-all/${className}`);
+    return response.data
+} 
