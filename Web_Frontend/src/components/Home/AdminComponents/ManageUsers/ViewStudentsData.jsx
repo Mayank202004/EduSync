@@ -1,41 +1,35 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { getAllStudents } from "@/services/dashboardService";
+import { getAllStudents, fetchAllClasses} from "@/services/dashboardService";
+import StudentDetails from "./StudentDetails";
 
-function StudentDetailsScreen({ student, onBack }) {
-  return (
-    <div className="p-6 border rounded shadow bg-white">
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-blue-600 hover:underline mb-4"
-      >
-        ← Back
-      </button>
-      <h2 className="text-2xl font-bold mb-4">Student Details</h2>
-      <p><strong>Full Name:</strong> {student.userId.fullName}</p>
-      <p><strong>Email:</strong> {student.userId.email}</p>
-      <p><strong>Allergies:</strong> {student.allergies.join(", ") || "-"}</p>
-      <p><strong>Address:</strong> {student.parentsInfo?.address || "-"}</p>
-      <p><strong>DOB:</strong> {student.parentsInfo?.dob || "-"}</p>
-      <p><strong>Blood Group:</strong> {student.parentsInfo?.bloodGroup || "-"}</p>
-      <p><strong>Gender:</strong> {student.gender || student.parentsInfo?.gender || "-"}</p>
-      <p><strong>School Transport:</strong> {student.parentsInfo?.schoolTransport ? "Yes" : "No"}</p>
-      <p>
-        <strong>Parent Contact:</strong>{" "}
-        {student.parentContact?.map(p => `${p.name} (${p.relation}) - ${p.phone}`).join(", ") || "-"}
-      </p>
-    </div>
-  );
-}
 
 function ViewStudentsData({ onBack }) {
+  const [classes, setClasses] = useState([]); // store classes and divisions
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedDiv, setSelectedDiv] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentsByDiv, setStudentsByDiv] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch all classes on component mount
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        setLoading(true);
+        const response = await fetchAllClasses();
+        setClasses(response.data || []);
+      } catch (err) {
+        // Handled by axios interceptor
+      }finally{
+        setLoading(false);
+      }
+    };
+    fetchClasses();
+  }, []);
+
+  // Fetch students when class is selected
   useEffect(() => {
     if (!selectedClass) return;
 
@@ -46,13 +40,16 @@ function ViewStudentsData({ onBack }) {
         setStudentsByDiv(response.data || {});
         setSelectedDiv(""); 
       } catch (err) {
-        // Handled by axios interceptor
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
     fetchStudents(); 
   }, [selectedClass]);
+
+  // Get divisions for selected class
+  const divisions = classes.find(cls => cls.className === selectedClass)?.divisions || [];
 
   // Filter students by division and search term
   const filteredStudents = selectedDiv
@@ -62,57 +59,67 @@ function ViewStudentsData({ onBack }) {
     : [];
 
   if (selectedStudent) {
-    return <StudentDetailsScreen student={selectedStudent} onBack={() => setSelectedStudent(null)} />;
+    return <StudentDetails student={selectedStudent} onBack={() => setSelectedStudent(null)} />;
   }
 
   return (
-    <div className="p-6">
+    <div className="px-6">
       <button onClick={onBack} className="flex items-center gap-2 text-blue-600 hover:underline mb-4">
-        ← Back
+        ← Back to Manage Users
       </button>
 
       <h1 className="text-2xl font-bold mb-4">View Students Data</h1>
 
       {/* Dropdowns - always visible */}
-      <div className="flex gap-4 mb-4">
-        <div>
-          <label className="block text-gray-700 mb-1">Class</label>
-          <select
-            value={selectedClass}
-            onChange={(e) => setSelectedClass(e.target.value)}
-            className="border p-2 rounded"
-          >
-            <option value="">Select Class</option>
-            {[1, 2, 3, 4, 10].map(cls => <option key={cls} value={cls}>{cls}</option>)}
-          </select>
+      <div className="flex items-end gap-4 mb-4">
+        {/* Left side: Class + Division */}
+        <div className="flex gap-4">
+          <div>
+            <label className="block text-gray-700 dark:text-white mb-1">Class</label>
+            <select
+              value={selectedClass}
+              onChange={(e) => setSelectedClass(e.target.value)}
+              className="border p-2 rounded dark:bg-customDarkFg dark:text-white"
+            >
+              <option value="">Select Class</option>
+              {classes.map(cls => (
+                <option key={cls._id} value={cls.className}>
+                  {cls.className}
+                </option>
+              ))}
+            </select>
+          </div>
+            
+          <div>
+            <label className="block text-gray-700 dark:text-white mb-1">Division</label>
+            <select
+              value={selectedDiv}
+              onChange={(e) => setSelectedDiv(e.target.value)}
+              className="border p-2 rounded dark:bg-customDarkFg dark:text-white"
+              disabled={!selectedClass || divisions.length === 0}
+            >
+              <option value="">Select Division</option>
+              {divisions.map(div => (
+                <option key={div} value={div}>
+                  {div}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-
-        <div>
-          <label className="block text-gray-700 mb-1">Division</label>
-          <select
-            value={selectedDiv}
-            onChange={(e) => setSelectedDiv(e.target.value)}
-            className="border p-2 rounded"
-            disabled={!selectedClass || !Object.keys(studentsByDiv).length}
-          >
-            <option value="">Select Division</option>
-            {Object.keys(studentsByDiv).map(div => (
-              <option key={div} value={div}>{div}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex-1">
-          <label className="block text-gray-700 mb-1">Search</label>
+            
+        {/* Right side: Search */}
+        <div className="flex-1 ml-auto max-w-sm">
           <input
             type="text"
             placeholder="Search by name"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full dark:bg-customDarkFg dark:text-white"
           />
         </div>
       </div>
+            
 
       {/* Table or messages */}
       {!selectedClass ? (
@@ -126,7 +133,7 @@ function ViewStudentsData({ onBack }) {
       ) : (
         <table className="min-w-full border border-gray-300 mt-4">
           <thead>
-            <tr className="bg-gray-200">
+            <tr className="bg-gray-200 dark:bg-customDarkFg">
               <th className="border px-4 py-2">Full Name</th>
               <th className="border px-4 py-2">Allergies</th>
               <th className="border px-4 py-2">Parent Contact</th>
@@ -136,7 +143,7 @@ function ViewStudentsData({ onBack }) {
             {filteredStudents.map(student => (
               <tr
                 key={student._id}
-                className="cursor-pointer hover:bg-gray-100"
+                className="cursor-pointer hover:bg-gray-100 dark:hover:bg-customDarkFg"
                 onClick={() => setSelectedStudent(student)}
               >
                 <td className="border px-4 py-2">{student.userId.fullName}</td>

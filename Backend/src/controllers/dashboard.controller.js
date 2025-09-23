@@ -15,6 +15,11 @@ import { deleteAllEvents } from "./calendar.controller.js";
 import { formatTeacherSubjects } from "./teacher.controller.js";
 import { Exam } from "../models/exam.model.js";
 
+/**
+ * @desc Controller to fetch student dashboard data
+ * @route GET /dashboard/student
+ * @access Private (Student)
+ */
 export const fetchDashboardData = asyncHandler(async (req, res) => {
     const user = req.user;
     const student = req.student;
@@ -25,6 +30,11 @@ export const fetchDashboardData = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, {chatData,monthlyAttendancePercentage,attendanceForTheMonth,events}, "Dashboard data fetched successfully"));
 });
 
+/**
+ * @desc Controller to fetch teacher dashboard data
+ * @route GET /dashboard/teacher
+ * @access Private (Teacher)
+ */
 export const fetchTeacherDashboardData = asyncHandler(async (req, res) => {
     const teacher = req.teacher;
     const chatData = await getTeacherChats(teacher,req.school?._id);
@@ -33,6 +43,11 @@ export const fetchTeacherDashboardData = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, {chatData,events,teacherSubjects}, "Teacher Dashboard data fetched successfully"));
 });
 
+/**
+ * @desc Controller to fetch super admin dashboard data
+ * @route GET /dashboard/super-admin
+ * @access Private (Super Admin)
+ */
 export const fetchSuperAdminDashboardData = asyncHandler(async (req, res) => {
     const allUsers = await getAllUsers(req.user._id,req.school?._id);
     const chatData = await getSuperAdminChats(req.user._id,req.school?._id);
