@@ -248,3 +248,29 @@ export const getAllStudents = async (className) => {
     const response = await axiosInstance.get(`${BASEURL}/student/see-all/${className}`);
     return response.data
 } 
+
+export const exportStudentData = async (className, div) => {
+  const response = await axiosInstance.post(
+    `${BASEURL}/student/export-data`,
+    {className,div},
+    {
+      responseType: 'blob', //Receive binary data
+    }
+  );
+
+  const blob = new Blob([response.data], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank'; // Attempt to open in new tab (Might not work in some browsers (will start direct download))
+  a.download = `Student_Data${className || 'Class'}_${div || 'Div'}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+
+  // Clean up
+  a.remove();
+  window.URL.revokeObjectURL(url);
+};
