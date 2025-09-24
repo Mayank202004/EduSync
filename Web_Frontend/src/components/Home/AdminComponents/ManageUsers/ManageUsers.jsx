@@ -43,7 +43,7 @@ const ManageUsers = ({ onBackPressed }) => {
   ];
 
   return (
-    <div className="text-gray-900 dark:text-white overflow-y-auto h-[calc(100%-30px)] my-5 w-full px-1">
+    <div className="text-gray-900 dark:text-white overflow-y-auto h-full w-full px-4 md:px-1 flex flex-col">
       {/* Back Button (to parent page) */}
       <button
         onClick={

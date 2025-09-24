@@ -127,7 +127,7 @@ const ManageAcademicYear = ({ onBackPressed }) => {
   };
 
   return (
-    <div className="p-5 my-5 space-y-8 max-w-5xl h-[calc(100%-30px)] mx-auto text-gray-900 dark:text-gray-100 overflow-y-auto">
+    <div className="p-5  space-y-8 max-w-5xl h-full mx-auto text-gray-900 dark:text-gray-100 overflow-y-auto">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold flex items-center gap-2">
           <CalendarDays className="w-6 h-6 text-blue-600" />

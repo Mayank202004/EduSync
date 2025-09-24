@@ -31,7 +31,7 @@ const AdminHomeCard = ({ icon: Icon, title, description, onClick }) => {
 const AdminHomeContent = ({setActiveView=()=>{}}) => {
   return (
     <div className="h-full w-full px-6 py-4 overflow-y-auto">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white my-5 w-full px-2">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white w-full px-2">
         Admin Dashboard
       </h1>
 
