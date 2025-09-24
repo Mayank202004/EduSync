@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { getAllStudents, fetchAllClasses } from "@/services/dashboardService";
+import { getAllStudents, fetchAllClasses, exportStudentData } from "@/services/dashboardService";
 import StudentDetails from "./StudentDetails";
 
 function ViewStudentsData({ onBack }) {
-  const [classes, setClasses] = useState([]); // store classes and divisions
+  const [classes, setClasses] = useState([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedDiv, setSelectedDiv] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,7 +12,7 @@ function ViewStudentsData({ onBack }) {
   const [studentsByDiv, setStudentsByDiv] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Fetch all classes on component mount
+  // Fetch classes for dropdown
   useEffect(() => {
     const fetchClasses = async () => {
       try {
@@ -20,7 +20,7 @@ function ViewStudentsData({ onBack }) {
         const response = await fetchAllClasses();
         setClasses(response.data || []);
       } catch (err) {
-        // Handled by axios interceptor
+        // handled by interceptor
       } finally {
         setLoading(false);
       }
@@ -28,10 +28,9 @@ function ViewStudentsData({ onBack }) {
     fetchClasses();
   }, []);
 
-  // Fetch students when class is selected
+  // Fetch students when class changes
   useEffect(() => {
     if (!selectedClass) return;
-
     const fetchStudents = async () => {
       setLoading(true);
       try {
@@ -47,11 +46,9 @@ function ViewStudentsData({ onBack }) {
     fetchStudents();
   }, [selectedClass]);
 
-  // Get divisions for selected class
   const divisions =
     classes.find((cls) => cls.className === selectedClass)?.divisions || [];
 
-  // Filter students by division and search term
   const filteredStudents = selectedDiv
     ? (studentsByDiv[selectedDiv] || []).filter((student) =>
         !searchTerm ||
@@ -60,6 +57,18 @@ function ViewStudentsData({ onBack }) {
           .includes(searchTerm.toLowerCase())
       )
     : [];
+
+  // Handle Export studnet data
+  const handleExport = () => {
+    toast.promise(
+      exportStudentData(selectedClass, selectedDiv),
+      {
+        loading: "Exporting student data...",
+        success: "Export completed!",
+        error: "",
+      }
+    );
+  };
 
   if (selectedStudent) {
     return (
@@ -81,12 +90,23 @@ function ViewStudentsData({ onBack }) {
           ← Back to Manage Users
         </button>
 
-        {/* Title */}
-        <h1 className="text-2xl font-bold mb-6">View Students Data</h1>
+        {/* Title + Export */}
+        <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+          <h1 className="text-2xl font-bold">View Students Data</h1>
+
+          {selectedClass && selectedDiv && (
+            <button
+              onClick={handleExport}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+            >
+              Export Data
+            </button>
+          )}
+        </div>
 
         {/* Filters */}
         <div className="flex items-end gap-4 mb-6 flex-wrap">
-          {/* Left side: Class + Division */}
+          {/* Class + Division */}
           <div className="flex gap-4">
             <div>
               <label className="block text-gray-700 dark:text-white mb-1">
@@ -126,7 +146,7 @@ function ViewStudentsData({ onBack }) {
             </div>
           </div>
 
-          {/* Right side: Search */}
+          {/* Search */}
           <div className="flex-1 ml-auto max-w-sm">
             <label className="block text-gray-700 dark:text-white mb-1">
               Search
@@ -141,7 +161,7 @@ function ViewStudentsData({ onBack }) {
           </div>
         </div>
 
-        {/* Table or messages */}
+        {/* Table / messages */}
         {!selectedClass ? (
           <div className="text-gray-500 mt-4">
             Please select a class to view students

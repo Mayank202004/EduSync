@@ -11,7 +11,7 @@ function StudentDetails({ student, onBack }) {
       : "No";
 
   return (
-    <div className="p-6 border rounded shadow bg-white dark:bg-customDarkBg dark:border-gray-700 max-w-4xl mx-auto text-gray-900 dark:text-gray-100">
+    <div className="p-4 sm:p-6 border rounded shadow bg-white dark:bg-customDarkBg dark:border-gray-700 max-w-5xl text-gray-900 dark:text-gray-100 overflow-y-auto mb-2 md:mb-0">
       {/* Back Button */}
       <button
         onClick={onBack}
@@ -21,11 +21,11 @@ function StudentDetails({ student, onBack }) {
       </button>
 
       {/* Header */}
-      <div className="flex items-center gap-6 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-6">
         {/* Avatar */}
         <AvatarIcon
-          size="large"                
-          withHover={false}         
+          size="large"
+          withHover={false}
           user={{
             fullName: student.userId?.fullName || "?",
             avatar: student.userId?.avatar,
@@ -34,8 +34,8 @@ function StudentDetails({ student, onBack }) {
 
         {/* Name + Email */}
         <div>
-          <h2 className="text-2xl font-bold">{student.userId?.fullName}</h2>
-          <p className="text-gray-600 dark:text-gray-400">
+          <h2 className="text-xl sm:text-2xl font-bold">{student.userId?.fullName}</h2>
+          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
             {student.userId?.email || "-"}
           </p>
           <span
@@ -51,7 +51,7 @@ function StudentDetails({ student, onBack }) {
       </div>
 
       {/* IDs */}
-      <div className="grid grid-cols-2 gap-4 mb-6 text-sm text-gray-700 dark:text-gray-400">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-sm">
         <p>
           <strong>Student ID:</strong> {student._id || "-"}
         </p>
@@ -61,7 +61,7 @@ function StudentDetails({ student, onBack }) {
       </div>
 
       {/* Basic Info */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-sm">
         <p>
           <strong>Class:</strong> {student.class || "-"}
         </p>
@@ -87,10 +87,10 @@ function StudentDetails({ student, onBack }) {
         <p>
           <strong>School Transport:</strong> {transport}
         </p>
-        <p className="col-span-2">
+        <p className="col-span-1 sm:col-span-2">
           <strong>Address:</strong> {student.address || "-"}
         </p>
-        <p className="col-span-2">
+        <p className="col-span-1 sm:col-span-2">
           <strong>Allergies:</strong>{" "}
           {student.allergies?.length ? student.allergies.join(", ") : "None"}
         </p>
@@ -100,7 +100,7 @@ function StudentDetails({ student, onBack }) {
       {student.parentsInfo && (
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-2">Parent Information</h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <p>
               <strong>Father:</strong> {student.parentsInfo.fatherName || "-"}
             </p>
@@ -135,7 +135,7 @@ function StudentDetails({ student, onBack }) {
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-2">Parent Contacts</h3>
         {student.parentContact?.length ? (
-          <ul className="list-disc pl-6 space-y-1">
+          <ul className="list-disc pl-6 space-y-1 text-sm">
             {student.parentContact.map((p, idx) => (
               <li key={idx}>
                 {p.name} ({p.relation}) – {p.phone}
@@ -143,7 +143,7 @@ function StudentDetails({ student, onBack }) {
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             No contacts available
           </p>
         )}
@@ -153,55 +153,36 @@ function StudentDetails({ student, onBack }) {
       <div>
         <h3 className="text-lg font-semibold mb-2">Siblings</h3>
         {student.siblingInfo?.length ? (
-          <table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
-            <thead className="bg-gray-100 dark:bg-customDarkFg">
-              <tr>
-                <th className="border p-2 text-left dark:border-gray-600">
-                  Name
-                </th>
-                <th className="border p-2 text-left dark:border-gray-600">
-                  Age
-                </th>
-                <th className="border p-2 text-left dark:border-gray-600">
-                  Relation
-                </th>
-                <th className="border p-2 text-left dark:border-gray-600">
-                  Same School
-                </th>
-                <th className="border p-2 text-left dark:border-gray-600">
-                  Class
-                </th>
-                <th className="border p-2 text-left dark:border-gray-600">
-                  Div
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {student.siblingInfo.map((s, idx) => (
-                <tr
-                  key={idx}
-                  className="hover:bg-gray-50 dark:hover:bg-customDarkFg"
-                >
-                  <td className="border p-2 dark:border-gray-600">{s.name}</td>
-                  <td className="border p-2 dark:border-gray-600">{s.age}</td>
-                  <td className="border p-2 dark:border-gray-600">
-                    {s.relation}
-                  </td>
-                  <td className="border p-2 dark:border-gray-600">
-                    {s.isInSameSchool ? "Yes" : "No"}
-                  </td>
-                  <td className="border p-2 dark:border-gray-600">
-                    {s.class || "-"}
-                  </td>
-                  <td className="border p-2 dark:border-gray-600">
-                    {s.div || "-"}
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
+              <thead className="bg-gray-100 dark:bg-customDarkFg">
+                <tr>
+                  <th className="border p-2 text-left dark:border-gray-600">Name</th>
+                  <th className="border p-2 text-left dark:border-gray-600">Age</th>
+                  <th className="border p-2 text-left dark:border-gray-600">Relation</th>
+                  <th className="border p-2 text-left dark:border-gray-600">Same School</th>
+                  <th className="border p-2 text-left dark:border-gray-600">Class</th>
+                  <th className="border p-2 text-left dark:border-gray-600">Div</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {student.siblingInfo.map((s, idx) => (
+                  <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-customDarkFg">
+                    <td className="border p-2 dark:border-gray-600">{s.name}</td>
+                    <td className="border p-2 dark:border-gray-600">{s.age}</td>
+                    <td className="border p-2 dark:border-gray-600">{s.relation}</td>
+                    <td className="border p-2 dark:border-gray-600">
+                      {s.isInSameSchool ? "Yes" : "No"}
+                    </td>
+                    <td className="border p-2 dark:border-gray-600">{s.class || "-"}</td>
+                    <td className="border p-2 dark:border-gray-600">{s.div || "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
-          <p className="text-gray-500 dark:text-gray-400">No siblings info</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">No siblings info</p>
         )}
       </div>
     </div>
