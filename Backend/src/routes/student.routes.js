@@ -21,5 +21,6 @@ router.route("/promote").patch(verifyJWT,verifySuperAdmin,StudentController.prom
 router.route("/shuffle").patch(verifyJWT,verifySuperAdmin,StudentController.shuffleDivisions);
 router.route("/assign-divisions").patch(verifyJWT,verifySuperAdmin,StudentController.manuallyAssignDivisions); 
 router.route("/see-all/:className").get(verifyJWT,verifySuperAdmin,StudentController.getStudentsData);
+router.route("/export-data").post(verifyJWT,verifySuperAdmin,StudentController.exportStudentsData);
 
 export default router;

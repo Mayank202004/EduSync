@@ -7,6 +7,7 @@ import { Chat } from "../models/chat.model.js";
 import School from "../models/school.model.js";
 import { ClassStructure } from "../models/classStructure.model.js";
 import { deleteAllAttendance } from "./attendence.controller.js";
+import ExcelJS from "exceljs";
 
 /**
  * @desc Add class and division details
@@ -709,4 +710,125 @@ export const getStudentsData = asyncHandler(async (req, res) => {
   }, {});
 
   res.status(200).json(new ApiResponse(200, studentsByDiv, "Students fetched successfully"));
+});
+
+
+/**
+ * @desc Export students' data for a class/div as XLSX
+ * @route POST /api/v1/student/export
+ * @access Private (Super Admin)
+ */
+export const exportStudentsData = asyncHandler(async (req, res) => {
+  const { className, div } = req.body;
+
+  if (!className || !div) {
+    return res.status(400).json({ success: false, message: "className and div are required" });
+  }
+
+  const students = await Student.find({
+    class: className,
+    div,
+    schoolId: req.school?._id,
+  })
+    .select("-createdAt -updatedAt -__v -schoolId")
+    .populate("userId", "fullName email avatar verified")
+    .lean();
+
+  if (!students.length) {
+    return res.status(404).json({ success: false, message: "No students found" });
+  }
+
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet(`Class ${className}-${div}`);
+
+  worksheet.columns = [
+    { header: "Full Name", key: "fullName", width: 25 },
+    { header: "Email", key: "email", width: 30 },
+    { header: "Verified", key: "verified", width: 10 },
+    { header: "Gender", key: "gender", width: 10 },
+    { header: "DOB", key: "dob", width: 15 },
+    { header: "Blood Group", key: "bloodGroup", width: 12 },
+    { header: "Height (cm)", key: "height", width: 12 },
+    { header: "Weight (kg)", key: "weight", width: 12 },
+    { header: "Address", key: "address", width: 30 },
+    { header: "School Transport", key: "schoolTransport", width: 15 },
+    { header: "Stop Name", key: "stopName", width: 15 },
+    { header: "Allergies", key: "allergies", width: 25 },
+    { header: "Father Name", key: "fatherName", width: 20 },
+    { header: "Father Occupation", key: "fatherOccupation", width: 20 },
+    { header: "Father Income", key: "fatherIncome", width: 15 },
+    { header: "Mother Name", key: "motherName", width: 20 },
+    { header: "Mother Occupation", key: "motherOccupation", width: 20 },
+    { header: "Mother Income", key: "motherIncome", width: 15 },
+    { header: "Parent Contacts", key: "parentContacts", width: 40 },
+    { header: "Siblings", key: "siblings", width: 50 },
+  ];
+
+  // Style header row
+  const headerRow = worksheet.getRow(1);
+  headerRow.eachCell((cell) => {
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "0070C0" }, // Blue background
+    };
+    cell.font = {
+      color: { argb: "FFFFFF" }, // White font
+      bold: true,
+    };
+    cell.alignment = { vertical: "middle", horizontal: "center" };
+  });
+
+  // Add student rows
+  students.forEach((student) => {
+    const parentContacts = student.parentContact?.length
+      ? student.parentContact
+          .map((p) => `${p.name} (${p.relation}): ${p.phone}`)
+          .join("; ")
+      : "None";
+
+    const siblings = student.siblingInfo?.length
+      ? student.siblingInfo
+          .map(
+            (s) =>
+              `${s.name} (${s.relation}), Age: ${s.age}, Class: ${s.class || "-"} Div: ${s.div || "-"}`
+          )
+          .join("; ")
+      : "None";
+
+    worksheet.addRow({
+      fullName: student.userId?.fullName || "N/A",
+      email: student.userId?.email || "N/A",
+      verified: student.userId?.verified ? "Yes" : "No",
+      gender: student.gender || "N/A",
+      dob: student.dob ? new Date(student.dob).toLocaleDateString("en-IN") : "N/A",
+      bloodGroup: student.bloodGroup || "N/A",
+      height: student.height || "N/A",
+      weight: student.weight || "N/A",
+      address: student.address || "N/A",
+      schoolTransport: student.schoolTransport ? "Yes" : "No",
+      stopName: student.stopName || "N/A",
+      allergies: student.allergies?.length ? student.allergies.join(", ") : "None",
+      fatherName: student.parentsInfo?.fatherName || "N/A",
+      fatherOccupation: student.parentsInfo?.fatherOccupation || "N/A",
+      fatherIncome: student.parentsInfo?.fatherIncome || "0",
+      motherName: student.parentsInfo?.motherName || "N/A",
+      motherOccupation: student.parentsInfo?.motherOccupation || "N/A",
+      motherIncome: student.parentsInfo?.motherIncome || "0",
+      parentContacts,
+      siblings,
+    });
+  });
+
+  res.setHeader(
+    "Content-Type",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  );
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=students_class_${className}_${div}.xlsx`
+  );
+
+  await workbook.xlsx.write(res);
+  res.end();
 });
