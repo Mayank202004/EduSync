@@ -229,6 +229,7 @@ const renderFeeReceipt = asyncHandler(async (req, res) => {
   if (!transactionId || !title || !feeId || !receiptNo || !feeType) {
     throw new ApiError(400, "Missing required fields");
   }
+  
 
   const studentFeeStatus = await StudentFeeStatus.findOne({ student: req.student._id });
   if (!studentFeeStatus) throw new ApiError(403, "No fee record found for this student");
@@ -244,6 +245,8 @@ const renderFeeReceipt = asyncHandler(async (req, res) => {
   const academicYear = await getSettingValue("academicYear", req.school?._id);
 
   const data = {
+    schoolName: req.school.name,
+    schoolLogo: req.school.logo,
     academicYear: academicYear ?? "20xx-20xx",
     name: req.user.fullName,
     standard: req.student.class + "-" + req.student.div,

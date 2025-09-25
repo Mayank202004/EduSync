@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
+import Logo from "@/assets/EdusyncLogoCropped.png";
 import NavLinks from "./NavLinks";
 import { SearchBar, Question } from "./NavbarButtons";
 import Avatar from "./Avatar";
@@ -34,12 +34,26 @@ const ResponsiveTopBar = ({ theme, setTheme }) => {
   return (
     <>
       <header className="navbar w-full flex items-center bg-white dark:bg-black shadow-md px-5 pr-3 py-3 max-h-15 duration-500">
-        <h1
+        {/* <h1
           onClick={() => navigate("/")}
           className="Logo text-3xl font-bold text-black dark:text-white cursor-pointer"
         >
           EduSync
-        </h1>
+        </h1> */}
+        <div className="flex justify-center items-center" onClick={() => navigate("/")}>
+          <img
+            src={Logo}
+            alt="EduSync Logo"
+            className="h-9"
+            onError={(e) => {
+              e.currentTarget.style.display = "none"; // hide broken image
+              e.currentTarget.nextElementSibling.style.display = "block"; // show fallback
+            }}
+          />
+          <h1 className="hidden text-3xl font-bold text-gray-800">
+            EduSync
+          </h1>
+        </div>
         {/* Mobile Topbar */}
         <div className="tablet:hidden ml-auto flex items-center gap-1.5 sm:gap-2">
           <Avatar />

@@ -61,6 +61,7 @@ export const resendOtpApi = async (email, tempToken) => {
  * @param {string} data.email - User's email address
  * @param {string} data.password - User's password
  * @param {string} data.role - User's role
+ * @param {string} data.schoolId - School _id
  * @returns {Promise<any>} - Promise resolving to the response data
  */
 export const signupApi = async (data) => {

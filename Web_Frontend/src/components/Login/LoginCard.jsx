@@ -6,6 +6,8 @@ import SimpleButton from "../UI/SimpleButton";
 import LinkButton from "../UI/LinkButton";
 import signInAction from "./form_actions/signInAction";
 import OtpInputCard from "./OtpInputCard";
+import Logo from "@/assets/EdusyncLogoCropped.png";
+
 
 const inputStyle =
   "border text-black border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:text-black my-0.5";
@@ -53,9 +55,21 @@ const LoginCard = ({ switchToSignup }) => {
   return (
     <div className="h-full w-full md:w-100 flex items-center justify-center">
       <div className="w-full bg-white rounded-xl p-8 justify-center">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          EduSync
-        </h1>
+        <div className="flex justify-center items-center mb-2">
+          <img
+            src={Logo}
+            alt="EduSync Logo"
+            className="h-12"
+            onError={(e) => {
+              e.currentTarget.style.display = "none"; // hide broken image
+              e.currentTarget.nextElementSibling.style.display = "block"; // show fallback
+            }}
+          />
+          <h1 className="hidden text-3xl font-bold text-gray-800">
+            EduSync
+          </h1>
+        </div>
+
         <form className="flex flex-col gap-2" action={formAction}>
           <Input
             inputStyle={inputStyle}
@@ -105,7 +119,7 @@ const LoginCard = ({ switchToSignup }) => {
         </Link>
 
         <div className="flex flex-wrap gap-1.5 mt-0.5 w-fit mx-auto text-center text-sm text-gray-600">
-          <span className="">Don’t have an account??</span>
+          <span className="">Don’t have an account?</span>
           <LinkButton buttonProps={{ onClick: switchToSignup }}>
             Sign up
           </LinkButton>

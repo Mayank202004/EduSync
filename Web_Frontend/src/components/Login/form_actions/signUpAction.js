@@ -14,6 +14,7 @@ const signUpAction = async (prevState, formData, onSuccess) => {
     role: role,
     password: formData.get("password")?.trim() || "",
     class: role === "student" ? formData.get("class")?.trim() || "" : "",
+    schoolId: formData.get("schoolId")?.trim() || "",
   };
 
   try {

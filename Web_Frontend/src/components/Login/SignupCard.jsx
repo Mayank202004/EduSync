@@ -4,7 +4,7 @@ import Input from "@/components/UI/Input";
 import SelectOption from "@/components/Chat/SelectOption";
 import SimpleButton from "@/components/UI/SimpleButton";
 import LinkButton from "@/components/UI/LinkButton";
-
+import Logo from "@/assets/EdusyncLogoCropped.png";
 import signUpAction from "./form_actions/signUpAction";
 import { ROLES_MAP } from "./value_maps/signupMaps";
 
@@ -28,6 +28,7 @@ function SignupCard({ switchToLogin }) {
     role: "",
     password: "",
     class: "",
+    schoolId: "",
   });
 
   const [errors, setErrors] = useState(new Map());
@@ -53,7 +54,20 @@ function SignupCard({ switchToLogin }) {
   return (
     <div className="h-full w-full md:w-100 flex items-center justify-center">
       <div className="w-full bg-white rounded-xl p-8">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">EduSync</h1>
+        <div className="flex justify-center items-center mb-2">
+          <img
+            src={Logo}
+            alt="EduSync Logo"
+            className="h-12"
+            onError={(e) => {
+              e.currentTarget.style.display = "none"; // hide broken image
+              e.currentTarget.nextElementSibling.style.display = "block"; // show fallback
+            }}
+          />
+          <h1 className="hidden text-3xl font-bold text-gray-800">
+            EduSync
+          </h1>
+        </div>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-1">
             <Input
@@ -112,6 +126,19 @@ function SignupCard({ switchToLogin }) {
                 }}
               />
             )}
+
+            <Input
+              inputStyle={inputStyle}
+              key="schoolId"
+              error={errors?.get("schoolId")}
+              inputProps={{
+                name: "schoolId",
+                required: true,
+                placeholder: "School ID",
+                value: inputValues.schoolId,
+                onChange: handleInputChange,
+              }}
+            />
 
             <Input
               inputStyle={inputStyle}
