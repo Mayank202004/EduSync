@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getAllStudents, fetchAllClasses, exportStudentData } from "@/services/dashboardService";
 import StudentDetails from "./StudentDetails";
+import { formatDate } from "@/utils/dateUtils";
 
 function ViewStudentsData({ onBack }) {
   const [classes, setClasses] = useState([]);
@@ -81,7 +82,7 @@ function ViewStudentsData({ onBack }) {
 
   return (
     <div className="px-6 h-full">
-      <div className="max-w-6xl mx-auto bg-white dark:bg-customDarkBg rounded-lg shadow-md p-6 h-full">
+      <div className="max-w-6xl mx-auto bg-white dark:bg-customDarkBg rounded-lg shadow-md p-6 min-h-full">
         {/* Back */}
         <button
           onClick={onBack}
@@ -180,8 +181,8 @@ function ViewStudentsData({ onBack }) {
               <thead>
                 <tr className="bg-gray-200 dark:bg-customDarkFg">
                   <th className="border px-4 py-2 text-left">Full Name</th>
-                  <th className="border px-4 py-2 text-left">Allergies</th>
-                  <th className="border px-4 py-2 text-left">Parent Contact</th>
+                  <th className="border px-4 py-2 text-left">DOB</th>
+                  <th className="border px-4 py-2 text-left">Gender</th>
                 </tr>
               </thead>
               <tbody>
@@ -195,16 +196,10 @@ function ViewStudentsData({ onBack }) {
                       {student.userId.fullName}
                     </td>
                     <td className="border px-4 py-2">
-                      {student.allergies?.length
-                        ? student.allergies.join(", ")
-                        : "-"}
+                      {student.dob ? formatDate(student.dob) : "Not Specified"}
                     </td>
                     <td className="border px-4 py-2">
-                      {student.parentContact?.length
-                        ? student.parentContact
-                            .map((p) => `${p.name} (${p.relation})`)
-                            .join(", ")
-                        : "-"}
+                      {student.gender !="unspecified" ? student.gender : "Not Specified"}
                     </td>
                   </tr>
                 ))}
