@@ -3,8 +3,9 @@ import Modal from "./Modal";
 import { CloudUpload, Download, Printer, Edit3 } from "lucide-react";
 import { getMarkListTemplate } from "@/services/marksServices";
 import toast from "react-hot-toast";
+import { parseMarkListTemplate } from "@/services/marksServices";
 
-function UploadMarklistModal({ isOpen, onClose, className, div }) {
+function UploadMarklistModal({ isOpen, onClose, className, div, onParsedMarks}) {
   const [file, setFile] = useState(null);
 
   const handleFileChange = (e) => {
@@ -44,6 +45,35 @@ function UploadMarklistModal({ isOpen, onClose, className, div }) {
     }
   };
 
+  const handleUpload = async () => {
+    if (!file) {
+      toast.error("Please select a file first.");
+      return;
+    }
+    if (!className || !div) {
+      toast.error("Please select class and division first.");
+      return;
+    }
+    try {
+      const parsedMarks = await toast.promise(
+        parseMarkListTemplate(file, className, div),
+        {
+          loading: "Uploading & parsing marklist...",
+          success: "Marklist parsed successfully!",
+          error: "",
+        }
+      );
+      if (onParsedMarks) {
+        onParsedMarks(parsedMarks);
+      }
+      setFile(null);
+      onClose();
+    } catch (err) {
+      // axios interceptor handles errors
+    }
+  };
+
+
   if (!isOpen) return null;
 
   return (
@@ -76,7 +106,7 @@ function UploadMarklistModal({ isOpen, onClose, className, div }) {
               select a file
               <input
                 type="file"
-                accept="application/pdf"
+                accept="application/pdf, image/*"
                 onChange={handleFileChange}
                 className="hidden"
               />
@@ -87,7 +117,7 @@ function UploadMarklistModal({ isOpen, onClose, className, div }) {
 
       {/* Steps Illustration */}
       <h3 className="text-lg font-semibold mb-4 text-center">Steps to Upload Marklist</h3>
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4 sm:gap-0">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4 sm:gap-2">
         
         <div className="flex gap-3 sm:gap-0">
           <div className="flex flex-col items-center text-center">
@@ -138,10 +168,7 @@ function UploadMarklistModal({ isOpen, onClose, className, div }) {
           className={`px-4 py-2 rounded-md text-white ${
             file ? "bg-green-600 hover:bg-green-700" : "bg-gray-400 cursor-not-allowed"
           } transition`}
-          onClick={() => {
-            console.log("Uploading file:", file);
-            // handle upload logic here
-          }}
+          onClick={handleUpload}
         >
           Upload
         </button>

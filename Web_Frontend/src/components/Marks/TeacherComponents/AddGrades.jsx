@@ -46,6 +46,18 @@ function AddGrades({exams}) {
     );
   };
 
+  const handleParsedMarks = (parsedMarks) => {
+    console.log("Parsed Marks:", parsedMarks);
+    console.log("Students:", students);
+    setStudents((prevStudents) =>
+      prevStudents.map((s) => {
+        const found = parsedMarks.find((pm) => pm._id === s.studentId);
+        return found ? { ...s, marksObtained: found.marks } : s;
+      })
+    );
+  };
+
+
   const handleAddClassMarks = async () => {
     if (!totalMarks || !selectedClass || !selectedDiv || !selectedSubject || !selectedExam) {
       toast.error("Please fill in all the required fields.");
@@ -211,7 +223,7 @@ function AddGrades({exams}) {
                       type="number"
                       min="0"
                       max={totalMarks || 100}
-                      value={student.marksObtained}
+                      value={student.marksObtained ?? ""}
                       onChange={(e) =>
                         handleMarksChange(student.studentId, e.target.value)
                       }
@@ -234,6 +246,7 @@ function AddGrades({exams}) {
           onClose={() => setIsModalOpen(false)}
           className={selectedClass}
           div={selectedDiv}
+          onParsedMarks={handleParsedMarks}
         />
       )}
 

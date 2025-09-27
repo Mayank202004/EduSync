@@ -1,4 +1,6 @@
 import axiosInstance from "@/api/axiosInstance";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 /**
  *
@@ -186,6 +188,34 @@ export const exportConsolidatedResult = async () => {
   link.remove();
   // Preview in new tab (instead of download)
   window.open(pdfUrl, "_blank");
+};
+
+/**
+ * @desc Parse marklist template
+ * @param {File} file - Handwritten marks marklist file 
+ * @returns {Promise<Object>} - Promise resolving to parsed data
+ */
+export const parseMarkListTemplate = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file); 
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_MARKS_PARSER_URL}/upload`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    if (response.status !== 200) {
+      toast.error(response.data.error || "Failed to parse marklist");
+    }
+    return response.data;
+  } catch (err) {
+    toast.error(err?.response?.data?.error || "Server error");
+  }
 };
 
 

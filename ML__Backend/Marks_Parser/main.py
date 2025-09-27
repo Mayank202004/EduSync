@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import cv2
 import numpy as np
 from pdf2image import convert_from_path
@@ -8,6 +9,7 @@ import tempfile
 import os
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "http://10.56.247.63:5173"}})
 reader = easyocr.Reader(['en'])
 
 # ----------------------
@@ -84,7 +86,8 @@ def stitch_cropped_pages(cropped_pages):
 # ----------------------
 def extract_data_from_img(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    results = reader.readtext(gray)
+    thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+    results = reader.readtext(thresh)
     
     extracted_data = []
     student_id = full_name = marks = None
