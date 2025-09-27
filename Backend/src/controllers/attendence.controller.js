@@ -636,7 +636,7 @@ const getTopAttendees = async (className = null, div = null, schoolId) => {
                     }
                 },
                 { $sort: { daysPresent: -1 } },
-                { $limit: 6 },
+                { $limit: 4 },
                 {
                     $lookup: {
                         from: "students",
