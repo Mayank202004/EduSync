@@ -23,7 +23,7 @@ function StudentMarks() {
       try {
         setLoading(true);
         const response = await getStudentMarksData();
-        setExams(response.data.gradesData);
+        setExams(response.data.gradesData ?? response.data.marksWithPercentage);
         setAllExamsPublished(response.data.allExamsPublished);
       } catch (err) {
         // handled globally

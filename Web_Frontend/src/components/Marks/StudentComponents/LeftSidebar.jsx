@@ -17,7 +17,7 @@ function LeftSidebar({ exams, activeIndex, setActiveIndex }) {
             <Home size={18} />
             <span>Home</span>
           </li>
-          {exams.map((exam, idx) => (
+          {exams?.map((exam, idx) => (
             <li
               key={exam.examId._id}
               className={`flex items-center space-x-2 p-3 rounded cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900 ${

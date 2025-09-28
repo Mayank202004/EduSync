@@ -47,8 +47,6 @@ function AddGrades({exams}) {
   };
 
   const handleParsedMarks = (parsedMarks) => {
-    console.log("Parsed Marks:", parsedMarks);
-    console.log("Students:", students);
     setStudents((prevStudents) =>
       prevStudents.map((s) => {
         const found = parsedMarks.find((pm) => pm._id === s.studentId);

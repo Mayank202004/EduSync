@@ -16,7 +16,7 @@ function MobileTabs({ exams, activeIndex, setActiveIndex }) {
       </button>
 
       {/* Exams Tabs */}
-      {exams.map((exam, idx) => (
+      {exams?.map((exam, idx) => (
         <button
           key={exam.id || idx}
           onClick={() => setActiveIndex(idx + 1)}

@@ -574,7 +574,7 @@ export const getStudentMarksData = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, marksWithPercentage, "Student marks fetched successfully"));
+    .json(new ApiResponse(200, {marksWithPercentage, allExamsPublished}, "Student marks fetched successfully"));
 });
 
 /**
