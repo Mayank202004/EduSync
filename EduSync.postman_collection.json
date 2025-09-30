@@ -1,0 +1,3290 @@
+{
+	"info": {
+		"_postman_id": "062a1517-bb70-4f4d-9510-8ee162a21992",
+		"name": "EduSync",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37383783",
+		"_collection_link": "https://crimson-robot-971810.postman.co/workspace/EduSync~4ccea696-365b-4cfa-9a74-e76dc382dd91/collection/37383783-062a1517-bb70-4f4d-9510-8ee162a21992?action=share&source=collection_link&creator=37383783"
+	},
+	"item": [
+		{
+			"name": "User Testing",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "fullName",
+									"value": "Mayank Sachin Chougale",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "mayank.chougale@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "mayank",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin@123456",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "teacher",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "mayank",
+									"description": "super admin",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "prakash.jaiswal@gmail.com",
+									"description": "student",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "password",
+									"value": "admin@123456",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "prashant",
+									"description": "class teacher 1B",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "manali",
+									"description": "class teacher 1 A",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "username",
+									"value": "aaryan",
+									"description": "class 1 A student",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "username",
+									"value": "hanmant",
+									"description": "teacher",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "username",
+									"value": "sakshi",
+									"description": "Sports Teacher",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "username",
+									"value": "principalxyz",
+									"description": "School B Super Admin",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "username",
+									"value": "kailash",
+									"description": "student (xyz school)",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "username",
+									"value": "pranali",
+									"description": "(1 B) Student",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"login"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-temp-token",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODhmM2RjNWRmOGMwODliYmQ0OGJhYjIiLCJlbWFpbCI6Inh5ei5wcmluY2lwYWxAZ21haWwuY29tIiwicHVycG9zZSI6IkxPR0lOIiwiaWF0IjoxNzU0ODQ4MTA2LCJleHAiOjE3NTQ4NDg3MDZ9.35T6YB-cyCkZwoR2OvpJHV8sueYWOefoxJvSSatel78",
+								"description": "Paste the temp token generated in login",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "otp",
+									"value": "477118",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/verify-otp",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"verify-otp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/refresh-token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"refresh-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "oldPassword",
+									"value": "mayank@123",
+									"type": "text"
+								},
+								{
+									"key": "newPassword",
+									"value": "admin@123456",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/change-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "mayank",
+									"type": "text"
+								},
+								{
+									"key": "fullName",
+									"value": "Mayank Sachin Chougale",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/update",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Avatar",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/mayan/Pictures/Screenshots/Screenshot 2025-03-26 173112.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/update-avatar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"update-avatar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Student Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/mayan/Downloads/bulk_register_students (Template).xlsx"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/bulk-register-students",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"bulk-register-students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Student by SuperAdmin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "fullName",
+									"value": "Kailash Ramesh Yadav",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "kr.yadav@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "kailash",
+									"type": "text"
+								},
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "div",
+									"value": "A",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "Male",
+									"description": "Optional",
+									"type": "text"
+								},
+								{
+									"key": "dob",
+									"value": "2019-03-04",
+									"description": "Optional",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/register-student",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"register-student"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Teacher by SuperAdmin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullName\":\"Manisha Rajkumar Singhania\",\r\n    \"email\":\"mr.singhania@gmail.com\",\r\n    \"username\":\"manisha\",\r\n    \"position\":\"PGT\",                                                 //Optional\r\n    \"subjects\":[\r\n        {\r\n            \"name\":\"science\",\r\n            \"classes\":[\r\n                {\r\n                    \"class\":\"1\",\r\n                    \"div\":[\"A\"]\r\n                }\r\n            ]\r\n        }\r\n    ],                                                              //Optional\r\n    \"classTeacher\": { \"class\": \"9\", \"div\": \"A\" },                   //Optional\r\n    \"classCoordinator\":null,                                        //Optional\r\n    \"phone\":\"9871276582\",                                           //Optional\r\n    \"address\":\"ABC Street\",                                         //Optional\r\n    \"role\":\"teacher\"                                                //Optional\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/register-teacher",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"register-teacher"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Resource Testing",
+			"item": [
+				{
+					"name": "Create Class",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"className\":\"1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/resource/add-class",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"resource",
+								"add-class"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Classes",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Add Subjects",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "classId",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "subjectName",
+									"value": "Marathi",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/resource/add-subject",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"resource",
+								"add-subject"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Chapter",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"className\":\"1\",\r\n    \"subjectName\":\"English\",\r\n    \"termNumber\":\"1\",\r\n    \"chapterName\":\"Play with Alphabets\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/resource/add-chapter",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"resource",
+								"add-chapter"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Resource",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/resource/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"resource",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Resource/s",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "termNumber",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "subjectName",
+									"value": "English",
+									"type": "text"
+								},
+								{
+									"key": "chapterName",
+									"value": "Play with Alphabets",
+									"type": "text"
+								},
+								{
+									"key": "files",
+									"type": "file",
+									"src": [
+										"/C:/Users/mayan/Pictures/Screenshots/Screenshot 2025-03-26 173112.png",
+										"/C:/Users/mayan/Pictures/Screenshots/Screenshot 2025-03-26 173112.png"
+									]
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/resource/add-resource",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"resource",
+								"add-resource"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Teacher Resources",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/resource/teacher",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"resource",
+								"teacher"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Resource",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/resource/delete-resource",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"resource",
+								"delete-resource"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Student Testing",
+			"item": [
+				{
+					"name": "Add Class Info",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "studId",
+									"value": "67e947769a87551d5c6f89be",
+									"type": "text"
+								},
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "div",
+									"value": "A",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/class-details",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"class-details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Parent Details",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "fatherName",
+									"value": "Abhinav Jaiswal",
+									"type": "text"
+								},
+								{
+									"key": "fatherOccupation",
+									"value": "Business",
+									"type": "text"
+								},
+								{
+									"key": "fatherIncome",
+									"value": "1000000",
+									"type": "text"
+								},
+								{
+									"key": "motherName",
+									"value": "Vamisha Jaiswal",
+									"type": "text"
+								},
+								{
+									"key": "motherOccupation",
+									"value": "Homemaker",
+									"type": "text"
+								},
+								{
+									"key": "motherIncome",
+									"value": "0",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/parent-details",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"parent-details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Parent Contact",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Abhinav jaiswal",
+									"type": "text"
+								},
+								{
+									"key": "relation",
+									"value": "Father",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "9856732345",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/parent-contact",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"parent-contact"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Allergy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "allergy",
+									"value": "Bee Wax",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/allergy",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"allergy"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Student Details",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "address",
+									"value": "Satara",
+									"type": "text"
+								},
+								{
+									"key": "dob",
+									"value": "2004-03-24",
+									"type": "text"
+								},
+								{
+									"key": "bloodGroup",
+									"value": "AB+",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/details",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Physical Details",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "studId",
+									"value": "67e947769a87551d5c6f89be",
+									"type": "text"
+								},
+								{
+									"key": "height",
+									"value": "152",
+									"type": "text"
+								},
+								{
+									"key": "weight",
+									"value": "30",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/physical-details",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"physical-details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Sibling Info",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Pranjal Jaiswal\",\r\n    \"age\":\"16\",\r\n    \"relation\":\"Sister\",\r\n    \"isInSameSchool\":true,\r\n    \"class\":\"10\",\r\n    \"div\":\"A\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/sibling-details",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"sibling-details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/student/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete sibling info",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/sibling-details/68402f6800cf3dd95e30a28d",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"sibling-details",
+								"68402f6800cf3dd95e30a28d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Parent Contact",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Abhinav jaiswal",
+									"type": "text"
+								},
+								{
+									"key": "relation",
+									"value": "Father",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "9856732345",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/parent-contact/67eaca341bc378d7eb0f0d3e",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"parent-contact",
+								"67eaca341bc378d7eb0f0d3e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Allergy",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "allergyName",
+									"value": "test allergy",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/allergy",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"allergy"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unverified Students",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/student/unverified",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"unverified"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Promote Students",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "fullName",
+									"value": "Mayank Sachin Chougale",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "mayank.chougale@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "mayank",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin@123456",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "teacher",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/promote",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"promote"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Shuffle Divisions",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "fullName",
+									"value": "Mayank Sachin Chougale",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "mayank.chougale@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "mayank",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin@123456",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "teacher",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/shuffle",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"shuffle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Manaually Assign Divisions",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"className\": \"1\",\r\n  \"assignments\": [\r\n    { \"_id\": \"67efd5f190ffa8b6b85f94a7\", \"div\": \"A\" },\r\n    { \"_id\": \"6826be85b537dedb3cfba45a\", \"div\": \"A\" },\r\n    { \"_id\": \"67e947769a87551d5c6f89be\", \"div\": \"A\" },\r\n    { \"_id\": \"67efd52c90ffa8b6b85f949b\", \"div\": \"A\" },\r\n    { \"_id\": \"686365f79f4d39d44079fec2\", \"div\": \"A\" }\r\n  ]\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/assign-divisions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"assign-divisions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Students Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/student/see-all/:className",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"see-all",
+								":className"
+							],
+							"variable": [
+								{
+									"key": "className",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Export Student Data",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Teacher testing",
+			"item": [
+				{
+					"name": "Verify Teacher",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/teacher/verify/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"teacher",
+								"verify",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "68637e77c448363aa9438efb",
+									"description": "UserId of teacher"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add/Update Teacher Details",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"Id\": \"67ec111f91fb526812ed3f16\",  // Teacher's ID\r\n  \"position\": \"PGT\",  // Position (e.g., PGT, TGT, etc.)\r\n  \"classTeacher\": {  // Class Teacher details\r\n    \"class\": \"9\",  // Class (e.g., \"9\")\r\n    \"div\": \"A\"  // Division (e.g., \"A\")\r\n  },\r\n  \"classCoordinator\": \"9\",  // Class Coordinator (e.g., class \"9\")\r\n  \"subjects\": [\r\n    {\r\n      \"name\": \"Math\",\r\n      \"classes\": [\r\n        {\r\n          \"class\": \"9\",\r\n          \"div\": [\"A\", \"B\"]  // Multiple divisions in class 9\r\n        },\r\n        {\r\n          \"class\": \"10\",\r\n          \"div\": [\"A\"]  // One division in class 10\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"name\": \"Science\",\r\n      \"classes\": [\r\n        {\r\n          \"class\": \"8\",\r\n          \"div\": \"C\"\r\n        },\r\n        {\r\n          \"class\": \"9\",\r\n          \"div\": \"B\"\r\n        }\r\n      ]\r\n    }\r\n  ],\r\n  \"phone\": \"9898765644\", \r\n  \"address\": \"123 Lamp Street\" \r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/teacher/details",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"teacher",
+								"details"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unverified Teachers",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "fullName",
+									"value": "Mayank Sachin Chougale",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "mayank.chougale@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "mayank",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin@123456",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "teacher",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/teacher/unverified",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"teacher",
+								"unverified"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All teachers",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Attendence Testing",
+			"item": [
+				{
+					"name": "Mark Class Attendence",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"date\": \"2025/03/31\",\r\n  \"absentStudents\": [\"67e947769a87551d5c6f89be\"],\r\n  \"permittedLeaveStudents\": []\r\n  //\"class\": \"1\", \r\n  //\"div\": \"A\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/attendence/mark",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attendence",
+								"mark"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Daily Attendence",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "date",
+									"value": "2025/08/03",
+									"type": "text"
+								},
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "div",
+									"value": "A",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/attendence/daily",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attendence",
+								"daily"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Attendence",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "month",
+									"value": "4",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "year",
+									"value": "2025",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/attendence/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attendence",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Attendance",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "class",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "div",
+									"value": "A",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/attendence/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attendence",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Export Attendence",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "div",
+									"value": "A",
+									"type": "text"
+								},
+								{
+									"key": "month",
+									"value": "4",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "year",
+									"value": "2025",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/attendence/export",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attendence",
+								"export"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get students list",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "div",
+									"value": "A",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/attendence/students",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attendence",
+								"students"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dashboard data",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "div",
+									"value": "A",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/attendence/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attendence",
+								"dashboard"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Admin (Top Level) data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/attendence/admin-dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"attendence",
+								"admin-dashboard"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Admin (Class Level) data",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Fee Structure Testing",
+			"item": [
+				{
+					"name": "Get Class Fee Structure",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "fullName",
+									"value": "Mayank Sachin Chougale",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "mayank.chougale@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "mayank",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin@123456",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "teacher",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/feestructure/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"feestructure",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All fee structures",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "fullName",
+									"value": "Mayank Sachin Chougale",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "mayank.chougale@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "mayank",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin@123456",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "teacher",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/feestructure/all",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"feestructure",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Fee Details",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "amount",
+									"value": "15000",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Term 1",
+									"type": "text"
+								},
+								{
+									"key": "feeType",
+									"value": "Tuition Fee",
+									"type": "text"
+								},
+								{
+									"key": "dueDate",
+									"value": "2025-11-2",
+									"description": "Optional",
+									"type": "text"
+								},
+								{
+									"key": "compulsory",
+									"value": "",
+									"description": "Optional ",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "discount",
+									"value": "",
+									"description": "Optional",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/feestructure/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"feestructure",
+								"add"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Paid Fees Testing",
+			"item": [
+				{
+					"name": "Get my fee status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/fee/myfees",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"fee",
+								"myfees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pay Fee",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "feeType",
+									"value": "Tuition Fee",
+									"type": "text"
+								},
+								{
+									"key": "structureId",
+									"value": "68299233501c1a93bc381814",
+									"description": "term 1 id for class 1 (given here change as per needed)",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "transactionId",
+									"value": "abcd1234",
+									"type": "text"
+								},
+								{
+									"key": "mode",
+									"value": "Online",
+									"type": "text"
+								},
+								{
+									"key": "structureId",
+									"value": "68299233501c1a93bc381810",
+									"description": "id for diary in other section",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "structureId",
+									"value": "68299233501c1a93bc381813",
+									"description": "if for full year fees 1st std",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "amount",
+									"value": "40000",
+									"type": "text"
+								},
+								{
+									"key": "structureId",
+									"value": "68299233501c1a93bc381808",
+									"description": "temr 1 transport fee",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/fee/pay",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"fee",
+								"pay"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Render Fee Receipt",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "transactionId",
+									"value": "abcd1234",
+									"type": "text"
+								},
+								{
+									"key": "feeType",
+									"value": "Tuition Fee",
+									"type": "text"
+								},
+								{
+									"key": "feeId",
+									"value": "68299233501c1a93bc381813",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Term 1",
+									"type": "text"
+								},
+								{
+									"key": "receiptNo",
+									"value": "fadsld867345fs0a9df54",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/fee/receipt",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"fee",
+								"receipt"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Calendar Testing",
+			"item": [
+				{
+					"name": "Get All Events",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/calendar/events",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"calendar",
+								"events"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add new Event",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Summer Vacations",
+									"type": "text"
+								},
+								{
+									"key": "start",
+									"value": "2025-04-22",
+									"type": "text"
+								},
+								{
+									"key": "end",
+									"value": "2025-06-08",
+									"type": "text"
+								},
+								{
+									"key": "eventType",
+									"value": "academic event",
+									"type": "text"
+								},
+								{
+									"key": "endDescription",
+									"value": "End of summer vacations",
+									"description": "Optional",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/calendar/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"calendar",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete event",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Summer Vacations",
+									"type": "text"
+								},
+								{
+									"key": "start",
+									"value": "2025-04-22",
+									"type": "text"
+								},
+								{
+									"key": "end",
+									"value": "2025-06-12",
+									"type": "text"
+								},
+								{
+									"key": "eventType",
+									"value": "academic event",
+									"type": "text"
+								},
+								{
+									"key": "endDescription",
+									"value": "end of summer vacations",
+									"description": "Optional",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/calendar/delete/682aee1bf9939526279ae46e",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"calendar",
+								"delete",
+								"682aee1bf9939526279ae46e"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Class Structure Testing",
+			"item": [
+				{
+					"name": "Add Class",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "className",
+									"value": "6",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/class/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"class",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Class",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "className",
+									"value": "6",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/class",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"class"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Division",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "div",
+									"value": "B",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/class/add-div",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"class",
+								"add-div"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Division",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "div",
+									"value": "C",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/class/div",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"class",
+								"div"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Classes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/class/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"class",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard Testing",
+			"item": [
+				{
+					"name": "Get Student Dashboard Data",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "fullName",
+									"value": "Mayank Sachin Chougale",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "mayank.chougale@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "mayank",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin@123456",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "teacher",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/student",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard",
+								"student"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Teacher dashboard data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/teacher",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard",
+								"teacher"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Super Admin Dashboard Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/super-admin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard",
+								"super-admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Perform Selective Cleanup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": " attendance",
+									"value": "false",
+									"type": "text"
+								},
+								{
+									"key": "feeStatus",
+									"value": "false",
+									"type": "text"
+								},
+								{
+									"key": "messages",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "tickets",
+									"value": "false",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/dashboard/cleanup",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"dashboard",
+								"cleanup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Manage Academic Year Data",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Chat Testing",
+			"item": [
+				{
+					"name": "Get Messages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/chat/6851a6175bfdedd20723e695",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"6851a6175bfdedd20723e695"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Chat details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/chat/personal/:id1/:id2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"personal",
+								":id1",
+								":id2"
+							],
+							"variable": [
+								{
+									"key": "id1",
+									"value": ""
+								},
+								{
+									"key": "id2",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "FAQ Testing",
+			"item": [
+				{
+					"name": "Add new FAQ",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "category",
+									"value": "fee",
+									"type": "text"
+								},
+								{
+									"key": "question",
+									"value": "How can I download the fee receipt?",
+									"type": "text"
+								},
+								{
+									"key": "answer",
+									"value": "Once the fee is paid and processed succesfully you can download the fee receipt by going to paid fees section and clicking the download icon",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/faq/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"faq",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all FAQ's",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{baseUrl}}/faq/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"faq",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get FAQ by category",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "fullName",
+									"value": "Mayank Sachin Chougale",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "mayank.chougale@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "mayank",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin@123456",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "teacher",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/faq/category/fee",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"faq",
+								"category",
+								"fee"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ticket Testing",
+			"item": [
+				{
+					"name": "Create Ticket",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "title",
+									"value": "Fee amount in fee booklet does not match fee amount",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Fee amount in fee booklet does not match fee amount for term 1 class 2 academic fee.",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "Fee",
+									"type": "text"
+								},
+								{
+									"key": "subCategory",
+									"value": "Fee Amount",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/ticket/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ticket",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get open tickets",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/ticket/open",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ticket",
+								"open"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Closed Tickets",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/ticket/closed",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"ticket",
+								"closed"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Settings Testing",
+			"item": [
+				{
+					"name": "Set Academic Year",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "academicYear",
+									"value": "2024-2025",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/setting/academic-year",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"setting",
+								"academic-year"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Academic Year",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/setting/academic-year",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"setting",
+								"academic-year"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set School Name",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "schoolName",
+									"value": "ABC International School",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/setting/school-name",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"setting",
+								"school-name"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get School name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/setting/school-name",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"setting",
+								"school-name"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "School Testing",
+			"item": [
+				{
+					"name": "Create new School",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "ABC School",
+									"type": "text"
+								},
+								{
+									"key": "slug",
+									"value": "abc",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Kolhapur",
+									"type": "text"
+								},
+								{
+									"key": "logo",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/school/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"school",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete School",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/school/688edc92f1606c2e57851d9a",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"school",
+								"688edc92f1606c2e57851d9a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update School",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "slug",
+									"value": "abc",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "logo",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/school/:schoolId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"school",
+								":schoolId"
+							],
+							"variable": [
+								{
+									"key": "schoolId",
+									"value": "688edc65e71c6b23995df44f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Schools",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/school/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"school",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get School by slug",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "slug",
+									"value": "abc",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "logo",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/school/:slug",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"school",
+								":slug"
+							],
+							"variable": [
+								{
+									"key": "slug",
+									"value": "abc"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Marks Testing",
+			"item": [
+				{
+					"name": "Get Class MarkList Template",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "div",
+									"value": "A",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/marks/class-marklist-template",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"marks",
+								"class-marklist-template"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student Marks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/marks/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"marks",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Teacher Marks Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/marks/teacher-data",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"marks",
+								"teacher-data"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Class Marks",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"examId\":\"68c5bd0e990753a21efd7c57\",\r\n    \"subject\":\"English\",\r\n    \"className\":\"1\",\r\n    \"div\":\"B\",\r\n    \"students\":[\r\n        {\"fullName\":\"Brijesh Singh\",\"studentId\":\"686365f79f4d39d44079fec2\",\"marksObtained\":\"33\"},\r\n        {\"fullName\":\"Pranali Sanjay Wagh\",\"studentId\":\"6826be85b537dedb3cfba45a\",\"marksObtained\":\"35\"}\r\n    ],\r\n    \"totalMarks\":\"40\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/marks/add-class-marks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"marks",
+								"add-class-marks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Class Marks",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"examId\":\"68c5bd0e990753a21efd7c57\",\r\n    \"subject\":\"English\",\r\n    \"className\":\"1\",\r\n    \"div\":\"B\",\r\n    \"students\":[\r\n        {\"fullName\":\"Brijesh Singh\",\"studentId\":\"686365f79f4d39d44079fec2\",\"marksObtained\":\"33\"},\r\n        {\"fullName\":\"Pranali Sanjay Wagh\",\"studentId\":\"6826be85b537dedb3cfba45a\",\"marksObtained\":\"35\"}\r\n    ],\r\n    \"totalMarks\":\"40\"\r\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/marks/update-class-marks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"marks",
+								"update-class-marks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Class Marks Data",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "div",
+									"value": "A",
+									"type": "text"
+								},
+								{
+									"key": "examId",
+									"value": "68c5bd0e990753a21efd7c57",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/marks/class-marks-data",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"marks",
+								"class-marks-data"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Initial SuperAdmin Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/marks/superadmin-data",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"marks",
+								"superadmin-data"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student Marks Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/marks/student-data",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"marks",
+								"student-data"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Publish Exam Result",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "examId",
+									"value": "68c5bd0e990753a21efd7c57",
+									"type": "text"
+								},
+								{
+									"key": "className",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "div",
+									"value": "B",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/marks/toggle-publish-exam-result",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"marks",
+								"toggle-publish-exam-result"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Render Exam Marksheet",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{baseUrl}}/marks/render-exam-marksheet",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"marks",
+								"render-exam-marksheet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Render Consolidated Marksheet",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Parse Marks from PDF template",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/mayan/Downloads/marks-class-1-A-term-1.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{marksParser}}/upload",
+							"host": [
+								"{{marksParser}}"
+							],
+							"path": [
+								"upload"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Exam Testing",
+			"item": [
+				{
+					"name": "Add Exam",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "examName",
+									"value": "Term 3",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/exams/add",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"exams",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Exams",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/exams",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"exams"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Exam",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/exams/:examId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"exams",
+								":examId"
+							],
+							"variable": [
+								{
+									"key": "examId",
+									"value": "",
+									"description": "Ender Exam _Id to delete"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
